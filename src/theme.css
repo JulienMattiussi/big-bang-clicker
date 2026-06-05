@@ -1,0 +1,74 @@
+/*
+ * Thèmes du jeu. UN thème par palier d'UI (data-tier) : changer l'attribut
+ * data-tier sur un conteneur re-thématise toute l'interface en dessous, via
+ * les variables CSS.
+ *
+ * Règle : les composants utilisent UNIQUEMENT les jetons sémantiques exposés à
+ * Tailwind (bg-bg, bg-surface, text-fg, text-muted, text-accent, border-border,
+ * text-octarine...). Jamais de couleur en dur ni de règle CSS locale répétée.
+ * Voir docs/UI-UX.md sections 0 et 4.
+ */
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-border: var(--border);
+  --color-octarine: var(--octarine);
+}
+
+/* Thème par défaut = palier COSMOS. */
+:root,
+[data-tier='cosmos'] {
+  --bg: #0b1026;
+  --surface: #141b33;
+  --fg: #e8ecff;
+  --muted: #9aa3c7;
+  --accent: #f59e0b;
+  --border: #26304f;
+  /* Octarine : la huitième couleur (clin d'oeil Disque-monde), réservée aux
+     éléments rares/magiques. Définie ici, héritée par tous les paliers. */
+  --octarine: #b026ff;
+}
+
+/* Palier VIVANT : organique, verts chauds. */
+[data-tier='vivant'] {
+  --bg: #0a1410;
+  --surface: #122019;
+  --fg: #e7f5ea;
+  --muted: #8fb2a0;
+  --accent: #34d399;
+  --border: #1e3327;
+}
+
+/* Palier CIVILISATION : terre, ocre. */
+[data-tier='civilisation'] {
+  --bg: #161208;
+  --surface: #221b0e;
+  --fg: #f3ecdc;
+  --muted: #c2b48f;
+  --accent: #d97706;
+  --border: #3a2f16;
+}
+
+/* Palier SPATIAL : froid, acier et indigo. */
+[data-tier='spatial'] {
+  --bg: #070b18;
+  --surface: #0f1630;
+  --fg: #e3e9ff;
+  --muted: #93a0c9;
+  --accent: #818cf8;
+  --border: #1d2747;
+}
+
+/* Palier TRANSCENDANCE : presque noir, lueur magenta. */
+[data-tier='transcendance'] {
+  --bg: #07040d;
+  --surface: #120a1e;
+  --fg: #f5e9ff;
+  --muted: #b89cc9;
+  --accent: #f472b6;
+  --border: #2a1840;
+}
