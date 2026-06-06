@@ -3,7 +3,7 @@ import type { Locale } from '@/i18n/types'
 
 const LOCALES: Locale[] = ['fr', 'en']
 
-/** Sélecteur de langue (FR / EN). */
+/** Language switch (FR / EN). */
 export function LanguageSwitch() {
   const { t, locale, setLocale } = useTranslation()
   return (

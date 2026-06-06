@@ -7,7 +7,7 @@ function App() {
   useTick()
   const { locale } = useTranslation()
 
-  // Reflète la langue courante sur <html lang> (prononciation des lecteurs d'écran).
+  // Reflects the current language on <html lang> (screen-reader pronunciation).
   useEffect(() => {
     document.documentElement.lang = locale
   }, [locale])

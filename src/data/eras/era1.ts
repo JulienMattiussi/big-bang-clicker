@@ -1,14 +1,14 @@
 import type { ConverterDef, EraDef, GeneratorDef, ResourceDef } from '@/lib/types'
 
 /**
- * Ère 1 - Recombinaison. Les électrons se lient aux nucléons (produits par
- * l'ère 0, qui doit donc continuer de tourner) pour former les premiers atomes
- * d'hydrogène. Démontre la cohabitation et le chaînage inter-ères.
+ * Era 1 - Recombination. Electrons bind to nucleons (produced by era 0, which
+ * must keep running) to form the first hydrogen atoms. Demonstrates cohabitation
+ * and cross-era chaining.
  */
 
 export const era1Resources: ResourceDef[] = [
   { id: 'electron', eraId: 'e1', nameKey: 'res.electron', icon: 'zap', tier: 1, isBase: true },
-  { id: 'hydrogene', eraId: 'e1', nameKey: 'res.hydrogene', icon: 'atom', tier: 2 },
+  { id: 'hydrogen', eraId: 'e1', nameKey: 'res.hydrogen', icon: 'atom', tier: 2 },
 ]
 
 export const era1Generators: GeneratorDef[] = [
@@ -18,23 +18,23 @@ export const era1Generators: GeneratorDef[] = [
     nameKey: 'gen.capture',
     output: 'electron',
     baseRate: 1,
-    // Niveau 1 atteignable après 100 clics (chaque clic = +1 électron).
+    // Level 1 reachable after 100 clicks (each click = +1 electron).
     cost: [{ resource: 'electron', base: 100, growth: 1.13 }],
   },
 ]
 
 export const era1Converters: ConverterDef[] = [
   {
-    id: 'recombinaison',
+    id: 'recombination',
     eraId: 'e1',
-    nameKey: 'conv.recombinaison',
+    nameKey: 'conv.recombination',
     inputs: [
       { resource: 'nucleon', amount: 1 },
       { resource: 'electron', amount: 1 },
     ],
-    outputs: [{ resource: 'hydrogene', amount: 1 }],
+    outputs: [{ resource: 'hydrogen', amount: 1 }],
     baseRate: 0.5,
-    // Après la capture : on automatise d'abord les électrons, puis la recombinaison.
+    // After capture: automate electrons first, then recombination.
     cost: [{ resource: 'electron', base: 250, growth: 1.15 }],
   },
 ]
@@ -51,10 +51,10 @@ export const era1: EraDef = {
   icon: 'orbit',
   uiTier: 'cosmos',
   widget: 'bohr',
-  unlock: { complexity: 50 },
-  resources: ['electron', 'hydrogene'],
+  unlock: { complexity: 30 },
+  resources: ['electron', 'hydrogen'],
   generators: ['capture'],
-  converters: ['recombinaison'],
+  converters: ['recombination'],
   upgrades: [],
   crises: [],
 }

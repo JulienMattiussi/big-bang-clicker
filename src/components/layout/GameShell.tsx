@@ -7,13 +7,15 @@ import { PurchasePanel } from '@/components/game/PurchasePanel'
 import { ComplexityBadge } from '@/components/game/ComplexityBadge'
 import { NextGoal } from '@/components/game/NextGoal'
 import { EraIcon } from '@/components/game/EraIcon'
+import { PrestigeBanner } from '@/components/game/PrestigeBanner'
+import { CrisisBanner } from '@/components/game/CrisisBanner'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 
 /**
- * Coquille de jeu : applique le thème du palier de l'ère active (data-tier),
- * affiche l'en-tête (ère, accroche, Complexité, langue) et les trois panneaux.
+ * Game shell: applies the active era's tier theme (data-tier), shows the header
+ * (era, tagline, Complexity, language) and the three panels.
  */
 export function GameShell() {
   const { t } = useTranslation()
@@ -27,8 +29,8 @@ export function GameShell() {
       data-tier={era.uiTier}
       className="mx-auto flex min-h-full max-w-5xl flex-col gap-6 bg-bg p-6 text-fg"
     >
-      {/* Barre du haut : objectif central (Complexité + palier, centré en ligne) ;
-          langue et options à droite. */}
+      {/* Top bar: central objective (Complexity + milestone, centered inline);
+          language and options on the right. */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1" />
         <div className="flex items-center gap-4">
@@ -48,7 +50,7 @@ export function GameShell() {
             <h1 className="text-3xl font-bold tracking-tight">
               {t(era.nameKey as TranslationKey)}
             </h1>
-            {/* Hauteur réservée (2 lignes) : changer de langue ne décale pas la suite. */}
+            {/* Reserved height (2 lines): switching language doesn't shift the rest. */}
             <p className="mt-1 min-h-12 max-w-prose leading-snug text-muted italic">
               {t(era.accrocheKey as TranslationKey)}
             </p>
@@ -56,6 +58,9 @@ export function GameShell() {
         </div>
         <EraTabs />
       </header>
+
+      <CrisisBanner />
+      <PrestigeBanner />
 
       <section className="grid gap-4 md:grid-cols-3">
         <ResourcePanel era={era} />

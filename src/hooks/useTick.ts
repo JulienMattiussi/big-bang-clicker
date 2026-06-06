@@ -1,14 +1,14 @@
 import { useEffect, useRef } from 'react'
 import { useGameStore } from '@/store/gameStore'
 
-/** Cadence du moteur (ms). Découplée de la cadence d'affichage. */
+/** Engine tick rate (ms). Decoupled from the render rate. */
 const TICK_MS = 100
-/** Intervalle d'autosauvegarde (ms). */
+/** Autosave interval (ms). */
 const SAVE_MS = 10_000
 
 /**
- * Boucle de jeu : avance le moteur à intervalle régulier (dt mesuré à
- * l'horloge) et autosauvegarde périodiquement. À appeler une fois dans App.
+ * Game loop: advances the engine at a fixed interval (dt measured from the
+ * clock) and autosaves periodically. Call once in App.
  */
 export function useTick(): void {
   const last = useRef(0)

@@ -6,7 +6,7 @@ interface PanelProps {
   className?: string
 }
 
-/** Conteneur de panneau (surface + bordure + rayon), avec titre optionnel. */
+/** Panel container (surface + border + radius), with an optional title. */
 export function Panel({ title, children, className = '' }: PanelProps) {
   return (
     <section className={`rounded-lg border border-border bg-surface p-4 ${className}`}>

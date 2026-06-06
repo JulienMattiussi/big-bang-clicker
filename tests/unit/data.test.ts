@@ -29,4 +29,21 @@ describe('intégrité des données', () => {
   it('le graphe de ressources est acyclique', () => {
     expect(topologicalOrder(defs).hasCycle).toBe(false)
   })
+
+  it('les crises référencent des entités existantes', () => {
+    for (const crisis of Object.values(defs.crises)) {
+      expect(defs.eras.some((e) => e.id === crisis.eraId)).toBe(true)
+      if (crisis.risk.sourceResource) {
+        expect(defs.resources[crisis.risk.sourceResource]).toBeDefined()
+      }
+      for (const effect of [...crisis.regression, ...crisis.rebound]) {
+        if (effect.type === 'resetResource' || effect.type === 'grantResource') {
+          expect(defs.resources[effect.target ?? '']).toBeDefined()
+        }
+        if (effect.type === 'multiplier' && effect.target !== 'global') {
+          expect(defs.resources[effect.target ?? '']).toBeDefined()
+        }
+      }
+    }
+  })
 })

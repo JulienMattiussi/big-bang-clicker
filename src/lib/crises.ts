@@ -1,15 +1,15 @@
 /**
- * Crises (régressions) : montée du risque, déclenchement, application des
- * effets de régression puis de rebond. Voir docs/GAME-DESIGN.md section 6 et
- * docs/ARCHITECTURE.md section 7.
+ * Crises (regressions): risk build-up, trigger, and applying regression then
+ * rebound effects. See docs/GAME-DESIGN.md section 6 and docs/ARCHITECTURE.md
+ * section 7.
  */
 
 import type { CrisisId, Effect, GameDefs, GameState } from './types'
 
-/** Vitesse de montée du risque (par unité de ressource-source et par seconde). */
+/** Risk build-up rate (per unit of source resource and per second). */
 export const RISK_RATE = 1
 
-/** Applique un effet (de crise ou d'upgrade) à l'état, de façon pure. */
+/** Applies a single effect (from a crisis or upgrade) to the state, purely. */
 export function applyEffect(state: GameState, effect: Effect): GameState {
   const target = effect.target
   switch (effect.type) {
@@ -67,7 +67,7 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
       if (!target || state.unlockedEras.includes(target)) return state
       return { ...state, unlockedEras: [...state.unlockedEras, target] }
     default:
-      // flatBonus et autres : non gérés pour l'instant (no-op).
+      // flatBonus and others: not handled yet (no-op).
       return state
   }
 }
@@ -76,7 +76,7 @@ export function applyEffects(state: GameState, effects: Effect[]): GameState {
   return effects.reduce((acc, effect) => applyEffect(acc, effect), state)
 }
 
-/** Fait monter les jauges de risque des crises non résolues. */
+/** Raises the risk gauge of unresolved crises. */
 export function updateRisk(state: GameState, defs: GameDefs, dt: number): GameState {
   if (dt <= 0) return state
   let changed = false
@@ -106,7 +106,7 @@ export function readyCrises(state: GameState, defs: GameDefs): CrisisId[] {
   return Object.keys(defs.crises).filter((id) => isCrisisReady(state, defs, id))
 }
 
-/** Résout une crise : régression puis rebond, marque résolue, remet le risque à 0. */
+/** Resolves a crisis: regression then rebound, marks resolved, resets risk to 0. */
 export function resolveCrisis(state: GameState, defs: GameDefs, id: CrisisId): GameState {
   const def = defs.crises[id]
   if (!def) return state

@@ -1,12 +1,12 @@
 /*
- * Thèmes du jeu. UN thème par palier d'UI (data-tier) : changer l'attribut
- * data-tier sur un conteneur re-thématise toute l'interface en dessous, via
- * les variables CSS.
+ * Game themes. ONE theme per UI tier (data-tier): changing the data-tier
+ * attribute on a container re-themes the whole interface below it, via CSS
+ * variables.
  *
- * Règle : les composants utilisent UNIQUEMENT les jetons sémantiques exposés à
- * Tailwind (bg-bg, bg-surface, text-fg, text-muted, text-accent, border-border,
- * text-octarine...). Jamais de couleur en dur ni de règle CSS locale répétée.
- * Voir docs/UI-UX.md sections 0 et 4.
+ * Rule: components use ONLY the semantic tokens exposed to Tailwind (bg-bg,
+ * bg-surface, text-fg, text-muted, text-accent, border-border, text-octarine...).
+ * Never a hardcoded color nor a repeated local CSS rule. See docs/UI-UX.md
+ * sections 0 and 4.
  */
 
 @theme inline {
@@ -22,7 +22,7 @@
   --color-octarine: var(--octarine);
 }
 
-/* Thème par défaut = palier COSMOS. */
+/* Default theme = COSMOS tier. */
 :root,
 [data-tier='cosmos'] {
   --bg: #0b1026;
@@ -32,17 +32,17 @@
   --accent: #f59e0b;
   --secondary: #38bdf8;
   --border: #26304f;
-  /* Octarine : la huitième couleur (clin d'oeil Disque-monde), réservée aux
-     éléments rares/magiques. Définie ici, héritée par tous les paliers. */
+  /* Octarine: the eighth color (Discworld wink), reserved for rare/magical
+     elements. Defined here, inherited by all tiers. */
   --octarine: #b026ff;
-  /* Couleurs dédiées aux icônes d'ère (duotone), distinctes de l'accent et du
-     secondaire. Identité constante d'un palier à l'autre. */
+  /* Dedicated era-icon colors (duotone), distinct from accent and secondary.
+     Constant identity from one tier to the next. */
   --era: #f472b6;
   --era-2: #2dd4bf;
 }
 
-/* Palier VIVANT : organique, verts chauds. */
-[data-tier='vivant'] {
+/* LIFE tier: organic, warm greens. */
+[data-tier='life'] {
   --bg: #0a1410;
   --surface: #122019;
   --fg: #e7f5ea;
@@ -52,8 +52,8 @@
   --border: #1e3327;
 }
 
-/* Palier CIVILISATION : terre, ocre. */
-[data-tier='civilisation'] {
+/* CIVILIZATION tier: earth, ochre. */
+[data-tier='civilization'] {
   --bg: #161208;
   --surface: #221b0e;
   --fg: #f3ecdc;
@@ -63,8 +63,8 @@
   --border: #3a2f16;
 }
 
-/* Palier SPATIAL : froid, acier et indigo. */
-[data-tier='spatial'] {
+/* SPACE tier: cold, steel and indigo. */
+[data-tier='space'] {
   --bg: #070b18;
   --surface: #0f1630;
   --fg: #e3e9ff;
@@ -74,8 +74,8 @@
   --border: #1d2747;
 }
 
-/* Palier TRANSCENDANCE : presque noir, lueur magenta. */
-[data-tier='transcendance'] {
+/* TRANSCENDENCE tier: near-black, magenta glow. */
+[data-tier='transcendence'] {
   --bg: #07040d;
   --surface: #120a1e;
   --fg: #f5e9ff;

@@ -2,8 +2,8 @@
 @import './theme.css';
 
 /*
- * Tailwind v4 ne met plus cursor:pointer sur les boutons par défaut.
- * Règle de base centralisée pour tous les éléments cliquables actifs.
+ * Tailwind v4 no longer sets cursor:pointer on buttons by default.
+ * Centralized base rule for all active clickable elements.
  */
 @layer base {
   button:not(:disabled),
@@ -13,7 +13,7 @@
   }
 }
 
-/* Retour visuel flottant au clic (le "+1" qui monte et s'estompe). */
+/* Floating click feedback (the "+1" that rises and fades). */
 @keyframes float-up {
   from {
     opacity: 1;
@@ -34,7 +34,7 @@
   }
 }
 
-/* Lueur "qui respire" du badge de Complexité (objectif majeur). */
+/* "Breathing" glow of the Complexity badge (major objective). */
 @keyframes glow-pulse {
   0%,
   100% {
@@ -53,6 +53,38 @@
   }
 }
 
+/* Era widget animations (central scene). */
+@keyframes widget-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes widget-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+.widget-spin {
+  animation: widget-spin 24s linear infinite;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+.widget-pulse {
+  animation: widget-pulse 4s ease-in-out infinite;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .widget-spin,
+  .widget-pulse {
+    animation: none;
+  }
+}
+
 html,
 body,
 #root {
@@ -61,7 +93,7 @@ body,
 
 body {
   margin: 0;
-  /* Fallback avant montage React ; l'UI re-thématise ensuite via data-tier. */
+  /* Fallback before React mounts; the UI re-themes afterwards via data-tier. */
   background: var(--bg);
   color: var(--fg);
   font-family:

@@ -8,9 +8,9 @@ const TAB_BASE =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
 /**
- * Navigation entre ères DÉBLOQUÉES uniquement (cohabitation). Style de "chip"
- * distinct du bouton de verbe : l'onglet actif est un contour accent (non
- * cliquable), pas un bouton plein. Aucune ère future n'est affichée (anti-spoiler).
+ * Navigation across UNLOCKED eras only (cohabitation). "Chip" style distinct
+ * from the verb button: the active tab is an accent outline (non-clickable),
+ * not a filled button. No future era is shown (anti-spoiler).
  */
 export function EraTabs() {
   const { t } = useTranslation()

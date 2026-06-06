@@ -3,7 +3,7 @@ import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { formatFixed } from '@/lib/format'
 
-/** Badge mis en avant de la Complexité : l'objectif majeur du jeu (octarine). */
+/** Highlighted Complexity badge: the game's major objective (octarine). */
 export function ComplexityBadge() {
   const { t } = useTranslation()
   const complexity = useGameStore((s) => s.state.complexity)

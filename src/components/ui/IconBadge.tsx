@@ -9,9 +9,9 @@ const KINDS: Record<Kind, string> = {
 }
 
 /**
- * Pastille d'icône d'une ressource ou d'une machine. Code couleur : machines en
- * couleur d'accent (l'orange évoque l'action qu'on déclenche), ressources en
- * couleur secondaire.
+ * Icon badge for a resource or a machine. Color code: machines in the accent
+ * color (orange suggests the action you trigger), resources in the secondary
+ * color.
  */
 export function IconBadge({ icon, kind = 'resource' }: { icon: string; kind?: Kind }) {
   return (

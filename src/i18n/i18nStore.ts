@@ -3,13 +3,13 @@ import type { Locale } from './types'
 
 const STORAGE_KEY = 'big-bang-clicker:locale'
 
-/** FR par défaut ; EN seulement si explicitement choisi ou navigateur anglais. */
+/** FR by default; EN only if explicitly chosen or the browser is English. */
 function detectLocale(): Locale {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved === 'fr' || saved === 'en') return saved
   } catch {
-    // Stockage indisponible : on ignore.
+    // Storage unavailable: ignore.
   }
   if (typeof navigator !== 'undefined' && navigator.language.startsWith('en')) return 'en'
   return 'fr'
@@ -26,7 +26,7 @@ export const useI18nStore = create<I18nStore>((set) => ({
     try {
       localStorage.setItem(STORAGE_KEY, locale)
     } catch {
-      // Stockage indisponible : on ignore.
+      // Storage unavailable: ignore.
     }
     set({ locale })
   },

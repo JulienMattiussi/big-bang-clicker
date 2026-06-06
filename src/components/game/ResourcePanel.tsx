@@ -7,7 +7,7 @@ import { formatFixed } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
 
-/** Liste les ressources de l'ère active : icône, nom, quantité + flux net. */
+/** Lists the active era's resources: icon, name, amount + net flow. */
 export function ResourcePanel({ era }: { era: EraDef }) {
   const { t } = useTranslation()
   const state = useGameStore((s) => s.state)

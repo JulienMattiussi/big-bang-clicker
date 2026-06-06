@@ -16,7 +16,7 @@ describe('GameShell', () => {
     const user = userEvent.setup()
     render(<GameShell />)
     await user.click(screen.getByRole('button', { name: 'Refroidir' }))
-    expect(useGameStore.getState().state.resources.particule).toBe(1)
+    expect(useGameStore.getState().state.resources.particle).toBe(1)
   })
 
   it("n'affiche pas d'onglet pour une ère non débloquée (anti-spoiler)", () => {

@@ -4,10 +4,10 @@ import { useTranslation } from '@/i18n/useTranslation'
 import { formatFixed, formatNumber } from '@/lib/format'
 
 /**
- * Progression vers le prochain palier (déblocage de l'ère suivante). Anti-spoiler :
- * on montre le seuil à atteindre, jamais ce qu'il débloque.
- * - Palier en Complexité : toujours affiché (objectif central, en octarine).
- * - Palier en ressource : affiché une fois la ressource découverte (produite).
+ * Progress toward the next milestone (unlocking the next era). Anti-spoiler:
+ * shows the threshold to reach, never what it unlocks.
+ * - Complexity milestone: always shown (central objective, in octarine).
+ * - Resource milestone: shown once the resource is discovered (produced).
  */
 export function NextGoal() {
   const { t } = useTranslation()
@@ -28,7 +28,7 @@ export function NextGoal() {
   const target = byComplexity ? (next.unlock.complexity ?? 0) : (next.unlock.amount ?? 0)
   if (target <= 0) return null
 
-  // Palier ressource : rien tant que la ressource n'est pas découverte.
+  // Resource milestone: nothing until the resource is discovered.
   if (!byComplexity && current <= 0) return null
 
   const icon = byComplexity ? 'gem' : resourceId ? defs.resources[resourceId].icon : 'gem'

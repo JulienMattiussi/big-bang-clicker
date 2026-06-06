@@ -1,17 +1,17 @@
 /**
- * Moteur de jeu : fonctions PURES (zéro React, zéro effet de bord). Tout est
- * testable et déterministe (le `dt` est fourni, jamais lu sur l'horloge).
- * Voir docs/ARCHITECTURE.md section 5.
+ * Game engine: PURE functions (no React, no side effects). Everything is
+ * testable and deterministic (`dt` is provided, never read from the clock).
+ * See docs/ARCHITECTURE.md section 5.
  */
 
 import type { ConverterId, CostCurve, GameDefs, GameState, GeneratorId, ResourceId } from './types'
 
-/** Coût géométrique du passage au niveau suivant (niveau 0-indexé). */
+/** Geometric cost of the next level (0-indexed level). */
 export function costAtLevel(curve: CostCurve, level: number): number {
   return curve.base * curve.growth ** level
 }
 
-/** Coût (multi-ressources) pour passer de `level` à `level + 1`. */
+/** Cost (multi-resource) to go from `level` to `level + 1`. */
 export function nextCost(cost: CostCurve[], level: number): Record<ResourceId, number> {
   const total: Record<ResourceId, number> = {}
   for (const curve of cost) {
@@ -41,12 +41,16 @@ function spend(
   return next
 }
 
-/** Multiplicateur de production d'une ressource (spécifique x global). */
+/** Production multiplier for a resource (specific x global x prestige meta). */
 function resourceMultiplier(state: GameState, resource: ResourceId): number {
-  return (state.multipliers[resource] ?? 1) * (state.multipliers.global ?? 1)
+  return (
+    (state.multipliers[resource] ?? 1) *
+    (state.multipliers.global ?? 1) *
+    (state.multipliers.meta ?? 1)
+  )
 }
 
-/** Clic manuel : ajoute une quantité à une ressource (le "verbe" de l'ère). */
+/** Manual click: adds an amount to a resource (the era's "verb"). */
 export function applyClick(state: GameState, resource: ResourceId, amount = 1): GameState {
   return {
     ...state,
@@ -54,7 +58,7 @@ export function applyClick(state: GameState, resource: ResourceId, amount = 1): 
   }
 }
 
-/** Achète un niveau de générateur si abordable, sinon renvoie null. */
+/** Buys one generator level if affordable, otherwise returns null. */
 export function buyGenerator(state: GameState, defs: GameDefs, id: GeneratorId): GameState | null {
   const gen = defs.generators[id]
   if (!gen) return null
@@ -68,7 +72,7 @@ export function buyGenerator(state: GameState, defs: GameDefs, id: GeneratorId):
   }
 }
 
-/** Achète un niveau de convertisseur si abordable, sinon renvoie null. */
+/** Buys one converter level if affordable, otherwise returns null. */
 export function buyConverter(state: GameState, defs: GameDefs, id: ConverterId): GameState | null {
   const conv = defs.converters[id]
   if (!conv) return null
@@ -87,8 +91,8 @@ export function buyConverter(state: GameState, defs: GameDefs, id: ConverterId):
 }
 
 /**
- * Débloque les ères dont la condition (`unlock`) est remplie. Une ère sans
- * condition n'est jamais auto-débloquée ici (l'ère de départ l'est à l'init).
+ * Unlocks eras whose `unlock` condition is met. An era without a condition is
+ * never auto-unlocked here (the starting era is unlocked at init).
  */
 export function unlockEras(state: GameState, defs: GameDefs): GameState {
   let unlocked = state.unlockedEras
@@ -111,10 +115,10 @@ export function unlockEras(state: GameState, defs: GameDefs): GameState {
 }
 
 /**
- * Avance l'état d'un pas de temps `dt` (en secondes) :
- * 1. production des générateurs ;
- * 2. conversions (limitées par les entrées disponibles, jamais de blocage dur) ;
- * 3. gain de Complexité, pondéré par la profondeur (tier) des sorties.
+ * Advances the state by one time step `dt` (in seconds):
+ * 1. generator production;
+ * 2. conversions (bounded by available inputs, never a hard block);
+ * 3. Complexity gain, weighted by the depth (tier) of the outputs.
  */
 export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
   if (dt <= 0) return state
@@ -122,7 +126,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
   const resources = { ...state.resources }
   let gained = 0
 
-  // 1. Générateurs : production directe.
+  // 1. Generators: direct production.
   for (const id in state.generators) {
     const level = state.generators[id].level
     if (level <= 0) continue
@@ -133,7 +137,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
       level * gen.baseRate * dt * resourceMultiplier(state, gen.output)
   }
 
-  // 2. Convertisseurs : combinaison, bornée par les entrées disponibles.
+  // 2. Converters: combination, bounded by available inputs.
   for (const id in state.converters) {
     const cState = state.converters[id]
     if (!cState.enabled || cState.level <= 0) continue

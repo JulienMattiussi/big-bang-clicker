@@ -1,17 +1,21 @@
 import { useRef, useState } from 'react'
-import { Button } from '@/components/ui/Button'
-import { EraIcon } from '@/components/game/EraIcon'
+import { EraWidget } from '@/components/game/widgets/EraWidget'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
 
-/** Zone de clic : exécute le "verbe" de l'ère et affiche un retour flottant. */
+/**
+ * Central scene: the era's iconic widget is the click area (the "verb").
+ * Shows a floating "+1" feedback on each click.
+ */
 export function ClickArea({ era }: { era: EraDef }) {
   const { t } = useTranslation()
   const click = useGameStore((s) => s.click)
   const [pops, setPops] = useState<number[]>([])
   const nextId = useRef(0)
+
+  const verb = t(era.verbKey as TranslationKey)
 
   const handleClick = () => {
     click(era.clickResource)
@@ -22,17 +26,21 @@ export function ClickArea({ era }: { era: EraDef }) {
   const removePop = (id: number) => setPops((current) => current.filter((p) => p !== id))
 
   return (
-    <div className="relative inline-flex">
-      <Button
-        className="min-w-60 px-8 py-6 text-lg whitespace-nowrap shadow-lg"
+    <div className="relative flex flex-col items-center gap-3">
+      <button
+        type="button"
+        aria-label={verb}
         onClick={handleClick}
+        className="group rounded-full p-3 transition select-none hover:bg-surface/50 focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 active:scale-95"
       >
-        <span className="flex items-center justify-center gap-2">
-          <EraIcon icon={era.icon} onAccent className="h-6 w-6 shrink-0" />
-          {t(era.verbKey as TranslationKey)}
-        </span>
-      </Button>
-      <div className="pointer-events-none absolute inset-x-0 -top-2 flex justify-center">
+        <EraWidget
+          widget={era.widget}
+          className="h-44 w-44 transition group-hover:brightness-110"
+        />
+      </button>
+      <span className="text-base font-semibold text-fg">{verb}</span>
+
+      <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center">
         {pops.map((id) => (
           <span
             key={id}

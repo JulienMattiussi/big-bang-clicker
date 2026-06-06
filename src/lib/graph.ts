@@ -1,15 +1,14 @@
 /**
- * Réseau de ressources : flux nets pour l'affichage, dépendances entre
- * ressources et tri topologique (détection de cycles).
- * Voir docs/ARCHITECTURE.md section 6.
+ * Resource network: net flows for display, dependencies between resources, and
+ * topological order (cycle detection). See docs/ARCHITECTURE.md section 6.
  */
 
 import type { GameDefs, GameState, ResourceId } from './types'
 
 /**
- * Production nette nominale par ressource (unités/s), pour l'affichage des
- * flux (+entrées / -consommation). "Nominal" = au plein régime des usines,
- * sans tenir compte d'un éventuel manque d'entrées à l'instant t.
+ * Nominal net production per resource (units/s), for displaying flows
+ * (+inputs / -consumption). "Nominal" = at full machine throughput, ignoring a
+ * possible lack of inputs at instant t.
  */
 export function netFlows(state: GameState, defs: GameDefs): Record<ResourceId, number> {
   const flows: Record<ResourceId, number> = {}
@@ -38,7 +37,7 @@ export function netFlows(state: GameState, defs: GameDefs): Record<ResourceId, n
   return flows
 }
 
-/** Pour chaque ressource, les ressources qui la nourrissent (entrées directes). */
+/** For each resource, the resources that feed it (direct inputs). */
 export function resourceDependencies(defs: GameDefs): Record<ResourceId, ResourceId[]> {
   const deps: Record<ResourceId, Set<ResourceId>> = {}
   for (const id in defs.converters) {
@@ -54,8 +53,8 @@ export function resourceDependencies(defs: GameDefs): Record<ResourceId, Resourc
 }
 
 /**
- * Tri topologique des ressources (entrées avant sorties). `hasCycle` signale
- * un cycle de combinaison (à éviter dans les données).
+ * Topological order of resources (inputs before outputs). `hasCycle` flags a
+ * combination cycle (to avoid in the data).
  */
 export function topologicalOrder(defs: GameDefs): { order: ResourceId[]; hasCycle: boolean } {
   const deps = resourceDependencies(defs)

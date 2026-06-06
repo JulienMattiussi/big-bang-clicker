@@ -8,7 +8,7 @@ interface UseTranslation {
   setLocale: (locale: Locale) => void
 }
 
-/** Hook de traduction : `t(clé)` dans la langue courante, repli sur le FR. */
+/** Translation hook: `t(key)` in the current language, falling back to FR. */
 export function useTranslation(): UseTranslation {
   const locale = useI18nStore((s) => s.locale)
   const setLocale = useI18nStore((s) => s.setLocale)

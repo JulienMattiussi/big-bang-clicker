@@ -28,7 +28,7 @@ interface RowProps {
   affordable: boolean
   onBuy: () => void
   t: T
-  /** Convertisseurs uniquement : état d'activation et bascule. */
+  /** Converters only: enabled state and toggle. */
   enabled?: boolean
   onToggle?: () => void
 }
@@ -50,7 +50,7 @@ function MachineRow({
       className={`rounded-md border border-border bg-bg/40 p-2 ${enabled === false ? 'opacity-60' : ''}`}
     >
       <div className="mb-2 flex items-center gap-2">
-        {/* Rouage : signale une machine qui automatise la production. */}
+        {/* Gear: marks a machine that automates production. */}
         <Icon name="cog" className="h-4 w-4 shrink-0 text-accent" />
         <IconBadge icon={outputIcon} kind="machine" />
         <span className="min-w-0 flex-1 leading-tight">{name}</span>
@@ -82,7 +82,7 @@ function MachineRow({
   )
 }
 
-/** Machines de l'ère active (générateurs et convertisseurs) à améliorer. */
+/** Machines of the active era (generators and converters) to upgrade. */
 export function PurchasePanel({ era }: { era: EraDef }) {
   const { t } = useTranslation()
   const state = useGameStore((s) => s.state)

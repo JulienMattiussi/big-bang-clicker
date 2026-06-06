@@ -79,18 +79,34 @@ Objectif : ajouter les ères par lots cohérents (par tier UI), en réutilisant
 le moteur. Pour chaque ère : données, contenu narratif, mini-système éventuel,
 traductions FR/EN, tests.
 
-- [ ] Tier COSMOS : ères 2, 3.
-- [ ] Tier VIVANT : ères 4 à 8 (+ transformation UI majeure).
-- [ ] Tier CIVILISATION : ères 9 à 11 (+ transformation UI majeure).
-- [ ] Tier SPATIAL : ères 12 à 14.
-- [ ] Tier TRANSCENDANCE : ère 15 (prestige) + méta-upgrades (Échos).
+- [x] Tier COSMOS : ères 2 (premières étoiles & galaxies), 3 (forges
+      stellaires), avec chaînage inter-ères (étoiles <- hydrogène, forges <-
+      étoiles).
+- [x] Widgets iconiques centraux (scène cliquable) : jauge de refroidissement,
+      atome de Bohr, galaxie spirale, tableau périodique (SVG animés).
+- [x] **Toutes les ères 4 à 19** créées (data-driven via fabrique `buildEra`),
+      bilingues FR/EN, avec chaînage inter-ères et déblocage par Complexité.
+      Thèmes par tier (cosmos/vivant/civilisation/spatial/transcendance) appliqués.
+- [x] **Prestige** (ère 19) : bandeau "Renaissance", conversion en Échos, reset.
+- [x] **Crises (régressions)** : extinction (ère 10), révolte de Starpacus
+      (ère 12), arme atomique (ère 14) ; bandeau de crise + résolution.
+- [x] Widget générique de repli + widgets dédiés : accrétion (ère 4), cellule
+      (ère 6), cité (ère 12), fusée (ère 15), en plus des 4 du tier COSMOS.
+- [ ] Widgets dédiés pour les ères restantes (vivant/civilisation/spatial).
+- [ ] Mini-systèmes spécifiques (arbre phylogénétique, carte Risk...).
+- [x] **Code 100% anglais** (ids, commentaires, clés i18n) ; seules les valeurs
+      de traduction sont localisées.
 
 ## Phase F - Finition
 
-- [ ] Équilibrage global multi-prestige.
+- [~] Équilibrage : seuils abaissés (×~3,2 par ère) pour rendre l'arc
+      franchissable ; reste à affiner finement en playtest.
+- [x] **Méta-upgrades** (dépense des Échos) : multiplicateurs de production
+      globaux permanents, persistants à travers les renaissances.
 - [ ] Onboarding / tutoriel léger.
-- [ ] Accessibilité, responsive mobile, dark mode.
-- [ ] Traduction EN complète et relue.
+- [x] Accessibilité (passe faite : focus, aria, contrastes, lang, progressbar).
+- [ ] Responsive mobile à peaufiner ; dark mode (déjà sombre par défaut) options.
+- [x] Traduction EN complète (typage garantit la complétude des clés).
 - [ ] (Optionnel) PWA, son, succès.
 - [ ] Déploiement (statique).
 

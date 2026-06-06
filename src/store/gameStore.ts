@@ -1,7 +1,9 @@
 import { create } from 'zustand'
 import type { ConverterId, EraId, GameDefs, GameState, GeneratorId, ResourceId } from '@/lib/types'
 import { applyClick, buyConverter, buyGenerator, tick, unlockEras } from '@/lib/engine'
-import { updateRisk } from '@/lib/crises'
+import { resolveCrisis as runResolveCrisis, updateRisk } from '@/lib/crises'
+import { prestige as runPrestige } from '@/lib/prestige'
+import { applyMeta, buyMeta } from '@/lib/meta'
 import {
   applyOffline,
   createInitialState,
@@ -15,30 +17,36 @@ import { defs } from '@/data'
 interface GameStore {
   state: GameState
   defs: GameDefs
-  /** Avance le jeu de `dt` secondes (production, risques, déblocages d'ères). */
+  /** Advances the game by `dt` seconds (production, risk, era unlocks). */
   tick: (dt: number) => void
-  /** Clic manuel sur une ressource (le "verbe" de l'ère). */
+  /** Manual click on a resource (the era's "verb"). */
   click: (resource: ResourceId, amount?: number) => void
   buyGenerator: (id: GeneratorId) => void
   buyConverter: (id: ConverterId) => void
-  /** Active/désactive un convertisseur (éviter qu'il draine une ressource). */
+  /** Enables/disables a converter (to avoid draining a resource). */
   toggleConverter: (id: ConverterId) => void
-  /** Change l'ère active (parmi les ères débloquées). */
+  /** Resolves a ready crisis (applies regression then rebound). */
+  resolveCrisis: (id: string) => void
+  /** Switches the active era (among unlocked ones). */
   setEra: (id: EraId) => void
-  /** Met à jour lastSeen et persiste l'état dans le localStorage. */
+  /** Updates lastSeen and persists the state to localStorage. */
   persist: () => void
-  /** Chaîne exportable de la sauvegarde courante. */
+  /** Exportable string of the current save. */
   exportSave: () => string
-  /** Importe une sauvegarde encodée ; renvoie false si le code est invalide. */
+  /** Imports an encoded save; returns false if the code is invalid. */
   importSave: (encoded: string) => boolean
-  /** Réinitialise complètement la partie (efface la sauvegarde). */
+  /** Fully resets the game (clears the save). */
   reset: () => void
+  /** Triggers prestige (new Big Bang): reset except Echoes/meta-upgrades. */
+  prestige: () => void
+  /** Buys a prestige meta-upgrade with Echoes. */
+  buyMetaUpgrade: (id: string) => void
 }
 
 function loadInitialState(now: number): GameState {
   const loaded = loadFromStorage()
-  if (loaded) return applyOffline(loaded, defs, now)
-  return createInitialState(now, defs.eras[0]?.id)
+  const base = loaded ? applyOffline(loaded, defs, now) : createInitialState(now, defs.eras[0]?.id)
+  return applyMeta(base, defs)
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -78,10 +86,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       saveToStorage(state)
       return { state }
     }),
+  resolveCrisis: (id) => set((s) => ({ state: runResolveCrisis(s.state, s.defs, id) })),
   exportSave: () => encodeSave(get().state),
   importSave: (encoded) => {
     try {
-      const next = applyOffline(decodeSave(encoded), defs, Date.now())
+      const next = applyMeta(applyOffline(decodeSave(encoded), defs, Date.now()), defs)
       saveToStorage(next)
       set({ state: next })
       return true
@@ -94,4 +103,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
     saveToStorage(fresh)
     set({ state: fresh })
   },
+  prestige: () => {
+    const next = runPrestige(get().state, Date.now())
+    // The starting era stays unlocked after rebirth.
+    const reborn = applyMeta(
+      {
+        ...next,
+        currentEraId: defs.eras[0]?.id ?? '',
+        unlockedEras: defs.eras[0] ? [defs.eras[0].id] : [],
+      },
+      defs,
+    )
+    saveToStorage(reborn)
+    set({ state: reborn })
+  },
+  buyMetaUpgrade: (id) => set((s) => ({ state: buyMeta(s.state, s.defs, id) })),
 }))

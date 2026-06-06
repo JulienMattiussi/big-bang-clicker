@@ -222,6 +222,12 @@ tests/
 
 ## Conventions globales du dépôt
 
+- **Code en anglais** : commentaires, identifiants (ids de ressources,
+  générateurs, convertisseurs, ères, crises, méta-upgrades), noms de variables
+  et de fonctions. Ne jamais mélanger français et anglais dans le code. Seules
+  les **valeurs de traduction** (`src/i18n/translations/fr.ts` / `en.ts`) sont
+  localisées : c'est du contenu, pas du code. Les clés i18n suivent les ids
+  anglais (`res.<id>`, `gen.<id>`...).
 - **Commits** : pas de trailer `Co-Authored-By`. Auteur = le compte git de
   Julien uniquement.
 - **Typographie** : ne jamais introduire de tiret long (em-dash `—` ou en-dash

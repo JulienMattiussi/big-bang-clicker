@@ -1,6 +1,7 @@
 {
   "permissions": {
     "allow": [
+      "Bash(cd:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
       "Bash(make:*)",
@@ -11,6 +12,8 @@
       "Bash(ls:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
+      "Bash(tail:*)",
+      "Bash(head:*)",
       "Bash(wc:*)",
       "Bash(which:*)",
       "Bash(mkdir:*)",

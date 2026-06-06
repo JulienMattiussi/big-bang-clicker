@@ -1,7 +1,7 @@
 /**
- * Modèle de données du jeu. Distinction clé (voir docs/ARCHITECTURE.md) :
- * - les *Def sont des DÉFINITIONS statiques (contenu, jamais sérialisées) ;
- * - GameState est l'ÉTAT runtime (sérialisé dans la sauvegarde).
+ * Game data model. Key distinction (see docs/ARCHITECTURE.md):
+ * - the *Def types are static DEFINITIONS (content, never serialized);
+ * - GameState is the runtime STATE (serialized in the save).
  */
 
 export type ResourceId = string
@@ -11,15 +11,15 @@ export type ConverterId = string
 export type UpgradeId = string
 export type CrisisId = string
 
-export type UiTier = 'cosmos' | 'vivant' | 'civilisation' | 'spatial' | 'transcendance'
+export type UiTier = 'cosmos' | 'life' | 'civilization' | 'space' | 'transcendence'
 
-/** Une quantité d'une ressource (entrée/sortie de recette, coût...). */
+/** An amount of a resource (recipe input/output, cost...). */
 export interface ResourceAmount {
   resource: ResourceId
   amount: number
 }
 
-/** Courbe de coût géométrique : base * growth^niveau. */
+/** Geometric cost curve: base * growth^level. */
 export interface CostCurve {
   resource: ResourceId
   base: number
@@ -30,15 +30,15 @@ export interface ResourceDef {
   id: ResourceId
   eraId: EraId
   nameKey: string
-  /** Symbole court affiché en pastille (ex : 'H', 'e⁻'). */
+  /** Icon identifier (see the Icon registry). */
   icon: string
-  /** Profondeur dans le graphe de combinaison : pondère le gain de Complexité. */
+  /** Depth in the combination graph: weights the Complexity gain. */
   tier: number
-  /** Productible directement (pas seulement via une recette). */
+  /** Produced directly (not only via a recipe). */
   isBase?: boolean
 }
 
-/** Usine produisant une ressource de base (générateur). */
+/** Machine producing a base resource (generator). */
 export interface GeneratorDef {
   id: GeneratorId
   eraId: EraId
@@ -48,7 +48,7 @@ export interface GeneratorDef {
   cost: CostCurve[]
 }
 
-/** Usine appliquant une recette (convertisseur) : entrées -> sorties. */
+/** Machine applying a recipe (converter): inputs -> outputs. */
 export interface ConverterDef {
   id: ConverterId
   eraId: EraId
@@ -71,7 +71,7 @@ export type EffectType =
 export interface Effect {
   type: EffectType
   target?: string
-  /** Ressource de destination (pour transformResource : target -> to). */
+  /** Destination resource (for transformResource: target -> to). */
   to?: ResourceId
   value?: number
 }
@@ -84,6 +84,16 @@ export interface UpgradeDef {
   cost: ResourceAmount[]
   requires?: UpgradeId[]
   effects: Effect[]
+}
+
+/** Prestige meta-upgrade: a permanent bonus bought with Echoes. */
+export interface MetaUpgradeDef {
+  id: string
+  nameKey: string
+  descKey: string
+  echoCost: number
+  /** Global production multiplier granted (multiplied across owned meta-upgrades). */
+  multiplier: number
 }
 
 export interface CrisisDef {
@@ -101,15 +111,15 @@ export interface EraDef {
   index: number
   nameKey: string
   accrocheKey: string
-  /** Titre du panneau des ressources (vocabulaire du domaine de l'ère). */
+  /** Title of the resources panel (era-domain vocabulary). */
   stockKey: string
-  /** Titre du panneau des machines (vocabulaire du domaine de l'ère). */
+  /** Title of the machines panel (era-domain vocabulary). */
   machinesKey: string
-  /** Libellé du bouton de clic (le "verbe" de l'ère). */
+  /** Label of the click button (the era's "verb"). */
   verbKey: string
-  /** Ressource produite par le clic manuel. */
+  /** Resource produced by the manual click. */
   clickResource: ResourceId
-  /** Icône de l'ère (identifiant lucide), affichée en bicolore. */
+  /** Era icon (lucide identifier), shown two-tone. */
   icon: string
   uiTier: UiTier
   widget: string
@@ -121,7 +131,7 @@ export interface EraDef {
   crises: CrisisId[]
 }
 
-/** Toutes les définitions statiques du jeu. */
+/** All static game definitions. */
 export interface GameDefs {
   eras: EraDef[]
   resources: Record<ResourceId, ResourceDef>
@@ -129,6 +139,7 @@ export interface GameDefs {
   converters: Record<ConverterId, ConverterDef>
   upgrades: Record<UpgradeId, UpgradeDef>
   crises: Record<CrisisId, CrisisDef>
+  metaUpgrades: MetaUpgradeDef[]
 }
 
 export interface GeneratorState {
@@ -146,7 +157,7 @@ export interface CrisisRuntime {
   count: number
 }
 
-/** État runtime sérialisable (la sauvegarde). */
+/** Serializable runtime state (the save). */
 export interface GameState {
   version: number
   startedAt: number
@@ -158,7 +169,7 @@ export interface GameState {
   converters: Record<ConverterId, ConverterState>
   upgrades: Record<UpgradeId, boolean>
   crises: Record<CrisisId, CrisisRuntime>
-  /** Multiplicateurs de production par ressource, plus la clé 'global'. */
+  /** Production multipliers per resource, plus the 'global' and 'meta' keys. */
   multipliers: Record<string, number>
   complexity: number
   echoes: number

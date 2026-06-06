@@ -17,7 +17,7 @@ const BASE =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ' +
   'active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100'
 
-/** Bouton générique. Centralise le style et le feedback (survol/clic). */
+/** Generic button. Centralizes style and feedback (hover/click). */
 export function Button({ variant = 'primary', className = '', children, ...rest }: ButtonProps) {
   return (
     <button type="button" className={`${BASE} ${VARIANTS[variant]} ${className}`} {...rest}>

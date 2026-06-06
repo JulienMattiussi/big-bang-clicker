@@ -6,7 +6,7 @@ import { useTranslation } from '@/i18n/useTranslation'
 
 type Status = 'idle' | 'copied' | 'ok' | 'error'
 
-/** Menu de gestion de la sauvegarde : export, import, réinitialisation. */
+/** Save management menu: export, import, reset. */
 export function SaveMenu() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
