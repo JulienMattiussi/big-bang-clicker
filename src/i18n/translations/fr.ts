@@ -18,6 +18,7 @@ export const fr = {
   'machine.resume': 'Réactiver',
   'machine.consumes': 'Consomme',
   'machine.produces': 'Produit',
+  'widget.temperature': 'Température',
 
   'crisis.title': 'Crise',
   'crisis.resolve': 'Surmonter',

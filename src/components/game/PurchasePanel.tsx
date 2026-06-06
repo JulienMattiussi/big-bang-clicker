@@ -3,6 +3,7 @@ import { Panel } from '@/components/ui/Panel'
 import { Button } from '@/components/ui/Button'
 import { IconBadge } from '@/components/ui/IconBadge'
 import { Icon } from '@/components/ui/Icon'
+import { EraIcon } from '@/components/game/EraIcon'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -29,6 +30,8 @@ interface FlowEntry {
   name: string
   perSec: number
   nextPerSec: number
+  /** Set when the resource belongs to a different era (which tab to find it). */
+  era?: { icon: string; name: string }
 }
 
 function FlowLine({ label, entries }: { label: string; entries: FlowEntry[] }) {
@@ -38,11 +41,12 @@ function FlowLine({ label, entries }: { label: string; entries: FlowEntry[] }) {
       {entries.map((e, i) => (
         <span
           key={i}
-          title={e.name}
+          title={e.era ? `${e.name} - ${e.era.name}` : e.name}
           className="inline-flex items-center gap-1 tabular-nums text-secondary"
         >
           <Icon name={e.icon} className="h-3 w-3" aria-hidden />
-          <span className="sr-only">{e.name}</span>
+          {e.era ? <EraIcon icon={e.era.icon} className="h-3 w-3" /> : null}
+          <span className="sr-only">{e.era ? `${e.name}, ${e.era.name}` : e.name}</span>
           {formatFixed(e.perSec)}
           <span className="text-muted/60">&rarr; {formatFixed(e.nextPerSec)}/s</span>
         </span>
@@ -146,6 +150,15 @@ export function PurchasePanel({ era }: { era: EraDef }) {
 
   const revealed = revealedMachines(state, era)
 
+  // Era a resource belongs to, only when it differs from the current one
+  // (so the player knows which tab to open to find it).
+  const eraTag = (resource: ResourceId): FlowEntry['era'] => {
+    const eraId = defs.resources[resource].eraId
+    if (eraId === era.id) return undefined
+    const owner = defs.eras.find((e) => e.id === eraId)
+    return owner ? { icon: owner.icon, name: t(owner.nameKey as TranslationKey) } : undefined
+  }
+
   // Floats a "-X" on each consumed resource counter when a machine is bought.
   const floatSpend = (cost: Record<ResourceId, number>) => {
     for (const [id, amount] of Object.entries(cost)) {
@@ -201,6 +214,7 @@ export function PurchasePanel({ era }: { era: EraDef }) {
               name: t(defs.resources[resource].nameKey as TranslationKey),
               perSec: amount * cycles,
               nextPerSec: amount * nextCycles,
+              era: eraTag(resource),
             })
             return (
               <MachineRow

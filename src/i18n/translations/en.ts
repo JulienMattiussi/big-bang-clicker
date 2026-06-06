@@ -20,6 +20,7 @@ export const en: Translations = {
   'machine.resume': 'Resume',
   'machine.consumes': 'Consumes',
   'machine.produces': 'Produces',
+  'widget.temperature': 'Temperature',
 
   'crisis.title': 'Crisis',
   'crisis.resolve': 'Overcome',
