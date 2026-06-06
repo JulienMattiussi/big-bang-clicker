@@ -7,7 +7,7 @@ import type { ConverterDef, EraDef, GeneratorDef, ResourceDef } from '@/lib/type
 
 export const era0Resources: ResourceDef[] = [
   { id: 'particle', eraId: 'e0', nameKey: 'res.particle', icon: 'sparkles', tier: 0, isBase: true },
-  { id: 'nucleon', eraId: 'e0', nameKey: 'res.nucleon', icon: 'circle-dot', tier: 1 },
+  { id: 'nucleon', eraId: 'e0', nameKey: 'res.nucleon', icon: 'nucleon', tier: 1 },
 ]
 
 export const era0Generators: GeneratorDef[] = [

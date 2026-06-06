@@ -3,8 +3,10 @@ import {
   applyClick,
   buyGenerator,
   canAfford,
+  canManualConvert,
   canUnlockNextEra,
   costAtLevel,
+  manualConvert,
   nextCost,
   tick,
   unlockNextEra,
@@ -121,6 +123,24 @@ describe('tick', () => {
 
   it('applyClick ajoute à une ressource', () => {
     expect(applyClick(stateWith({}), 'quark', 5).resources.quark).toBe(5)
+  })
+})
+
+describe('conversion manuelle', () => {
+  it('refuse sans les intrants suffisants', () => {
+    const state = stateWith({ resources: { quark: 2 } })
+    expect(canManualConvert(state, defs, 'fuse')).toBe(false)
+    expect(manualConvert(state, defs, 'fuse').resources.proton ?? 0).toBe(0)
+  })
+
+  it('applique une recette une fois, consomme, produit et crédite la Complexité', () => {
+    const state = stateWith({ resources: { quark: 5 } })
+    expect(canManualConvert(state, defs, 'fuse')).toBe(true)
+    const next = manualConvert(state, defs, 'fuse')
+    expect(next.resources.quark).toBe(2)
+    expect(next.resources.proton).toBeCloseTo(1)
+    expect(next.complexity).toBeCloseTo(1)
+    expect(next.discovered.proton).toBe(true) // sticky discovery
   })
 })
 

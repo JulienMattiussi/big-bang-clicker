@@ -58,12 +58,25 @@ function resourceMultiplier(state: GameState, resource: ResourceId): number {
   )
 }
 
+/** Marks resources currently held (>0) as discovered (sticky, never unset). */
+function discoveredWith(
+  prev: Record<string, boolean>,
+  resources: Record<ResourceId, number>,
+): Record<string, boolean> {
+  let next = prev
+  for (const id in resources) {
+    if (resources[id] > 0 && !next[id]) {
+      if (next === prev) next = { ...prev }
+      next[id] = true
+    }
+  }
+  return next
+}
+
 /** Manual click: adds an amount to a resource (the era's "verb"). */
 export function applyClick(state: GameState, resource: ResourceId, amount = 1): GameState {
-  return {
-    ...state,
-    resources: { ...state.resources, [resource]: (state.resources[resource] ?? 0) + amount },
-  }
+  const resources = { ...state.resources, [resource]: (state.resources[resource] ?? 0) + amount }
+  return { ...state, resources, discovered: discoveredWith(state.discovered, resources) }
 }
 
 /** Buys one generator level if affordable, otherwise returns null. */
@@ -150,6 +163,70 @@ function latestUnlockedIndex(state: GameState): number {
   return max
 }
 
+/** Raw Complexity from producing `amount` of a resource, decayed by era recency. */
+function complexityFor(
+  defs: GameDefs,
+  resource: ResourceId,
+  amount: number,
+  latestEra: number,
+): number {
+  const def = defs.resources[resource]
+  const tier = def?.tier ?? 0
+  const gap = latestEra - eraIndexFromId(def?.eraId ?? '')
+  const recency = gap <= 0 ? 1 : 1 / COMPLEXITY_ERA_DECAY ** gap
+  return amount * tier * recency
+}
+
+/** Applies the next-milestone cap to a raw Complexity gain (no passive overshoot). */
+function creditedComplexity(
+  state: GameState,
+  defs: GameDefs,
+  rawGain: number,
+): { complexity: number; totalComplexityEver: number } {
+  const next = nextLockedEra(state, defs)
+  const cap =
+    next && next.unlock.complexity !== undefined ? next.unlock.complexity : Number.POSITIVE_INFINITY
+  const credited = Math.min(rawGain, Math.max(0, cap - state.complexity))
+  return {
+    complexity: state.complexity + credited,
+    totalComplexityEver: state.totalComplexityEver + credited,
+  }
+}
+
+/** True if the player has the inputs to apply a manual recipe once. */
+export function canManualConvert(state: GameState, defs: GameDefs, id: ConverterId): boolean {
+  const conv = defs.converters[id]
+  if (!conv) return false
+  return conv.inputs.every((i) => (state.resources[i.resource] ?? 0) >= i.amount)
+}
+
+/**
+ * Applies a manual recipe once (one click): consumes the inputs, produces the
+ * outputs, credits Complexity. The interactive way to combine resources.
+ */
+export function manualConvert(state: GameState, defs: GameDefs, id: ConverterId): GameState {
+  const conv = defs.converters[id]
+  if (!conv || !canManualConvert(state, defs, id)) return state
+
+  const resources = { ...state.resources }
+  for (const input of conv.inputs) {
+    resources[input.resource] = (resources[input.resource] ?? 0) - input.amount
+  }
+  const latestEra = latestUnlockedIndex(state)
+  let gained = 0
+  for (const output of conv.outputs) {
+    resources[output.resource] =
+      (resources[output.resource] ?? 0) + output.amount * resourceMultiplier(state, output.resource)
+    gained += complexityFor(defs, output.resource, output.amount, latestEra)
+  }
+  return {
+    ...state,
+    resources,
+    discovered: discoveredWith(state.discovered, resources),
+    ...creditedComplexity(state, defs, gained),
+  }
+}
+
 /**
  * Advances the state by one time step `dt` (in seconds):
  * 1. generator production;
@@ -180,7 +257,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     const cState = state.converters[id]
     if (!cState.enabled || cState.level <= 0) continue
     const conv = defs.converters[id]
-    if (!conv) continue
+    if (!conv || conv.manual) continue
 
     let cycles = cState.level * conv.baseRate * dt
     for (const input of conv.inputs) {
@@ -197,26 +274,16 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
       resources[output.resource] =
         (resources[output.resource] ?? 0) +
         output.amount * cycles * resourceMultiplier(state, output.resource)
-      const def = defs.resources[output.resource]
-      const tier = def?.tier ?? 0
-      // Older eras contribute exponentially less Complexity than the latest one.
-      const gap = latestEra - eraIndexFromId(def?.eraId ?? '')
-      const recency = gap <= 0 ? 1 : 1 / COMPLEXITY_ERA_DECAY ** gap
-      gained += output.amount * cycles * tier * recency
+      gained += complexityFor(defs, output.resource, output.amount * cycles, latestEra)
     }
   }
 
   // Cap Complexity at the next milestone cost: no passive overshoot, the player
-  // must cross (which spends it) to keep gaining.
-  const next = nextLockedEra(state, defs)
-  const cap =
-    next && next.unlock.complexity !== undefined ? next.unlock.complexity : Number.POSITIVE_INFINITY
-  const credited = Math.min(gained, Math.max(0, cap - state.complexity))
-
+  // must cross the milestone to keep gaining.
   return {
     ...state,
     resources,
-    complexity: state.complexity + credited,
-    totalComplexityEver: state.totalComplexityEver + credited,
+    discovered: discoveredWith(state.discovered, resources),
+    ...creditedComplexity(state, defs, gained),
   }
 }

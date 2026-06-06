@@ -17,6 +17,14 @@ export function ResourcePanel({ era }: { era: EraDef }) {
   const flows = netFlows(state, defs)
   const revealed = revealedResources(state, defs, era)
 
+  // Machines that consume a resource (so the player knows where it goes).
+  const consumedBy = (id: string) => {
+    const names = Object.values(defs.converters)
+      .filter((c) => c.inputs.some((i) => i.resource === id))
+      .map((c) => t(c.nameKey as TranslationKey))
+    return names.length ? `${t('machine.consumedBy')} : ${names.join(', ')}` : undefined
+  }
+
   return (
     <Panel title={t(era.stockKey as TranslationKey)}>
       <ul className="flex flex-col gap-2">
@@ -28,9 +36,13 @@ export function ResourcePanel({ era }: { era: EraDef }) {
             const flow = flows[id] ?? 0
             const sign = flow >= 0 ? '+' : ''
             return (
-              <li key={id} className="relative flex items-center justify-between gap-3">
+              <li
+                key={id}
+                title={consumedBy(id)}
+                className="relative flex items-center justify-between gap-3"
+              >
                 <span className="flex min-w-0 items-center gap-2">
-                  <IconBadge icon={def.icon} kind="resource" />
+                  <IconBadge icon={def.icon} symbol={def.symbol} kind="resource" />
                   <span className="truncate">{t(def.nameKey as TranslationKey)}</span>
                 </span>
                 <span className="shrink-0 tabular-nums">

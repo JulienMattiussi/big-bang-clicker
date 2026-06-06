@@ -29,6 +29,7 @@ export function createInitialState(now: number, firstEraId: EraId = ''): GameSta
     echoes: 0,
     metaUpgrades: {},
     totalComplexityEver: 0,
+    discovered: {},
   }
 }
 

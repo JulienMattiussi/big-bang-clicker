@@ -2,6 +2,7 @@ import { LanguageSwitch } from '@/components/layout/LanguageSwitch'
 import { SaveMenu } from '@/components/layout/SaveMenu'
 import { EraTabs } from '@/components/game/EraTabs'
 import { ClickArea } from '@/components/game/ClickArea'
+import { hasInteractiveWidget } from '@/components/game/widgets/interactive'
 import { ResourcePanel } from '@/components/game/ResourcePanel'
 import { PurchasePanel } from '@/components/game/PurchasePanel'
 import { ComplexityBadge } from '@/components/game/ComplexityBadge'
@@ -62,13 +63,26 @@ export function GameShell() {
       <CrisisBanner />
       <PrestigeBanner />
 
-      <section className="grid gap-4 md:grid-cols-3">
-        <ResourcePanel era={era} />
-        <div className="flex items-center justify-center py-6">
-          <ClickArea era={era} />
-        </div>
-        <PurchasePanel era={era} />
-      </section>
+      {hasInteractiveWidget(era.widget) ? (
+        // Interactive widget: panels on top, full-width mechanic below.
+        <>
+          <section className="grid gap-4 md:grid-cols-2">
+            <ResourcePanel era={era} />
+            <PurchasePanel era={era} />
+          </section>
+          <section className="flex justify-center py-2">
+            <ClickArea era={era} />
+          </section>
+        </>
+      ) : (
+        <section className="grid gap-4 md:grid-cols-3">
+          <ResourcePanel era={era} />
+          <div className="flex items-center justify-center py-6">
+            <ClickArea era={era} />
+          </div>
+          <PurchasePanel era={era} />
+        </section>
+      )}
     </main>
   )
 }

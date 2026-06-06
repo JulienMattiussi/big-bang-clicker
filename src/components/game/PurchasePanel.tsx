@@ -35,22 +35,27 @@ interface FlowEntry {
 }
 
 function FlowLine({ label, entries }: { label: string; entries: FlowEntry[] }) {
+  // Stack the resources vertically when there are several (more readable than
+  // a long inline row, e.g. recombination consuming nucleons + electrons).
+  const stacked = entries.length > 1
   return (
-    <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+    <div className="flex items-start gap-2">
       <span className="shrink-0">{label}</span>
-      {entries.map((e, i) => (
-        <span
-          key={i}
-          title={e.era ? `${e.name} - ${e.era.name}` : e.name}
-          className="inline-flex items-center gap-1 tabular-nums text-secondary"
-        >
-          <Icon name={e.icon} className="h-3 w-3" aria-hidden />
-          {e.era ? <EraIcon icon={e.era.icon} className="h-3 w-3" /> : null}
-          <span className="sr-only">{e.era ? `${e.name}, ${e.era.name}` : e.name}</span>
-          {formatFixed(e.perSec)}
-          <span className="text-muted/60">&rarr; {formatFixed(e.nextPerSec)}/s</span>
-        </span>
-      ))}
+      <div className={stacked ? 'flex flex-col gap-0.5' : 'flex flex-wrap items-center gap-x-2'}>
+        {entries.map((e, i) => (
+          <span
+            key={i}
+            title={e.era ? `${e.name} - ${e.era.name}` : e.name}
+            className="inline-flex items-center gap-1 tabular-nums text-secondary"
+          >
+            <Icon name={e.icon} className="h-3 w-3" aria-hidden />
+            {e.era ? <EraIcon icon={e.era.icon} className="h-3 w-3" /> : null}
+            <span className="sr-only">{e.era ? `${e.name}, ${e.era.name}` : e.name}</span>
+            {formatFixed(e.perSec)}
+            <span className="text-muted/60">&rarr; {formatFixed(e.nextPerSec)}/s</span>
+          </span>
+        ))}
+      </div>
     </div>
   )
 }
@@ -201,7 +206,7 @@ export function PurchasePanel({ era }: { era: EraDef }) {
             )
           })}
         {era.converters
-          .filter((id) => revealed.has(id))
+          .filter((id) => revealed.has(id) && !defs.converters[id].manual)
           .map((id) => {
             const def = defs.converters[id]
             const converterState = state.converters[id]

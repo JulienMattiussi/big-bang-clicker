@@ -4,6 +4,7 @@ import {
   applyClick,
   buyConverter,
   buyGenerator,
+  manualConvert as runManualConvert,
   tick,
   unlockNextEra as runUnlockNextEra,
 } from '@/lib/engine'
@@ -29,6 +30,8 @@ interface GameStore {
   click: (resource: ResourceId, amount?: number) => void
   buyGenerator: (id: GeneratorId) => void
   buyConverter: (id: ConverterId) => void
+  /** Applies a manual recipe once (interactive widgets, e.g. the periodic table). */
+  manualConvert: (id: ConverterId) => void
   /** Enables/disables a converter (to avoid draining a resource). */
   toggleConverter: (id: ConverterId) => void
   /** Resolves a ready crisis (applies regression then rebound). */
@@ -72,6 +75,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const next = buyConverter(s.state, s.defs, id)
       return next ? { state: next } : {}
     }),
+  manualConvert: (id) => set((s) => ({ state: runManualConvert(s.state, s.defs, id) })),
   setEra: (id) =>
     set((s) =>
       s.state.unlockedEras.includes(id) ? { state: { ...s.state, currentEraId: id } } : {},

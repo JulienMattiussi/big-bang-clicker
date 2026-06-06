@@ -11,15 +11,28 @@ const KINDS: Record<Kind, string> = {
 /**
  * Icon badge for a resource or a machine. Color code: machines in the accent
  * color (orange suggests the action you trigger), resources in the secondary
- * color.
+ * color. A `symbol` (e.g. a chemical symbol like "Si") is rendered as text
+ * instead of an icon, for atom resources.
  */
-export function IconBadge({ icon, kind = 'resource' }: { icon: string; kind?: Kind }) {
+export function IconBadge({
+  icon,
+  symbol,
+  kind = 'resource',
+}: {
+  icon: string
+  symbol?: string
+  kind?: Kind
+}) {
   return (
     <span
       aria-hidden
       className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md ${KINDS[kind]}`}
     >
-      <Icon name={icon} className="h-3.5 w-3.5" />
+      {symbol ? (
+        <span className="text-[10px] leading-none font-bold">{symbol}</span>
+      ) : (
+        <Icon name={icon} className="h-3.5 w-3.5" />
+      )}
     </span>
   )
 }

@@ -20,6 +20,7 @@ export const en: Translations = {
   'machine.resume': 'Resume',
   'machine.consumes': 'Consumes',
   'machine.produces': 'Produces',
+  'machine.consumedBy': 'Consumed by',
   'widget.temperature': 'Temperature',
 
   'crisis.title': 'Crisis',
@@ -71,6 +72,9 @@ export const en: Translations = {
   'res.star': 'Stars',
   'res.galaxy': 'Galaxies',
   'res.fusion': 'Fusion',
+  'res.helium': 'Helium',
+  'res.carbon': 'Carbon',
+  'res.silicon': 'Silicon',
   'res.heavyElement': 'Heavy elements',
   'res.dust': 'Dust',
   'res.planet': 'Planet',

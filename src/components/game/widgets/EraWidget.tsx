@@ -2,7 +2,6 @@ import type { ReactElement } from 'react'
 import { CoolingWidget } from './CoolingWidget'
 import { BohrWidget } from './BohrWidget'
 import { GalaxyWidget } from './GalaxyWidget'
-import { PeriodicWidget } from './PeriodicWidget'
 import { AccretionWidget } from './AccretionWidget'
 import { CellWidget } from './CellWidget'
 import { CityWidget } from './CityWidget'
@@ -16,7 +15,6 @@ const WIDGETS: Record<string, WidgetComponent> = {
   cooling: CoolingWidget,
   bohr: BohrWidget,
   galaxy: GalaxyWidget,
-  periodic: PeriodicWidget,
   accretion: AccretionWidget,
   cell: CellWidget,
   city: CityWidget,

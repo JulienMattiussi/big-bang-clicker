@@ -1,4 +1,5 @@
 import { EraWidget } from '@/components/game/widgets/EraWidget'
+import { INTERACTIVE_WIDGETS } from '@/components/game/widgets/interactive'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -6,13 +7,17 @@ import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
 
 /**
- * Central scene: the era's iconic widget is the click area (the "verb").
- * Each click floats a "+1" on the produced resource's counter.
+ * Central scene. Either the era's interactive widget (its own mechanic), or the
+ * generic verb: clicking the iconic widget floats a "+1" on the produced
+ * resource's counter.
  */
 export function ClickArea({ era }: { era: EraDef }) {
   const { t } = useTranslation()
   const click = useGameStore((s) => s.click)
   const spawn = useFeedbackStore((s) => s.spawn)
+
+  const Interactive = INTERACTIVE_WIDGETS[era.widget]
+  if (Interactive) return <Interactive era={era} />
 
   const verb = t(era.verbKey as TranslationKey)
 

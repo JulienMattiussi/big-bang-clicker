@@ -28,7 +28,8 @@ export function revealedMachines(state: GameState, era: EraDef): Set<string> {
 
 /**
  * Resource ids currently revealed: the click resource, the outputs of revealed
- * machines, or any resource the player already has.
+ * machines, any resource the player holds, or any already discovered (sticky:
+ * once produced, a resource stays listed even when its stock is back to 0).
  */
 export function revealedResources(state: GameState, defs: GameDefs, era: EraDef): Set<string> {
   const machines = revealedMachines(state, era)
@@ -42,7 +43,12 @@ export function revealedResources(state: GameState, defs: GameDefs, era: EraDef)
 
   const revealed = new Set<string>()
   for (const id of era.resources) {
-    if (id === era.clickResource || outputs.has(id) || (state.resources[id] ?? 0) > 0) {
+    if (
+      id === era.clickResource ||
+      outputs.has(id) ||
+      (state.resources[id] ?? 0) > 0 ||
+      state.discovered[id]
+    ) {
       revealed.add(id)
     }
   }

@@ -44,5 +44,6 @@ export function prestige(state: GameState, now: number): GameState {
     echoes: state.echoes + echoesGain(state),
     metaUpgrades: state.metaUpgrades,
     totalComplexityEver: state.totalComplexityEver,
+    discovered: {},
   }
 }

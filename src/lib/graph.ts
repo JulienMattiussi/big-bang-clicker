@@ -4,36 +4,20 @@
  */
 
 import type { GameDefs, GameState, ResourceId } from './types'
+import { tick } from './engine'
 
 /**
- * Nominal net production per resource (units/s), for displaying flows
- * (+inputs / -consumption). "Nominal" = at full machine throughput, ignoring a
- * possible lack of inputs at instant t.
+ * REAL net change per resource (units/s), by simulating one second of the
+ * engine. Unlike a nominal sum, this matches what actually happens to the
+ * stock: a resource consumed as fast as it is produced (flow-through, pinned at
+ * 0) shows ~0, not a misleading negative. Used for the resources panel.
  */
 export function netFlows(state: GameState, defs: GameDefs): Record<ResourceId, number> {
+  const after = tick(state, defs, 1)
   const flows: Record<ResourceId, number> = {}
-  const add = (resource: ResourceId, n: number) => {
-    flows[resource] = (flows[resource] ?? 0) + n
+  for (const id in defs.resources) {
+    flows[id] = (after.resources[id] ?? 0) - (state.resources[id] ?? 0)
   }
-
-  for (const id in state.generators) {
-    const level = state.generators[id].level
-    if (level <= 0) continue
-    const gen = defs.generators[id]
-    if (!gen) continue
-    add(gen.output, level * gen.baseRate)
-  }
-
-  for (const id in state.converters) {
-    const cState = state.converters[id]
-    if (!cState.enabled || cState.level <= 0) continue
-    const conv = defs.converters[id]
-    if (!conv) continue
-    const cycles = cState.level * conv.baseRate
-    for (const input of conv.inputs) add(input.resource, -input.amount * cycles)
-    for (const output of conv.outputs) add(output.resource, output.amount * cycles)
-  }
-
   return flows
 }
 

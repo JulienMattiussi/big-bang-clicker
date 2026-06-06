@@ -7,8 +7,8 @@ import type { ConverterDef, EraDef, GeneratorDef, ResourceDef } from '@/lib/type
  */
 
 export const era1Resources: ResourceDef[] = [
-  { id: 'electron', eraId: 'e1', nameKey: 'res.electron', icon: 'zap', tier: 1, isBase: true },
-  { id: 'hydrogen', eraId: 'e1', nameKey: 'res.hydrogen', icon: 'atom', tier: 2 },
+  { id: 'electron', eraId: 'e1', nameKey: 'res.electron', icon: 'electron', tier: 1, isBase: true },
+  { id: 'hydrogen', eraId: 'e1', nameKey: 'res.hydrogen', icon: 'atom', symbol: 'H', tier: 2 },
 ]
 
 export const era1Generators: GeneratorDef[] = [

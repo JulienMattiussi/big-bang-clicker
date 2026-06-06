@@ -38,7 +38,7 @@ const defs: GameDefs = {
 }
 
 describe('netFlows', () => {
-  it('calcule la production nette nominale par ressource', () => {
+  it('calcule la variation réelle par ressource', () => {
     const state = {
       ...createInitialState(0),
       generators: { genA: { level: 1 } },
@@ -48,6 +48,17 @@ describe('netFlows', () => {
     expect(flows.a).toBeCloseTo(1) // +2 produit, -1 consommé
     expect(flows.b).toBeCloseTo(0) // +1 produit, -1 consommé
     expect(flows.c).toBeCloseTo(1)
+  })
+
+  it('une ressource entièrement consommée reste à ~0 (pas de négatif trompeur)', () => {
+    const state = {
+      ...createInitialState(0),
+      generators: { genA: { level: 1 } }, // +2 a/s
+      converters: { makeB: { level: 5, enabled: true } }, // veut 5 a/s, borné à 2
+    }
+    const flows = netFlows(state, defs)
+    expect(flows.a).toBeCloseTo(0) // produit 2, consommé 2 (borné aux entrées)
+    expect(flows.b).toBeCloseTo(2)
   })
 })
 

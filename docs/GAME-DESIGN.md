@@ -263,7 +263,19 @@ pandémies...), avec parcimonie.
 ## 7. Renouvellement : un verbe par ère
 
 Pour éviter le "même bouton, autres mots", chaque grande ère introduit un
-geste de jeu distinct. Détail dans [PHASES.md](./PHASES.md). Vue d'ensemble :
+geste de jeu distinct. **Le widget iconique de l'ère PORTE cette mécanique**
+(il n'est pas décoratif) : c'est l'élément interactif central. Un widget peut
+revenir et se complexifier d'une ère à l'autre (ex : un tableau de Mendeleïev
+simple, puis plus riche). Détail dans [PHASES.md](./PHASES.md).
+
+> Mécanique technique : un widget interactif appelle `manualConvert` (moteur)
+> pour appliquer une recette **manuelle** (un clic = une combinaison ; les
+> convertisseurs `manual` ne sont ni auto-exécutés au tick ni achetables). Cela
+> fournit aussi le **moyen manuel d'obtenir une ressource** propre à chaque ère.
+> Prototype : le tableau périodique de l'ère 3 (cases cliquables qui fusionnent
+> les éléments légers en lourds, dévoilées progressivement).
+
+Vue d'ensemble :
 
 > Découpage validé à 20 ères (dérivé de [SCIENCE.md](./SCIENCE.md)). Détail
 > complet (ressources, widgets, science) dans [PHASES.md](./PHASES.md).

@@ -18,6 +18,7 @@ export const fr = {
   'machine.resume': 'Réactiver',
   'machine.consumes': 'Consomme',
   'machine.produces': 'Produit',
+  'machine.consumedBy': 'Consommé par',
   'widget.temperature': 'Température',
 
   'crisis.title': 'Crise',
@@ -69,6 +70,9 @@ export const fr = {
   'res.star': 'Étoiles',
   'res.galaxy': 'Galaxies',
   'res.fusion': 'Fusion',
+  'res.helium': 'Hélium',
+  'res.carbon': 'Carbone',
+  'res.silicon': 'Silicium',
   'res.heavyElement': 'Éléments lourds',
   'res.dust': 'Poussière',
   'res.planet': 'Planète',

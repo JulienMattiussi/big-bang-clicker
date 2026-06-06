@@ -9,7 +9,7 @@ import type { ConverterDef, EraDef, GeneratorDef, ResourceDef } from '@/lib/type
 export const era2Resources: ResourceDef[] = [
   { id: 'gasCloud', eraId: 'e2', nameKey: 'res.gasCloud', icon: 'cloud', tier: 3, isBase: true },
   { id: 'star', eraId: 'e2', nameKey: 'res.star', icon: 'star', tier: 4 },
-  { id: 'galaxy', eraId: 'e2', nameKey: 'res.galaxy', icon: 'disc', tier: 5 },
+  { id: 'galaxy', eraId: 'e2', nameKey: 'res.galaxy', icon: 'ellipse', tier: 5 },
 ]
 
 export const era2Generators: GeneratorDef[] = [
