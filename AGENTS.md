@@ -161,8 +161,9 @@ tests/
 ### Principes produit (à respecter dans toute l'UI)
 - **Découverte progressive (anti-spoiler)** : ne JAMAIS révéler dans l'UI les
   ères ou contenus non débloqués (pas de liste, de compteur total, d'aperçu de
-  la fin). Verrouillé = caché, pas grisé-nommé. Voir
-  [GAME-DESIGN.md](./docs/GAME-DESIGN.md) section 7.1.
+  la fin). Verrouillé = caché, pas grisé-nommé. **Aussi à l'intérieur d'une
+  ère** : machines et ressources se dévoilent une par une (`src/lib/reveal.ts`).
+  Voir [GAME-DESIGN.md](./docs/GAME-DESIGN.md) section 7.1.
 - **Qualité visuelle** : interface jolie, agréable, soignée, équilibrée
   (hiérarchie, rythme, palette, feedback sobre, densité maîtrisée). Voir
   [UI-UX.md](./docs/UI-UX.md) section 0.

@@ -1,4 +1,5 @@
 import { IconBadge } from '@/components/ui/IconBadge'
+import { Button } from '@/components/ui/Button'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { formatFixed, formatNumber } from '@/lib/format'
@@ -13,6 +14,7 @@ export function NextGoal() {
   const { t } = useTranslation()
   const state = useGameStore((s) => s.state)
   const defs = useGameStore((s) => s.defs)
+  const unlockNextEra = useGameStore((s) => s.unlockNextEra)
 
   const next = defs.eras.find(
     (era) =>
@@ -57,6 +59,11 @@ export function NextGoal() {
       >
         <div className={`h-full rounded-full ${barColor}`} style={{ width: `${pct}%` }} />
       </div>
+      {current >= target ? (
+        <Button className="mt-1 w-full text-center" onClick={() => unlockNextEra()}>
+          {t('app.unlock')}
+        </Button>
+      ) : null}
     </div>
   )
 }

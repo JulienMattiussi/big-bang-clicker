@@ -27,8 +27,12 @@
 .click-pop {
   animation: float-up 0.8s ease-out forwards;
 }
+.float-delta {
+  animation: float-up 0.9s ease-out forwards;
+}
 @media (prefers-reduced-motion: reduce) {
-  .click-pop {
+  .click-pop,
+  .float-delta {
     animation: none;
     opacity: 0;
   }

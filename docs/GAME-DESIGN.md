@@ -294,8 +294,20 @@ geste de jeu distinct. Détail dans [PHASES.md](./PHASES.md). Vue d'ensemble :
 ## 8. Progression et déblocage
 
 - Chaque ère a une **condition de passage** vers la suivante : un seuil de
-  ressource locale ET/OU un coût en Complexité, parfois un objectif narratif
-  (ex : "former le premier acide aminé").
+  Complexité (ou de ressource). **Franchir un palier est une action manuelle**
+  (bouton "Franchir le palier") qui débloque l'ère, mais **ne dépense pas** la
+  Complexité : aucune ère ne se débloque automatiquement (le cap ci-dessous
+  évite la cascade). La Complexité **ne recule que sur les évènements
+  régressifs** (crises).
+- **Cap** : la Complexité ne dépasse jamais le coût du prochain palier. Une fois
+  ce palier atteint, elle est gelée tant qu'on ne l'a pas franchi (rien ne
+  s'accumule passivement par-dessus).
+- **Décroissance par ère** (`COMPLEXITY_ERA_DECAY = 50`) : la Complexité gagnée
+  vient quasi exclusivement de l'ère la plus récente. Chaque ère antérieure
+  rapporte ÷50 (÷2500 deux ères plus tôt, etc.) : les ères passées deviennent
+  négligeables, il faut donc jouer l'ère courante pour remplir la jauge. Les
+  ressources anciennes restent produites (elles alimentent les recettes), mais
+  ne contribuent quasiment plus à la Complexité.
 - Le passage **n'efface pas** l'ère précédente (cohabitation).
 - Certaines ères débloquent des **mécaniques bonus** (mini-systèmes) décrites
   dans [PHASES.md](./PHASES.md), à introduire progressivement pour ne pas
@@ -316,6 +328,11 @@ Règles concrètes :
 - **Contenu verrouillé = caché, pas grisé-nommé** : un générateur, une
   ressource, un widget ou une crise non débloqués n'apparaissent pas du tout
   (pas de "à venir", pas de silhouette nommée).
+- **Dévoilement progressif intra-ère** : à l'intérieur d'une ère, on ne montre
+  pas tout d'un coup. La première machine est visible ; la suivante n'apparaît
+  qu'une fois la précédente au niveau 1 ; une ressource n'apparaît qu'avec la
+  machine qui la produit (ou dès qu'on en possède). Cela guide le joueur sans le
+  noyer. Implémenté de façon générique dans `src/lib/reveal.ts`.
 - **Textes non révélateurs** : titre, accroche, descriptions et infobulles ne
   doivent parler que du présent et du passé du joueur, jamais du futur.
 - **Indices diégétiques seulement** : tout au plus, l'état courant peut

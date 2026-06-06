@@ -4,7 +4,15 @@
  * See docs/ARCHITECTURE.md section 5.
  */
 
-import type { ConverterId, CostCurve, GameDefs, GameState, GeneratorId, ResourceId } from './types'
+import type {
+  ConverterId,
+  CostCurve,
+  EraDef,
+  GameDefs,
+  GameState,
+  GeneratorId,
+  ResourceId,
+} from './types'
 
 /** Geometric cost of the next level (0-indexed level). */
 export function costAtLevel(curve: CostCurve, level: number): number {
@@ -90,41 +98,71 @@ export function buyConverter(state: GameState, defs: GameDefs, id: ConverterId):
   }
 }
 
+/** The next locked era (in order) that has an unlock condition, or undefined. */
+export function nextLockedEra(state: GameState, defs: GameDefs): EraDef | undefined {
+  return defs.eras.find(
+    (era) =>
+      !state.unlockedEras.includes(era.id) &&
+      (era.unlock.resource !== undefined || era.unlock.complexity !== undefined),
+  )
+}
+
+/** True if the player can currently afford the next era's milestone cost. */
+export function canUnlockNextEra(state: GameState, defs: GameDefs): boolean {
+  const era = nextLockedEra(state, defs)
+  if (!era) return false
+  const { resource, amount, complexity } = era.unlock
+  if (complexity !== undefined) return state.complexity >= complexity
+  if (resource !== undefined) return (state.resources[resource] ?? 0) >= (amount ?? 0)
+  return false
+}
+
 /**
- * Unlocks eras whose `unlock` condition is met. An era without a condition is
- * never auto-unlocked here (the starting era is unlocked at init).
+ * Crosses the next milestone: a manual action that unlocks the era and switches
+ * to it. It does NOT spend Complexity. Eras never auto-unlock (no passive
+ * cascade, thanks to the cap in `tick`), and Complexity only recedes on
+ * regressive events (crises).
  */
-export function unlockEras(state: GameState, defs: GameDefs): GameState {
-  let unlocked = state.unlockedEras
-  let changed = false
-  for (const era of defs.eras) {
-    if (unlocked.includes(era.id)) continue
-    const { resource, amount, complexity } = era.unlock
-    if (resource === undefined && complexity === undefined) continue
-    const resourceOk = resource === undefined || (state.resources[resource] ?? 0) >= (amount ?? 0)
-    const complexityOk = complexity === undefined || state.complexity >= complexity
-    if (resourceOk && complexityOk) {
-      if (!changed) {
-        unlocked = [...unlocked]
-        changed = true
-      }
-      unlocked.push(era.id)
-    }
+export function unlockNextEra(state: GameState, defs: GameDefs): GameState {
+  const era = nextLockedEra(state, defs)
+  if (!era || !canUnlockNextEra(state, defs)) return state
+  return {
+    ...state,
+    unlockedEras: [...state.unlockedEras, era.id],
+    currentEraId: era.id,
   }
-  return changed ? { ...state, unlockedEras: unlocked } : state
+}
+
+/** Each era older than the latest unlocked one contributes this much LESS Complexity. */
+export const COMPLEXITY_ERA_DECAY = 50
+
+function eraIndexFromId(eraId: string): number {
+  const n = Number(eraId.slice(1))
+  return Number.isFinite(n) ? n : 0
+}
+
+function latestUnlockedIndex(state: GameState): number {
+  let max = 0
+  for (const id of state.unlockedEras) {
+    const n = eraIndexFromId(id)
+    if (n > max) max = n
+  }
+  return max
 }
 
 /**
  * Advances the state by one time step `dt` (in seconds):
  * 1. generator production;
  * 2. conversions (bounded by available inputs, never a hard block);
- * 3. Complexity gain, weighted by the depth (tier) of the outputs.
+ * 3. Complexity gain, dominated by the latest era (older eras decay), and
+ *    CAPPED at the next milestone cost (no passive overshoot; cross to continue).
  */
 export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
   if (dt <= 0) return state
 
   const resources = { ...state.resources }
   let gained = 0
+  const latestEra = latestUnlockedIndex(state)
 
   // 1. Generators: direct production.
   for (const id in state.generators) {
@@ -159,15 +197,26 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
       resources[output.resource] =
         (resources[output.resource] ?? 0) +
         output.amount * cycles * resourceMultiplier(state, output.resource)
-      const tier = defs.resources[output.resource]?.tier ?? 0
-      gained += output.amount * cycles * tier
+      const def = defs.resources[output.resource]
+      const tier = def?.tier ?? 0
+      // Older eras contribute exponentially less Complexity than the latest one.
+      const gap = latestEra - eraIndexFromId(def?.eraId ?? '')
+      const recency = gap <= 0 ? 1 : 1 / COMPLEXITY_ERA_DECAY ** gap
+      gained += output.amount * cycles * tier * recency
     }
   }
+
+  // Cap Complexity at the next milestone cost: no passive overshoot, the player
+  // must cross (which spends it) to keep gaining.
+  const next = nextLockedEra(state, defs)
+  const cap =
+    next && next.unlock.complexity !== undefined ? next.unlock.complexity : Number.POSITIVE_INFINITY
+  const credited = Math.min(gained, Math.max(0, cap - state.complexity))
 
   return {
     ...state,
     resources,
-    complexity: state.complexity + gained,
-    totalComplexityEver: state.totalComplexityEver + gained,
+    complexity: state.complexity + credited,
+    totalComplexityEver: state.totalComplexityEver + credited,
   }
 }

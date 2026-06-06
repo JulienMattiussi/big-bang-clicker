@@ -1,6 +1,12 @@
 import { create } from 'zustand'
 import type { ConverterId, EraId, GameDefs, GameState, GeneratorId, ResourceId } from '@/lib/types'
-import { applyClick, buyConverter, buyGenerator, tick, unlockEras } from '@/lib/engine'
+import {
+  applyClick,
+  buyConverter,
+  buyGenerator,
+  tick,
+  unlockNextEra as runUnlockNextEra,
+} from '@/lib/engine'
 import { resolveCrisis as runResolveCrisis, updateRisk } from '@/lib/crises'
 import { prestige as runPrestige } from '@/lib/prestige'
 import { applyMeta, buyMeta } from '@/lib/meta'
@@ -29,6 +35,8 @@ interface GameStore {
   resolveCrisis: (id: string) => void
   /** Switches the active era (among unlocked ones). */
   setEra: (id: EraId) => void
+  /** Crosses the next milestone: spends the cost, unlocks and switches to it. */
+  unlockNextEra: () => void
   /** Updates lastSeen and persists the state to localStorage. */
   persist: () => void
   /** Exportable string of the current save. */
@@ -52,8 +60,7 @@ function loadInitialState(now: number): GameState {
 export const useGameStore = create<GameStore>((set, get) => ({
   state: loadInitialState(Date.now()),
   defs,
-  tick: (dt) =>
-    set((s) => ({ state: unlockEras(updateRisk(tick(s.state, s.defs, dt), s.defs, dt), s.defs) })),
+  tick: (dt) => set((s) => ({ state: updateRisk(tick(s.state, s.defs, dt), s.defs, dt) })),
   click: (resource, amount = 1) => set((s) => ({ state: applyClick(s.state, resource, amount) })),
   buyGenerator: (id) =>
     set((s) => {
@@ -69,6 +76,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) =>
       s.state.unlockedEras.includes(id) ? { state: { ...s.state, currentEraId: id } } : {},
     ),
+  unlockNextEra: () => set((s) => ({ state: runUnlockNextEra(s.state, s.defs) })),
   toggleConverter: (id) =>
     set((s) => {
       const current = s.state.converters[id]

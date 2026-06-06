@@ -8,6 +8,7 @@ import type { Translations } from '../types'
 export const en: Translations = {
   'app.complexity': 'Complexity',
   'app.nextGoal': 'Next milestone',
+  'app.unlock': 'Reach the milestone',
   'lang.label': 'Language',
   'nav.eras': 'Eras',
 
@@ -17,6 +18,8 @@ export const en: Translations = {
 
   'machine.pause': 'Pause',
   'machine.resume': 'Resume',
+  'machine.consumes': 'Consumes',
+  'machine.produces': 'Produces',
 
   'crisis.title': 'Crisis',
   'crisis.resolve': 'Overcome',

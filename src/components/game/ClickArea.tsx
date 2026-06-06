@@ -1,32 +1,28 @@
-import { useRef, useState } from 'react'
 import { EraWidget } from '@/components/game/widgets/EraWidget'
 import { useGameStore } from '@/store/gameStore'
+import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
 
 /**
  * Central scene: the era's iconic widget is the click area (the "verb").
- * Shows a floating "+1" feedback on each click.
+ * Each click floats a "+1" on the produced resource's counter.
  */
 export function ClickArea({ era }: { era: EraDef }) {
   const { t } = useTranslation()
   const click = useGameStore((s) => s.click)
-  const [pops, setPops] = useState<number[]>([])
-  const nextId = useRef(0)
+  const spawn = useFeedbackStore((s) => s.spawn)
 
   const verb = t(era.verbKey as TranslationKey)
 
   const handleClick = () => {
     click(era.clickResource)
-    const id = nextId.current++
-    setPops((current) => [...current, id])
+    spawn(`res:${era.clickResource}`, '+1', 'resource')
   }
 
-  const removePop = (id: number) => setPops((current) => current.filter((p) => p !== id))
-
   return (
-    <div className="relative flex flex-col items-center gap-3">
+    <div className="flex flex-col items-center gap-3">
       <button
         type="button"
         aria-label={verb}
@@ -39,19 +35,6 @@ export function ClickArea({ era }: { era: EraDef }) {
         />
       </button>
       <span className="text-base font-semibold text-fg">{verb}</span>
-
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center">
-        {pops.map((id) => (
-          <span
-            key={id}
-            aria-hidden
-            onAnimationEnd={() => removePop(id)}
-            className="click-pop absolute font-bold text-accent"
-          >
-            +1
-          </span>
-        ))}
-      </div>
     </div>
   )
 }

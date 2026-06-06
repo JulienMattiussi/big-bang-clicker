@@ -27,6 +27,20 @@ export function useTick(): void {
         useGameStore.getState().persist()
       }
     }, TICK_MS)
-    return () => clearInterval(interval)
+
+    // Also persist when leaving or backgrounding the page, so clicks made
+    // between two autosaves are never lost on reload/close.
+    const save = () => useGameStore.getState().persist()
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') save()
+    }
+    window.addEventListener('pagehide', save)
+    document.addEventListener('visibilitychange', onVisibility)
+
+    return () => {
+      clearInterval(interval)
+      window.removeEventListener('pagehide', save)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
   }, [])
 }

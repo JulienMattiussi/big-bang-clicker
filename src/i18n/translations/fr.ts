@@ -6,6 +6,7 @@
 export const fr = {
   'app.complexity': 'Complexité',
   'app.nextGoal': 'Prochain palier',
+  'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',
 
@@ -15,6 +16,8 @@ export const fr = {
 
   'machine.pause': 'Mettre en pause',
   'machine.resume': 'Réactiver',
+  'machine.consumes': 'Consomme',
+  'machine.produces': 'Produit',
 
   'crisis.title': 'Crise',
   'crisis.resolve': 'Surmonter',

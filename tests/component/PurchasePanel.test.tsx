@@ -12,6 +12,8 @@ describe('PurchasePanel', () => {
     useGameStore.setState({
       state: {
         ...createInitialState(0, 'e0'),
+        // The generator must be level >= 1 for the converter to be revealed.
+        generators: { expansion: { level: 1 } },
         converters: { confinement: { level: 1, enabled: true } },
       },
     })
