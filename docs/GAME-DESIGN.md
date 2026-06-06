@@ -270,7 +270,7 @@ simple, puis plus riche). Détail dans [PHASES.md](./PHASES.md).
 
 > Mécanique technique : **toute recette (convertisseur) est à la fois manuelle
 > et automatisable**. Un clic applique une recette (`manualConvert`, moteur) :
-> c'est le **moyen manuel d'obtenir une ressource** (bouton "Fabriquer", ou les
+> c'est le **moyen manuel d'obtenir une ressource** (bouton "Produire", ou les
 > cases d'un widget comme le tableau périodique). Acheter des niveaux
 > l'**automatise** (elle tourne alors au tick), façon clicker (cliquer puis
 > automatiser). Prototype : le tableau périodique de l'ère 3 (cases cliquables

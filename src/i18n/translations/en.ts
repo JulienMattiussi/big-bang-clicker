@@ -10,6 +10,7 @@ export const en: Translations = {
   'app.nextGoal': 'Next milestone',
   'complexity.source': 'Produces Complexity',
   'complexity.reduced': 'reduced, older era',
+  'complexity.toDiscover': 'Something to discover here will grow Complexity',
   'app.unlock': 'Reach the milestone',
   'lang.label': 'Language',
   'nav.eras': 'Eras',
@@ -23,13 +24,14 @@ export const en: Translations = {
   'machine.consumes': 'Consumes',
   'machine.produces': 'Produces',
   'machine.consumedBy': 'Consumed by',
-  'machine.craft': 'Make',
+  'machine.produce': 'Produce',
   'widget.temperature': 'Temperature',
+  'bohr.hint': 'Capture the electron as it nears the nucleus',
 
   'event.continue': 'Continue',
   'tuto.firstMachine.title': 'Your first machine',
   'tuto.firstMachine.body':
-    'This is a machine. Click "Make" to produce by hand, or "Upgrade" to buy levels and automate it. Everything combines: resources from one era feed the next.',
+    'This is a machine. Click "Produce" to make it by hand, or "Upgrade" to buy levels and automate it. Everything combines: resources from one era feed the next.',
 
   'crisis.title': 'Crisis',
   'crisis.resolve': 'Overcome',

@@ -8,6 +8,7 @@ export const fr = {
   'app.nextGoal': 'Prochain palier',
   'complexity.source': 'Produit de la Complexité',
   'complexity.reduced': 'réduite, ère antérieure',
+  'complexity.toDiscover': 'Quelque chose à découvrir ici fera progresser la Complexité',
   'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',
@@ -21,13 +22,14 @@ export const fr = {
   'machine.consumes': 'Consomme',
   'machine.produces': 'Produit',
   'machine.consumedBy': 'Consommé par',
-  'machine.craft': 'Fabriquer',
+  'machine.produce': 'Produire',
   'widget.temperature': 'Température',
+  'bohr.hint': "Capture l'électron quand il s'approche du noyau",
 
   'event.continue': 'Continuer',
   'tuto.firstMachine.title': 'Ta première machine',
   'tuto.firstMachine.body':
-    "Voici une machine. Clique « Fabriquer » pour produire à la main, ou « Améliorer » pour acheter des niveaux et automatiser la production. Tout se combine : les ressources d'une ère alimentent la suivante.",
+    "Voici une machine. Clique « Produire » pour produire à la main, ou « Améliorer » pour acheter des niveaux et automatiser. Tout se combine : les ressources d'une ère alimentent la suivante.",
 
   'crisis.title': 'Crise',
   'crisis.resolve': 'Surmonter',

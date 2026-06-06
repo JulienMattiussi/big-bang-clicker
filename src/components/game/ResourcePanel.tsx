@@ -34,6 +34,10 @@ export function ResourcePanel({ era }: { era: EraDef }) {
   // contribution and the era-decay "debuff" applied to older eras.
   const producesComplexity = (id: string) =>
     Object.values(defs.converters).some((c) => c.outputs.some((o) => o.resource === id))
+
+  // Teaser: the era still has a key (Complexity-producing) resource left to
+  // discover -> hint at it without spoiling what it is.
+  const hasHiddenKey = era.resources.some((id) => !revealed.has(id) && producesComplexity(id))
   const complexityTip = (id: string) => {
     const def = defs.resources[id]
     const gap = latestIndex - eraIndex(def.eraId)
@@ -84,6 +88,22 @@ export function ResourcePanel({ era }: { era: EraDef }) {
               </li>
             )
           })}
+
+        {hasHiddenKey ? (
+          <li
+            title={t('complexity.toDiscover')}
+            className="flex items-center justify-between gap-3 opacity-70"
+          >
+            <span className="flex min-w-0 items-center gap-2">
+              <IconBadge icon="circle-dot" symbol="?" kind="resource" />
+              <span className="text-muted">…</span>
+              <span className="inline-flex shrink-0 text-octarine">
+                <Icon name="gem" className="h-3 w-3" aria-hidden />
+              </span>
+            </span>
+            <span className="sr-only">{t('complexity.toDiscover')}</span>
+          </li>
+        ) : null}
       </ul>
     </Panel>
   )

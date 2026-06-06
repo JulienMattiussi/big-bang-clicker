@@ -140,7 +140,7 @@ function MachineRow({
             automation, which flexes to absorb the variable cost label. */}
         {onCraft ? (
           <Button className="shrink-0 whitespace-nowrap" disabled={!canCraft} onClick={onCraft}>
-            {t('machine.craft')}
+            {t('machine.produce')}
           </Button>
         ) : null}
         <Button

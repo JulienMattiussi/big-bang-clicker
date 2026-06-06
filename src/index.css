@@ -89,6 +89,66 @@
   }
 }
 
+/* Bohr atom (era 1): orbiting electrons + light burst on a successful capture. */
+@keyframes electron-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes light-burst {
+  from {
+    transform: scale(0.15);
+    opacity: 0.95;
+  }
+  to {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+.electron-orbit {
+  animation: electron-orbit 2.6s linear infinite;
+  /* Rotate around the SVG viewBox centre (50,50), not the electron's own box. */
+  transform-origin: 50% 50%;
+  transform-box: view-box;
+}
+
+/* Captured electron fading away once bound. */
+@keyframes electron-fade {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.2);
+  }
+}
+.electron-fade {
+  animation: electron-fade 0.5s ease-out forwards;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .electron-fade {
+    animation: none;
+    opacity: 0;
+  }
+}
+.light-burst {
+  animation: light-burst 0.55s ease-out forwards;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .electron-orbit {
+    animation: none;
+  }
+  .light-burst {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 /* Event modal entrance (overlay fade + dialog pop). */
 @keyframes overlay-in {
   from {

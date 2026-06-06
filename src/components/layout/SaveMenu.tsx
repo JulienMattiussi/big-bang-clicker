@@ -43,6 +43,8 @@ function SavePanel({ onDone }: { onDone: () => void }) {
   const copy = () => {
     void navigator.clipboard?.writeText(code)
     setStatus('copied')
+    // Briefly show the confirmation, then close the menu on success.
+    window.setTimeout(onDone, 700)
   }
 
   const download = () => {
@@ -53,6 +55,7 @@ function SavePanel({ onDone }: { onDone: () => void }) {
     link.download = 'big-bang-clicker-save.txt'
     link.click()
     URL.revokeObjectURL(url)
+    window.setTimeout(onDone, 400)
   }
 
   const doImport = () => setStatus(importSave(importText.trim()) ? 'ok' : 'error')

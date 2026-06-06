@@ -2,7 +2,7 @@ import { LanguageSwitch } from '@/components/layout/LanguageSwitch'
 import { SaveMenu } from '@/components/layout/SaveMenu'
 import { EraTabs } from '@/components/game/EraTabs'
 import { ClickArea } from '@/components/game/ClickArea'
-import { hasInteractiveWidget } from '@/components/game/widgets/interactive'
+import { isFullWidthWidget } from '@/components/game/widgets/interactive'
 import { ResourcePanel } from '@/components/game/ResourcePanel'
 import { PurchasePanel } from '@/components/game/PurchasePanel'
 import { ComplexityBadge } from '@/components/game/ComplexityBadge'
@@ -63,8 +63,8 @@ export function GameShell() {
       <CrisisBanner />
       <PrestigeBanner />
 
-      {hasInteractiveWidget(era.widget) ? (
-        // Interactive widget: full-width mechanic on top (no scroll), panels below.
+      {isFullWidthWidget(era.widget) ? (
+        // Wide widget (e.g. periodic table): full-width on top, panels below.
         <>
           <section className="flex justify-center py-2">
             <ClickArea era={era} />
