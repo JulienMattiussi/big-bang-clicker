@@ -30,6 +30,7 @@ export function createInitialState(now: number, firstEraId: EraId = ''): GameSta
     metaUpgrades: {},
     totalComplexityEver: 0,
     discovered: {},
+    seenEvents: {},
   }
 }
 

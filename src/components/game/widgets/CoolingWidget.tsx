@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
+import { useClickPulse } from '@/store/clickPulse'
 import { useTranslation } from '@/i18n/useTranslation'
 
 /** Temperature drop per click and passive re-heating rate (per second). */
 const COOL_PER_CLICK = 10
-const WARM_PER_SECOND = 30
+const WARM_PER_SECOND = 40
 const TICK_MS = 100
 
 const SPARKS = [
@@ -52,13 +53,18 @@ export function CoolingWidget({ className }: { className?: string }) {
     return () => clearInterval(timer)
   }, [])
 
-  const cool = () => setTemperature((temp) => Math.max(0, temp - COOL_PER_CLICK))
+  // Cool on each verb activation (mouse OR keyboard), via the generic signal.
+  useEffect(
+    () =>
+      useClickPulse.subscribe(() => setTemperature((temp) => Math.max(0, temp - COOL_PER_CLICK))),
+    [],
+  )
 
   const heat = temperature / 100
   const radius = 34 + 8 * heat
 
   return (
-    <div className={`relative ${className ?? ''}`} onPointerDown={cool}>
+    <div className={`relative ${className ?? ''}`}>
       <svg viewBox="0 0 100 100" className="h-full w-full" aria-hidden="true">
         <defs>
           <radialGradient id="bbc-cooling" cx="50%" cy="45%" r="60%">

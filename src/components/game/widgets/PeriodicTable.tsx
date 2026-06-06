@@ -90,7 +90,12 @@ export function PeriodicTable({ era }: { era: EraDef }) {
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
-      <div className="grid w-full gap-1" style={grid}>
+      <div
+        role="group"
+        aria-label={t(era.verbKey as TranslationKey)}
+        className="grid w-full gap-1"
+        style={grid}
+      >
         {LAYOUT.map(({ col, row }) => {
           const cell: CSSProperties = { gridColumnStart: col, gridRowStart: row }
           const el = elementAt(col, row)
@@ -120,7 +125,7 @@ export function PeriodicTable({ era }: { era: EraDef }) {
               title={title}
               aria-label={`${name(el.resource)}: ${formatFixed(amount)}. ${title}`}
               style={cell}
-              className={`flex aspect-square flex-col items-center justify-center rounded-md border p-0.5 text-center transition select-none focus-visible:outline-2 focus-visible:outline-accent active:scale-95 ${
+              className={`flex aspect-square flex-col items-center justify-center rounded-md border p-0.5 text-center transition select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-95 ${
                 el.converter
                   ? affordable
                     ? 'border-border bg-surface hover:border-accent'

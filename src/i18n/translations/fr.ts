@@ -6,6 +6,8 @@
 export const fr = {
   'app.complexity': 'Complexité',
   'app.nextGoal': 'Prochain palier',
+  'complexity.source': 'Produit de la Complexité',
+  'complexity.reduced': 'réduite, ère antérieure',
   'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',
@@ -19,7 +21,13 @@ export const fr = {
   'machine.consumes': 'Consomme',
   'machine.produces': 'Produit',
   'machine.consumedBy': 'Consommé par',
+  'machine.craft': 'Fabriquer',
   'widget.temperature': 'Température',
+
+  'event.continue': 'Continuer',
+  'tuto.firstMachine.title': 'Ta première machine',
+  'tuto.firstMachine.body':
+    "Voici une machine. Clique « Fabriquer » pour produire à la main, ou « Améliorer » pour acheter des niveaux et automatiser la production. Tout se combine : les ressources d'une ère alimentent la suivante.",
 
   'crisis.title': 'Crise',
   'crisis.resolve': 'Surmonter',
@@ -131,7 +139,6 @@ export const fr = {
   'conv.recombination': 'Recombinaison',
   'conv.ignition': 'Allumage stellaire',
   'conv.galaxyAssembly': 'Assemblage galactique',
-  'conv.forge': 'Forge stellaire',
   'conv.accretion': 'Accrétion',
   'conv.synthesis': 'Synthèse',
   'conv.division': 'Division cellulaire',
@@ -248,4 +255,44 @@ export const fr = {
   'era.e19.stock': 'Instabilité',
   'era.e19.machines': 'Singularité',
   'era.e19.verb': 'Tendre vers la rupture',
+
+  // Textes de transition (modale d'évènement) affichés en entrant dans l'ère.
+  'era.e1.transition':
+    "L'univers s'est assez refroidi : les électrons se lient enfin aux noyaux. Les premiers atomes naissent, et la lumière file librement. Que la lumière soit.",
+  'era.e2.transition':
+    "Dans le noir des âges sombres, la gravité rassemble le gaz jusqu'à l'embrasement. Les toutes premières étoiles s'allument et trouent la nuit.",
+  'era.e3.transition':
+    'Au cœur des étoiles, la fusion forge des éléments de plus en plus lourds. Rien ne se perd, rien ne se crée : tout se transforme.',
+  'era.e4.transition':
+    "Autour d'une jeune étoile, la poussière s'agglomère en disque, puis en mondes. Parmi eux, un petit caillou bleu plein de promesses.",
+  'era.e5.transition':
+    "Eau, chaleur, foudre et chimie qui s'emballe : les premières molécules organiques s'assemblent. La soupe primordiale est servie.",
+  'era.e6.transition':
+    'Une membrane se referme, une molécule se recopie, une cellule se divise. Cette fois, la vie commence vraiment.',
+  'era.e7.transition':
+    "Des microbes inventent la photosynthèse et rejettent un gaz corrosif : l'oxygène. Catastrophe pour les uns, tremplin pour la suite.",
+  'era.e8.transition':
+    "Plutôt que de se digérer, des cellules s'associent. De cette colocation réussie naît la cellule complexe.",
+  'era.e9.transition':
+    "En un clin d'œil géologique, le vivant invente mille plans de corps. Yeux, carapaces, nageoires : la vie passe en mode prototype.",
+  'era.e10.transition':
+    "Plantes puis animaux sortent de l'eau et partent à la conquête des continents. La vie, décidément, trouve toujours un chemin.",
+  'era.e11.transition':
+    "Le feu, l'outil, le langage. Un primate bavard se met à poser des questions, à commencer par « pourquoi ? ».",
+  'era.e12.transition':
+    "On se sédentarise, on cultive, on bâtit. De la tribu à la cité, l'humanité apprend à vivre ensemble (et à râler ensemble).",
+  'era.e13.transition':
+    "Cités et peuples s'organisent : on commerce, on négocie... ou on se fait la guerre. La diplomatie est inventée, juste après l'armée.",
+  'era.e14.transition':
+    "La science accélère : machines, électricité, calcul. On invente désormais plus vite qu'on ne réfléchit aux conséquences.",
+  'era.e15.transition':
+    'Des fusées quittent le berceau. Car la Terre est un berceau, pas une demeure : il est temps de déménager vers les étoiles.',
+  'era.e16.transition':
+    "D'étoile en étoile, l'humanité essaime. Les colonies fleurissent : une galaxie entière ne demande qu'à vivre.",
+  'era.e17.transition':
+    "Reste l'immense vide entre les galaxies. On le franchit par des ponts cosmiques : l'univers devient un quartier.",
+  'era.e18.transition':
+    "Tout converge enfin : l'univers entier, réuni en une seule ville-univers à son apogée. Que pourrait-il bien arriver ?",
+  'era.e19.transition':
+    "Quelque part, un dirigeant de quartier galactique a oublié d'éteindre le gaz après son petit-déjeuner. L'univers entier s'embrase. Tout est à refaire... en mieux.",
 } as const

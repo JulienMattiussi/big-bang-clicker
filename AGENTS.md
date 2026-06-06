@@ -43,7 +43,10 @@ Choix validés : voir la section "Décisions" plus bas et
 
 > Principe directeur : **data-driven**. Le moteur de jeu est générique ; les
 > ères, ressources, générateurs et upgrades sont décrits en **données**, pas
-> en code. Ajouter une ère doit coûter surtout du contenu, pas de la logique.
+> en code. Ajouter une ère générique coûte surtout du contenu. **Exception
+> assumée** : une ère dotée d'un widget interactif portant sa mécanique (ex : le
+> tableau périodique, `components/game/widgets/PeriodicTable.tsx` + `interactive.ts`)
+> demande aussi un composant. Voir [GAME-DESIGN](./docs/GAME-DESIGN.md) section 7.
 
 État actuel (le moteur existe ; le contenu des ères et l'UI de jeu arrivent
 en phase D) :

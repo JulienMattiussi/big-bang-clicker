@@ -1,10 +1,13 @@
 import { useEffect } from 'react'
 import { GameShell } from '@/components/layout/GameShell'
+import { EventModal } from '@/components/game/EventModal'
 import { useTick } from '@/hooks/useTick'
+import { useEvents } from '@/hooks/useEvents'
 import { useTranslation } from '@/i18n/useTranslation'
 
 function App() {
   useTick()
+  useEvents()
   const { locale } = useTranslation()
 
   // Reflects the current language on <html lang> (screen-reader pronunciation).
@@ -12,7 +15,12 @@ function App() {
     document.documentElement.lang = locale
   }, [locale])
 
-  return <GameShell />
+  return (
+    <>
+      <GameShell />
+      <EventModal />
+    </>
+  )
 }
 
 export default App

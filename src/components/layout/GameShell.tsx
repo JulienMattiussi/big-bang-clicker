@@ -28,7 +28,7 @@ export function GameShell() {
   return (
     <main
       data-tier={era.uiTier}
-      className="mx-auto flex min-h-full max-w-5xl flex-col gap-6 bg-bg p-6 text-fg"
+      className="mx-auto flex min-h-full max-w-7xl flex-col gap-6 bg-bg p-6 text-fg"
     >
       {/* Top bar: central objective (Complexity + milestone, centered inline);
           language and options on the right. */}
@@ -64,14 +64,14 @@ export function GameShell() {
       <PrestigeBanner />
 
       {hasInteractiveWidget(era.widget) ? (
-        // Interactive widget: panels on top, full-width mechanic below.
+        // Interactive widget: full-width mechanic on top (no scroll), panels below.
         <>
+          <section className="flex justify-center py-2">
+            <ClickArea era={era} />
+          </section>
           <section className="grid gap-4 md:grid-cols-2">
             <ResourcePanel era={era} />
             <PurchasePanel era={era} />
-          </section>
-          <section className="flex justify-center py-2">
-            <ClickArea era={era} />
           </section>
         </>
       ) : (

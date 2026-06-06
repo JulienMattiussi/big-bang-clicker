@@ -20,9 +20,12 @@ puissante.
 
 ## Statut
 
-Conception **terminée** (voir `docs/`) et **échafaudage technique en place**
-(Vite + React + TS + Tailwind + Zustand, lint/tests/Makefile, `make check`
-passe). Prochaine étape : le moteur de jeu (voir [docs/ROADMAP.md](./docs/ROADMAP.md)).
+Conception **terminée** (voir `docs/`). **Jouable de bout en bout** : moteur
+data-driven, les 20 ères, prestige (Échos) + méta-upgrades, crises, recettes
+manuelles + automatisables, premier widget interactif (tableau périodique).
+Stack Vite + React + TS + Tailwind + Zustand, lint/tests/Makefile, `make check`
+passe. En cours : finition (widgets dédiés restants, modales d'évènements,
+onboarding, équilibrage, déploiement). Voir [docs/ROADMAP.md](./docs/ROADMAP.md).
 
 ## Documentation
 

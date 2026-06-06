@@ -2,6 +2,7 @@ import { EraWidget } from '@/components/game/widgets/EraWidget'
 import { INTERACTIVE_WIDGETS } from '@/components/game/widgets/interactive'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
+import { useClickPulse } from '@/store/clickPulse'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
@@ -24,6 +25,7 @@ export function ClickArea({ era }: { era: EraDef }) {
   const handleClick = () => {
     click(era.clickResource)
     spawn(`res:${era.clickResource}`, '+1', 'resource')
+    useClickPulse.getState().pulse() // generic verb signal (mouse + keyboard)
   }
 
   return (

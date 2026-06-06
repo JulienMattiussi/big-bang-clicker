@@ -19,12 +19,19 @@ export function costAtLevel(curve: CostCurve, level: number): number {
   return curve.base * curve.growth ** level
 }
 
-/** Cost (multi-resource) to go from `level` to `level + 1`. */
+/** Rounds an upgrade cost to the nearest ten (never below 10 for a real cost). */
+function roundCost(amount: number): number {
+  const rounded = Math.round(amount / 10) * 10
+  return rounded === 0 && amount > 0 ? 10 : rounded
+}
+
+/** Cost (multi-resource) to go from `level` to `level + 1`, rounded to the nearest ten. */
 export function nextCost(cost: CostCurve[], level: number): Record<ResourceId, number> {
   const total: Record<ResourceId, number> = {}
   for (const curve of cost) {
     total[curve.resource] = (total[curve.resource] ?? 0) + costAtLevel(curve, level)
   }
+  for (const id in total) total[id] = roundCost(total[id])
   return total
 }
 
@@ -257,7 +264,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     const cState = state.converters[id]
     if (!cState.enabled || cState.level <= 0) continue
     const conv = defs.converters[id]
-    if (!conv || conv.manual) continue
+    if (!conv) continue
 
     let cycles = cState.level * conv.baseRate * dt
     for (const input of conv.inputs) {

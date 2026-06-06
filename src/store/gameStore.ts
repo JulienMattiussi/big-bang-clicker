@@ -11,6 +11,7 @@ import {
 import { resolveCrisis as runResolveCrisis, updateRisk } from '@/lib/crises'
 import { prestige as runPrestige } from '@/lib/prestige'
 import { applyMeta, buyMeta } from '@/lib/meta'
+import { triggeredEvents } from '@/lib/events'
 import {
   applyOffline,
   createInitialState,
@@ -52,12 +53,19 @@ interface GameStore {
   prestige: () => void
   /** Buys a prestige meta-upgrade with Echoes. */
   buyMetaUpgrade: (id: string) => void
+  /** Marks a narrative event as shown (so it never fires again). */
+  markEventSeen: (id: string) => void
 }
 
 function loadInitialState(now: number): GameState {
   const loaded = loadFromStorage()
   const base = loaded ? applyOffline(loaded, defs, now) : createInitialState(now, defs.eras[0]?.id)
-  return applyMeta(base, defs)
+  const ready = applyMeta(base, defs)
+  // Pre-mark already-satisfied events as seen so a returning save doesn't replay
+  // its whole past on load; only genuinely new events fire from now on.
+  const seenEvents = { ...ready.seenEvents }
+  for (const event of triggeredEvents(ready, defs)) seenEvents[event.id] = true
+  return { ...ready, seenEvents }
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -130,4 +138,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ state: reborn })
   },
   buyMetaUpgrade: (id) => set((s) => ({ state: buyMeta(s.state, s.defs, id) })),
+  markEventSeen: (id) =>
+    set((s) =>
+      s.state.seenEvents[id]
+        ? {}
+        : { state: { ...s.state, seenEvents: { ...s.state.seenEvents, [id]: true } } },
+    ),
 }))

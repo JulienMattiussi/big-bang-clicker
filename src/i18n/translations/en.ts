@@ -8,6 +8,8 @@ import type { Translations } from '../types'
 export const en: Translations = {
   'app.complexity': 'Complexity',
   'app.nextGoal': 'Next milestone',
+  'complexity.source': 'Produces Complexity',
+  'complexity.reduced': 'reduced, older era',
   'app.unlock': 'Reach the milestone',
   'lang.label': 'Language',
   'nav.eras': 'Eras',
@@ -21,7 +23,13 @@ export const en: Translations = {
   'machine.consumes': 'Consumes',
   'machine.produces': 'Produces',
   'machine.consumedBy': 'Consumed by',
+  'machine.craft': 'Make',
   'widget.temperature': 'Temperature',
+
+  'event.continue': 'Continue',
+  'tuto.firstMachine.title': 'Your first machine',
+  'tuto.firstMachine.body':
+    'This is a machine. Click "Make" to produce by hand, or "Upgrade" to buy levels and automate it. Everything combines: resources from one era feed the next.',
 
   'crisis.title': 'Crisis',
   'crisis.resolve': 'Overcome',
@@ -133,7 +141,6 @@ export const en: Translations = {
   'conv.recombination': 'Recombination',
   'conv.ignition': 'Stellar ignition',
   'conv.galaxyAssembly': 'Galactic assembly',
-  'conv.forge': 'Stellar forge',
   'conv.accretion': 'Accretion',
   'conv.synthesis': 'Synthesis',
   'conv.division': 'Cell division',
@@ -250,4 +257,44 @@ export const en: Translations = {
   'era.e19.stock': 'Instability',
   'era.e19.machines': 'Singularity',
   'era.e19.verb': 'Push to the brink',
+
+  // Transition texts (event modal) shown when entering the era.
+  'era.e1.transition':
+    'The universe has cooled enough: electrons finally bind to nuclei. The first atoms form and light streams free. Let there be light.',
+  'era.e2.transition':
+    'In the cosmic dark ages, gravity gathers gas until it ignites. The very first stars switch on and pierce the night.',
+  'era.e3.transition':
+    'Deep inside stars, fusion forges ever heavier elements. Nothing is lost, nothing is created: everything is transformed.',
+  'era.e4.transition':
+    'Around a young star, dust clumps into a disc, then into worlds. Among them, a promising little blue pebble.',
+  'era.e5.transition':
+    'Water, heat, lightning and runaway chemistry: the first organic molecules assemble. The primordial soup is served.',
+  'era.e6.transition':
+    'A membrane closes, a molecule copies itself, a cell divides. This time, life truly begins.',
+  'era.e7.transition':
+    'Microbes invent photosynthesis and exhale a corrosive gas: oxygen. A disaster for many, a springboard for what comes next.',
+  'era.e8.transition':
+    'Rather than digest one another, cells team up. From that successful flat-share, the complex cell is born.',
+  'era.e9.transition':
+    'In a geological blink, life invents a thousand body plans. Eyes, shells, fins: evolution goes full prototype mode.',
+  'era.e10.transition':
+    'Plants then animals leave the water and set out to conquer the continents. Life, after all, finds a way.',
+  'era.e11.transition':
+    'Fire, tools, language. A chatty primate starts asking questions, beginning with "why?".',
+  'era.e12.transition':
+    'We settle, farm and build. From tribe to city, humanity learns to live together (and to complain together).',
+  'era.e13.transition':
+    'Cities and peoples organise: they trade, negotiate... or wage war. Diplomacy is invented, just after the army.',
+  'era.e14.transition':
+    'Science accelerates: machines, electricity, computing. We now invent faster than we think through the consequences.',
+  'era.e15.transition':
+    'Rockets leave the cradle. For Earth is a cradle, not a home: time to move out to the stars.',
+  'era.e16.transition':
+    'Star by star, humanity spreads. Colonies bloom: a whole galaxy is just waiting to live.',
+  'era.e17.transition':
+    'Only the vast void between galaxies remains. We bridge it with cosmic links: the universe becomes a neighbourhood.',
+  'era.e18.transition':
+    'At last everything converges: the entire universe gathered into a single universe-city at its peak. What could possibly go wrong?',
+  'era.e19.transition':
+    'Somewhere, a galactic-district leader forgot to turn off the gas after breakfast. The whole universe goes up in flames. Time to start over... better.',
 }

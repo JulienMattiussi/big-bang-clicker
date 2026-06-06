@@ -55,6 +55,7 @@ export function NextGoal() {
         aria-valuemin={0}
         aria-valuemax={target}
         aria-valuenow={Math.floor(current)}
+        aria-valuetext={`${formatFixed(current)} / ${formatNumber(target)}`}
         className="h-1.5 w-full overflow-hidden rounded-full bg-border"
       >
         <div className={`h-full rounded-full ${barColor}`} style={{ width: `${pct}%` }} />

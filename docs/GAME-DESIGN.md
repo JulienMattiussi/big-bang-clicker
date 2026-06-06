@@ -9,7 +9,7 @@
 
 Un jeu incrémental (clicker / idle) qui raconte l'histoire de l'univers, du
 Big Bang jusqu'à une ville-univers qui ré-explose pour tout recommencer, en
-mieux. Le joueur traverse 16 ères, chacune apportant un nouveau geste de jeu
+mieux. Le joueur traverse 20 ères, chacune apportant un nouveau geste de jeu
 (un "verbe"), tout en faisant cohabiter les ères déjà débloquées.
 
 Références assumées : **Cell to Singularity** (même thème évolutif),
@@ -33,7 +33,7 @@ Références assumées : **Cell to Singularity** (même thème évolutif),
         seuil atteint ──► nouvelle ère débloquée (nouveau verbe)
                 │
                 ▼
-     ... 16 ères ... ──► phase 15 : explosion ──► PRESTIGE (New Game+)
+     ... 20 ères ... ──► ère 19 : explosion ──► PRESTIGE (New Game+)
 ```
 
 Chaque ère est une instance du même moteur générique : une ressource locale,
@@ -118,7 +118,7 @@ combinaison. La Complexité :
 
 ### 3.3 Monnaie de prestige : les Échos
 
-Au terme de la phase 15 (la ville-univers explose), le joueur déclenche un
+Au terme de l'ère 19 (la ville-univers explose), le joueur déclenche un
 **nouveau Big Bang**. Tout est remis à zéro (ressources locales, générateurs,
 upgrades, ères) SAUF les **Échos**, gagnés en fonction de la Complexité totale
 accumulée durant la partie. Les Échos achètent des **bonus permanents** (méta-
@@ -268,12 +268,14 @@ geste de jeu distinct. **Le widget iconique de l'ère PORTE cette mécanique**
 revenir et se complexifier d'une ère à l'autre (ex : un tableau de Mendeleïev
 simple, puis plus riche). Détail dans [PHASES.md](./PHASES.md).
 
-> Mécanique technique : un widget interactif appelle `manualConvert` (moteur)
-> pour appliquer une recette **manuelle** (un clic = une combinaison ; les
-> convertisseurs `manual` ne sont ni auto-exécutés au tick ni achetables). Cela
-> fournit aussi le **moyen manuel d'obtenir une ressource** propre à chaque ère.
-> Prototype : le tableau périodique de l'ère 3 (cases cliquables qui fusionnent
-> les éléments légers en lourds, dévoilées progressivement).
+> Mécanique technique : **toute recette (convertisseur) est à la fois manuelle
+> et automatisable**. Un clic applique une recette (`manualConvert`, moteur) :
+> c'est le **moyen manuel d'obtenir une ressource** (bouton "Fabriquer", ou les
+> cases d'un widget comme le tableau périodique). Acheter des niveaux
+> l'**automatise** (elle tourne alors au tick), façon clicker (cliquer puis
+> automatiser). Prototype : le tableau périodique de l'ère 3 (cases cliquables
+> qui fusionnent les éléments légers en lourds, dévoilées progressivement ;
+> automatisation achetable dans le panneau des forges).
 
 Vue d'ensemble :
 
@@ -389,6 +391,13 @@ Règles concrètes :
 
 > Le catalogue vivant des anecdotes, easter eggs et références culturelles est
 > tenu dans [NARRATIVE.md](./NARRATIVE.md).
+
+> **Vecteur : modales d'évènements.** Le narratif et l'humour passent par un
+> système de **modales** (`src/lib/events.ts`, `EventModal`) déclenchées par :
+> le **changement d'ère** (texte d'évolution, clés `era.eN.transition`), les
+> **crises** (annonce de la régression), et un **tutoriel** à la 1re machine
+> (onboarding). Chaque évènement n'apparaît qu'une fois (`GameState.seenEvents`).
+> C'est l'emplacement privilégié des références comiques.
 
 - **Ton dominant** : émerveillement et sérieux scientifique. Le fil rouge est
   la complexité qui émerge, racontée avec curiosité et un brin d'épopée.

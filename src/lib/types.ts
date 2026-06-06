@@ -59,12 +59,6 @@ export interface ConverterDef {
   outputs: ResourceAmount[]
   baseRate: number
   cost: CostCurve[]
-  /**
-   * Manual recipe: triggered by the player via an interactive widget (one
-   * application per click), not an auto-machine. Skipped by the tick and the
-   * purchase panel. See manualConvert in engine.ts.
-   */
-  manual?: boolean
 }
 
 export type EffectType =
@@ -185,4 +179,6 @@ export interface GameState {
   totalComplexityEver: number
   /** Resources ever produced (>0). Sticky: drives lasting discovery (e.g. periodic table cells). */
   discovered: Record<ResourceId, boolean>
+  /** Event-modal ids already shown (so each narrative event fires once). */
+  seenEvents: Record<string, boolean>
 }

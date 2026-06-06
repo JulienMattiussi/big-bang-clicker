@@ -7,7 +7,7 @@ import { EraIcon } from '@/components/game/EraIcon'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
-import { canAfford, nextCost } from '@/lib/engine'
+import { canAfford, canManualConvert, nextCost } from '@/lib/engine'
 import { revealedMachines } from '@/lib/reveal'
 import { formatFixed, formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
@@ -87,7 +87,9 @@ interface RowProps {
   onBuy: () => void
   t: T
   flows: ReactNode
-  /** Converters only: enabled state and toggle. */
+  /** Converters only: manual craft (one recipe per click) + automation toggle. */
+  onCraft?: () => void
+  canCraft?: boolean
   enabled?: boolean
   onToggle?: () => void
 }
@@ -101,6 +103,8 @@ function MachineRow({
   onBuy,
   t,
   flows,
+  onCraft,
+  canCraft,
   enabled,
   onToggle,
 }: RowProps) {
@@ -131,14 +135,23 @@ function MachineRow({
         ) : null}
       </div>
       {flows}
-      <Button
-        variant="ghost"
-        className="w-full text-center whitespace-nowrap"
-        disabled={!affordable}
-        onClick={onBuy}
-      >
-        {t('ui.buy')} <span className="text-muted">({costLabel})</span>
-      </Button>
+      <div className="flex gap-2">
+        {/* Manual craft (orange = the action you trigger), constant width; then
+            automation, which flexes to absorb the variable cost label. */}
+        {onCraft ? (
+          <Button className="shrink-0 whitespace-nowrap" disabled={!canCraft} onClick={onCraft}>
+            {t('machine.craft')}
+          </Button>
+        ) : null}
+        <Button
+          variant="ghost"
+          className="flex-1 text-center whitespace-nowrap"
+          disabled={!affordable}
+          onClick={onBuy}
+        >
+          {t('ui.buy')} <span className="text-muted">({costLabel})</span>
+        </Button>
+      </div>
     </li>
   )
 }
@@ -151,9 +164,10 @@ export function PurchasePanel({ era }: { era: EraDef }) {
   const buyGenerator = useGameStore((s) => s.buyGenerator)
   const buyConverter = useGameStore((s) => s.buyConverter)
   const toggleConverter = useGameStore((s) => s.toggleConverter)
+  const manualConvert = useGameStore((s) => s.manualConvert)
   const spawn = useFeedbackStore((s) => s.spawn)
 
-  const revealed = revealedMachines(state, era)
+  const revealed = revealedMachines(state, defs, era)
 
   // Era a resource belongs to, only when it differs from the current one
   // (so the player knows which tab to open to find it).
@@ -169,6 +183,16 @@ export function PurchasePanel({ era }: { era: EraDef }) {
     for (const [id, amount] of Object.entries(cost)) {
       spawn(`res:${id}`, `-${formatNumber(amount)}`, 'spend')
     }
+  }
+
+  // Manual craft: apply one recipe by hand, with floating feedback.
+  const craft = (id: string) => {
+    const def = defs.converters[id]
+    if (!canManualConvert(state, defs, id)) return
+    manualConvert(id)
+    for (const i of def.inputs) spawn(`res:${i.resource}`, `-${formatNumber(i.amount)}`, 'spend')
+    for (const o of def.outputs)
+      spawn(`res:${o.resource}`, `+${formatNumber(o.amount)}`, 'resource')
   }
 
   return (
@@ -206,7 +230,7 @@ export function PurchasePanel({ era }: { era: EraDef }) {
             )
           })}
         {era.converters
-          .filter((id) => revealed.has(id) && !defs.converters[id].manual)
+          .filter((id) => revealed.has(id))
           .map((id) => {
             const def = defs.converters[id]
             const converterState = state.converters[id]
@@ -234,6 +258,8 @@ export function PurchasePanel({ era }: { era: EraDef }) {
                   buyConverter(id)
                   floatSpend(cost)
                 }}
+                onCraft={() => craft(id)}
+                canCraft={canManualConvert(state, defs, id)}
                 enabled={converterState?.enabled ?? true}
                 onToggle={() => toggleConverter(id)}
                 flows={

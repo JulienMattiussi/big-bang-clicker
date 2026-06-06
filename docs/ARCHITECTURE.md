@@ -13,7 +13,9 @@
 
 - **Data-driven** : aucune ère n'est codée en dur. Le moteur lit des
   **définitions** (statiques, dans `src/data/`) et fait évoluer un **état**
-  (runtime, sérialisé). Ajouter une ère = ajouter des données + du contenu i18n.
+  (runtime, sérialisé). Ajouter une ère **générique** = données + i18n. Une ère
+  dotée d'un **widget interactif** (mécanique propre, ex : tableau périodique)
+  demande en plus un composant widget (voir section 11) : exception assumée.
 - **Séparation définitions / état** : les définitions (`*Def`) ne sont **jamais
   sérialisées** ; seul l'état runtime l'est (niveaux, quantités, drapeaux). Les
   sauvegardes restent petites et le contenu peut évoluer sans casser les saves.
@@ -29,32 +31,33 @@ Voir aussi [AGENTS.md](../AGENTS.md). Détail data-driven :
 
 ```
 src/
-├── lib/
-│   ├── types.ts        # tous les types du domaine (Def + State)
-│   ├── engine.ts       # tick : production, conversion, flux nets, coûts
-│   ├── graph.ts        # réseau de ressources : recettes, dépendances, tri
-│   ├── crises.ts       # logique des crises (risque, déclenchement, effets)
-│   ├── prestige.ts     # calcul des Échos, reset New Game+
-│   ├── save.ts         # sérialisation, versioning, migrations, idle offline
-│   ├── format.ts       # notation abrégée des grands nombres
-│   └── selectors.ts    # dérivations (production nette par ressource, coûts)
+├── lib/                  # logique pure (zéro React, testée)
+│   ├── types.ts          # types du domaine (Def + State)
+│   ├── engine.ts         # tick, coûts, achats, conversion manuelle, franchissement de palier
+│   ├── graph.ts          # réseau de ressources : flux nets (réels), dépendances, tri topologique
+│   ├── reveal.ts         # dévoilement progressif (machines / ressources)
+│   ├── crises.ts         # risque, déclenchement, effets
+│   ├── prestige.ts       # Échos, reset New Game+
+│   ├── meta.ts           # méta-upgrades de prestige
+│   ├── save.ts           # état initial, sérialisation versionnée + migrations, idle, export/import
+│   └── format.ts         # notation abrégée des grands nombres
 ├── data/
-│   ├── eras/           # une définition d'ère par fichier (0..19)
-│   ├── resources.ts    # (ou réparti par ère) ResourceDef
-│   ├── widgets.ts      # mapping ère -> widget iconique
-│   └── index.ts        # agrégation typée de toutes les données
+│   ├── eras/             # une définition d'ère par fichier (era0..era4, life, civilization, space, transcendence) + factory.ts
+│   ├── crises.ts         # définitions de crises
+│   ├── metaUpgrades.ts   # définitions des méta-upgrades
+│   └── index.ts          # agrégation typée (defs)
 ├── store/
-│   ├── gameStore.ts    # état de jeu + actions
-│   ├── saveStore.ts    # persistance, export/import
-│   └── settingsStore.ts# langue, dark mode, plafond idle
-├── i18n/               # i18n custom (voir section 8)
-├── hooks/              # useTick, useGame, ...
+│   ├── gameStore.ts      # état de jeu + actions + persistance
+│   └── feedbackStore.ts  # nombres flottants transitoires (+X / -X), non persisté
+├── i18n/                 # i18n custom (voir section 10)
+├── hooks/
+│   └── useTick.ts        # boucle de jeu + autosauvegarde (+ sauvegarde à la fermeture)
 ├── components/
-│   ├── ui/             # primitives
-│   ├── game/           # ressources, usines, upgrades, crises
-│   ├── widgets/        # widgets iconiques (Bohr, Mendeleïev, phylo, Risk...)
-│   └── layout/         # coquille, navigation d'ères, paliers UI
-└── App.tsx             # navigation par état (pas de router)
+│   ├── ui/               # primitives (Button, Panel, Icon, IconBadge, FloaterLayer...)
+│   ├── game/             # ressources, machines, paliers, badges, bannières
+│   │   └── widgets/      # widgets d'ère (CoolingWidget, BohrWidget... + PeriodicTable interactif, interactive.ts)
+│   └── layout/           # coquille, navigation d'ères
+└── App.tsx               # navigation par état (pas de router)
 ```
 
 ## 3. Modèle de données (définitions statiques)
@@ -63,12 +66,14 @@ src/
 type ResourceId = string
 type EraId = string
 
-type UiTier = 'cosmos' | 'vivant' | 'civilisation' | 'spatial' | 'transcendance'
+type UiTier = 'cosmos' | 'life' | 'civilization' | 'space' | 'transcendence'
 
 interface ResourceDef {
   id: ResourceId
   eraId: EraId
   nameKey: string        // clé i18n
+  icon: string           // identifiant d'icône
+  symbol?: string        // symbole chimique (atomes) affiché à la place de l'icône
   tier: number           // profondeur dans le graphe -> récompense en Complexité
   isBase?: boolean       // productible directement (pas seulement via recette)
 }
@@ -89,7 +94,9 @@ interface GeneratorDef {
   cost: CostCurve[]
 }
 
-// "Usine" appliquant une recette (convertisseur) : entrées -> sorties
+// Recette (convertisseur) : entrées -> sorties. Toute recette est à la fois
+// déclenchable à la main (manualConvert : 1 clic = 1 recette) ET automatisable
+// en achetant des niveaux (elle tourne alors au tick). Pas de flag "manual".
 interface ConverterDef {
   id: string
   eraId: EraId
@@ -156,10 +163,12 @@ interface GameState {
   converters: Record<string, { level: number; enabled: boolean }>
   upgrades: Record<string, boolean>
   crises: Record<string, { risk: number; resolved: boolean; count: number }>
-  complexity: number           // méta-ressource
+  multipliers: Record<string, number>  // par ressource + clés 'global' et 'meta'
+  complexity: number           // méta-ressource (plafonnée au prochain palier)
   echoes: number               // monnaie de prestige
   metaUpgrades: Record<string, boolean>
   totalComplexityEver: number  // base du calcul de prestige
+  discovered: Record<ResourceId, boolean>  // ressources déjà produites (dévoilement collant)
 }
 ```
 
@@ -184,21 +193,33 @@ function tick(state: GameState, defs: GameDefs, dt: number): GameState
    - **Pas de blocage dur** (règle GAME-DESIGN 3.1ter) : la consommation est
      clampée aux stocks disponibles ; les ressources de base gardent une
      production minimale.
-3. **Flux nets** : on dérive la production nette par ressource (+entrées /
-   -consommation) pour l'affichage (voir `selectors.ts` et [UI-UX.md](./UI-UX.md)).
-4. **Complexité** : chaque combinaison effectuée crédite de la Complexité,
-   **pondérée par le `tier`** de la ressource produite (plus c'est profond dans
-   le graphe, plus ça rapporte).
-5. **Risque des crises** : mettre à jour les jauges de risque (section 7).
-6. **Déblocage d'ères** : si une condition `unlock` est remplie, ajouter l'ère
-   à `unlockedEras`.
+3. **Complexité** : chaque conversion crédite de la Complexité, **pondérée par
+   le `tier`** de la sortie (plus c'est profond, plus ça rapporte) ET
+   **décroissante avec l'ancienneté de l'ère** (`COMPLEXITY_ERA_DECAY = 50` :
+   une ère antérieure rapporte ÷50, ÷2500 deux ères plus tôt...), puis
+   **plafonnée au coût du prochain palier** (pas de dépassement passif). La
+   Complexité ne **recule que sur les crises**.
+4. **Risque des crises** : mis à jour par `updateRisk` (composé avec `tick`
+   dans le store), voir section 7.
+
+Hors `tick` (actions, dans le store / le moteur) :
+
+- **Conversion manuelle** (`manualConvert`) : applique une recette d'un clic.
+  C'est le **moyen manuel d'obtenir une ressource** ; toute recette reste aussi
+  automatisable (achat de niveaux -> exécution au tick). Voir GAME-DESIGN 7.
+- **Franchissement de palier** (`unlockNextEra` / `canUnlockNextEra`) : action
+  **manuelle** qui débloque l'ère suivante et **ne dépense pas** la Complexité.
+  Aucune ère ne se débloque automatiquement (le cap évite la cascade).
+- **Flux nets** (`graph.ts` `netFlows`) : **variation réelle** par ressource
+  (simulation d'un tick), pour l'affichage (voir [UI-UX.md](./UI-UX.md)).
 
 Déterminisme : le tick **ne lit jamais l'horloge** lui-même ; `dt` est fourni.
 Cela rend le moteur testable et compatible avec le calcul hors-ligne et la
 reprise de sauvegarde.
 
-Boucle : un hook `useTick` cadence le moteur (requestAnimationFrame ou
-intervalle fixe, ex : 10 Hz) et applique `tick` au `gameStore`.
+Boucle : le hook `useTick` cadence le moteur (intervalle fixe, 10 Hz) et applique
+`tick` au `gameStore` ; il autosauvegarde périodiquement et **à la fermeture /
+mise en arrière-plan** de la page (`pagehide` / `visibilitychange`).
 
 ## 6. Réseau de ressources (graph.ts)
 
@@ -236,14 +257,15 @@ Implémente la mécanique de [GAME-DESIGN.md](./GAME-DESIGN.md) section 6 :
 
 ## 9. Sauvegarde, export/import, idle hors-ligne (save.ts)
 
-- **Persistance** : `saveStore` s'abonne au `gameStore`, **throttle** l'écriture
-  (ex : toutes les 10 s + sur évènements majeurs) vers `localStorage` sous une
-  clé versionnée.
+- **Persistance** : le `gameStore` écrit dans `localStorage` (clé versionnée)
+  via une **autosauvegarde** périodique (`useTick`, ~10 s) ET **à la fermeture /
+  mise en arrière-plan** de la page (`pagehide` / `visibilitychange`), pour ne
+  rien perdre entre deux autosauvegardes.
 - **Versioning + migrations** : `GameState.version` ; un tableau de migrations
-  `vN -> vN+1` applique les transformations à la lecture. Toute évolution de
-  schéma ajoute une migration ; on ne casse jamais une save sans migration.
-  Les nouveaux contenus (ères, ressources) apparaissent par défaut à 0/non
-  débloqués, donc une vieille save reste valide.
+  `vN -> vN+1` s'applique à la lecture. Pour un **ajout de champ**, on n'ajoute
+  pas forcément de migration : `withDefaults` complète les champs manquants à
+  partir de l'état initial (ex : `discovered` ajouté ainsi, sans migration).
+  Une vraie évolution incompatible, elle, ajoute une migration.
 - **Idle hors-ligne** : à la reprise, `elapsed = now - lastSeen`, **plafonné**
   (anti-triche d'horloge). On crédite la production accumulée (tick en gros pas
   ou approximation fermée). Plafond réglable dans `settingsStore`.
@@ -265,6 +287,13 @@ Implémente la mécanique de [GAME-DESIGN.md](./GAME-DESIGN.md) section 6 :
 - Coquille stable + scène centrale = widget iconique de l'ère active (voir
   [UI-UX.md](./UI-UX.md)). Chaque widget lit des **données** (`src/data/`) et
   l'**état** via des sélecteurs Zustand fins.
+- Certains widgets sont **interactifs et portent la mécanique de l'ère** (ex :
+  le tableau périodique, `components/game/widgets/PeriodicTable.tsx`, enregistré
+  dans `interactive.ts` ; `ClickArea` les route, `GameShell` les place en pleine
+  largeur au-dessus des panneaux). C'est l'**exception assumée** au "100%
+  data-driven" : une telle ère demande aussi un composant. Voir GAME-DESIGN 7.
+- **Feedback** : nombres flottants `+X` / `-X` sur les compteurs
+  (`feedbackStore` + `FloaterLayer`).
 - Paliers de transformation pilotés par `EraDef.uiTier` (bascule de palette/
   layout, transitions majeures aux ères 5/6 et 12).
 - SVG d'abord ; Canvas/WebGL pour les scènes denses (Voie lactée, toile

@@ -9,16 +9,17 @@ import type { ConverterDef, EraDef, GeneratorDef, ResourceDef } from '@/lib/type
 
 export const era3Resources: ResourceDef[] = [
   { id: 'fusion', eraId: 'e3', nameKey: 'res.fusion', icon: 'flame', tier: 4, isBase: true },
+  // Heavier elements reward markedly more Complexity (incentive to climb the chain).
   { id: 'helium', eraId: 'e3', nameKey: 'res.helium', icon: 'atom', symbol: 'He', tier: 5 },
-  { id: 'carbon', eraId: 'e3', nameKey: 'res.carbon', icon: 'hexagon', symbol: 'C', tier: 6 },
-  { id: 'silicon', eraId: 'e3', nameKey: 'res.silicon', icon: 'box', symbol: 'Si', tier: 7 },
+  { id: 'carbon', eraId: 'e3', nameKey: 'res.carbon', icon: 'hexagon', symbol: 'C', tier: 8 },
+  { id: 'silicon', eraId: 'e3', nameKey: 'res.silicon', icon: 'box', symbol: 'Si', tier: 12 },
   {
     id: 'heavyElement',
     eraId: 'e3',
     nameKey: 'res.heavyElement',
     icon: 'gem',
     symbol: 'Fe',
-    tier: 8,
+    tier: 18,
   },
 ]
 
@@ -33,7 +34,10 @@ export const era3Generators: GeneratorDef[] = [
   },
 ]
 
-/** Manual fusion recipes (triggered by clicking the periodic table cells). */
+/**
+ * Fusion recipes. Each is clickable by hand (the periodic table cells) AND
+ * automatable by buying levels (auto-fusion), like every recipe now.
+ */
 export const era3Converters: ConverterDef[] = [
   {
     id: 'fuseHelium',
@@ -41,9 +45,8 @@ export const era3Converters: ConverterDef[] = [
     nameKey: 'res.helium',
     inputs: [{ resource: 'fusion', amount: 4 }],
     outputs: [{ resource: 'helium', amount: 1 }],
-    baseRate: 0,
-    cost: [],
-    manual: true,
+    baseRate: 0.5,
+    cost: [{ resource: 'fusion', base: 80, growth: 1.18 }],
   },
   {
     id: 'fuseCarbon',
@@ -51,9 +54,8 @@ export const era3Converters: ConverterDef[] = [
     nameKey: 'res.carbon',
     inputs: [{ resource: 'helium', amount: 3 }],
     outputs: [{ resource: 'carbon', amount: 1 }],
-    baseRate: 0,
-    cost: [],
-    manual: true,
+    baseRate: 0.4,
+    cost: [{ resource: 'fusion', base: 200, growth: 1.18 }],
   },
   {
     id: 'fuseSilicon',
@@ -64,9 +66,8 @@ export const era3Converters: ConverterDef[] = [
       { resource: 'helium', amount: 1 },
     ],
     outputs: [{ resource: 'silicon', amount: 1 }],
-    baseRate: 0,
-    cost: [],
-    manual: true,
+    baseRate: 0.3,
+    cost: [{ resource: 'fusion', base: 500, growth: 1.18 }],
   },
   {
     id: 'fuseIron',
@@ -74,9 +75,8 @@ export const era3Converters: ConverterDef[] = [
     nameKey: 'res.heavyElement',
     inputs: [{ resource: 'silicon', amount: 2 }],
     outputs: [{ resource: 'heavyElement', amount: 1 }],
-    baseRate: 0,
-    cost: [],
-    manual: true,
+    baseRate: 0.25,
+    cost: [{ resource: 'fusion', base: 1200, growth: 1.18 }],
   },
 ]
 
