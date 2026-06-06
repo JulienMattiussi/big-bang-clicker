@@ -166,6 +166,12 @@ tests/
 - **Qualité visuelle** : interface jolie, agréable, soignée, équilibrée
   (hiérarchie, rythme, palette, feedback sobre, densité maîtrisée). Voir
   [UI-UX.md](./docs/UI-UX.md) section 0.
+- **Accessibilité (à vérifier à CHAQUE étape)** : tout cliquable est un
+  bouton/lien avec libellé accessible ; icônes décoratives en `aria-hidden` ;
+  champs avec label ou `aria-label` ; **focus clavier visible** ; contrastes
+  suffisants (y compris icônes sur fond d'accent) ; `lang` du document = langue
+  courante ; barres de progression en `role="progressbar"` ; groupes/nav
+  étiquetés ; ne jamais coder l'information par la seule couleur.
 - **Automatisation** : clicker standard (clic -> générateurs/usines ->
   automatisation), pour garder la complexité ressentie constante. Voir
   GAME-DESIGN section 5.

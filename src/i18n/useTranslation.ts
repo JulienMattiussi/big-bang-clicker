@@ -12,6 +12,7 @@ interface UseTranslation {
 export function useTranslation(): UseTranslation {
   const locale = useI18nStore((s) => s.locale)
   const setLocale = useI18nStore((s) => s.setLocale)
-  const t = (key: TranslationKey): string => translations[locale][key] || translations.fr[key]
+  const t = (key: TranslationKey): string =>
+    translations[locale][key] || translations.fr[key] || key
   return { t, locale, setLocale }
 }

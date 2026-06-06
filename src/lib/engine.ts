@@ -87,6 +87,30 @@ export function buyConverter(state: GameState, defs: GameDefs, id: ConverterId):
 }
 
 /**
+ * Débloque les ères dont la condition (`unlock`) est remplie. Une ère sans
+ * condition n'est jamais auto-débloquée ici (l'ère de départ l'est à l'init).
+ */
+export function unlockEras(state: GameState, defs: GameDefs): GameState {
+  let unlocked = state.unlockedEras
+  let changed = false
+  for (const era of defs.eras) {
+    if (unlocked.includes(era.id)) continue
+    const { resource, amount, complexity } = era.unlock
+    if (resource === undefined && complexity === undefined) continue
+    const resourceOk = resource === undefined || (state.resources[resource] ?? 0) >= (amount ?? 0)
+    const complexityOk = complexity === undefined || state.complexity >= complexity
+    if (resourceOk && complexityOk) {
+      if (!changed) {
+        unlocked = [...unlocked]
+        changed = true
+      }
+      unlocked.push(era.id)
+    }
+  }
+  return changed ? { ...state, unlockedEras: unlocked } : state
+}
+
+/**
  * Avance l'état d'un pas de temps `dt` (en secondes) :
  * 1. production des générateurs ;
  * 2. conversions (limitées par les entrées disponibles, jamais de blocage dur) ;

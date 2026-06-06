@@ -59,13 +59,19 @@ Objectif : un moteur qui sait jouer **une** ère, piloté par des données.
 ## Phase D - Tranche verticale (vertical slice)
 
 Objectif : **2 ères jouables et reliées**, pour valider le fun et la
-cohabitation avant de produire les 16.
+cohabitation avant de produire les 20.
 
-- [ ] Ère 0 (Refroidir) + Ère 1 (Atomes) entièrement jouables.
-- [ ] Passage d'ère + cohabitation (l'ère 0 continue de tourner).
-- [ ] Méta-ressource Complexité fonctionnelle.
-- [ ] Coquille UI du tier COSMOS + un palier de transformation.
-- [ ] Playtest et ajustement de l'équilibrage.
+- [x] Ère 0 (Refroidir) + Ère 1 (Recombinaison) jouables (data-driven).
+- [x] Passage d'ère + cohabitation (la recombinaison consomme les nucléons de
+      l'ère 0, qui doit continuer de tourner).
+- [x] Méta-ressource Complexité fonctionnelle.
+- [x] Coquille UI du tier COSMOS (GameShell, panneaux ressources/production,
+      clic, onglets d'ères) + thème par palier via data-tier.
+- [x] UI bilingue (FR/EN), primitives réutilisables (`ui/Button`, `ui/Panel`),
+      curseur sur les cliquables, jetons de thème partout.
+- [ ] Playtest et ajustement de l'équilibrage (chiffres encore bruts).
+- [ ] (Plus tard) un palier de transformation visible nécessite une ère d'un
+      autre tier (VIVANT) : à voir en phase E.
 
 ## Phase E - Déroulé des ères
 

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test'
 
-test('la page affiche le titre du jeu', async ({ page }) => {
+test("la page affiche l'ère de départ", async ({ page }) => {
   await page.goto('/')
-  await expect(page.getByRole('heading', { name: 'Big Bang Clicker' })).toBeVisible()
+  // 'Big Bang' est le nom de l'ère 0, identique en FR et EN.
+  await expect(page.getByRole('heading', { name: 'Big Bang' })).toBeVisible()
 })

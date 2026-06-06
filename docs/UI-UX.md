@@ -33,6 +33,10 @@ guide chaque écran et chaque revue d'UI. Critères concrets (vérifiables) :
   soin du détail (icônes, alignements, transitions de palier) est constant.
 - **Responsive et accessible** : aussi soigné sur mobile que sur desktop ;
   navigable au clavier, contrastes et tailles respectés.
+- **Stabilité au changement de langue** : la mise en page ne doit JAMAIS bouger
+  en passant FR <-> EN. Réserver la hauteur des textes variables (accroches sur
+  2 lignes), fixer la largeur des éléments dont le libellé change (boutons,
+  sélecteur de langue), `whitespace-nowrap` sur les libellés courts.
 
 En cas de doute lors d'une revue : préférer la sobriété élégante au surchargé.
 

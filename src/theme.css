@@ -15,6 +15,9 @@
   --color-fg: var(--fg);
   --color-muted: var(--muted);
   --color-accent: var(--accent);
+  --color-secondary: var(--secondary);
+  --color-era: var(--era);
+  --color-era-2: var(--era-2);
   --color-border: var(--border);
   --color-octarine: var(--octarine);
 }
@@ -27,10 +30,15 @@
   --fg: #e8ecff;
   --muted: #9aa3c7;
   --accent: #f59e0b;
+  --secondary: #38bdf8;
   --border: #26304f;
   /* Octarine : la huitième couleur (clin d'oeil Disque-monde), réservée aux
      éléments rares/magiques. Définie ici, héritée par tous les paliers. */
   --octarine: #b026ff;
+  /* Couleurs dédiées aux icônes d'ère (duotone), distinctes de l'accent et du
+     secondaire. Identité constante d'un palier à l'autre. */
+  --era: #f472b6;
+  --era-2: #2dd4bf;
 }
 
 /* Palier VIVANT : organique, verts chauds. */
@@ -40,6 +48,7 @@
   --fg: #e7f5ea;
   --muted: #8fb2a0;
   --accent: #34d399;
+  --secondary: #22d3ee;
   --border: #1e3327;
 }
 
@@ -50,6 +59,7 @@
   --fg: #f3ecdc;
   --muted: #c2b48f;
   --accent: #d97706;
+  --secondary: #60a5fa;
   --border: #3a2f16;
 }
 
@@ -60,6 +70,7 @@
   --fg: #e3e9ff;
   --muted: #93a0c9;
   --accent: #818cf8;
+  --secondary: #22d3ee;
   --border: #1d2747;
 }
 
@@ -70,5 +81,6 @@
   --fg: #f5e9ff;
   --muted: #b89cc9;
   --accent: #f472b6;
+  --secondary: #a78bfa;
   --border: #2a1840;
 }

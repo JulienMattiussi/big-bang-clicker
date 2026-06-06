@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatNumber } from '@/lib/format'
+import { formatFixed, formatNumber } from '@/lib/format'
 
 describe('formatNumber', () => {
   it('affiche les petits nombres tels quels', () => {
@@ -22,5 +22,19 @@ describe('formatNumber', () => {
 
   it('bascule en notation scientifique pour les très grands nombres', () => {
     expect(formatNumber(1e25)).toContain('e')
+  })
+})
+
+describe('formatFixed', () => {
+  it('garde un nombre de décimales constant (pas de flick)', () => {
+    expect(formatFixed(20.9)).toBe('20.9')
+    expect(formatFixed(21)).toBe('21.0')
+    expect(formatFixed(21.1)).toBe('21.1')
+    expect(formatFixed(0)).toBe('0.0')
+  })
+
+  it('abrège aussi avec décimales fixes', () => {
+    expect(formatFixed(1500)).toBe('1.5k')
+    expect(formatFixed(2_000_000)).toBe('2.0M')
   })
 })

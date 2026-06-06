@@ -30,6 +30,8 @@ export interface ResourceDef {
   id: ResourceId
   eraId: EraId
   nameKey: string
+  /** Symbole court affiché en pastille (ex : 'H', 'e⁻'). */
+  icon: string
   /** Profondeur dans le graphe de combinaison : pondère le gain de Complexité. */
   tier: number
   /** Productible directement (pas seulement via une recette). */
@@ -99,6 +101,16 @@ export interface EraDef {
   index: number
   nameKey: string
   accrocheKey: string
+  /** Titre du panneau des ressources (vocabulaire du domaine de l'ère). */
+  stockKey: string
+  /** Titre du panneau des machines (vocabulaire du domaine de l'ère). */
+  machinesKey: string
+  /** Libellé du bouton de clic (le "verbe" de l'ère). */
+  verbKey: string
+  /** Ressource produite par le clic manuel. */
+  clickResource: ResourceId
+  /** Icône de l'ère (identifiant lucide), affichée en bicolore. */
+  icon: string
   uiTier: UiTier
   widget: string
   unlock: { resource?: ResourceId; amount?: number; complexity?: number }

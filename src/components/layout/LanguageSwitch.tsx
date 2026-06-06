@@ -7,18 +7,27 @@ const LOCALES: Locale[] = ['fr', 'en']
 export function LanguageSwitch() {
   const { t, locale, setLocale } = useTranslation()
   return (
-    <div className="flex gap-3 text-xs" aria-label={t('lang.label')}>
-      {LOCALES.map((code) => (
-        <button
-          key={code}
-          type="button"
-          onClick={() => setLocale(code)}
-          aria-pressed={locale === code}
-          className={locale === code ? 'font-bold text-accent' : 'text-muted'}
-        >
-          {code.toUpperCase()}
-        </button>
-      ))}
+    <div role="group" aria-label={t('lang.label')} className="flex gap-3 text-xs">
+      {LOCALES.map((code) => {
+        const active = locale === code
+        return (
+          <button
+            key={code}
+            type="button"
+            onClick={() => setLocale(code)}
+            disabled={active}
+            aria-pressed={active}
+            className={
+              'w-7 text-center ' +
+              (active
+                ? 'cursor-default font-bold text-accent'
+                : 'text-muted transition-colors hover:text-fg')
+            }
+          >
+            {code.toUpperCase()}
+          </button>
+        )
+      })}
     </div>
   )
 }
