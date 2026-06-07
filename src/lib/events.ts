@@ -16,6 +16,8 @@ export interface GameEvent {
   titleKey: string
   bodyKey: string
   icon?: string
+  /** When set, the modal shows this infinity pebble's drawing (discovery). */
+  galetId?: string
 }
 
 /** All events whose condition is currently satisfied (regardless of "seen"). */

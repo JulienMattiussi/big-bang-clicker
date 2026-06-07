@@ -19,10 +19,19 @@ export function costAtLevel(curve: CostCurve, level: number): number {
   return curve.base * curve.growth ** level
 }
 
-/** Rounds an upgrade cost to the nearest ten (never below 10 for a real cost). */
+/**
+ * Rounds an upgrade cost so the displayed value is clean at its own scale:
+ * to the nearest ten below 1000 (never below 10 for a real cost), and to a
+ * single significant figure above (e.g. 45.48k -> 50k, 2.03k -> 2k).
+ */
 function roundCost(amount: number): number {
-  const rounded = Math.round(amount / 10) * 10
-  return rounded === 0 && amount > 0 ? 10 : rounded
+  if (amount <= 0) return 0
+  if (amount < 1000) {
+    const rounded = Math.round(amount / 10) * 10
+    return rounded === 0 ? 10 : rounded
+  }
+  const mag = 10 ** Math.floor(Math.log10(amount))
+  return Math.round(amount / mag) * mag
 }
 
 /** Cost (multi-resource) to go from `level` to `level + 1`, rounded to the nearest ten. */
@@ -63,6 +72,28 @@ function resourceMultiplier(state: GameState, resource: ResourceId): number {
     (state.multipliers.global ?? 1) *
     (state.multipliers.meta ?? 1)
   )
+}
+
+/**
+ * Combined multiplier from active "infinity pebbles" (galets) on a generator's
+ * output. A pebble with a generatorMultiplier effect boosts generators of eras
+ * up to its `maxEraIndex` while it is found AND active.
+ */
+export function galetGeneratorMultiplier(
+  state: GameState,
+  defs: GameDefs,
+  generatorId: GeneratorId,
+): number {
+  const gen = defs.generators[generatorId]
+  if (!gen) return 1
+  const eraIdx = eraIndexFromId(gen.eraId)
+  let m = 1
+  for (const galet of defs.galets ?? []) {
+    if (galet.effect.type !== 'generatorMultiplier') continue
+    const owned = state.galets?.[galet.id]
+    if (owned?.found && owned.active && eraIdx <= galet.effect.maxEraIndex) m *= galet.effect.value
+  }
+  return m
 }
 
 /** Marks resources currently held (>0) as discovered (sticky, never unset). */
@@ -281,7 +312,11 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     if (!gen) continue
     resources[gen.output] =
       (resources[gen.output] ?? 0) +
-      level * gen.baseRate * dt * resourceMultiplier(state, gen.output)
+      level *
+        gen.baseRate *
+        dt *
+        resourceMultiplier(state, gen.output) *
+        galetGeneratorMultiplier(state, defs, id)
   }
 
   // 2. Converters: combination, bounded by available inputs.

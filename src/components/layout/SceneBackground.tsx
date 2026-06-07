@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react'
+import { useEffect, useRef, type ReactElement } from 'react'
 
 /**
  * Ambient scene background, rendered behind the whole UI. It changes by ERA
@@ -47,13 +47,31 @@ const STARS = Array.from({ length: 150 }, () => ({
 }))
 
 const rc = mulberry32(202)
-const CELLS = Array.from({ length: 8 }, () => ({
-  x: 10 + rc() * 80,
-  y: 12 + rc() * 76,
-  rx: 7 + rc() * 8,
-  ry: 5 + rc() * 6,
-  rot: rc() * 180,
-}))
+const CELLS = Array.from({ length: 26 }, () => {
+  const rx = 1.5 + rc() * 2.3
+  const ry = 1 + rc() * 1.6
+  // Slight tint variation between cells: mostly accent with a touch of secondary.
+  const mix = 62 + rc() * 33
+  return {
+    x: 6 + rc() * 88,
+    y: 8 + rc() * 84,
+    rx,
+    ry,
+    rot: rc() * 180,
+    // Nucleus offset within the cell (not always centred), organic look.
+    nx: (rc() - 0.5) * rx * 0.9,
+    ny: (rc() - 0.5) * ry * 0.9,
+    tint: `color-mix(in srgb, var(--color-accent) ${mix.toFixed(0)}%, var(--color-secondary))`,
+    // Per-cell drift (Lissajous), desynchronised: amplitudes, frequencies, phases.
+    ax: 1.5 + rc() * 3,
+    ay: 1.5 + rc() * 3,
+    fx: 0.05 + rc() * 0.12,
+    fy: 0.05 + rc() * 0.12,
+    phx: rc() * Math.PI * 2,
+    phy: rc() * Math.PI * 2,
+    rotSpeed: (rc() - 0.5) * 12,
+  }
+})
 
 const rb = mulberry32(303)
 const BUBBLES = Array.from({ length: 18 }, () => ({
@@ -165,28 +183,54 @@ function StarsScene(): ReactElement {
 }
 
 function CellsScene(): ReactElement {
+  const svgRef = useRef<SVGSVGElement>(null)
+  // Each cell drifts on its own slow Lissajous path (desynchronised), driven by
+  // rAF via the SVG transform attribute (reliable for translation). Disabled
+  // under prefers-reduced-motion.
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    let raf = 0
+    const start = performance.now()
+    const loop = (now: number) => {
+      const t = (now - start) / 1000
+      const svg = svgRef.current
+      for (let i = 0; i < CELLS.length; i++) {
+        const c = CELLS[i]
+        const x = c.x + c.ax * Math.sin(t * c.fx + c.phx)
+        const y = c.y + c.ay * Math.cos(t * c.fy + c.phy)
+        svg
+          ?.querySelector(`[data-cell="${i}"]`)
+          ?.setAttribute(
+            'transform',
+            `translate(${x.toFixed(2)} ${y.toFixed(2)}) rotate(${(c.rot + t * c.rotSpeed).toFixed(1)})`,
+          )
+      }
+      raf = requestAnimationFrame(loop)
+    }
+    raf = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(raf)
+  }, [])
+
   return (
-    <div className="bg-sway absolute inset-0">
-      <svg className={svgClass} {...svgProps}>
-        <Defs />
-        {CELLS.map((c, i) => (
-          <g key={i} transform={`rotate(${c.rot} ${c.x} ${c.y})`}>
-            <ellipse
-              cx={c.x}
-              cy={c.y}
-              rx={c.rx}
-              ry={c.ry}
-              fill="var(--color-accent)"
-              fillOpacity="0.1"
-              stroke="var(--color-accent)"
-              strokeOpacity="0.3"
-              strokeWidth="0.4"
-            />
-            <circle cx={c.x} cy={c.y} r={c.ry * 0.4} fill="var(--color-accent)" opacity="0.28" />
-          </g>
-        ))}
-      </svg>
-    </div>
+    <svg ref={svgRef} className={svgClass} {...svgProps}>
+      <Defs />
+      {CELLS.map((c, i) => (
+        <g key={i} data-cell={i} transform={`translate(${c.x} ${c.y}) rotate(${c.rot})`}>
+          <ellipse
+            cx={0}
+            cy={0}
+            rx={c.rx}
+            ry={c.ry}
+            fill={c.tint}
+            fillOpacity="0.1"
+            stroke={c.tint}
+            strokeOpacity="0.3"
+            strokeWidth="0.4"
+          />
+          <circle cx={c.nx} cy={c.ny} r={c.ry * 0.4} fill={c.tint} opacity="0.28" />
+        </g>
+      ))}
+    </svg>
   )
 }
 

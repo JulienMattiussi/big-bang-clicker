@@ -13,6 +13,13 @@ export const fr = {
   'alert.eraDeclining': 'Une ressource est en baisse dans cette ère',
   'alert.stalled': 'Bloquée : production à zéro (intrant manquant)',
   'alert.eraStalled': 'Une production est bloquée à zéro dans cette ère',
+
+  // Galets de l'infini (pierres collectionnables à effet activable).
+  'galet.found.title': "Un galet de l'infini !",
+  'galet.receptacle': "Galets de l'infini",
+  'galet.inactive': 'inactif',
+  'galet.matter.name': 'Galet peint de la matière',
+  'galet.matter.desc': "Décuple la production des usines primaires d'avant l'ère de la vie",
   'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',

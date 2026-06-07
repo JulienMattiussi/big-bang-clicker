@@ -15,6 +15,7 @@ import { spaceConverters, spaceEras, spaceGenerators, spaceResources } from './e
 import { era19, era19Generators, era19Resources } from './eras/transcendence'
 import { crisisDefs } from './crises'
 import { metaUpgradeDefs } from './metaUpgrades'
+import { galetDefs } from './galets'
 
 /**
  * Game data (data-driven). The engine is generic: adding an era = adding its
@@ -69,4 +70,5 @@ export const defs: GameDefs = {
   upgrades: {},
   crises: byId(crisisDefs),
   metaUpgrades: metaUpgradeDefs,
+  galets: galetDefs,
 }

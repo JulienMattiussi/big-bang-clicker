@@ -4,7 +4,7 @@
  */
 
 import type { GameDefs, GameState, ResourceId } from './types'
-import { tick } from './engine'
+import { galetGeneratorMultiplier, tick } from './engine'
 
 /**
  * REAL net change per resource (units/s), by simulating one second of the
@@ -40,7 +40,7 @@ export function nominalFlows(state: GameState, defs: GameDefs): Record<ResourceI
     if (level <= 0) continue
     const gen = defs.generators[id]
     if (!gen) continue
-    add(gen.output, level * gen.baseRate * mult(gen.output))
+    add(gen.output, level * gen.baseRate * mult(gen.output) * galetGeneratorMultiplier(state, defs, id))
   }
   for (const id in state.converters) {
     const cState = state.converters[id]

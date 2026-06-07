@@ -382,6 +382,38 @@
   }
 }
 
+/* Infinity-pebble receptacle: a small crafted tray with carved sockets. */
+.galet-tray {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-surface) 80%, var(--color-fg)),
+    var(--color-surface) 60%,
+    color-mix(in srgb, var(--color-surface) 80%, var(--color-bg))
+  );
+  border: 1px solid color-mix(in srgb, var(--color-border) 55%, var(--color-accent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-fg) 20%, transparent),
+    inset 0 -2px 4px color-mix(in srgb, var(--color-bg) 70%, transparent),
+    0 4px 10px -5px var(--color-bg);
+}
+.galet-socket {
+  background-image: radial-gradient(
+    circle at 50% 36%,
+    color-mix(in srgb, var(--color-bg) 92%, #000),
+    color-mix(in srgb, var(--color-bg) 55%, var(--color-surface))
+  );
+  box-shadow:
+    inset 0 2px 5px color-mix(in srgb, var(--color-bg) 75%, #000),
+    inset 0 -1px 0 color-mix(in srgb, var(--color-fg) 12%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--color-border) 70%, transparent);
+}
+.galet-socket-filled {
+  box-shadow:
+    inset 0 2px 5px color-mix(in srgb, var(--color-bg) 75%, #000),
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, var(--color-border)),
+    0 0 8px -2px color-mix(in srgb, var(--color-accent) 50%, transparent);
+}
+
 /* Event modal entrance (overlay fade + dialog pop). */
 @keyframes overlay-in {
   from {

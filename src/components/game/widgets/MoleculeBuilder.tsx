@@ -24,26 +24,72 @@ const TINT: Record<string, string> = {
   P: 'var(--color-octarine)',
 }
 
-/** A few target molecules, cycled as the player completes them. */
+/** A regular polygon ring of atoms (helper for the cyclic molecules). */
+function ring(syms: string[], r = 22): Molecule {
+  const atoms = syms.map((sym, i) => {
+    const a = -Math.PI / 2 + (i / syms.length) * Math.PI * 2
+    return { x: 50 + Math.cos(a) * r, y: 50 + Math.sin(a) * r, sym }
+  })
+  const bonds = syms.map((_, i) => [i, (i + 1) % syms.length] as [number, number])
+  return { atoms, bonds }
+}
+
+/** Target molecules, cycled as the player completes them (simple + chains + rings). */
 const MOLECULES: Molecule[] = [
+  // Dihydrogen H2.
   {
     atoms: [
-      { x: 50, y: 44, sym: 'O' },
-      { x: 33, y: 60, sym: 'H' },
-      { x: 67, y: 60, sym: 'H' },
+      { x: 38, y: 50, sym: 'H' },
+      { x: 62, y: 50, sym: 'H' },
+    ],
+    bonds: [[0, 1]],
+  },
+  // Water H2O.
+  {
+    atoms: [
+      { x: 50, y: 42, sym: 'O' },
+      { x: 34, y: 58, sym: 'H' },
+      { x: 66, y: 58, sym: 'H' },
     ],
     bonds: [
       [0, 1],
       [0, 2],
     ],
   },
+  // Carbon dioxide CO2 (linear).
+  {
+    atoms: [
+      { x: 26, y: 50, sym: 'O' },
+      { x: 50, y: 50, sym: 'C' },
+      { x: 74, y: 50, sym: 'O' },
+    ],
+    bonds: [
+      [1, 0],
+      [1, 2],
+    ],
+  },
+  // Ammonia NH3.
+  {
+    atoms: [
+      { x: 50, y: 46, sym: 'N' },
+      { x: 32, y: 58, sym: 'H' },
+      { x: 68, y: 58, sym: 'H' },
+      { x: 50, y: 70, sym: 'H' },
+    ],
+    bonds: [
+      [0, 1],
+      [0, 2],
+      [0, 3],
+    ],
+  },
+  // Methane CH4.
   {
     atoms: [
       { x: 50, y: 50, sym: 'C' },
       { x: 50, y: 28, sym: 'H' },
-      { x: 72, y: 58, sym: 'H' },
-      { x: 28, y: 58, sym: 'H' },
-      { x: 50, y: 72, sym: 'N' },
+      { x: 72, y: 62, sym: 'H' },
+      { x: 28, y: 62, sym: 'H' },
+      { x: 50, y: 72, sym: 'H' },
     ],
     bonds: [
       [0, 1],
@@ -52,24 +98,56 @@ const MOLECULES: Molecule[] = [
       [0, 4],
     ],
   },
+  // Methanol CH3OH (simplified).
   {
-    // A 5-membered ring (nucleotide-like): connect consecutive atoms.
-    atoms: Array.from({ length: 5 }, (_, i) => {
-      const a = -Math.PI / 2 + (i / 5) * Math.PI * 2
-      return {
-        x: 50 + Math.cos(a) * 22,
-        y: 50 + Math.sin(a) * 22,
-        sym: ['C', 'N', 'C', 'C', 'P'][i],
-      }
-    }),
+    atoms: [
+      { x: 40, y: 52, sym: 'C' },
+      { x: 64, y: 46, sym: 'O' },
+      { x: 26, y: 42, sym: 'H' },
+      { x: 26, y: 62, sym: 'H' },
+      { x: 78, y: 36, sym: 'H' },
+    ],
+    bonds: [
+      [0, 1],
+      [0, 2],
+      [0, 3],
+      [1, 4],
+    ],
+  },
+  // Propane: a 3-carbon zigzag chain with end hydrogens.
+  {
+    atoms: [
+      { x: 28, y: 54, sym: 'C' },
+      { x: 50, y: 46, sym: 'C' },
+      { x: 72, y: 54, sym: 'C' },
+      { x: 28, y: 36, sym: 'H' },
+      { x: 72, y: 36, sym: 'H' },
+    ],
+    bonds: [
+      [0, 1],
+      [1, 2],
+      [0, 3],
+      [2, 4],
+    ],
+  },
+  // Butane: a 4-carbon zigzag (skeletal).
+  {
+    atoms: [
+      { x: 22, y: 56, sym: 'C' },
+      { x: 40, y: 44, sym: 'C' },
+      { x: 58, y: 56, sym: 'C' },
+      { x: 76, y: 44, sym: 'C' },
+    ],
     bonds: [
       [0, 1],
       [1, 2],
       [2, 3],
-      [3, 4],
-      [4, 0],
     ],
   },
+  // Five-membered ring (nucleotide-like).
+  ring(['C', 'N', 'C', 'C', 'P']),
+  // Six-membered carbon ring (benzene-like).
+  ring(['C', 'C', 'C', 'C', 'C', 'C']),
 ]
 
 const bondKey = (a: number, b: number) => (a < b ? `${a}-${b}` : `${b}-${a}`)
@@ -127,7 +205,7 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
     <div className="flex flex-col items-center gap-3">
       <svg
         key={done}
-        viewBox="0 0 100 100"
+        viewBox="10 10 80 80"
         className="h-60 w-60 overflow-visible"
         role="group"
         aria-label={verb}
@@ -142,9 +220,10 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
               y1={mol.atoms[a].y}
               x2={mol.atoms[b].x}
               y2={mol.atoms[b].y}
-              stroke={on ? 'var(--color-accent)' : 'var(--color-border)'}
-              strokeWidth={on ? 2.4 : 1}
-              strokeDasharray={on ? undefined : '2 3'}
+              stroke={on ? 'var(--color-accent)' : 'var(--color-muted)'}
+              strokeWidth={on ? 3 : 2}
+              strokeOpacity={on ? 1 : 0.7}
+              strokeDasharray={on ? undefined : '3 2.5'}
               strokeLinecap="round"
               className={on ? 'pop-in' : undefined}
             />
@@ -157,10 +236,10 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
             <circle
               cx={atom.x}
               cy={atom.y}
-              r="8"
+              r="6.5"
               fill={selected === i ? 'var(--color-accent)' : 'var(--color-surface)'}
               stroke={TINT[atom.sym] ?? 'var(--color-border)'}
-              strokeWidth="2"
+              strokeWidth="1.8"
             />
             <text
               x={atom.x}
@@ -176,7 +255,7 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
             <circle
               cx={atom.x}
               cy={atom.y}
-              r="9"
+              r="8"
               fill="transparent"
               role="button"
               tabIndex={0}

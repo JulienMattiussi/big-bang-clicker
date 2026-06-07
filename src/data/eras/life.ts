@@ -10,10 +10,11 @@ const bundles: EraBundle[] = [
     widget: 'molecule',
     base: { id: 'molecule', icon: 'flask', tier: 6 },
     combined: { id: 'rna', icon: 'dna', tier: 8 },
-    consumes: 'planet',
+    consumes: 'carbon',
     generatorId: 'chemistry',
     converterId: 'synthesis',
     unlockComplexity: 8_000,
+    generatorBase: 50, // cheaper first usine for this era (less grind to start)
   }),
   buildEra({
     id: 'e6',

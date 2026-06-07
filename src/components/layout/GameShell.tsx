@@ -1,6 +1,7 @@
 import { LanguageSwitch } from '@/components/layout/LanguageSwitch'
 import { SaveMenu } from '@/components/layout/SaveMenu'
 import { SceneBackground } from '@/components/layout/SceneBackground'
+import { GaletReceptacle } from '@/components/layout/GaletReceptacle'
 import { EraTabs } from '@/components/game/EraTabs'
 import { ClickArea } from '@/components/game/ClickArea'
 import { isFullWidthWidget } from '@/components/game/widgets/interactive'
@@ -29,14 +30,16 @@ export function GameShell() {
   return (
     <main
       data-tier={era.uiTier}
-      className="relative isolate mx-auto flex min-h-full max-w-7xl flex-col gap-4 p-6 text-fg transition-colors duration-700"
+      className="relative isolate mx-auto flex min-h-full max-w-7xl flex-col gap-4 px-3.5 py-6 text-fg transition-colors duration-700"
     >
       {/* Ambient scene background (per era group), behind everything. */}
       <SceneBackground eraIndex={era.index} />
       {/* Top bar: central objective (Complexity + milestone, centered inline);
           language and options on the right. */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex-1" />
+        <div className="flex flex-1 items-center">
+          <GaletReceptacle />
+        </div>
         <div className="flex items-center gap-4">
           <ComplexityBadge />
           <NextGoal />
@@ -79,7 +82,7 @@ export function GameShell() {
           </section>
         </>
       ) : (
-        <section className="grid gap-4 md:grid-cols-3">
+        <section className="grid gap-4 md:grid-cols-[5fr_4fr_5fr]">
           <ResourcePanel era={era} />
           <div className="flex items-center justify-center py-6">
             <ClickArea era={era} />

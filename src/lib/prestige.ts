@@ -24,8 +24,8 @@ export function canPrestige(state: GameState): boolean {
 }
 
 /**
- * Triggers prestige: full run reset. Keeps Echoes (plus the gain), meta-upgrades
- * and the cumulative total Complexity.
+ * Triggers prestige: full run reset. Keeps Echoes (plus the gain), meta-upgrades,
+ * the cumulative total Complexity, and the infinity pebbles (kept across rebirths).
  */
 export function prestige(state: GameState, now: number): GameState {
   return {
@@ -46,5 +46,6 @@ export function prestige(state: GameState, now: number): GameState {
     totalComplexityEver: state.totalComplexityEver,
     discovered: {},
     seenEvents: {},
+    galets: state.galets ?? {},
   }
 }

@@ -9,6 +9,8 @@ import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { canAfford, canManualConvert, nextCost } from '@/lib/engine'
 import { revealedMachines } from '@/lib/reveal'
+import { galetsAffectingGenerator } from '@/lib/galets'
+import { Galet } from '@/components/game/Galet'
 import { formatFixed, formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
 import type { ConverterDef, EraDef, GameDefs, ResourceAmount, ResourceId } from '@/lib/types'
@@ -90,10 +92,21 @@ function MachineFlows({
   )
 }
 
+/** A found pebble affecting this machine (shown next to its name). */
+interface GaletBadge {
+  id: string
+  color: string
+  motif: string
+  shape?: number
+  active: boolean
+  title: string
+}
+
 interface RowProps {
   name: string
   outputIcon: string
   level: number
+  badges?: GaletBadge[]
   costLabel: string
   affordable: boolean
   onBuy: () => void
@@ -111,6 +124,7 @@ function MachineRow({
   name,
   outputIcon,
   level,
+  badges,
   costLabel,
   affordable,
   onBuy,
@@ -131,7 +145,15 @@ function MachineRow({
         {/* Gear: marks a machine that automates production. */}
         <Icon name="cog" className="h-4 w-4 shrink-0 text-accent" />
         <IconBadge icon={outputIcon} kind="machine" />
-        <span className="min-w-0 flex-1 leading-tight">{name}</span>
+        <span className="min-w-0 leading-tight">{name}</span>
+        {/* Infinity-pebble badges: a pebble that boosts this machine (dim if off). */}
+        {badges?.map((b) => (
+          <span key={b.id} title={b.title} className="inline-flex shrink-0">
+            <Galet color={b.color} motif={b.motif} shape={b.shape} size={26} dim={!b.active} />
+            <span className="sr-only">{b.title}</span>
+          </span>
+        ))}
+        <span className="flex-1" />
         <span className="shrink-0 text-xs text-muted">
           {t('ui.level')} {level}
         </span>
@@ -217,6 +239,21 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
     }
   }
 
+  // Infinity-pebble badges affecting a generator (shown next to its name).
+  const genBadges = (id: string): GaletBadge[] =>
+    galetsAffectingGenerator(state, defs, id).map((g) => {
+      const active = state.galets[g.id]?.active ?? false
+      const label = `${t(g.nameKey as TranslationKey)} - ${t(g.descKey as TranslationKey)}`
+      return {
+        id: g.id,
+        color: g.color,
+        motif: g.motif,
+        shape: g.shape,
+        active,
+        title: active ? label : `${label} (${t('galet.inactive')})`,
+      }
+    })
+
   // Manual craft: apply one recipe by hand, with floating feedback.
   const craft = (id: string) => {
     const def = defs.converters[id]
@@ -249,6 +286,7 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
                 key={id}
                 t={t}
                 name={t(def.nameKey as TranslationKey)}
+                badges={genBadges(id)}
                 outputIcon={defs.resources[def.output].icon}
                 level={level}
                 costLabel={describeCost(cost, defs, t)}

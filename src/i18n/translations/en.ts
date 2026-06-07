@@ -15,6 +15,13 @@ export const en: Translations = {
   'alert.eraDeclining': 'A resource is declining in this era',
   'alert.stalled': 'Stalled: production at zero (missing input)',
   'alert.eraStalled': 'A production is stalled at zero in this era',
+
+  // Pebbles of infinity (collectible stones with a toggleable effect).
+  'galet.found.title': 'A pebble of infinity!',
+  'galet.receptacle': 'Pebbles of infinity',
+  'galet.inactive': 'inactive',
+  'galet.matter.name': 'Painted pebble of matter',
+  'galet.matter.desc': 'Tenfold the production of the primary factories from before the Life era',
   'app.unlock': 'Reach the milestone',
   'lang.label': 'Language',
   'nav.eras': 'Eras',

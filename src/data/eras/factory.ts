@@ -20,6 +20,8 @@ export interface SimpleEraSpec {
   generatorId: string
   converterId: string
   unlockComplexity: number
+  /** Cost of the generator's first level (default 100). */
+  generatorBase?: number
 }
 
 export interface EraBundle {
@@ -57,7 +59,7 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
       nameKey: `gen.${spec.generatorId}`,
       output: base.id,
       baseRate: 1,
-      cost: [{ resource: base.id, base: 100, growth: 1.12 }],
+      cost: [{ resource: base.id, base: spec.generatorBase ?? 100, growth: 1.12 }],
     },
   ]
 

@@ -58,6 +58,10 @@ interface GameStore {
   buyMetaUpgrade: (id: string) => void
   /** Marks a narrative event as shown (so it never fires again). */
   markEventSeen: (id: string) => void
+  /** Marks an infinity pebble as found (starts active). */
+  discoverGalet: (id: string) => void
+  /** Toggles a found pebble's effect on/off. */
+  toggleGalet: (id: string) => void
 }
 
 function loadInitialState(now: number): GameState {
@@ -148,4 +152,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? {}
         : { state: { ...s.state, seenEvents: { ...s.state.seenEvents, [id]: true } } },
     ),
+  discoverGalet: (id) =>
+    set((s) =>
+      s.state.galets[id]?.found
+        ? {}
+        : { state: { ...s.state, galets: { ...s.state.galets, [id]: { found: true, active: true } } } },
+    ),
+  toggleGalet: (id) =>
+    set((s) => {
+      const galet = s.state.galets[id]
+      if (!galet?.found) return {}
+      return {
+        state: { ...s.state, galets: { ...s.state.galets, [id]: { ...galet, active: !galet.active } } },
+      }
+    }),
 }))

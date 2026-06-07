@@ -98,6 +98,30 @@ export interface MetaUpgradeDef {
   multiplier: number
 }
 
+/** Effect of an "infinity pebble" (galet) when active. */
+export interface GaletEffect {
+  /** Multiplies the output of generators of eras with index <= maxEraIndex. */
+  type: 'generatorMultiplier'
+  maxEraIndex: number
+  value: number
+}
+
+/** A collectible "pebble of infinity": found at a milestone, toggleable. */
+export interface GaletDef {
+  id: string
+  nameKey: string
+  descKey: string
+  /** Colour of the painted motif (fixed CSS token, not tier-dependent). */
+  color: string
+  /** Painted motif id drawn on the grey stone (e.g. 'atom'). */
+  motif: string
+  /** Stone silhouette index (each pebble has a different shape). */
+  shape?: number
+  /** Discovered when this era's milestone becomes reachable (before crossing). */
+  discoverEraId: EraId
+  effect: GaletEffect
+}
+
 export interface CrisisDef {
   id: CrisisId
   eraId: EraId
@@ -143,6 +167,7 @@ export interface GameDefs {
   upgrades: Record<UpgradeId, UpgradeDef>
   crises: Record<CrisisId, CrisisDef>
   metaUpgrades: MetaUpgradeDef[]
+  galets: GaletDef[]
 }
 
 export interface GeneratorState {
@@ -182,4 +207,6 @@ export interface GameState {
   discovered: Record<ResourceId, boolean>
   /** Event-modal ids already shown (so each narrative event fires once). */
   seenEvents: Record<string, boolean>
+  /** Infinity pebbles: whether each is found and currently active. */
+  galets: Record<string, { found: boolean; active: boolean }>
 }
