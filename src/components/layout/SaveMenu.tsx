@@ -85,7 +85,7 @@ function SavePanel({ onDone }: { onDone: () => void }) {
   }
 
   return (
-    <div className="absolute top-full right-0 z-10 mt-2 w-80 rounded-lg border border-border bg-surface p-4 text-left shadow-xl">
+    <div className="shadow-float absolute top-full right-0 z-10 mt-2 w-80 rounded-lg border border-border bg-surface p-4 text-left">
       <div className="flex flex-col gap-4">
         <section className="flex flex-col gap-2">
           <span className="block text-xs font-semibold tracking-wide text-muted uppercase">

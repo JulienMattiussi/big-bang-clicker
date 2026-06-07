@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
+import { clickYield } from '@/lib/engine'
 import { formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
@@ -71,9 +72,11 @@ export function StarNursery({ era }: { era: EraDef }) {
       y = 50 + Math.sin(a) * d
     }
     addPuff(x, y)
-    // Every click collapses gas: +1 gas cloud (the era's verb).
-    click(era.clickResource)
-    spawn(`res:${era.clickResource}`, '+1', 'resource')
+    // Every click collapses gas (the era's verb), scaled by the generator level.
+    const { state, defs } = useGameStore.getState()
+    const gas = clickYield(state, defs, era)
+    click(era.clickResource, gas)
+    spawn(`res:${era.clickResource}`, `+${formatNumber(gas)}`, 'resource')
     window.clearTimeout(decayRef.current)
 
     // A rapid click near the previous one continues the combo; else it restarts.

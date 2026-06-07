@@ -10,7 +10,27 @@ import { createInitialState } from '@/lib/save'
 import type { GameDefs } from '@/lib/types'
 
 const defs: GameDefs = {
-  eras: [],
+  eras: [
+    {
+      id: 'e',
+      index: 0,
+      nameKey: '',
+      taglineKey: '',
+      stockKey: '',
+      machinesKey: '',
+      verbKey: '',
+      clickResource: 'a',
+      icon: '',
+      uiTier: 'cosmos',
+      widget: 'generic',
+      unlock: {},
+      resources: ['a', 'b', 'c'],
+      generators: ['genA'],
+      converters: ['makeB', 'makeC'],
+      upgrades: [],
+      crises: [],
+    },
+  ],
   resources: {
     a: { id: 'a', eraId: 'e', nameKey: '', tier: 0, isBase: true },
     b: { id: 'b', eraId: 'e', nameKey: '', tier: 1 },
@@ -80,13 +100,14 @@ describe('decliningResources', () => {
     expect(declining.has('b')).toBe(false) // +1/s
   })
 
-  it('reste en déficit même quand le stock est à 0 (ressource affamée)', () => {
+  it('repère une ressource qui se vide car sa production amont est à sec', () => {
     const state = {
       ...createInitialState(0),
-      resources: { a: 0 }, // épuisée, mais toujours demandée
-      converters: { makeB: { level: 1, enabled: true } },
+      resources: { a: 0, b: 10 }, // makeB à sec (pas de 'a'), 'b' en stock
+      converters: { makeB: { level: 1, enabled: true }, makeC: { level: 1, enabled: true } },
     }
-    expect(decliningResources(state, defs).has('a')).toBe(true)
+    // makeB produit 0 (a=0), makeC consomme 1 b/s -> 'b' réel -1/s (capacité nominale trompeuse)
+    expect(decliningResources(state, defs).has('b')).toBe(true)
   })
 })
 
@@ -94,17 +115,19 @@ describe('stalledResources', () => {
   it("repère une production bloquée à zéro (machine affamée d'un intrant)", () => {
     const state = {
       ...createInitialState(0),
+      unlockedEras: ['e'],
       resources: { a: 0 }, // pas d'intrant, pas de générateur
       converters: { makeB: { level: 1, enabled: true } }, // pourrait produire b, mais à sec
     }
     const stalled = stalledResources(state, defs)
-    expect(stalled.has('b')).toBe(true) // capacité +1/s, réel 0/s
-    expect(stalled.has('a')).toBe(false) // 'a' est en déficit (rouge), pas bloquée
+    expect(stalled.has('b')).toBe(true) // recette dispo, b révélé, mais réel 0/s
+    expect(stalled.has('a')).toBe(false) // 'a' n'est pas une sortie de recette
   })
 
   it('ne signale pas une production qui tourne réellement', () => {
     const state = {
       ...createInitialState(0),
+      unlockedEras: ['e'],
       generators: { genA: { level: 1 } }, // alimente 'a'
       converters: { makeB: { level: 1, enabled: true } },
     }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
+import { clickYield } from '@/lib/engine'
 import { formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
@@ -76,11 +77,13 @@ export function BohrAtom({ era }: { era: EraDef }) {
     const nucleon = conv?.inputs.find((i) => i.resource !== era.clickResource)
     const haveNucleon = !nucleon || (state.resources[nucleon.resource] ?? 0) >= nucleon.amount
 
+    const yield_ = clickYield(state, defs, era)
     if (closeRef.current && conv && haveNucleon) {
-      // Capture two electrons: one binds into hydrogen, one stays with you.
-      click(era.clickResource, 2)
+      // Capture electrons (scales with the generator level): one binds into
+      // hydrogen, the rest stay with you -> net `yield_` electrons.
+      click(era.clickResource, yield_ + 1)
       manualConvert(recipe)
-      spawn(`res:${era.clickResource}`, '+1', 'resource')
+      spawn(`res:${era.clickResource}`, `+${formatNumber(yield_)}`, 'resource')
       for (const o of conv.outputs)
         spawn(`res:${o.resource}`, `+${formatNumber(o.amount)}`, 'resource')
       if (nucleon) spawn(`res:${nucleon.resource}`, `-${formatNumber(nucleon.amount)}`, 'spend')
@@ -89,9 +92,9 @@ export function BohrAtom({ era }: { era: EraDef }) {
       setFlash((f) => f + 1)
       startRef.current = performance.now()
     } else {
-      // Mistimed (or no nucleus): you still capture a loose electron.
-      click(era.clickResource)
-      spawn(`res:${era.clickResource}`, '+1', 'resource')
+      // Mistimed (or no nucleus): you still capture loose electrons (scaled).
+      click(era.clickResource, yield_)
+      spawn(`res:${era.clickResource}`, `+${formatNumber(yield_)}`, 'resource')
     }
   }
 

@@ -51,6 +51,7 @@
   --stone-light: #c2c7d0;
   --stone-dark: #6b7280;
   --galet-matter: #f5b042; /* amber - primordial matter, painted as an atom */
+  --galet-life: #3fbf6f; /* green - life, painted as a cell */
 }
 
 /* LIFE tier: organic, warm greens. */

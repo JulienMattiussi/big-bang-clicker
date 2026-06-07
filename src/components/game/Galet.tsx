@@ -26,6 +26,13 @@ const MOTIFS: Record<string, (color: string) => ReactElement> = {
       <circle r="2.4" fill={color} />
     </g>
   ),
+  // A cell: membrane with an off-centre nucleus.
+  cell: (color) => (
+    <g transform="translate(18 16)">
+      <ellipse rx="10" ry="8" fill="none" stroke={color} strokeWidth="1.4" transform="rotate(-12)" />
+      <circle cx="2.5" cy="1" r="2.8" fill={color} />
+    </g>
+  ),
 }
 
 export function Galet({

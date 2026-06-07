@@ -84,6 +84,52 @@ function NucleonIcon(props: SVGProps<SVGSVGElement>): ReactElement {
   )
 }
 
+/** Custom glyph (molecule): a water-like ball-and-stick (one O, two H, bent). */
+function MoleculeIcon(props: SVGProps<SVGSVGElement>): ReactElement {
+  return (
+    <svg {...GLYPH_PROPS} {...props}>
+      <line x1="12" y1="9" x2="6.5" y2="16" />
+      <line x1="12" y1="9" x2="17.5" y2="16" />
+      <circle cx="12" cy="9" r="3.4" fill="currentColor" stroke="none" />
+      <circle cx="6.5" cy="16.5" r="2.3" fill="currentColor" stroke="none" />
+      <circle cx="17.5" cy="16.5" r="2.3" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+/** Custom glyph (cell): a membrane with an off-centre nucleus. */
+function CellIcon(props: SVGProps<SVGSVGElement>): ReactElement {
+  return (
+    <svg {...GLYPH_PROPS} {...props}>
+      <ellipse cx="12" cy="12" rx="9" ry="7.5" transform="rotate(-12 12 12)" />
+      <circle cx="14.5" cy="13" r="2.4" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+/** Spikes for the virus glyph (capsid + glycoprotein knobs), precomputed. */
+const VIRUS_SPIKES = Array.from({ length: 8 }, (_, i) => {
+  const a = (i / 8) * Math.PI * 2
+  const c = Math.cos(a)
+  const s = Math.sin(a)
+  return { x1: 12 + c * 6, y1: 12 + s * 6, x2: 12 + c * 9.2, y2: 12 + s * 9.2, kx: 12 + c * 10, ky: 12 + s * 10 }
+})
+
+/** Custom glyph (virus): a capsid hedged with spiked glycoproteins (VIH-like). */
+function VirusIcon(props: SVGProps<SVGSVGElement>): ReactElement {
+  return (
+    <svg {...GLYPH_PROPS} {...props}>
+      <circle cx="12" cy="12" r="5.5" />
+      {VIRUS_SPIKES.map((sp, i) => (
+        <g key={i}>
+          <line x1={sp.x1} y1={sp.y1} x2={sp.x2} y2={sp.y2} />
+          <circle cx={sp.kx} cy={sp.ky} r="1.3" fill="currentColor" stroke="none" />
+        </g>
+      ))}
+    </svg>
+  )
+}
+
 type Glyph = LucideIcon | ((props: SVGProps<SVGSVGElement>) => ReactElement)
 
 /**
@@ -106,6 +152,9 @@ const ICONS: Record<string, Glyph> = {
   ellipse: EllipseIcon,
   electron: ElectronIcon,
   nucleon: NucleonIcon,
+  cell: CellIcon,
+  molecule: MoleculeIcon,
+  virus: VirusIcon,
   hexagon: Hexagon,
   globe: Globe,
   flask: FlaskConical,

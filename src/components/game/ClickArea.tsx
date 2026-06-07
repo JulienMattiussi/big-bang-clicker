@@ -4,6 +4,8 @@ import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useClickPulse } from '@/store/clickPulse'
 import { useTranslation } from '@/i18n/useTranslation'
+import { clickYield } from '@/lib/engine'
+import { formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
 
@@ -23,8 +25,10 @@ export function ClickArea({ era }: { era: EraDef }) {
   const verb = t(era.verbKey as TranslationKey)
 
   const handleClick = () => {
-    click(era.clickResource)
-    spawn(`res:${era.clickResource}`, '+1', 'resource')
+    const { state, defs } = useGameStore.getState()
+    const amount = clickYield(state, defs, era)
+    click(era.clickResource, amount)
+    spawn(`res:${era.clickResource}`, `+${formatNumber(amount)}`, 'resource')
     useClickPulse.getState().pulse() // generic verb signal (mouse + keyboard)
   }
 

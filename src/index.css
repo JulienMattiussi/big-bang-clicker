@@ -414,6 +414,65 @@
     0 0 8px -2px color-mix(in srgb, var(--color-accent) 50%, transparent);
 }
 
+/* Blade cursor for the petri-dish cut zone (a little knife, tip = hotspot). */
+.cursor-blade {
+  cursor:
+    url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='28'%20height='28'%20viewBox='0%200%2028%2028'%3E%3Cpath%20d='M5%2023l3-3'%20stroke='%235b3a1a'%20stroke-width='3'%20stroke-linecap='round'/%3E%3Cpath%20d='M7%2021L23%205l2%202L9%2023z'%20fill='%23cdd2db'%20stroke='%233a3f49'%20stroke-width='1'/%3E%3Cpath%20d='M8%2020L22%206'%20stroke='%23ffffff'%20stroke-width='1'%20stroke-linecap='round'/%3E%3C/svg%3E")
+      23 5,
+    crosshair;
+}
+
+/* Activity bar under an active machine's title: fills in 5s, loops. */
+@keyframes activity-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+/* Loop speed: 5s normally, 3s when galet-boosted. The -boost variants play a
+   quick 0.5s fill first (on upgrade) then resume looping. */
+.activity-bar,
+.activity-bar-fast,
+.activity-bar-boost,
+.activity-bar-boost-fast {
+  transform-origin: left center;
+}
+.activity-bar {
+  animation: activity-fill 5s linear infinite;
+}
+.activity-bar-fast {
+  animation: activity-fill 3s linear infinite;
+}
+.activity-bar-boost {
+  animation:
+    activity-fill 0.5s ease-out,
+    activity-fill 5s linear 0.5s infinite;
+}
+.activity-bar-boost-fast {
+  animation:
+    activity-fill 0.5s ease-out,
+    activity-fill 3s linear 0.5s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .activity-bar,
+  .activity-bar-fast,
+  .activity-bar-boost,
+  .activity-bar-boost-fast {
+    animation: none;
+    transform: scaleX(1);
+  }
+}
+
+/* Strong drop shadow for floating panels (galet tooltip, save menu) so they read
+   clearly above the panels behind them on the dark theme. */
+.shadow-float {
+  box-shadow:
+    0 8px 20px -6px rgba(0, 0, 0, 0.55),
+    0 24px 60px -12px rgba(0, 0, 0, 0.72);
+}
+
 /* Event modal entrance (overlay fade + dialog pop). */
 @keyframes overlay-in {
   from {

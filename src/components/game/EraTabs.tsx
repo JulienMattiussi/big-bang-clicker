@@ -42,7 +42,7 @@ export function EraTabs() {
             className={`${TAB_BASE} ${
               active
                 ? 'cursor-default border-accent bg-surface text-accent'
-                : 'border-border text-muted hover:bg-surface hover:text-fg'
+                : 'border-border bg-bg text-muted hover:bg-surface hover:text-fg'
             }`}
           >
             <EraIcon icon={era.icon} className="h-4 w-4" />

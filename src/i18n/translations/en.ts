@@ -18,15 +18,21 @@ export const en: Translations = {
 
   // Pebbles of infinity (collectible stones with a toggleable effect).
   'galet.found.eyebrow': 'Legendary discovery',
-  'galet.found.title': 'A pebble of infinity!',
-  'galet.found.intro':
-    'You have just uncovered an exceptional relic, polished by the ages at the very edge of the cosmos. They say only a handful exist, scattered across the whole history of the universe... and you hold the very first.',
+  'galet.found.title': 'A painted pebble of infinity!',
   'galet.found.power': 'Power',
   'galet.found.cta': 'Claim it',
-  'galet.receptacle': 'Pebbles of infinity',
+  'galet.receptacle': 'Painted pebbles of infinity',
   'galet.inactive': 'inactive',
+  'galet.active': 'active',
+  'galet.toggle': 'Click to toggle on / off',
   'galet.matter.name': 'Painted pebble of matter',
-  'galet.matter.desc': 'Tenfold the production of the primary factories from before the Life era',
+  'galet.matter.desc': 'Tenfold the production of the primary factories from before the Life era (×10 output)',
+  'galet.matter.lore':
+    'You have uncovered an exceptional relic, polished by the ages at the very edge of the cosmos: the very first one. An atom is painted on it in amber, the raw matter from which all the rest will arise.',
+  'galet.life.name': 'Painted pebble of life',
+  'galet.life.desc': 'Fivefold the production of the secondary factories up to the Life era (×5 output)',
+  'galet.life.lore':
+    'A second relic reveals itself, painted with a deep green cell. Where matter was once inert, something, at last, begins to live.',
   'app.unlock': 'Reach the milestone',
   'lang.label': 'Language',
   'nav.eras': 'Eras',
@@ -49,8 +55,8 @@ export const en: Translations = {
   'accretion.hint': 'Click inside the drifting clumps (follow them) to forge planets; elsewhere you gather dust',
   'molecule.hint': 'Link two atoms to draw a bond; complete the molecule',
   'molecule.atom': 'Atom',
-  'petri.hint': 'Click an empty cell to divide, a live one to prune; manage density',
-  'petri.cell': 'Cell',
+  'petri.hint': 'Slash the swimming cells to split them\n3 in one stroke = a bonus microbe',
+  'petri.divide': 'Split a cell',
   'balance.hint': 'Keep the needle in the green zone; push without triggering the catastrophe',
   'balance.gauge': 'Atmospheric balance',
   'balance.co2': 'CO₂',

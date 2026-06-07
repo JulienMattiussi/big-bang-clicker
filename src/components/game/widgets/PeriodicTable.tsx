@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react'
-import { canManualConvert } from '@/lib/engine'
+import { canManualConvert, clickYield, galetConverterMultiplier } from '@/lib/engine'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -65,18 +65,28 @@ export function PeriodicTable({ era }: { era: EraDef }) {
   }
 
   const onBaseClick = (resource: ResourceId) => {
-    click(resource)
-    spawn(`res:${resource}`, '+1', 'resource')
+    const amount = clickYield(state, defs, era)
+    click(resource, amount)
+    spawn(`res:${resource}`, `+${formatNumber(amount)}`, 'resource')
   }
 
   const onFuse = (converterId: ConverterId) => {
     const conv = defs.converters[converterId]
     if (!canManualConvert(state, defs, converterId)) return
-    manualConvert(converterId)
+    // Fuse a batch proportional to this forge's level (level + 1), bounded by the
+    // inputs actually available (re-checked against the live state each cycle).
+    const target = (state.converters[converterId]?.level ?? 0) + 1
+    let n = 0
+    while (n < target && canManualConvert(useGameStore.getState().state, defs, converterId)) {
+      manualConvert(converterId)
+      n++
+    }
+    if (n === 0) return
+    const g = galetConverterMultiplier(state, defs, converterId) // pebble boost on the output
     for (const input of conv.inputs)
-      spawn(`res:${input.resource}`, `-${formatNumber(input.amount)}`, 'spend')
+      spawn(`res:${input.resource}`, `-${formatNumber(input.amount * n)}`, 'spend')
     for (const output of conv.outputs)
-      spawn(`res:${output.resource}`, `+${formatNumber(output.amount)}`, 'resource')
+      spawn(`res:${output.resource}`, `+${formatNumber(output.amount * n * g)}`, 'resource')
   }
 
   const recipe = (converterId: ConverterId) => {

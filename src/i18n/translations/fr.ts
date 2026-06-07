@@ -16,15 +16,21 @@ export const fr = {
 
   // Galets de l'infini (pierres collectionnables à effet activable).
   'galet.found.eyebrow': 'Découverte légendaire',
-  'galet.found.title': "Un galet de l'infini !",
-  'galet.found.intro':
-    "Tu viens de découvrir une relique exceptionnelle, polie par les âges aux confins du cosmos. On raconte qu'il en existe une poignée, disséminées à travers toute l'histoire de l'univers... et tu tiens la toute première.",
+  'galet.found.title': "Un galet peint de l'infini !",
   'galet.found.power': 'Pouvoir',
   'galet.found.cta': "M'en emparer",
-  'galet.receptacle': "Galets de l'infini",
+  'galet.receptacle': "Galets peints de l'infini",
   'galet.inactive': 'inactif',
+  'galet.active': 'actif',
+  'galet.toggle': 'Clic : activer / désactiver',
   'galet.matter.name': 'Galet peint de la matière',
-  'galet.matter.desc': "Décuple la production des usines primaires d'avant l'ère de la vie",
+  'galet.matter.desc': "Décuple la production des usines primaires d'avant l'ère de la vie (produit ×10)",
+  'galet.matter.lore':
+    "Tu viens de découvrir une relique exceptionnelle, polie par les âges aux confins du cosmos : la toute première. Sur sa face, un atome peint à l'ambre, la matière brute dont naîtra tout le reste.",
+  'galet.life.name': 'Galet peint de la vie',
+  'galet.life.desc': "Quintuple la production des usines secondaires jusqu'à l'ère de la vie (produit ×5)",
+  'galet.life.lore':
+    "Une deuxième relique se révèle, peinte d'une cellule d'un vert profond. Là où la matière n'était qu'inerte, quelque chose, enfin, se met à vivre.",
   'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',
@@ -48,8 +54,9 @@ export const fr = {
     'Clique dans les amas mobiles (en suivant le clic) pour forger des planètes ; ailleurs, tu récoltes de la poussière',
   'molecule.hint': 'Relie deux atomes pour tracer une liaison ; complète la molécule',
   'molecule.atom': 'Atome',
-  'petri.hint': 'Clique une case vide pour diviser, une cellule pour élaguer ; gère la densité',
-  'petri.cell': 'Cellule',
+  'petri.hint':
+    "Tranche les cellules qui nagent pour les diviser\n3 d'un seul geste = un microbe en plus",
+  'petri.divide': 'Diviser une cellule',
   'balance.hint': "Garde l'aiguille dans la zone verte ; pousse sans déclencher la catastrophe",
   'balance.gauge': 'Balance atmosphérique',
   'balance.co2': 'CO₂',

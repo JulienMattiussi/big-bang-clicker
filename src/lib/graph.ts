@@ -4,7 +4,8 @@
  */
 
 import type { GameDefs, GameState, ResourceId } from './types'
-import { galetGeneratorMultiplier, tick } from './engine'
+import { tick } from './engine'
+import { revealedResources } from './reveal'
 
 /**
  * REAL net change per resource (units/s), by simulating one second of the
@@ -22,65 +23,41 @@ export function netFlows(state: GameState, defs: GameDefs): Record<ResourceId, n
 }
 
 /**
- * NOMINAL net flow per resource: full production capacity (with multipliers)
- * minus full consumption demand, ignoring current stock. Unlike `netFlows`, a
- * structural deficit shows here even when the stock has already hit 0 (the
- * resource is starved, not merely stable). Used for the shortage alert.
- */
-export function nominalFlows(state: GameState, defs: GameDefs): Record<ResourceId, number> {
-  const mult = (r: ResourceId) =>
-    (state.multipliers[r] ?? 1) * (state.multipliers.global ?? 1) * (state.multipliers.meta ?? 1)
-  const flows: Record<ResourceId, number> = {}
-  const add = (resource: ResourceId, n: number) => {
-    flows[resource] = (flows[resource] ?? 0) + n
-  }
-
-  for (const id in state.generators) {
-    const level = state.generators[id].level
-    if (level <= 0) continue
-    const gen = defs.generators[id]
-    if (!gen) continue
-    add(gen.output, level * gen.baseRate * mult(gen.output) * galetGeneratorMultiplier(state, defs, id))
-  }
-  for (const id in state.converters) {
-    const cState = state.converters[id]
-    if (!cState.enabled || cState.level <= 0) continue
-    const conv = defs.converters[id]
-    if (!conv) continue
-    const cycles = cState.level * conv.baseRate
-    for (const input of conv.inputs) add(input.resource, -input.amount * cycles)
-    for (const output of conv.outputs)
-      add(output.resource, output.amount * cycles * mult(output.resource))
-  }
-  return flows
-}
-
-/**
- * Resources in deficit: consumption capacity exceeds production capacity, so the
- * stock is draining (or already starved at 0). Based on nominal flows, so the
- * alert persists even once the stock reaches 0.
+ * Resources whose stock is REALLY decreasing right now (real net flow negative
+ * at the displayed scale). Red alert. The 0.05 threshold matches the one-decimal
+ * display (below shows "+0.0/s").
  */
 export function decliningResources(state: GameState, defs: GameDefs): Set<ResourceId> {
-  const flows = nominalFlows(state, defs)
+  const real = netFlows(state, defs)
   const declining = new Set<ResourceId>()
-  for (const id in flows) {
-    if (flows[id] < -1e-6) declining.add(id)
+  for (const id in real) {
+    if (real[id] < -0.05) declining.add(id)
   }
   return declining
 }
 
 /**
- * Resources STALLED at zero: an enabled machine has the capacity to produce them
- * (nominal flow > 0) but the real flow is ~0 because it is starved of an input.
- * Distinct from `decliningResources` (a negative nominal flow): here production
- * is simply blocked. Used for the "production at zero" alert.
+ * Resources a recipe COULD produce (revealed output of an unlocked converter)
+ * whose stock is NOT growing: the displayed net flow rounds to 0/s (and it is
+ * not declining, which is the red alert). Yellow alert ("production at zero"):
+ * recipe not built, starved, or fully consumed - the stock just isn't building
+ * up. 0.05 matches the one-decimal display ("+0.0/s").
  */
 export function stalledResources(state: GameState, defs: GameDefs): Set<ResourceId> {
-  const nominal = nominalFlows(state, defs)
   const real = netFlows(state, defs)
   const stalled = new Set<ResourceId>()
-  for (const id in nominal) {
-    if (nominal[id] > 1e-6 && (real[id] ?? 0) <= 1e-6) stalled.add(id)
+  for (const era of defs.eras) {
+    if (!state.unlockedEras.includes(era.id)) continue
+    const revealed = revealedResources(state, defs, era)
+    for (const cid of era.converters) {
+      const conv = defs.converters[cid]
+      if (!conv) continue
+      for (const output of conv.outputs) {
+        const r = output.resource
+        const flow = real[r] ?? 0
+        if (revealed.has(r) && flow >= -0.05 && flow < 0.05) stalled.add(r)
+      }
+    }
   }
   return stalled
 }

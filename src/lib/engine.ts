@@ -8,6 +8,7 @@ import type {
   ConverterId,
   CostCurve,
   EraDef,
+  EraId,
   GameDefs,
   GameState,
   GeneratorId,
@@ -75,26 +76,53 @@ function resourceMultiplier(state: GameState, resource: ResourceId): number {
   )
 }
 
-/**
- * Combined multiplier from active "infinity pebbles" (galets) on a generator's
- * output. A pebble with a generatorMultiplier effect boosts generators of eras
- * up to its `maxEraIndex` while it is found AND active.
- */
+/** Product of active galet multipliers of `type` that reach a machine's era. */
+function galetMachineMultiplier(
+  state: GameState,
+  defs: GameDefs,
+  eraId: EraId,
+  type: 'generatorMultiplier' | 'converterMultiplier',
+): number {
+  const eraIdx = eraIndexFromId(eraId)
+  let m = 1
+  for (const galet of defs.galets ?? []) {
+    if (galet.effect.type !== type) continue
+    const owned = state.galets?.[galet.id]
+    if (owned?.found && owned.active && eraIdx <= galet.effect.maxEraIndex) m *= galet.effect.value
+  }
+  return m
+}
+
+/** Multiplier from active pebbles on a generator's (primary factory) output. */
 export function galetGeneratorMultiplier(
   state: GameState,
   defs: GameDefs,
   generatorId: GeneratorId,
 ): number {
   const gen = defs.generators[generatorId]
-  if (!gen) return 1
-  const eraIdx = eraIndexFromId(gen.eraId)
-  let m = 1
-  for (const galet of defs.galets ?? []) {
-    if (galet.effect.type !== 'generatorMultiplier') continue
-    const owned = state.galets?.[galet.id]
-    if (owned?.found && owned.active && eraIdx <= galet.effect.maxEraIndex) m *= galet.effect.value
-  }
-  return m
+  return gen ? galetMachineMultiplier(state, defs, gen.eraId, 'generatorMultiplier') : 1
+}
+
+/** Multiplier from active pebbles on a converter's (secondary factory) output. */
+export function galetConverterMultiplier(
+  state: GameState,
+  defs: GameDefs,
+  converterId: ConverterId,
+): number {
+  const conv = defs.converters[converterId]
+  return conv ? galetMachineMultiplier(state, defs, conv.eraId, 'converterMultiplier') : 1
+}
+
+/**
+ * Yield of one manual "verb" action from a widget: it scales with the era's
+ * primary generator level (level + 1, so 1 at level 0, 66 at level 65) and with
+ * any active pebble boosting that generator (so 660 at level 65 with a x10 galet).
+ */
+export function clickYield(state: GameState, defs: GameDefs, era: EraDef): number {
+  const genId = era.generators[0]
+  if (!genId) return 1
+  const level = state.generators[genId]?.level ?? 0
+  return (level + 1) * galetGeneratorMultiplier(state, defs, genId)
 }
 
 /** Marks resources currently held (>0) as discovered (sticky, never unset). */
@@ -252,10 +280,12 @@ export function manualConvert(state: GameState, defs: GameDefs, id: ConverterId)
     resources[input.resource] = (resources[input.resource] ?? 0) - input.amount
   }
   const latestEra = latestUnlockedIndex(state)
+  const galet = galetConverterMultiplier(state, defs, id)
   let gained = 0
   for (const output of conv.outputs) {
     resources[output.resource] =
-      (resources[output.resource] ?? 0) + output.amount * resourceMultiplier(state, output.resource)
+      (resources[output.resource] ?? 0) +
+      output.amount * resourceMultiplier(state, output.resource) * galet
     gained += complexityFor(defs, output.resource, output.amount, latestEra)
   }
   return {
@@ -277,10 +307,12 @@ export function manualProduce(state: GameState, defs: GameDefs, id: ConverterId)
   if (!conv) return state
   const resources = { ...state.resources }
   const latestEra = latestUnlockedIndex(state)
+  const galet = galetConverterMultiplier(state, defs, id)
   let gained = 0
   for (const output of conv.outputs) {
     resources[output.resource] =
-      (resources[output.resource] ?? 0) + output.amount * resourceMultiplier(state, output.resource)
+      (resources[output.resource] ?? 0) +
+      output.amount * resourceMultiplier(state, output.resource) * galet
     gained += complexityFor(defs, output.resource, output.amount, latestEra)
   }
   return {
@@ -335,13 +367,14 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     }
     if (cycles <= 0) continue
 
+    const convGalet = galetConverterMultiplier(state, defs, id)
     for (const input of conv.inputs) {
       resources[input.resource] = (resources[input.resource] ?? 0) - input.amount * cycles
     }
     for (const output of conv.outputs) {
       resources[output.resource] =
         (resources[output.resource] ?? 0) +
-        output.amount * cycles * resourceMultiplier(state, output.resource)
+        output.amount * cycles * resourceMultiplier(state, output.resource) * convGalet
       gained += complexityFor(defs, output.resource, output.amount * cycles, latestEra)
     }
   }

@@ -72,7 +72,7 @@ export function EventModal() {
             <span className="text-lg font-semibold text-accent">
               {t(galet.nameKey as TranslationKey)}
             </span>
-            <p className="leading-relaxed text-muted">{t('galet.found.intro')}</p>
+            <p className="leading-relaxed text-muted">{t(galet.loreKey as TranslationKey)}</p>
             <div className="mt-1 flex w-full items-center gap-2 rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-left">
               <span className="shrink-0">
                 <Galet color={galet.color} motif={galet.motif} shape={galet.shape} size={24} />

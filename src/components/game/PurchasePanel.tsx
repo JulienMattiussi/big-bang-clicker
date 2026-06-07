@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Panel } from '@/components/ui/Panel'
 import { Button } from '@/components/ui/Button'
 import { IconBadge } from '@/components/ui/IconBadge'
@@ -7,13 +7,19 @@ import { EraIcon } from '@/components/game/EraIcon'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
-import { canAfford, canManualConvert, nextCost } from '@/lib/engine'
+import {
+  canAfford,
+  canManualConvert,
+  galetConverterMultiplier,
+  galetGeneratorMultiplier,
+  nextCost,
+} from '@/lib/engine'
 import { revealedMachines } from '@/lib/reveal'
-import { galetsAffectingGenerator } from '@/lib/galets'
+import { galetsAffectingConverter, galetsAffectingGenerator } from '@/lib/galets'
 import { Galet } from '@/components/game/Galet'
 import { formatFixed, formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
-import type { ConverterDef, EraDef, GameDefs, ResourceAmount, ResourceId } from '@/lib/types'
+import type { ConverterDef, EraDef, GaletDef, GameDefs, ResourceAmount, ResourceId } from '@/lib/types'
 
 type T = (key: TranslationKey) => string
 
@@ -41,6 +47,8 @@ function describeRecipe(conv: ConverterDef, defs: GameDefs, t: T): string {
 /** A machine flow entry: a resource and its per-second rate now and next level. */
 interface FlowEntry {
   icon: string
+  /** Chemical symbol (e.g. "Si"): shown instead of the icon, like the resources panel. */
+  symbol?: string
   name: string
   perSec: number
   nextPerSec: number
@@ -62,7 +70,13 @@ function FlowLine({ label, entries }: { label: string; entries: FlowEntry[] }) {
             title={e.era ? `${e.name} - ${e.era.name}` : e.name}
             className="inline-flex items-center gap-1 tabular-nums text-secondary"
           >
-            <Icon name={e.icon} className="h-3 w-3" aria-hidden />
+            {e.symbol ? (
+              <span aria-hidden className="text-[9px] leading-none font-bold">
+                {e.symbol}
+              </span>
+            ) : (
+              <Icon name={e.icon} className="h-3 w-3" aria-hidden />
+            )}
             {e.era ? <EraIcon icon={e.era.icon} className="h-3 w-3" /> : null}
             <span className="sr-only">{e.era ? `${e.name}, ${e.era.name}` : e.name}</span>
             {formatFixed(e.perSec)}
@@ -137,11 +151,37 @@ function MachineRow({
   onToggle,
 }: RowProps) {
   const toggleLabel = enabled ? t('machine.pause') : t('machine.resume')
+  const running = level >= 1 && enabled !== false
+  const boosted = !!badges?.some((b) => b.active) // an active pebble speeds it up
+  // Quick "fill" pulse on each upgrade (re-keys the bar to replay), then it loops.
+  const [boost, setBoost] = useState(0)
+  const handleBuy = () => {
+    onBuy()
+    setBoost((b) => b + 1)
+  }
   return (
     <li
       className={`flex h-full flex-col rounded-md border border-border bg-bg/40 p-2 ${enabled === false ? 'opacity-60' : ''}`}
     >
-      <div className="mb-2 flex items-center gap-2">
+      <div className="relative mb-2 rounded">
+        {/* Activity fill BEHIND the title (underlay): sweeps full then loops
+            (5s, or 3s when galet-boosted); an upgrade replays a quick fill. */}
+        {running ? (
+          <div
+            key={`${boost}-${boosted ? 'b' : 'n'}`}
+            aria-hidden
+            className={`${
+              boost > 0
+                ? boosted
+                  ? 'activity-bar-boost-fast'
+                  : 'activity-bar-boost'
+                : boosted
+                  ? 'activity-bar-fast'
+                  : 'activity-bar'
+            } absolute inset-y-0 left-0 w-full rounded bg-accent/15`}
+          />
+        ) : null}
+        <div className="relative flex items-center gap-2 px-1 py-0.5">
         {/* Gear: marks a machine that automates production. */}
         <Icon name="cog" className="h-4 w-4 shrink-0 text-accent" />
         <IconBadge icon={outputIcon} kind="machine" />
@@ -169,6 +209,7 @@ function MachineRow({
             <Icon name={enabled ? 'pause' : 'play'} className="h-3.5 w-3.5" />
           </Button>
         ) : null}
+        </div>
       </div>
       {flows}
       <div className="mt-auto flex gap-2">
@@ -190,7 +231,7 @@ function MachineRow({
           variant="ghost"
           className="flex flex-1 flex-col items-center justify-center leading-tight"
           disabled={!affordable}
-          onClick={onBuy}
+          onClick={handleBuy}
         >
           <span>{t('ui.buy')}</span>
           <span className="text-muted">({costLabel})</span>
@@ -239,9 +280,9 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
     }
   }
 
-  // Infinity-pebble badges affecting a generator (shown next to its name).
-  const genBadges = (id: string): GaletBadge[] =>
-    galetsAffectingGenerator(state, defs, id).map((g) => {
+  // Infinity-pebble badges next to a machine's name (gen = primary, conv = secondary).
+  const toBadges = (galets: GaletDef[]): GaletBadge[] =>
+    galets.map((g) => {
       const active = state.galets[g.id]?.active ?? false
       const label = `${t(g.nameKey as TranslationKey)} - ${t(g.descKey as TranslationKey)}`
       return {
@@ -253,15 +294,18 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
         title: active ? label : `${label} (${t('galet.inactive')})`,
       }
     })
+  const genBadges = (id: string) => toBadges(galetsAffectingGenerator(state, defs, id))
+  const convBadges = (id: string) => toBadges(galetsAffectingConverter(state, defs, id))
 
   // Manual craft: apply one recipe by hand, with floating feedback.
   const craft = (id: string) => {
     const def = defs.converters[id]
     if (!canManualConvert(state, defs, id)) return
     manualConvert(id)
+    const g = galetConverterMultiplier(state, defs, id) // pebble boost on the output
     for (const i of def.inputs) spawn(`res:${i.resource}`, `-${formatNumber(i.amount)}`, 'spend')
     for (const o of def.outputs)
-      spawn(`res:${o.resource}`, `+${formatNumber(o.amount)}`, 'resource')
+      spawn(`res:${o.resource}`, `+${formatNumber(o.amount * g)}`, 'resource')
   }
 
   return (
@@ -273,12 +317,14 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
             const def = defs.generators[id]
             const level = state.generators[id]?.level ?? 0
             const cost = nextCost(def.cost, level)
+            const gMult = galetGeneratorMultiplier(state, defs, id) // pebble boost
             const produce: FlowEntry[] = [
               {
                 icon: defs.resources[def.output].icon,
+                symbol: defs.resources[def.output].symbol,
                 name: t(defs.resources[def.output].nameKey as TranslationKey),
-                perSec: level * def.baseRate,
-                nextPerSec: (level + 1) * def.baseRate,
+                perSec: level * def.baseRate * gMult,
+                nextPerSec: (level + 1) * def.baseRate * gMult,
               },
             ]
             return (
@@ -308,8 +354,10 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
             const cost = nextCost(def.cost, level)
             const cycles = level * def.baseRate
             const nextCycles = (level + 1) * def.baseRate
+            const cMult = galetConverterMultiplier(state, defs, id) // pebble boost (output only)
             const toFlow = (resource: ResourceId, amount: number): FlowEntry => ({
               icon: defs.resources[resource].icon,
+              symbol: defs.resources[resource].symbol,
               name: t(defs.resources[resource].nameKey as TranslationKey),
               perSec: amount * cycles,
               nextPerSec: amount * nextCycles,
@@ -320,6 +368,7 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
                 key={id}
                 t={t}
                 name={t(def.nameKey as TranslationKey)}
+                badges={convBadges(id)}
                 outputIcon={defs.resources[def.outputs[0].resource].icon}
                 level={level}
                 costLabel={describeCost(cost, defs, t)}
@@ -337,7 +386,7 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
                   <MachineFlows
                     t={t}
                     consume={def.inputs.map((i) => toFlow(i.resource, i.amount))}
-                    produce={def.outputs.map((o) => toFlow(o.resource, o.amount))}
+                    produce={def.outputs.map((o) => toFlow(o.resource, o.amount * cMult))}
                   />
                 }
               />

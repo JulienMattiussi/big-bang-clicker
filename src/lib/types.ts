@@ -100,8 +100,12 @@ export interface MetaUpgradeDef {
 
 /** Effect of an "infinity pebble" (galet) when active. */
 export interface GaletEffect {
-  /** Multiplies the output of generators of eras with index <= maxEraIndex. */
-  type: 'generatorMultiplier'
+  /**
+   * Multiplies the output of machines of eras with index <= maxEraIndex:
+   * - generatorMultiplier: primary factories (generators);
+   * - converterMultiplier: secondary factories (converters/recipes).
+   */
+  type: 'generatorMultiplier' | 'converterMultiplier'
   maxEraIndex: number
   value: number
 }
@@ -111,6 +115,8 @@ export interface GaletDef {
   id: string
   nameKey: string
   descKey: string
+  /** Contextual flavour text shown in the discovery modal (one per pebble). */
+  loreKey: string
   /** Colour of the painted motif (fixed CSS token, not tier-dependent). */
   color: string
   /** Painted motif id drawn on the grey stone (e.g. 'atom'). */

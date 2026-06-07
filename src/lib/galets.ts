@@ -16,19 +16,36 @@ export function discoverableGalets(state: GameState, defs: GameDefs): GaletDef[]
   })
 }
 
-/** Found pebbles affecting a generator's output (for the machine badge). */
+/** Found pebbles affecting a machine of `eraId` for the given effect type. */
+function galetsAffecting(
+  state: GameState,
+  defs: GameDefs,
+  eraId: string,
+  type: GaletDef['effect']['type'],
+): GaletDef[] {
+  const eraIdx = Number(eraId.slice(1)) || 0
+  return defs.galets.filter(
+    (g) =>
+      state.galets?.[g.id]?.found && g.effect.type === type && eraIdx <= g.effect.maxEraIndex,
+  )
+}
+
+/** Found pebbles affecting a generator's output (primary factory badge). */
 export function galetsAffectingGenerator(
   state: GameState,
   defs: GameDefs,
   generatorId: string,
 ): GaletDef[] {
   const gen = defs.generators[generatorId]
-  if (!gen) return []
-  const eraIdx = Number(gen.eraId.slice(1)) || 0
-  return defs.galets.filter(
-    (g) =>
-      state.galets?.[g.id]?.found &&
-      g.effect.type === 'generatorMultiplier' &&
-      eraIdx <= g.effect.maxEraIndex,
-  )
+  return gen ? galetsAffecting(state, defs, gen.eraId, 'generatorMultiplier') : []
+}
+
+/** Found pebbles affecting a converter's output (secondary factory badge). */
+export function galetsAffectingConverter(
+  state: GameState,
+  defs: GameDefs,
+  converterId: string,
+): GaletDef[] {
+  const conv = defs.converters[converterId]
+  return conv ? galetsAffecting(state, defs, conv.eraId, 'converterMultiplier') : []
 }

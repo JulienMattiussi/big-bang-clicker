@@ -1,6 +1,7 @@
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
+import { clickYield } from '@/lib/engine'
 import { formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef, ResourceId } from '@/lib/types'
@@ -34,8 +35,10 @@ export function useEraMechanic(era: EraDef) {
 
   const gainBase = (n = 1) => {
     if (n <= 0) return
-    click(era.clickResource, n)
-    spawn(`res:${era.clickResource}`, `+${formatNumber(n)}`, 'resource')
+    const { state, defs } = useGameStore.getState()
+    const amount = n * clickYield(state, defs, era)
+    click(era.clickResource, amount)
+    spawn(`res:${era.clickResource}`, `+${formatNumber(amount)}`, 'resource')
   }
 
   /** Produces the recipe output once (free), with a floating +x on each output. */
