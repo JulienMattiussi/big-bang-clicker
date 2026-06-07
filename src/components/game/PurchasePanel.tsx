@@ -71,7 +71,10 @@ function FlowLine({ label, entries }: { label: string; entries: FlowEntry[] }) {
             className="inline-flex items-center gap-1 tabular-nums text-secondary"
           >
             {e.symbol ? (
-              <span aria-hidden className="text-[9px] leading-none font-bold">
+              <span
+                aria-hidden
+                className={`${e.symbol.length > 1 ? 'text-[9px]' : 'text-xs'} leading-none font-bold`}
+              >
                 {e.symbol}
               </span>
             ) : (

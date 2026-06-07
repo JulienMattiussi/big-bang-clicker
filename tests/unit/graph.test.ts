@@ -121,7 +121,7 @@ describe('stalledResources', () => {
     }
     const stalled = stalledResources(state, defs)
     expect(stalled.has('b')).toBe(true) // recette dispo, b révélé, mais réel 0/s
-    expect(stalled.has('a')).toBe(false) // 'a' n'est pas une sortie de recette
+    expect(stalled.has('a')).toBe(true) // 'a' = sortie de générateur révélée, à 0/s (production non bâtie)
   })
 
   it('ne signale pas une production qui tourne réellement', () => {
@@ -132,6 +132,18 @@ describe('stalledResources', () => {
       converters: { makeB: { level: 1, enabled: true } },
     }
     expect(stalledResources(state, defs).has('b')).toBe(false)
+  })
+
+  it('signale une ressource de base entièrement consommée en aval (réel ~0/s)', () => {
+    const state = {
+      ...createInitialState(0),
+      unlockedEras: ['e'],
+      resources: { a: 10 },
+      generators: { genA: { level: 1 } }, // +2 a/s
+      converters: { makeB: { level: 2, enabled: true } }, // consomme 2 a/s -> 'a' réel ~0/s
+    }
+    // Cas oxygène : produite mais intégralement consommée, le stock ne bouge pas.
+    expect(stalledResources(state, defs).has('a')).toBe(true)
   })
 })
 

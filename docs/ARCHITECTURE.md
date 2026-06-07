@@ -233,8 +233,9 @@ Hors `tick` (actions, dans le store / le moteur) :
   (différence d'un tick simulé, pour l'affichage). Deux alertes en dérivent, sur
   les seuls flux réels : `decliningResources` (rouge) = ressources qui reculent
   (consommées plus vite que produites) ; `stalledResources` (jaune) = sortie de
-  convertisseur révélée mais figée autour de zéro (production à l'arrêt). Voir
-  [UI-UX.md](./UI-UX.md).
+  machine révélée (générateur OU convertisseur, donc ressources de base
+  incluses) figée autour de zéro (production non bâtie, à sec, ou entièrement
+  consommée en aval, ex. l'oxygène). Voir [UI-UX.md](./UI-UX.md).
 
 Déterminisme : le tick **ne lit jamais l'horloge** lui-même ; `dt` est fourni.
 Cela rend le moteur testable et compatible avec le calcul hors-ligne et la

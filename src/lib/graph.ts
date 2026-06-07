@@ -37,11 +37,13 @@ export function decliningResources(state: GameState, defs: GameDefs): Set<Resour
 }
 
 /**
- * Resources a recipe COULD produce (revealed output of an unlocked converter)
- * whose stock is NOT growing: the displayed net flow rounds to 0/s (and it is
- * not declining, which is the red alert). Yellow alert ("production at zero"):
- * recipe not built, starved, or fully consumed - the stock just isn't building
- * up. 0.05 matches the one-decimal display ("+0.0/s").
+ * Resources a machine COULD produce (revealed output of an unlocked generator
+ * OR converter) whose stock is NOT growing: the displayed net flow rounds to 0/s
+ * (and it is not declining, which is the red alert). Yellow alert ("production
+ * at zero"): machine not built, starved, or fully consumed - the stock just
+ * isn't building up. Covers BASE resources too (a generator output fully eaten
+ * downstream, e.g. oxygen consumed as fast as it is produced). 0.05 matches the
+ * one-decimal display ("+0.0/s").
  */
 export function stalledResources(state: GameState, defs: GameDefs): Set<ResourceId> {
   const real = netFlows(state, defs)
@@ -49,14 +51,20 @@ export function stalledResources(state: GameState, defs: GameDefs): Set<Resource
   for (const era of defs.eras) {
     if (!state.unlockedEras.includes(era.id)) continue
     const revealed = revealedResources(state, defs, era)
+    // Every resource this era's machines are meant to output (base + combined).
+    const produced = new Set<ResourceId>()
+    for (const gid of era.generators) {
+      const gen = defs.generators[gid]
+      if (gen) produced.add(gen.output)
+    }
     for (const cid of era.converters) {
       const conv = defs.converters[cid]
       if (!conv) continue
-      for (const output of conv.outputs) {
-        const r = output.resource
-        const flow = real[r] ?? 0
-        if (revealed.has(r) && flow >= -0.05 && flow < 0.05) stalled.add(r)
-      }
+      for (const output of conv.outputs) produced.add(output.resource)
+    }
+    for (const r of produced) {
+      const flow = real[r] ?? 0
+      if (revealed.has(r) && flow >= -0.05 && flow < 0.05) stalled.add(r)
     }
   }
   return stalled
