@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
@@ -37,6 +37,7 @@ function SavePanel({ onDone }: { onDone: () => void }) {
   const [importText, setImportText] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [confirmReset, setConfirmReset] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
 
   const fieldClass = 'h-16 w-full resize-none rounded-md border border-border bg-bg p-2 text-xs'
 
@@ -59,6 +60,20 @@ function SavePanel({ onDone }: { onDone: () => void }) {
   }
 
   const doImport = () => setStatus(importSave(importText.trim()) ? 'ok' : 'error')
+
+  // Import directly from a chosen file (no copy-paste).
+  const importFromFile = async (file: File) => {
+    const text = await file.text()
+    const ok = importSave(text.trim())
+    setStatus(ok ? 'ok' : 'error')
+    if (ok) window.setTimeout(onDone, 700)
+  }
+
+  const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // allow re-selecting the same file later
+    if (file) void importFromFile(file)
+  }
 
   const doReset = () => {
     if (!confirmReset) {
@@ -93,6 +108,24 @@ function SavePanel({ onDone }: { onDone: () => void }) {
           <span className="block text-xs font-semibold tracking-wide text-muted uppercase">
             {t('save.import')}
           </span>
+          {/* Import from a file (no copy-paste needed). */}
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".txt,.json,text/plain,application/json"
+            className="sr-only"
+            aria-hidden
+            tabIndex={-1}
+            onChange={onFileChange}
+          />
+          <Button
+            variant="ghost"
+            className="w-full text-center"
+            onClick={() => fileRef.current?.click()}
+          >
+            <Icon name="upload" className="mr-1 inline h-4 w-4 align-text-bottom" />
+            {t('save.importFile')}
+          </Button>
           <textarea
             value={importText}
             onChange={(e) => setImportText(e.target.value)}

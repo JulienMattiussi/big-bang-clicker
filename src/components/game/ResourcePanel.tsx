@@ -3,7 +3,7 @@ import { IconBadge } from '@/components/ui/IconBadge'
 import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
-import { decliningResources, netFlows } from '@/lib/graph'
+import { decliningResources, netFlows, stalledResources } from '@/lib/graph'
 import { revealedMachines, revealedResources } from '@/lib/reveal'
 import { COMPLEXITY_ERA_DECAY } from '@/lib/engine'
 import { FloaterLayer } from '@/components/ui/FloaterLayer'
@@ -18,6 +18,7 @@ export function ResourcePanel({ era }: { era: EraDef }) {
   const defs = useGameStore((s) => s.defs)
   const flows = netFlows(state, defs)
   const declining = decliningResources(state, defs)
+  const stalled = stalledResources(state, defs)
   const revealed = revealedResources(state, defs, era)
 
   const eraIndex = (eraId: string) => Number(eraId.slice(1)) || 0
@@ -76,17 +77,29 @@ export function ResourcePanel({ era }: { era: EraDef }) {
                 className="relative flex items-center justify-between gap-3"
               >
                 <span className="flex min-w-0 items-center gap-2">
-                  {/* Notification badge overlapping the icon's corner when the
-                      resource is declining (consumed faster than produced). */}
+                  {/* Notification badge overlapping the icon's corner: red when
+                      the resource is declining (consumed faster than produced),
+                      yellow when its production is stalled at zero (starved). */}
                   <span
                     className="relative inline-flex shrink-0"
-                    title={declining.has(id) ? t('alert.declining') : undefined}
+                    title={
+                      declining.has(id)
+                        ? t('alert.declining')
+                        : stalled.has(id)
+                          ? t('alert.stalled')
+                          : undefined
+                    }
                   >
                     <IconBadge icon={def.icon} symbol={def.symbol} kind="resource" />
                     {declining.has(id) ? (
                       <span className="pointer-events-none absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] leading-none font-bold text-white shadow">
                         <span aria-hidden>!</span>
                         <span className="sr-only">{t('alert.declining')}</span>
+                      </span>
+                    ) : stalled.has(id) ? (
+                      <span className="pointer-events-none absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-yellow-400 text-[10px] leading-none font-bold text-black shadow">
+                        <span aria-hidden>!</span>
+                        <span className="sr-only">{t('alert.stalled')}</span>
                       </span>
                     ) : null}
                   </span>

@@ -144,12 +144,26 @@ Les deux transformations majeures (apparition de la vie ; apparition des
 sociétés) modifient la mise en page, la palette et l'iconographie, pas
 seulement les libellés. Les autres ères changent surtout leur scène/widget.
 
+### 3.1 Fond ambiant par groupe d'ères
+
+Derrière toute l'UI, un **fond animé** (`components/layout/SceneBackground.tsx`)
+évolue par **groupe d'ères**, à une granularité plus fine que la couleur de
+palier : gaz primordial informe (e0-e1), champ d'étoiles (e2-e4), cellules
+(e5-e6), mer organique avec bulles (e7-e10), toile de civilisation (e11-e14),
+champ galactique (e15-e18), singularité en contraction (e19). Il **utilise les
+jetons sémantiques**, donc il se recolore avec le palier (basculements radicaux
+à e5 et e11). Décoratif : `aria-hidden`, sans interaction, lent et sobre,
+désactivé sous `prefers-reduced-motion`. Le changement de scène et de couleur
+est adouci par un fondu et des `transition-colors`. Les transforms SVG se
+limitent à scale/opacity/rotate (fiables) ; les translations vivent sur des
+conteneurs HTML.
+
 ## 4. Design system
 
 - **Thèmes centralisés (un par palier)** : tout le style passe par des **jetons
   sémantiques** définis dans `src/theme.css` via Tailwind v4 (`@theme inline` +
-  variables CSS). Chaque palier (cosmos, vivant, civilisation, spatial,
-  transcendance) est un **thème** qui redéfinit les variables ; basculer
+  variables CSS). Chaque palier (cosmos, life, civilization, space,
+  transcendence) est un **thème** qui redéfinit les variables ; basculer
   l'attribut `data-tier` re-thématise toute l'UI en dessous.
 - **Jetons disponibles** : `bg-bg`, `bg-surface`, `text-fg`, `text-muted`,
   `text-accent` / `bg-accent`, `border-border`, `text-octarine` (couleur rare).

@@ -1,29 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cd:*)",
-      "Bash(npm:*)",
-      "Bash(npx:*)",
-      "Bash(make:*)",
-      "Bash(git status:*)",
-      "Bash(git diff:*)",
-      "Bash(git log:*)",
-      "Bash(git show:*)",
-      "Bash(ls:*)",
-      "Bash(find:*)",
-      "Bash(grep:*)",
-      "Bash(tail:*)",
-      "Bash(head:*)",
-      "Bash(wc:*)",
-      "Bash(which:*)",
-      "Bash(mkdir:*)",
-      "Bash(cp:*)",
-      "Bash(mv:*)",
-      "Bash(curl -s http://localhost:*)",
-      "Bash(node:*)",
-      "Bash(rm:*)",
-      "Bash(touch:*)",
-      "Bash(cat:*)"
+      "Bash(npm -v)",
+      "Bash(npm install *)",
+      "Bash(make check *)",
+      "Bash(npx tsc *)",
+      "Bash(node -e \"const p=require\\('./node_modules/vitest/package.json'\\); console.log\\(Object.keys\\(p.dependencies||{}\\).filter\\(d=>d.includes\\('vite-node'\\)\\)\\)\")"
     ]
   }
 }

@@ -1,0 +1,289 @@
+# Big Bang Clicker - Catalogue de conception des widgets-mécaniques
+
+> **Statut : implémentés.** Les 10 widgets des ères 4 à 13 décrits ici sont
+> codés et branchés (`src/components/game/widgets/`, registre `interactive.ts`).
+> Ce document reste la référence de conception.
+>
+> Conception des widgets des **ères 4 à 13** (les ères 0-3 étaient déjà
+> implémentées). Respecte le
+> [playbook widgets](./UI-UX.md) et les règles d'[AGENTS](../AGENTS.md) :
+> mécanique concrète, jolie + réactive, anti-frustration (jamais d'échec sec),
+> manuel + automatisable, accessibilité (clavier, aria), science respectée,
+> peut revenir et se complexifier.
+
+## Principe : faire progresser l'expérience
+
+Le **type d'interaction évolue** avec le récit, pour casser la monotonie : on
+passe de la **dextérité/artisanat** (jauge, timing, semis, fusion) à des
+**systèmes vivants** (équilibre, croissance, assemblage), puis à de la
+**stratégie cognitive et sociale** (arbre, mémoire, urbanisme, carte). La
+**gestion de ressources** elle-même évolue à partir de l'ère 7 (équilibres à
+tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
+
+| Ère | Thème | Widget | Archétype d'interaction (nouveau) |
+|----:|-------|--------|-----------------------------------|
+| 0 | Big Bang | jauge de température | *(fait)* jauge |
+| 1 | Recombinaison | atome de Bohr | *(fait)* capture d'un mobile (timing) |
+| 2 | Premières étoiles | pépinière | *(fait)* semis + combo de clics |
+| 3 | Forges stellaires | tableau périodique | *(fait)* grille de fusion |
+| **4** | Système solaire | disque d'accrétion | **fusion physique** (collisions, croissance) |
+| **5** | Briques de la vie | molécules boule-tige | **tracer des liaisons** (graphe à dessiner) |
+| **6** | Premières vies | boîte de Petri | **automate / culture** (diviser, élaguer) |
+| **7** | Grande Oxydation | balance atmosphérique | **équilibre à tenir** (corde raide) |
+| **8** | Eucaryotes | endosymbiose | **glisser-engloutir** (combiner A dans B) |
+| **9** | Cambrien | atelier du vivant | **assemblage modulaire** (équiper un plan de corps) |
+| **10** | Conquête des terres | arbre du vivant | **arbre qui ramifie** (croissance + extinctions) |
+| **11** | Intelligence | constellation d'idées | **mémoire / séquence** (Simon) |
+| **12** | Sociétés | plan de la cité | **placement sur grille** (adjacences) |
+| **13** | Nations | carte du monde | **contrôle de territoire** (diplomatie vs guerre) |
+
+---
+
+## Ère 4 - Système solaire : disque d'accrétion
+
+- **Ressources / recette** : `dust` (+ `heavyElement` de l'ère 3) -> `planet`
+  (recette `accretion`). Verbe : Accréter.
+- **Mécanique - fusion physique.** Un disque protoplanétaire tourne ; des
+  **planétésimaux** y dérivent. On les **pousse au clic/drag** vers le centre ;
+  deux corps qui se touchent **fusionnent** en un plus gros (croissance type
+  boule de neige : poussière -> caillou -> planétésimal -> planète). Atteindre
+  une taille seuil détache une **planète**.
+- **Progression / nouveauté** : première mécanique de **collision/croissance**
+  (rien de tel avant). On gère plusieurs corps qui grossissent en parallèle.
+- **Gestion de ressources** : classique (les corps accumulent de la "masse" =
+  poussière + éléments lourds ; la masse seuil produit `planet`).
+- **Implémentation** : manuel = pousser/fusionner ; auto = `accretion`
+  automatisée (achat de niveaux). Anti-frustration = pas d'échec ; pousser
+  rate juste = le corps continue de dériver. a11y = bouton "Accréter" qui
+  fusionne le couple le plus proche (clavier). Récurrence : revient à l'ère
+  spatiale (former des systèmes entiers).
+
+```
+        . o     . O          o = caillou, O = planétésimal
+   .  o    ( * )   O   .      ( * ) = soleil ; clic/drag -> rapproche
+      . O      .  o           contact -> fusion -> plus gros -> Planète
+```
+
+## Ère 5 - Briques de la vie : molécules boule-tige
+
+- **Ressources / recette** : `molecule` -> `rna` (recette `synthesis`). Verbe :
+  Synthétiser.
+- **Mécanique - tracer des liaisons.** Des atomes (boules : C, H, O, N)
+  flottent ; on **trace une liaison en glissant** d'un atome à un autre.
+  Compléter le motif d'une molécule cible (ex : une base d'ARN) la **produit**
+  et libère les atomes. Modèle boule-tige authentique.
+- **Progression / nouveauté** : premier **dessin de graphe** (on construit une
+  structure en reliant des nœuds), très différent du clic/placement.
+- **Gestion de ressources** : les atomes sont une "réserve" qu'on assemble ; la
+  molécule finie devient la ressource. Introduit l'idée de **recette spatiale**
+  (la forme compte), pas juste une quantité.
+- **Implémentation** : manuel = tracer les liaisons (`manualProduce` à la
+  complétion) ; auto = `synthesis` automatisée. Anti-frustration = liaison
+  fausse -> elle se défait doucement, pas de perte. a11y = au clavier, un
+  bouton "lier" qui relie la prochaine paire valide. Récurrence : revient pour
+  des molécules plus grosses (protéines, ADN).
+
+## Ère 6 - Premières vies : boîte de Petri
+
+- **Ressources / recette** : `cell` -> `microbe` (recette `division`). Verbe :
+  Répliquer.
+- **Mécanique - automate / culture.** Une boîte de Petri (petite grille
+  organique). On **tape une cellule pour la diviser** dans une case voisine
+  libre ; les cellules se répliment aussi toutes seules lentement. Mais la
+  **surpopulation** asphyxie : trop dense -> des cellules meurent. On **gère la
+  densité** (élaguer, laisser de l'espace) pour maximiser la production de
+  microbes.
+- **Progression / nouveauté** : première **simulation spatiale vivante**
+  (croissance + mort), proche d'un automate cellulaire. On entretient un
+  système, on ne fait pas qu'accumuler.
+- **Gestion de ressources** : nouveauté - une **population vivante** sur une
+  grille, avec une **capacité de charge** (densité optimale). La ressource
+  dépend de l'état spatial, pas d'un simple compteur.
+- **Implémentation** : manuel = diviser/élaguer ; auto = `division` (réplication
+  passive). Anti-frustration = la surpopulation ralentit, ne détruit pas tout
+  (rebond). a11y = boutons "Diviser" / "Élaguer". Récurrence : multicellularité.
+
+## Ère 7 - Grande Oxydation : balance atmosphérique
+
+- **Ressources / recette** : `oxygen` -> `atmosphere` (recette `oxidation`).
+  Verbe : Oxygéner.
+- **Mécanique - équilibre à tenir.** Une **balance** (CO2 d'un côté, O2 de
+  l'autre) avec une **zone verte** au milieu. Cliquer "Oxygéner" pousse vers
+  l'O2 ; l'atmosphère dérive seule vers le CO2. Le but : **maintenir l'aiguille
+  dans la zone** pour produire de l'atmosphère stable. Pousser trop fort = la
+  **Grande Oxydation / catastrophe de l'oxygène** (crise narrative) : effondrement
+  puis rebond (vie aérobie).
+- **Progression / nouveauté** : première mécanique d'**homéostasie** (tenir un
+  équilibre, pas accumuler). Tension nouvelle : trop peu ET trop sont mauvais.
+- **Gestion de ressources** : évolution forte - la ressource n'est pas un stock
+  qu'on maximise mais un **équilibre dynamique**. Lié à une **crise**.
+- **Implémentation** : manuel = pousser l'aiguille ; auto = une régulation
+  achetable qui amortit la dérive (élargit la zone verte). Anti-frustration =
+  sortir de la zone = production réduite, pas zéro ; la catastrophe est un
+  rebond net positif. a11y = `role="slider"`/`progressbar` + valeur lue, bouton
+  "Oxygéner". Récurrence : climat/terraformation aux ères spatiales.
+
+```
+   [ CO2 ======|##ZONE##|====== O2 ]   garder l'aiguille | dans ##
+        derive <-                       clic "Oxygener" -> pousse a droite
+```
+
+## Ère 8 - Eucaryotes : endosymbiose
+
+- **Ressources / recette** : `organelle` -> `eukaryote` (recette
+  `endosymbiosis`). Verbe : Fusionner.
+- **Mécanique - glisser-engloutir.** Une grande cellule-hôte au centre ; de
+  petites **organites** (mitochondrie, chloroplaste) dérivent autour. On en
+  **glisse une dans l'hôte** : si elle est compatible / au bon moment, elle est
+  **engloutie** (symbiose) et la cellule gagne une fonction -> produit un
+  eucaryote. Combiner **deux choses distinctes** délibérément.
+- **Progression / nouveauté** : geste de **glisser-déposer combinatoire** (A
+  dans B), différent de la collision passive (ère 4) et du tracé (ère 5).
+- **Gestion de ressources** : la cellule-hôte **accumule des fonctions**
+  (organites internes) ; chaque type d'organite ajoute un bonus -> ressource
+  composite.
+- **Implémentation** : manuel = drag organite -> hôte ; auto = `endosymbiosis`.
+  Anti-frustration = mauvaise organite -> rejetée en douceur, réessaye. a11y =
+  liste d'organites avec bouton "Engloutir". Récurrence : symbioses plus
+  complexes.
+
+## Ère 9 - Cambrien : atelier du vivant
+
+- **Ressources / recette** : `tissue` -> `organism` (recette `differentiation`).
+  Verbe : Assembler.
+- **Mécanique - assemblage modulaire.** Un **plan de corps** (silhouette) avec
+  des emplacements (yeux, membres, carapace, nageoires). On **équipe** les
+  emplacements avec des tissus différenciés (glisser/cliquer une "pièce" sur un
+  slot). Une combinaison complète **produit un organisme** ; des combos
+  particuliers donnent des bonus (explosion des formes du Cambrien).
+- **Progression / nouveauté** : **loadout / personnalisation** (on compose une
+  entité à partir de modules), inédit. Invite à expérimenter des combinaisons.
+- **Gestion de ressources** : les tissus sont des **composants** ; les
+  organismes produits varient selon l'assemblage (qualité/bonus), pas qu'une
+  quantité.
+- **Implémentation** : manuel = équiper les slots ; auto = `differentiation`
+  produit l'organisme "standard". Anti-frustration = combo non optimale =
+  organisme basique, jamais rien. a11y = slots = boutons étiquetés. Récurrence :
+  morphologies avancées aux ères suivantes.
+
+## Ère 10 - Conquête des terres : arbre du vivant
+
+- **Ressources / recette** : `flora`/`fauna` (recette `evolution`). Verbe :
+  Faire évoluer. **Crise** : extinction de masse (ère 10).
+- **Mécanique - arbre qui ramifie.** Un **arbre phylogénétique** qui pousse :
+  à chaque nœud, on **choisit une branche** (mutation/lignée) à faire évoluer
+  (clic). Chaque branche vivante **produit** de la biodiversité. Lors d'une
+  **extinction**, une partie des branches **meurt** (visuellement élaguée) ;
+  une branche mineure **rebondit** en explosant de diversité (mammifères après
+  les dinosaures).
+- **Progression / nouveauté** : première **structure persistante stratégique**
+  (un arbre qu'on cultive sur la durée), couplée aux **crises**. On prend des
+  décisions de long terme.
+- **Gestion de ressources** : forte évolution - la production est **portée par
+  les branches vivantes** ; on peut **perdre** des branches (extinction), donc
+  diversifier devient une stratégie de résilience.
+- **Implémentation** : manuel = choisir/étendre des branches ; auto =
+  `evolution`. Anti-frustration = l'extinction est un rebond net positif
+  (mécanique de crise existante). a11y = arbre navigable au clavier (nœuds =
+  boutons). Récurrence : arbre des civilisations / des technologies.
+
+```
+            o--- (branche A)
+   racine --+--- (branche B) === vivante, produit
+            o--- (branche C)  X  eteinte (extinction) -> une mineure rebondit
+```
+
+## Ère 11 - Intelligence : constellation d'idées (mémoire)
+
+- **Ressources / recette** : `tool` -> `knowledge` (recette `learning`). Verbe :
+  Apprendre.
+- **Mécanique - mémoire / séquence (Simon).** Des "idées" (nœuds d'une
+  constellation) **s'illuminent dans un ordre** ; le joueur **reproduit la
+  séquence** en cliquant les nœuds dans le bon ordre (apprendre = retenir et
+  transmettre). Réussir produit du `knowledge` ; les séquences **s'allongent**
+  avec le niveau.
+- **Progression / nouveauté** : pure mécanique de **mémoire**, inédite et
+  cérébrale - colle au thème de l'éveil de l'esprit. Casse franchement la
+  routine.
+- **Gestion de ressources** : le `knowledge` récompense la **performance**
+  (longueur de séquence réussie), introduisant une ressource liée à l'habileté
+  cognitive.
+- **Implémentation** : manuel = reproduire la séquence ; auto = `learning`
+  (transmission passive du savoir). Anti-frustration = une erreur = séquence
+  plus courte validée (savoir partiel), jamais zéro. a11y = nœuds = boutons
+  numérotés, séquence aussi annoncée (aria-live) pour ne pas dépendre du seul
+  visuel. Récurrence : sciences, paradigmes.
+
+## Ère 12 - Sociétés : plan de la cité
+
+- **Ressources / recette** : `population` -> `city` (recette `construction`).
+  Verbe : Bâtir. **Crise** : esclavage/révolte (Starpacus, ère 12).
+- **Mécanique - placement sur grille (adjacences).** Une grille de terrain ; on
+  **pose des bâtiments** (habitations, fermes, ateliers, marchés) en choisissant
+  l'emplacement. Les **adjacences** donnent des bonus (ferme à côté d'habitation,
+  marché entre ateliers...). Optimiser le plan **augmente la production** de
+  cité/population.
+- **Progression / nouveauté** : premier **puzzle d'optimisation spatiale** (où
+  poser pour maximiser), façon city-builder léger. Décisions de placement
+  durables.
+- **Gestion de ressources** : nouveauté - la production dépend de la
+  **disposition** (adjacences), pas seulement des quantités. Couplée à la crise
+  de révolte (sur-exploitation -> rebond).
+- **Implémentation** : manuel = poser/déplacer des bâtiments ; auto =
+  `construction`. Anti-frustration = mauvais placement = bonus moindre, jamais
+  négatif ; on peut redéplacer. a11y = grille de cases-boutons + palette de
+  bâtiments. Récurrence : mégastructures galactiques, ville-univers (finale).
+
+```
+   [Hab][Fer][   ]      adjacence Hab+Fer = bonus nourriture
+   [Ate][Mar][Ate]      Marche entre 2 Ateliers = bonus commerce
+   [   ][Hab][   ]      poser pour maximiser les voisinages
+```
+
+## Ère 13 - Nations : carte du monde
+
+- **Ressources / recette** : `trade` -> `empire` (recette `conquest`). Verbe :
+  Négocier / Conquérir.
+- **Mécanique - contrôle de territoire (Risk léger).** Une **carte de régions**.
+  Chaque région **non contrôlée** peut être prise de deux façons : **négocier**
+  (lent, sûr, pacifique -> `trade`) ou **conquérir** (rapide, risqué, monte la
+  tension -> `empire`). Contrôler des régions **produit** de l'influence ; les
+  régions adjacentes contrôlées forment des **blocs** (bonus). La voie guerrière
+  alimente la **course à l'armement** (lien vers la crise atomique de l'ère 14).
+- **Progression / nouveauté** : première **stratégie de carte avec choix
+  moral/tactique** (diplomatie vs guerre), apogée de la montée en complexité
+  stratégique. Deux styles de jeu.
+- **Gestion de ressources** : forte évolution - production **territoriale** +
+  un **axe de choix** (commerce vs conquête) qui oriente quelles ressources on
+  privilégie et le niveau de risque.
+- **Implémentation** : manuel = cliquer une région -> Négocier / Conquérir ;
+  auto = `conquest` (expansion passive). Anti-frustration = une conquête ratée
+  = région non prise + un peu de tension, jamais de perte sèche. a11y = régions
+  = boutons étiquetés (nom + action). Récurrence : fédérations galactiques,
+  intergalactique.
+
+```
+   ( A )==( B )   ( C )      A,B controlees (bloc -> bonus)
+      \\    |       |         C neutre : [Negocier] (sur) ou [Conquerir] (risque)
+   ( D )--( E )==( F )
+```
+
+---
+
+## Notes transverses
+
+- **Réutilisation moteur** : chaque widget pilote les ressources/recettes
+  existantes via `manualProduce` / `manualConvert` / `click` + flottants ; le
+  fond idle reste l'automatisation (`tick`).
+- **Nouveaux états** : certaines mécaniques (Petri, arbre, cité, carte)
+  demandent un **état de widget persistant** (grille, structure). À décider :
+  local (non sauvegardé, se reconstruit) ou ajouté à `GameState` (comme
+  `discovered`/`seenEvents`, avec `withDefaults`). Privilégier le local quand la
+  structure peut se régénérer ; persister quand la disposition est un acquis du
+  joueur (cité, arbre).
+- **Coût d'implémentation** (indicatif) : faible = balance (e7), endosymbiose
+  (e8), mémoire (e11) ; moyen = accrétion (e4), molécules (e5), assemblage (e9) ;
+  élevé = Petri/automate (e6), arbre (e10), cité (e12), carte (e13).
+- **Ordre suggéré** : commencer par e4 (accrétion, continuité cosmique) puis
+  e7 (balance, peu coûteux et très distinct) pour valider deux archétypes
+  nouveaux avant les gros (arbre, cité, carte).

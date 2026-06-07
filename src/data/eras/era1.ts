@@ -43,7 +43,7 @@ export const era1: EraDef = {
   id: 'e1',
   index: 1,
   nameKey: 'era.e1.name',
-  accrocheKey: 'era.e1.accroche',
+  taglineKey: 'era.e1.tagline',
   stockKey: 'era.e1.stock',
   machinesKey: 'era.e1.machines',
   verbKey: 'era.e1.verb',

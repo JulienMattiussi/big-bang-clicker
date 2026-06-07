@@ -48,41 +48,40 @@ Choix validés : voir la section "Décisions" plus bas et
 > tableau périodique, `components/game/widgets/PeriodicTable.tsx` + `interactive.ts`)
 > demande aussi un composant. Voir [GAME-DESIGN](./docs/GAME-DESIGN.md) section 7.
 
-État actuel (le moteur existe ; le contenu des ères et l'UI de jeu arrivent
-en phase D) :
+État actuel : jouable de bout en bout (moteur, 20 ères, prestige, crises,
+widgets interactifs des ères 0-3, modales d'évènements). Arborescence :
 
 ```
 src/
 ├── lib/                  # Logique pure, zéro React (entièrement testée)
-│   ├── types.ts          # Era, Resource, Generator, Converter, Upgrade, Crisis, GameState...
-│   ├── engine.ts         # Tick : production, conversion bornée, coûts, achats, Complexité
-│   ├── graph.ts          # Réseau de ressources : flux nets, dépendances, tri topologique
-│   ├── crises.ts         # Crises : risque, déclenchement, effets régression/rebond
+│   ├── types.ts          # Types du domaine (Era, Resource, Generator, Converter, Crisis, GameState...)
+│   ├── engine.ts         # Tick, coûts, achats, conversion manuelle (+ production gratuite), franchissement de palier
+│   ├── graph.ts          # Flux nets (réels) + nominaux + ressources en déficit, dépendances, tri
+│   ├── reveal.ts         # Dévoilement progressif (machines / ressources)
+│   ├── events.ts         # Évènements narratifs déclenchés (transitions, crises, tuto)
+│   ├── crises.ts         # Crises : risque, déclenchement, régression/rebond
 │   ├── prestige.ts       # Échos + reset New Game+
+│   ├── meta.ts           # Méta-upgrades de prestige
 │   ├── save.ts           # État initial, sérialisation versionnée + migrations, idle, export/import
 │   └── format.ts         # Notation abrégée des grands nombres
-├── data/
-│   ├── index.ts          # defs : GameDefs (vide pour l'instant)
-│   └── eras/             # Une description par ère (à venir, phase D+)
-├── store/
-│   └── gameStore.ts      # État de jeu + actions (tick, click, achats, persist)
-│                         # (settingsStore à venir : dark mode, plafond idle)
+├── data/                 # Contenu data-driven (modifiable sans toucher au moteur)
+│   ├── eras/             # Une description par ère (era0..era4, life, civilization, space, transcendence) + factory.ts
+│   ├── crises.ts         # Définitions de crises
+│   ├── metaUpgrades.ts   # Définitions des méta-upgrades
+│   └── index.ts          # defs : GameDefs (agrégation typée)
+├── store/                # Stores Zustand : gameStore (persisté) ; feedbackStore, clickPulse, eventStore (transitoires)
 ├── i18n/                 # i18n custom (FR source de vérité, EN typé complet)
-│   ├── types.ts          # Locale, TranslationKey (dérivée du FR), Translations
-│   ├── i18nStore.ts      # Store Zustand + persistance
-│   ├── useTranslation.ts # hook t()
-│   └── translations/     # fr.ts (source), en.ts, index.ts
-├── hooks/
-│   └── useTick.ts        # Boucle de jeu + autosauvegarde
+├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales)
 ├── components/           # Par domaine ; un composant par fichier
-│   ├── ui/               # Primitives (Button, Panel, Number...) (à venir)
-│   ├── game/             # Ressources, usines, upgrades, scène d'ère (à venir)
-│   └── layout/           # Coquille, navigation, paliers ; ex : LanguageSwitch.tsx
+│   ├── ui/               # Primitives (Button, Panel, Icon, IconBadge, FloaterLayer...)
+│   ├── game/             # Ressources, machines, paliers, badges, bannières, EventModal
+│   │   └── widgets/      # Widgets d'ère : passifs + interactifs (BohrAtom, StarNursery, PeriodicTable) via interactive.ts
+│   └── layout/           # Coquille, navigation d'ères ; LanguageSwitch, SaveMenu
 └── App.tsx               # Navigation par état (pas de router)
 tests/
-├── helpers.ts            # Helpers partagés (makeState...) - éviter la duplication
-├── unit/                 # Vitest - logique pure (engine, graph, crises, prestige, save, format)
-├── component/            # Vitest + Testing Library (App, LanguageSwitch, useTick)
+├── helpers.ts            # Helpers partagés (makeState) - éviter la duplication
+├── unit/                 # Vitest - logique pure
+├── component/            # Vitest + Testing Library
 └── e2e/                  # Playwright (smoke)
 ```
 
@@ -96,8 +95,8 @@ tests/
   internes, jamais de chemins relatifs `../../`.
 - **Tailwind v4** : `@import 'tailwindcss'` dans le CSS, pas de
   `tailwind.config.js`. Classes utilitaires par défaut.
-- **Thèmes centralisés** : un thème par palier d'UI (cosmos, vivant,
-  civilisation, spatial, transcendance), défini dans `src/theme.css` via
+- **Thèmes centralisés** : un thème par palier d'UI (cosmos, life,
+  civilization, space, transcendence), défini dans `src/theme.css` via
   `@theme inline` + variables CSS basculées par `data-tier`. Les composants
   utilisent **uniquement les jetons sémantiques** (`bg-bg`, `bg-surface`,
   `text-fg`, `text-muted`, `text-accent`, `border-border`, `text-octarine`) :

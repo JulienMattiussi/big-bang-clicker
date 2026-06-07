@@ -39,7 +39,7 @@ export const era0: EraDef = {
   id: 'e0',
   index: 0,
   nameKey: 'era.e0.name',
-  accrocheKey: 'era.e0.accroche',
+  taglineKey: 'era.e0.tagline',
   stockKey: 'era.e0.stock',
   machinesKey: 'era.e0.machines',
   verbKey: 'era.e0.verb',

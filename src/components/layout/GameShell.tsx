@@ -1,5 +1,6 @@
 import { LanguageSwitch } from '@/components/layout/LanguageSwitch'
 import { SaveMenu } from '@/components/layout/SaveMenu'
+import { SceneBackground } from '@/components/layout/SceneBackground'
 import { EraTabs } from '@/components/game/EraTabs'
 import { ClickArea } from '@/components/game/ClickArea'
 import { isFullWidthWidget } from '@/components/game/widgets/interactive'
@@ -28,8 +29,10 @@ export function GameShell() {
   return (
     <main
       data-tier={era.uiTier}
-      className="mx-auto flex min-h-full max-w-7xl flex-col gap-6 bg-bg p-6 text-fg"
+      className="relative isolate mx-auto flex min-h-full max-w-7xl flex-col gap-4 p-6 text-fg transition-colors duration-700"
     >
+      {/* Ambient scene background (per era group), behind everything. */}
+      <SceneBackground eraIndex={era.index} />
       {/* Top bar: central objective (Complexity + milestone, centered inline);
           language and options on the right. */}
       <div className="flex items-center justify-between gap-4">
@@ -52,8 +55,8 @@ export function GameShell() {
               {t(era.nameKey as TranslationKey)}
             </h1>
             {/* Reserved height (2 lines): switching language doesn't shift the rest. */}
-            <p className="mt-1 min-h-12 max-w-prose leading-snug text-muted italic">
-              {t(era.accrocheKey as TranslationKey)}
+            <p className="mt-0.5 min-h-6 max-w-prose leading-snug text-muted italic">
+              {t(era.taglineKey as TranslationKey)}
             </p>
           </div>
         </div>
@@ -66,7 +69,7 @@ export function GameShell() {
       {isFullWidthWidget(era.widget) ? (
         // Wide widget (e.g. periodic table): full-width on top, panels below.
         <>
-          <section className="flex justify-center py-2">
+          <section className="-mt-2 flex justify-center pb-2">
             <ClickArea era={era} />
           </section>
           {/* Resources kept narrow so the wide machines panel fits 3 columns. */}

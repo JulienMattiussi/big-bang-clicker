@@ -45,6 +45,13 @@ test-e2e: ## Run e2e tests with Playwright (installs Chromium on first run)
 test-e2e-ui: ## Run e2e tests with Playwright UI
 	npm run test:e2e:ui
 
+.PHONY: sim sim-view
+sim: ## Run balance simulations (writes sim/results/*.json); play the game meanwhile
+	npx vitest run --config sim/vitest.sim.config.ts
+
+sim-view: ## Show the simulation viewer URL (needs `make start` running)
+	@echo "Viewer : http://localhost:1138/sim/viewer/  (lance 'make start' si besoin)"
+
 fix: format lint ## Format and lint all code
 
 check: build lint typecheck test-unit ## Run all checks (build, lint, typecheck, unit tests)

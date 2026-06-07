@@ -39,6 +39,14 @@
      Constant identity from one tier to the next. */
   --era: #f472b6;
   --era-2: #2dd4bf;
+  /* Realistic, muted planet tints for the solar-system widget (no pink/purple,
+     no neon). Shaded into spheres via a gradient overlay in the SVG. */
+  --planet-1: #6b8fb5; /* ocean blue */
+  --planet-2: #b5613a; /* rust */
+  --planet-3: #c9a76b; /* sand / gold */
+  --planet-4: #7d8a72; /* muted olive */
+  --planet-5: #9aa3ab; /* grey rock */
+  --planet-6: #8fb0c4; /* pale ice blue */
 }
 
 /* LIFE tier: organic, warm greens. */

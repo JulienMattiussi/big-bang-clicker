@@ -154,7 +154,7 @@ function MachineRow({
             automation, which flexes to absorb the variable cost label. */}
         {onCraft ? (
           <Button
-            className="shrink-0 whitespace-nowrap"
+            className="flex shrink-0 items-center justify-center whitespace-nowrap"
             disabled={!canCraft}
             title={craftTitle}
             onClick={onCraft}
@@ -162,13 +162,16 @@ function MachineRow({
             {t('machine.produce')}
           </Button>
         ) : null}
+        {/* Label and cost on separate lines: the button keeps the same shape
+            whatever the cost text length (no awkward mid-label wrap). */}
         <Button
           variant="ghost"
-          className="flex-1 text-center"
+          className="flex flex-1 flex-col items-center justify-center leading-tight"
           disabled={!affordable}
           onClick={onBuy}
         >
-          {t('ui.buy')} <span className="text-muted">({costLabel})</span>
+          <span>{t('ui.buy')}</span>
+          <span className="text-muted">({costLabel})</span>
         </Button>
       </div>
     </li>
@@ -187,6 +190,16 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
   const spawn = useFeedbackStore((s) => s.spawn)
 
   const revealed = revealedMachines(state, defs, era)
+
+  // Cap the wide layout's columns at the number of revealed machines (max 3),
+  // so an era with few machines (e.g. the solar system) doesn't leave gaps.
+  const revealedCount =
+    era.generators.filter((id) => revealed.has(id)).length +
+    era.converters.filter((id) => revealed.has(id)).length
+  const wideGrid =
+    revealedCount <= 2
+      ? 'grid grid-cols-1 gap-2 sm:grid-cols-2'
+      : 'grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3'
 
   // Era a resource belongs to, only when it differs from the current one
   // (so the player knows which tab to open to find it).
@@ -216,11 +229,7 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
 
   return (
     <Panel title={t(era.machinesKey as TranslationKey)}>
-      <ul
-        className={
-          wide ? 'grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3' : 'flex flex-col gap-2'
-        }
-      >
+      <ul className={wide ? wideGrid : 'flex flex-col gap-2'}>
         {era.generators
           .filter((id) => revealed.has(id))
           .map((id) => {

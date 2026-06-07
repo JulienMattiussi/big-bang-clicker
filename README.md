@@ -22,10 +22,14 @@ puissante.
 
 Conception **terminée** (voir `docs/`). **Jouable de bout en bout** : moteur
 data-driven, les 20 ères, prestige (Échos) + méta-upgrades, crises, recettes
-manuelles + automatisables, premier widget interactif (tableau périodique).
-Stack Vite + React + TS + Tailwind + Zustand, lint/tests/Makefile, `make check`
-passe. En cours : finition (widgets dédiés restants, modales d'évènements,
-onboarding, équilibrage, déploiement). Voir [docs/ROADMAP.md](./docs/ROADMAP.md).
+manuelles + automatisables, modales d'évènements narratifs, et des widgets
+interactifs aux mécaniques distinctes pour les ères 0 à 13 (jauge, atome de Bohr,
+pépinière d'étoiles, tableau périodique, disque d'accrétion, modèle moléculaire,
+boîte de Petri, balance atmosphérique, endosymbiose, atelier du vivant, arbre du
+vivant, constellation mnésique, plan de cité, carte du monde). Conception des
+widgets dans [docs/WIDGETS.md](./docs/WIDGETS.md). Stack Vite + React + TS +
+Tailwind + Zustand, lint/tests/Makefile, `make check` passe. En cours : finition
+(widgets des ères 14+, onboarding, équilibrage, déploiement). Voir [docs/ROADMAP.md](./docs/ROADMAP.md).
 
 ## Documentation
 

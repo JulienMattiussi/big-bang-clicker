@@ -33,9 +33,10 @@ Voir aussi [AGENTS.md](../AGENTS.md). Détail data-driven :
 src/
 ├── lib/                  # logique pure (zéro React, testée)
 │   ├── types.ts          # types du domaine (Def + State)
-│   ├── engine.ts         # tick, coûts, achats, conversion manuelle, franchissement de palier
-│   ├── graph.ts          # réseau de ressources : flux nets (réels), dépendances, tri topologique
+│   ├── engine.ts         # tick, coûts, achats, conversion manuelle (+ production gratuite), franchissement de palier
+│   ├── graph.ts          # flux nets (réels) + flux nominaux + ressources en déficit, dépendances, tri
 │   ├── reveal.ts         # dévoilement progressif (machines / ressources)
+│   ├── events.ts         # évènements narratifs déclenchés (transitions, crises, tuto)
 │   ├── crises.ts         # risque, déclenchement, effets
 │   ├── prestige.ts       # Échos, reset New Game+
 │   ├── meta.ts           # méta-upgrades de prestige
@@ -46,16 +47,19 @@ src/
 │   ├── crises.ts         # définitions de crises
 │   ├── metaUpgrades.ts   # définitions des méta-upgrades
 │   └── index.ts          # agrégation typée (defs)
-├── store/
+├── store/                # stores Zustand (gameStore persisté ; les autres transitoires)
 │   ├── gameStore.ts      # état de jeu + actions + persistance
-│   └── feedbackStore.ts  # nombres flottants transitoires (+X / -X), non persisté
+│   ├── feedbackStore.ts  # nombres flottants transitoires (+X / -X)
+│   ├── clickPulse.ts     # signal générique "verbe activé" (widgets passifs, ex. jauge)
+│   └── eventStore.ts     # file des modales d'évènements
 ├── i18n/                 # i18n custom (voir section 10)
 ├── hooks/
-│   └── useTick.ts        # boucle de jeu + autosauvegarde (+ sauvegarde à la fermeture)
+│   ├── useTick.ts        # boucle de jeu + autosauvegarde (+ sauvegarde à la fermeture)
+│   └── useEvents.ts      # détecte et enfile les évènements narratifs
 ├── components/
 │   ├── ui/               # primitives (Button, Panel, Icon, IconBadge, FloaterLayer...)
-│   ├── game/             # ressources, machines, paliers, badges, bannières
-│   │   └── widgets/      # widgets d'ère (CoolingWidget, BohrWidget... + PeriodicTable interactif, interactive.ts)
+│   ├── game/             # ressources, machines, paliers, badges, bannières, EventModal
+│   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget, AccretionWidget...) + interactifs (BohrAtom, StarNursery, PeriodicTable) via interactive.ts
 │   └── layout/           # coquille, navigation d'ères
 └── App.tsx               # navigation par état (pas de router)
 ```
@@ -169,6 +173,7 @@ interface GameState {
   metaUpgrades: Record<string, boolean>
   totalComplexityEver: number  // base du calcul de prestige
   discovered: Record<ResourceId, boolean>  // ressources déjà produites (dévoilement collant)
+  seenEvents: Record<string, boolean>      // modales narratives déjà montrées (une fois)
 }
 ```
 
@@ -204,14 +209,18 @@ function tick(state: GameState, defs: GameDefs, dt: number): GameState
 
 Hors `tick` (actions, dans le store / le moteur) :
 
-- **Conversion manuelle** (`manualConvert`) : applique une recette d'un clic.
-  C'est le **moyen manuel d'obtenir une ressource** ; toute recette reste aussi
-  automatisable (achat de niveaux -> exécution au tick). Voir GAME-DESIGN 7.
+- **Conversion manuelle** (`manualConvert`) : applique une recette d'un clic
+  (consomme les entrées). C'est le **moyen manuel d'obtenir une ressource** ;
+  toute recette reste aussi automatisable (achat de niveaux -> exécution au
+  tick). Variante **`manualProduce`** : produit les sorties **gratuitement** (sans
+  consommer), pour les widgets où le geste ne doit pas vider le stock. GAME-DESIGN 7.
 - **Franchissement de palier** (`unlockNextEra` / `canUnlockNextEra`) : action
   **manuelle** qui débloque l'ère suivante et **ne dépense pas** la Complexité.
   Aucune ère ne se débloque automatiquement (le cap évite la cascade).
-- **Flux nets** (`graph.ts` `netFlows`) : **variation réelle** par ressource
-  (simulation d'un tick), pour l'affichage (voir [UI-UX.md](./UI-UX.md)).
+- **Flux** (`graph.ts`) : `netFlows` = **variation réelle** par ressource
+  (simulation d'un tick, pour l'affichage) ; `nominalFlows` = capacité
+  production - demande (ignore le stock) ; `decliningResources` = ressources en
+  **déficit** (alerte "!" qui persiste même à 0). Voir [UI-UX.md](./UI-UX.md).
 
 Déterminisme : le tick **ne lit jamais l'horloge** lui-même ; `dt` est fourni.
 Cela rend le moteur testable et compatible avec le calcul hors-ligne et la
@@ -287,13 +296,18 @@ Implémente la mécanique de [GAME-DESIGN.md](./GAME-DESIGN.md) section 6 :
 - Coquille stable + scène centrale = widget iconique de l'ère active (voir
   [UI-UX.md](./UI-UX.md)). Chaque widget lit des **données** (`src/data/`) et
   l'**état** via des sélecteurs Zustand fins.
-- Certains widgets sont **interactifs et portent la mécanique de l'ère** (ex :
-  le tableau périodique, `components/game/widgets/PeriodicTable.tsx`, enregistré
-  dans `interactive.ts` ; `ClickArea` les route, `GameShell` les place en pleine
-  largeur au-dessus des panneaux). C'est l'**exception assumée** au "100%
-  data-driven" : une telle ère demande aussi un composant. Voir GAME-DESIGN 7.
-- **Feedback** : nombres flottants `+X` / `-X` sur les compteurs
-  (`feedbackStore` + `FloaterLayer`).
+- Certains widgets sont **interactifs et portent la mécanique de l'ère**,
+  enregistrés dans `interactive.ts` (`INTERACTIVE_WIDGETS`) : `BohrAtom` (ère 1),
+  `StarNursery` (ère 2), `PeriodicTable` (ère 3). `ClickArea` les route ; les
+  larges (`isFullWidthWidget`, ex. le tableau périodique) passent en pleine
+  largeur au-dessus des panneaux, les compacts (Bohr, galaxie) restent centrés
+  dans les 3 colonnes. C'est l'**exception assumée** au "100% data-driven" :
+  une telle ère demande aussi un composant. Voir GAME-DESIGN 7.
+- **Évènements narratifs** : modales (`EventModal` + `eventStore` + `useEvents`
+  + `lib/events.ts`) au changement d'ère, aux crises et au tuto (anti-rejeu via
+  `GameState.seenEvents`).
+- **Feedback** : nombres flottants `+X` / `-X` sur les compteurs (`feedbackStore`
+  + `FloaterLayer`) ; alerte "!" sur les ressources en déficit (ressource + onglet).
 - Paliers de transformation pilotés par `EraDef.uiTier` (bascule de palette/
   layout, transitions majeures aux ères 5/6 et 12).
 - SVG d'abord ; Canvas/WebGL pour les scènes denses (Voie lactée, toile

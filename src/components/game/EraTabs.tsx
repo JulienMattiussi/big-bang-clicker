@@ -1,6 +1,6 @@
 import { EraIcon } from '@/components/game/EraIcon'
 import { useGameStore } from '@/store/gameStore'
-import { decliningResources } from '@/lib/graph'
+import { decliningResources, stalledResources } from '@/lib/graph'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 
@@ -23,8 +23,10 @@ export function EraTabs() {
   const visible = defs.eras.filter((era) => state.unlockedEras.includes(era.id))
   if (visible.length <= 1) return null
 
-  // A tab flags when one of its era's resources is shrinking (supply issue).
+  // A tab flags when one of its era's resources is shrinking (red) or its
+  // production is stalled at zero (yellow).
   const declining = decliningResources(state, defs)
+  const stalled = stalledResources(state, defs)
 
   return (
     <nav aria-label={t('nav.eras')} className="flex flex-wrap gap-2">
@@ -45,7 +47,8 @@ export function EraTabs() {
           >
             <EraIcon icon={era.icon} className="h-4 w-4" />
             {t(era.nameKey as TranslationKey)}
-            {/* Notification badge overlapping the whole tab's corner (not inside). */}
+            {/* Notification badge overlapping the whole tab's corner (not inside):
+                red for a declining resource, yellow for a production stalled at zero. */}
             {era.resources.some((r) => declining.has(r)) ? (
               <span
                 title={t('alert.eraDeclining')}
@@ -53,6 +56,14 @@ export function EraTabs() {
               >
                 <span aria-hidden>!</span>
                 <span className="sr-only">{t('alert.eraDeclining')}</span>
+              </span>
+            ) : era.resources.some((r) => stalled.has(r)) ? (
+              <span
+                title={t('alert.eraStalled')}
+                className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-400 text-xs leading-none font-bold text-black shadow"
+              >
+                <span aria-hidden>!</span>
+                <span className="sr-only">{t('alert.eraStalled')}</span>
               </span>
             ) : null}
           </button>

@@ -69,6 +69,22 @@ export function decliningResources(state: GameState, defs: GameDefs): Set<Resour
   return declining
 }
 
+/**
+ * Resources STALLED at zero: an enabled machine has the capacity to produce them
+ * (nominal flow > 0) but the real flow is ~0 because it is starved of an input.
+ * Distinct from `decliningResources` (a negative nominal flow): here production
+ * is simply blocked. Used for the "production at zero" alert.
+ */
+export function stalledResources(state: GameState, defs: GameDefs): Set<ResourceId> {
+  const nominal = nominalFlows(state, defs)
+  const real = netFlows(state, defs)
+  const stalled = new Set<ResourceId>()
+  for (const id in nominal) {
+    if (nominal[id] > 1e-6 && (real[id] ?? 0) <= 1e-6) stalled.add(id)
+  }
+  return stalled
+}
+
 /** For each resource, the resources that feed it (direct inputs). */
 export function resourceDependencies(defs: GameDefs): Record<ResourceId, ResourceId[]> {
   const deps: Record<ResourceId, Set<ResourceId>> = {}

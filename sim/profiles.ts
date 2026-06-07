@@ -1,0 +1,53 @@
+import type { ProfileConfig, UnlockPolicy } from './types'
+
+/**
+ * Four player archetypes, to bracket the time range rather than rely on a
+ * single fragile number. Widget skill is abstracted as a manual-action rate
+ * (clicks + completes per second), not the actual mini-game.
+ */
+export const PROFILES: ProfileConfig[] = [
+  {
+    id: 'minimal',
+    label: 'Minimal (bootstrap)',
+    // Clicks only to launch each era's first machine, then lets it run.
+    clicksPerSecond: 8,
+    completesPerSecond: 0,
+    decisionIntervalS: 1,
+    strategy: 'cheapest',
+    clickMode: 'bootstrap',
+  },
+  {
+    id: 'idle',
+    label: 'Idle (full auto)',
+    clicksPerSecond: 0,
+    completesPerSecond: 0,
+    decisionIntervalS: 5,
+    strategy: 'cheapest',
+  },
+  {
+    id: 'casual',
+    label: 'Casual',
+    clicksPerSecond: 2,
+    completesPerSecond: 0.3,
+    decisionIntervalS: 3,
+    strategy: 'cheapest',
+  },
+  {
+    id: 'active',
+    label: 'Active',
+    clicksPerSecond: 6,
+    completesPerSecond: 1,
+    decisionIntervalS: 2,
+    strategy: 'cheapest',
+  },
+  {
+    id: 'optimal',
+    label: 'Optimal',
+    clicksPerSecond: 8,
+    completesPerSecond: 2,
+    decisionIntervalS: 1,
+    strategy: 'tierFirst',
+  },
+]
+
+export const UNLOCK_POLICIES: UnlockPolicy[] = ['asap', 'ready']

@@ -209,6 +209,179 @@
   }
 }
 
+/* Shared widget juice (eras 4+): pop-in (place/merge), bloom (success burst),
+   shake (crisis/overshoot). */
+@keyframes pop-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.pop-in {
+  animation: pop-in 0.32s ease-out backwards;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+@keyframes bloom {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.bloom {
+  animation: bloom 0.5s ease-out backwards;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+@keyframes widget-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-2.5px);
+  }
+  75% {
+    transform: translateX(2.5px);
+  }
+}
+.widget-shake {
+  animation: widget-shake 0.42s ease-in-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .pop-in,
+  .bloom {
+    animation: none;
+  }
+  .widget-shake {
+    animation: none;
+  }
+}
+
+/* Ambient scene background (changes per era group; sober, slow, alive). */
+@keyframes bg-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes bg-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.16);
+    opacity: 0.75;
+  }
+}
+@keyframes bg-drift {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(2.5%, -2.5%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+@keyframes bg-twinkle {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+@keyframes bg-rise {
+  0% {
+    transform: translateY(18px);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateY(-120px);
+    opacity: 0;
+  }
+}
+@keyframes bg-sway {
+  0%,
+  100% {
+    transform: translateX(-2.5%);
+  }
+  50% {
+    transform: translateX(2.5%);
+  }
+}
+@keyframes bg-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.06);
+  }
+}
+.bg-scene {
+  animation: bg-fade-in 0.9s ease-out;
+}
+.bg-breathe {
+  animation: bg-breathe 9s ease-in-out infinite;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+.bg-drift {
+  animation: bg-drift 26s ease-in-out infinite;
+}
+.bg-twinkle {
+  animation: bg-twinkle 4s ease-in-out infinite;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+.bg-rise {
+  animation: bg-rise 9s ease-in infinite;
+  transform-box: fill-box;
+}
+.bg-sway {
+  animation: bg-sway 14s ease-in-out infinite;
+}
+.bg-pulse {
+  animation: bg-pulse 6s ease-in-out infinite;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-scene,
+  .bg-breathe,
+  .bg-drift,
+  .bg-twinkle,
+  .bg-rise,
+  .bg-sway,
+  .bg-pulse {
+    animation: none;
+  }
+}
+
 /* Event modal entrance (overlay fade + dialog pop). */
 @keyframes overlay-in {
   from {

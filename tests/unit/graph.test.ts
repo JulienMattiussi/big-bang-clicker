@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest'
-import { decliningResources, netFlows, resourceDependencies, topologicalOrder } from '@/lib/graph'
+import {
+  decliningResources,
+  netFlows,
+  resourceDependencies,
+  stalledResources,
+  topologicalOrder,
+} from '@/lib/graph'
 import { createInitialState } from '@/lib/save'
 import type { GameDefs } from '@/lib/types'
 
@@ -81,6 +87,28 @@ describe('decliningResources', () => {
       converters: { makeB: { level: 1, enabled: true } },
     }
     expect(decliningResources(state, defs).has('a')).toBe(true)
+  })
+})
+
+describe('stalledResources', () => {
+  it("repère une production bloquée à zéro (machine affamée d'un intrant)", () => {
+    const state = {
+      ...createInitialState(0),
+      resources: { a: 0 }, // pas d'intrant, pas de générateur
+      converters: { makeB: { level: 1, enabled: true } }, // pourrait produire b, mais à sec
+    }
+    const stalled = stalledResources(state, defs)
+    expect(stalled.has('b')).toBe(true) // capacité +1/s, réel 0/s
+    expect(stalled.has('a')).toBe(false) // 'a' est en déficit (rouge), pas bloquée
+  })
+
+  it('ne signale pas une production qui tourne réellement', () => {
+    const state = {
+      ...createInitialState(0),
+      generators: { genA: { level: 1 } }, // alimente 'a'
+      converters: { makeB: { level: 1, enabled: true } },
+    }
+    expect(stalledResources(state, defs).has('b')).toBe(false)
   })
 })
 

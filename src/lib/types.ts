@@ -112,7 +112,8 @@ export interface EraDef {
   id: EraId
   index: number
   nameKey: string
-  accrocheKey: string
+  /** One-line tagline shown under the era title. */
+  taglineKey: string
   /** Title of the resources panel (era-domain vocabulary). */
   stockKey: string
   /** Title of the machines panel (era-domain vocabulary). */

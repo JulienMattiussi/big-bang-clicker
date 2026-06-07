@@ -80,7 +80,7 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
     id,
     index: spec.index,
     nameKey: `era.${id}.name`,
-    accrocheKey: `era.${id}.accroche`,
+    taglineKey: `era.${id}.tagline`,
     stockKey: `era.${id}.stock`,
     machinesKey: `era.${id}.machines`,
     verbKey: `era.${id}.verb`,
