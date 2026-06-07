@@ -20,18 +20,19 @@ export function costAtLevel(curve: CostCurve, level: number): number {
 }
 
 /**
- * Rounds an upgrade cost so the displayed value is clean at its own scale:
- * to the nearest ten below 1000 (never below 10 for a real cost), and to a
- * single significant figure above (e.g. 45.48k -> 50k, 2.03k -> 2k).
+ * Rounds an upgrade cost cleanly at its displayed scale (the mantissa shown
+ * before the k/M/... suffix, in [1, 1000), grouped by 1000 like format.ts):
+ * - mantissa < 10  -> to the unit (e.g. 3k, 9k, 4M);
+ * - mantissa >= 10 -> to the nearest 5, so the last digit is 0 or 5 (15, 20k,
+ *   105k, 305k, 200M).
  */
 function roundCost(amount: number): number {
   if (amount <= 0) return 0
-  if (amount < 1000) {
-    const rounded = Math.round(amount / 10) * 10
-    return rounded === 0 ? 10 : rounded
-  }
-  const mag = 10 ** Math.floor(Math.log10(amount))
-  return Math.round(amount / mag) * mag
+  const tier = amount < 1000 ? 0 : Math.floor(Math.log10(amount) / 3)
+  const scale = 1000 ** tier
+  const mantissa = amount / scale
+  const rounded = mantissa < 10 ? Math.round(mantissa) : Math.round(mantissa / 5) * 5
+  return Math.max(1, rounded) * scale
 }
 
 /** Cost (multi-resource) to go from `level` to `level + 1`, rounded to the nearest ten. */

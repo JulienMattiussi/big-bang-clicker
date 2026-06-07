@@ -15,7 +15,12 @@ export const fr = {
   'alert.eraStalled': 'Une production est bloquée à zéro dans cette ère',
 
   // Galets de l'infini (pierres collectionnables à effet activable).
+  'galet.found.eyebrow': 'Découverte légendaire',
   'galet.found.title': "Un galet de l'infini !",
+  'galet.found.intro':
+    "Tu viens de découvrir une relique exceptionnelle, polie par les âges aux confins du cosmos. On raconte qu'il en existe une poignée, disséminées à travers toute l'histoire de l'univers... et tu tiens la toute première.",
+  'galet.found.power': 'Pouvoir',
+  'galet.found.cta': "M'en emparer",
   'galet.receptacle': "Galets de l'infini",
   'galet.inactive': 'inactif',
   'galet.matter.name': 'Galet peint de la matière',

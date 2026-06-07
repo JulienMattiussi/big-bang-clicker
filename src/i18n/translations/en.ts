@@ -17,7 +17,12 @@ export const en: Translations = {
   'alert.eraStalled': 'A production is stalled at zero in this era',
 
   // Pebbles of infinity (collectible stones with a toggleable effect).
+  'galet.found.eyebrow': 'Legendary discovery',
   'galet.found.title': 'A pebble of infinity!',
+  'galet.found.intro':
+    'You have just uncovered an exceptional relic, polished by the ages at the very edge of the cosmos. They say only a handful exist, scattered across the whole history of the universe... and you hold the very first.',
+  'galet.found.power': 'Power',
+  'galet.found.cta': 'Claim it',
   'galet.receptacle': 'Pebbles of infinity',
   'galet.inactive': 'inactive',
   'galet.matter.name': 'Painted pebble of matter',

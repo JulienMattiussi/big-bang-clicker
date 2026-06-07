@@ -56,9 +56,11 @@ describe('coûts', () => {
     expect(nextCost(defs.generators.quarkGen.cost, 0)).toEqual({ quark: 10 })
   })
 
-  it('arrondit le coût à la dizaine proche', () => {
+  it("arrondit le coût à l'échelle affichée (unité <10, sinon 0 ou 5)", () => {
     expect(nextCost([{ resource: 'quark', base: 247.6, growth: 1 }], 0)).toEqual({ quark: 250 })
     expect(nextCost([{ resource: 'quark', base: 112, growth: 1 }], 0)).toEqual({ quark: 110 })
+    expect(nextCost([{ resource: 'quark', base: 8340, growth: 1 }], 0)).toEqual({ quark: 8000 })
+    expect(nextCost([{ resource: 'quark', base: 116390, growth: 1 }], 0)).toEqual({ quark: 115000 })
   })
 
   it("vérifie l'abordabilité", () => {
