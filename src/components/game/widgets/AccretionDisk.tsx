@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
+import { viewBoxPoint } from './svgCoords'
 import { useEraMechanic } from './useEraMechanic'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
@@ -158,14 +159,10 @@ export function AccretionDisk({ era }: { era: EraDef }) {
 
   const accrete = (e: MouseEvent) => {
     gainBase() // every click gathers dust
-    const rect = svgRef.current?.getBoundingClientRect()
     const keyboard = e.detail === 0
-    let px = CX
-    let py = CY
-    if (!keyboard && rect) {
-      px = ((e.clientX - rect.left) / rect.width) * VBW
-      py = ((e.clientY - rect.top) / rect.height) * VBH
-    }
+    const p = keyboard ? null : viewBoxPoint(svgRef.current, e.clientX, e.clientY, VBW, VBH)
+    const px = p?.x ?? CX
+    const py = p?.y ?? CY
 
     const cs = clumps.current
     let hit = -1

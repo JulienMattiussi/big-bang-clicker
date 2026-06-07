@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
+import { viewBoxPoint } from './svgCoords'
 import { useEraMechanic } from './useEraMechanic'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
@@ -206,11 +207,8 @@ export function PetriDish({ era }: { era: EraDef }) {
     setSplits((list) => [...list.slice(-5), { id: nextId.current++, x: c.x, y: c.y }])
   }
 
-  const toViewBox = (e: PointerEvent<HTMLDivElement>) => {
-    const rect = svgRef.current?.getBoundingClientRect()
-    if (!rect) return null
-    return { x: ((e.clientX - rect.left) / rect.width) * VB, y: ((e.clientY - rect.top) / rect.height) * VB }
-  }
+  const toViewBox = (e: PointerEvent<HTMLDivElement>) =>
+    viewBoxPoint(svgRef.current, e.clientX, e.clientY, VB)
 
   const onPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     const p = toViewBox(e)

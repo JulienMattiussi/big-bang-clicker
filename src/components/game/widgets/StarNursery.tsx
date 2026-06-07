@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
+import { viewBoxPoint } from './svgCoords'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -61,10 +62,10 @@ export function StarNursery({ era }: { era: EraDef }) {
     // Cursor position for mouse; a scattered point for keyboard (detail === 0).
     let x = 50
     let y = 50
-    const rect = svgRef.current?.getBoundingClientRect()
-    if (e.detail !== 0 && rect) {
-      x = Math.min(92, Math.max(8, ((e.clientX - rect.left) / rect.width) * 100))
-      y = Math.min(92, Math.max(8, ((e.clientY - rect.top) / rect.height) * 100))
+    const p = e.detail !== 0 ? viewBoxPoint(svgRef.current, e.clientX, e.clientY, 100) : null
+    if (p) {
+      x = Math.min(92, Math.max(8, p.x))
+      y = Math.min(92, Math.max(8, p.y))
     } else {
       const a = Math.random() * Math.PI * 2
       const d = 20 + Math.random() * 22

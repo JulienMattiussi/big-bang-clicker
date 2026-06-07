@@ -1,6 +1,7 @@
 import { Panel } from '@/components/ui/Panel'
 import { IconBadge } from '@/components/ui/IconBadge'
 import { Icon } from '@/components/ui/Icon'
+import { AlertBadge } from '@/components/ui/AlertBadge'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { decliningResources, netFlows, stalledResources } from '@/lib/graph'
@@ -92,15 +93,9 @@ export function ResourcePanel({ era }: { era: EraDef }) {
                   >
                     <IconBadge icon={def.icon} symbol={def.symbol} kind="resource" />
                     {declining.has(id) ? (
-                      <span className="pointer-events-none absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] leading-none font-bold text-white shadow">
-                        <span aria-hidden>!</span>
-                        <span className="sr-only">{t('alert.declining')}</span>
-                      </span>
+                      <AlertBadge kind="decline" labelKey="alert.declining" />
                     ) : stalled.has(id) ? (
-                      <span className="pointer-events-none absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-yellow-400 text-[10px] leading-none font-bold text-black shadow">
-                        <span aria-hidden>!</span>
-                        <span className="sr-only">{t('alert.stalled')}</span>
-                      </span>
+                      <AlertBadge kind="stall" labelKey="alert.stalled" />
                     ) : null}
                   </span>
                   <span className="truncate">{t(def.nameKey as TranslationKey)}</span>

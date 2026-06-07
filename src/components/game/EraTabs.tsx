@@ -1,4 +1,5 @@
 import { EraIcon } from '@/components/game/EraIcon'
+import { AlertBadge } from '@/components/ui/AlertBadge'
 import { useGameStore } from '@/store/gameStore'
 import { decliningResources, stalledResources } from '@/lib/graph'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -47,24 +48,12 @@ export function EraTabs() {
           >
             <EraIcon icon={era.icon} className="h-4 w-4" />
             {t(era.nameKey as TranslationKey)}
-            {/* Notification badge overlapping the whole tab's corner (not inside):
+            {/* Notification badge overlapping the whole tab's corner:
                 red for a declining resource, yellow for a production stalled at zero. */}
             {era.resources.some((r) => declining.has(r)) ? (
-              <span
-                title={t('alert.eraDeclining')}
-                className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs leading-none font-bold text-white shadow"
-              >
-                <span aria-hidden>!</span>
-                <span className="sr-only">{t('alert.eraDeclining')}</span>
-              </span>
+              <AlertBadge kind="decline" labelKey="alert.eraDeclining" size="md" />
             ) : era.resources.some((r) => stalled.has(r)) ? (
-              <span
-                title={t('alert.eraStalled')}
-                className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-400 text-xs leading-none font-bold text-black shadow"
-              >
-                <span aria-hidden>!</span>
-                <span className="sr-only">{t('alert.eraStalled')}</span>
-              </span>
+              <AlertBadge kind="stall" labelKey="alert.eraStalled" size="md" />
             ) : null}
           </button>
         )

@@ -71,30 +71,29 @@ export function GaletReceptacle() {
           role="tooltip"
           className="shadow-float modal-in absolute top-full left-0 z-30 mt-2 w-80 rounded-lg border border-octarine/40 bg-surface p-3 text-left"
         >
-          <div className="flex items-center gap-3">
-            <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
-              <div
-                aria-hidden
-                className="absolute inset-0 rounded-full blur-md"
-                style={{
-                  background: `radial-gradient(circle, ${card.color}, transparent 70%)`,
-                  opacity: cardActive ? 0.5 : 0.2,
-                }}
-              />
-              <div className="relative">
-                <Galet color={card.color} motif={card.motif} shape={card.shape} size={52} dim={!cardActive} />
-              </div>
+          {/* The pebble shown large, on its own line spanning the card width. */}
+          <div className="relative flex h-28 items-center justify-center">
+            <div
+              aria-hidden
+              className="absolute inset-0 rounded-lg blur-xl"
+              style={{
+                background: `radial-gradient(circle, ${card.color}, transparent 68%)`,
+                opacity: cardActive ? 0.45 : 0.18,
+              }}
+            />
+            <div className="relative">
+              <Galet color={card.color} motif={card.motif} shape={card.shape} size={104} dim={!cardActive} />
             </div>
-            <div className="min-w-0">
-              <div className="leading-tight font-semibold text-fg">{t(card.nameKey as TranslationKey)}</div>
-              <div
-                className={`text-[10px] font-semibold tracking-wide uppercase ${
-                  cardActive ? 'text-accent' : 'text-muted'
-                }`}
-              >
-                {cardActive ? t('galet.active') : t('galet.inactive')}
-              </div>
-            </div>
+          </div>
+          <div className="mt-2 flex items-baseline justify-between gap-2">
+            <span className="font-semibold text-fg">{t(card.nameKey as TranslationKey)}</span>
+            <span
+              className={`shrink-0 text-[10px] font-semibold tracking-wide uppercase ${
+                cardActive ? 'text-accent' : 'text-muted'
+              }`}
+            >
+              {cardActive ? t('galet.active') : t('galet.inactive')}
+            </span>
           </div>
           <p className="mt-2 text-xs leading-snug text-muted/80 italic">
             {t(card.loreKey as TranslationKey)}

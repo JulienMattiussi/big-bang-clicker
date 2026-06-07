@@ -5,7 +5,8 @@
       "Bash(npm install *)",
       "Bash(make check *)",
       "Bash(npx tsc *)",
-      "Bash(node -e \"const p=require\\('./node_modules/vitest/package.json'\\); console.log\\(Object.keys\\(p.dependencies||{}\\).filter\\(d=>d.includes\\('vite-node'\\)\\)\\)\")"
+      "Bash(node -e \"const p=require\\('./node_modules/vitest/package.json'\\); console.log\\(Object.keys\\(p.dependencies||{}\\).filter\\(d=>d.includes\\('vite-node'\\)\\)\\)\")",
+      "Bash(grep -nE \"^#{1,3} \" docs/ARCHITECTURE.md)"
     ]
   }
 }

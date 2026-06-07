@@ -49,40 +49,48 @@ Choix validés : voir la section "Décisions" plus bas et
 > demande aussi un composant. Voir [GAME-DESIGN](./docs/GAME-DESIGN.md) section 7.
 
 État actuel : jouable de bout en bout (moteur, 20 ères, prestige, crises,
-widgets interactifs des ères 0-3, modales d'évènements). Arborescence :
+widgets interactifs sur-mesure pour la plupart des ères, galets de l'infini,
+fond de scène par palier, modales d'évènements). Arborescence :
 
 ```
 src/
 ├── lib/                  # Logique pure, zéro React (entièrement testée)
 │   ├── types.ts          # Types du domaine (Era, Resource, Generator, Converter, Crisis, GameState...)
-│   ├── engine.ts         # Tick, coûts, achats, conversion manuelle (+ production gratuite), franchissement de palier
-│   ├── graph.ts          # Flux nets (réels) + nominaux + ressources en déficit, dépendances, tri
+│   ├── engine.ts         # Tick, coûts (arrondis), achats, conversion manuelle, multiplicateurs de galets, clickYield, palier
+│   ├── graph.ts          # Flux nets réels + alertes (ressources en déclin / production à zéro), dépendances, tri
 │   ├── reveal.ts         # Dévoilement progressif (machines / ressources)
 │   ├── events.ts         # Évènements narratifs déclenchés (transitions, crises, tuto)
 │   ├── crises.ts         # Crises : risque, déclenchement, régression/rebond
 │   ├── prestige.ts       # Échos + reset New Game+
 │   ├── meta.ts           # Méta-upgrades de prestige
 │   ├── save.ts           # État initial, sérialisation versionnée + migrations, idle, export/import
-│   └── format.ts         # Notation abrégée des grands nombres
+│   ├── format.ts         # Notation abrégée des grands nombres
+│   └── galets.ts         # Galets de l'infini : découverte + galets affectant une machine
 ├── data/                 # Contenu data-driven (modifiable sans toucher au moteur)
-│   ├── eras/             # Une description par ère (era0..era4, life, civilization, space, transcendence) + factory.ts
+│   ├── eras/             # Toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence
 │   ├── crises.ts         # Définitions de crises
 │   ├── metaUpgrades.ts   # Définitions des méta-upgrades
+│   ├── galets.ts         # Définitions des galets de l'infini (collectibles conservés au prestige)
 │   └── index.ts          # defs : GameDefs (agrégation typée)
 ├── store/                # Stores Zustand : gameStore (persisté) ; feedbackStore, clickPulse, eventStore (transitoires)
 ├── i18n/                 # i18n custom (FR source de vérité, EN typé complet)
-├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales)
+├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales), useGalets (découverte), useEraMechanic (clic d'ère)
 ├── components/           # Par domaine ; un composant par fichier
-│   ├── ui/               # Primitives (Button, Panel, Icon, IconBadge, FloaterLayer...)
-│   ├── game/             # Ressources, machines, paliers, badges, bannières, EventModal
-│   │   └── widgets/      # Widgets d'ère : passifs + interactifs (BohrAtom, StarNursery, PeriodicTable) via interactive.ts
-│   └── layout/           # Coquille, navigation d'ères ; LanguageSwitch, SaveMenu
+│   ├── ui/               # Primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── game/             # Ressources, machines, paliers, badges, bannières, galets, EventModal
+│   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
+│   └── layout/           # Coquille, navigation d'ères, SceneBackground, GaletReceptacle ; LanguageSwitch, SaveMenu
 └── App.tsx               # Navigation par état (pas de router)
 tests/
 ├── helpers.ts            # Helpers partagés (makeState) - éviter la duplication
 ├── unit/                 # Vitest - logique pure
 ├── component/            # Vitest + Testing Library
 └── e2e/                  # Playwright (smoke)
+sim/                      # Harnais de simulation d'équilibrage (exclu de make check)
+├── profiles.ts           # Profils de joueur (minimal, idle, casual, active, optimal)
+├── simulate.ts           # Boucle de simulation headless (temps/palier, retours arrière, activation)
+├── run.sim.ts            # Génère sim/results/*.json (make sim)
+└── viewer/               # Visualisation comparée des runs (make sim-view)
 ```
 
 ---
@@ -182,6 +190,38 @@ tests/
 ### Qualité (avant de considérer une tâche terminée)
 - `make check` doit passer (build + lint + typecheck + tests unitaires).
 
+### Checkup complet du projet
+
+Un « checkup » (revue de santé globale, au-delà d'une tâche ponctuelle) couvre
+les dimensions suivantes. À dérouler dans l'ordre ; chaque point est à corriger,
+pas seulement à constater.
+
+1. **Porte qualité** : `make check` vert (build + lint + typecheck + tests). Le
+   harnais de simulation (`sim/`) en est exclu ; le relancer (`make sim`) si
+   l'équilibrage a bougé.
+2. **Typographie** : aucun tiret long (`—`/`–`) dans le code, les chaînes, les
+   commentaires, la doc (l'exemple de la règle dans cet AGENTS est la seule
+   occurrence tolérée). Recherche : `grep -rnP "[\x{2014}\x{2013}]"`.
+3. **Couleurs en dur** : les composants n'utilisent que les jetons sémantiques.
+   Exceptions documentées et tolérées : badges d'alerte (`bg-red-500` /
+   `bg-yellow-400`), bannière de crise, scrim de modale (`bg-black/60`), dégradé
+   de température de `CoolingWidget`, et `theme.css` / `index.css` (CSS brut
+   autorisé). Tout nouveau hex hors de ces cas est à remplacer par un jeton.
+4. **i18n** : parité stricte FR/EN (même nombre de clés), tout texte via `t()`,
+   aucune chaîne affichée en dur.
+5. **Accessibilité** (voir la checklist « Principes produit » ci-dessus) :
+   cliquables = boutons/liens étiquetés, focus clavier visible (y compris les
+   cibles SVG `role="button"` : prévoir un `strokeWidth` + `focus-visible:`),
+   icônes décoratives `aria-hidden`, alertes jamais portées par la seule
+   couleur, `progressbar` correctement balisées, `lang` du document à jour.
+6. **Qualité du code** : factorisation / déduplication (un motif répété devient
+   un helper `src/lib` ou `src/hooks`, ou un composant `components/ui/`), pas de
+   code mort (export non importé et non testé), fichiers < ~300 lignes.
+7. **Commentaires** : utiles seulement (le pourquoi / le non-évident) ; supprimer
+   ceux qui paraphrasent le code.
+8. **Documentation** : AGENTS.md (arborescence, règles), `docs/` et `README.md`
+   reflètent l'état réel du code (nouvelles ères, widgets, systèmes).
+
 ---
 
 ## Commandes (Makefile)
@@ -197,6 +237,8 @@ tests/
 | `make test` | Tests unitaires (e2e : `make test-e2e`) |
 | `make fix` | Format + lint |
 | `make check` | build + lint + typecheck + tests unitaires |
+| `make sim` | Lance les simulations d'équilibrage (génère `sim/results/*.json`) |
+| `make sim-view` | Affiche l'URL du visualiseur graphique (nécessite `make start`) |
 
 ---
 

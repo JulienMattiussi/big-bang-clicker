@@ -33,19 +33,21 @@ Voir aussi [AGENTS.md](../AGENTS.md). Détail data-driven :
 src/
 ├── lib/                  # logique pure (zéro React, testée)
 │   ├── types.ts          # types du domaine (Def + State)
-│   ├── engine.ts         # tick, coûts, achats, conversion manuelle (+ production gratuite), franchissement de palier
-│   ├── graph.ts          # flux nets (réels) + flux nominaux + ressources en déficit, dépendances, tri
+│   ├── engine.ts         # tick, coûts (arrondis), achats, conversion manuelle, multiplicateurs de galets, clickYield, palier
+│   ├── graph.ts          # flux nets réels + alertes (déclin / production à zéro), dépendances, tri
 │   ├── reveal.ts         # dévoilement progressif (machines / ressources)
 │   ├── events.ts         # évènements narratifs déclenchés (transitions, crises, tuto)
 │   ├── crises.ts         # risque, déclenchement, effets
 │   ├── prestige.ts       # Échos, reset New Game+
 │   ├── meta.ts           # méta-upgrades de prestige
 │   ├── save.ts           # état initial, sérialisation versionnée + migrations, idle, export/import
-│   └── format.ts         # notation abrégée des grands nombres
+│   ├── format.ts         # notation abrégée des grands nombres
+│   └── galets.ts         # galets de l'infini : découverte + galets affectant une machine
 ├── data/
-│   ├── eras/             # une définition d'ère par fichier (era0..era4, life, civilization, space, transcendence) + factory.ts
+│   ├── eras/             # toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence
 │   ├── crises.ts         # définitions de crises
 │   ├── metaUpgrades.ts   # définitions des méta-upgrades
+│   ├── galets.ts         # définitions des galets de l'infini
 │   └── index.ts          # agrégation typée (defs)
 ├── store/                # stores Zustand (gameStore persisté ; les autres transitoires)
 │   ├── gameStore.ts      # état de jeu + actions + persistance
@@ -55,14 +57,20 @@ src/
 ├── i18n/                 # i18n custom (voir section 10)
 ├── hooks/
 │   ├── useTick.ts        # boucle de jeu + autosauvegarde (+ sauvegarde à la fermeture)
-│   └── useEvents.ts      # détecte et enfile les évènements narratifs
+│   ├── useEvents.ts      # détecte et enfile les évènements narratifs
+│   ├── useGalets.ts      # découverte des galets au franchissement de palier
+│   └── useEraMechanic.ts # geste de clic d'une ère (gain de base + complétion gratuite)
 ├── components/
-│   ├── ui/               # primitives (Button, Panel, Icon, IconBadge, FloaterLayer...)
-│   ├── game/             # ressources, machines, paliers, badges, bannières, EventModal
-│   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget, AccretionWidget...) + interactifs (BohrAtom, StarNursery, PeriodicTable) via interactive.ts
-│   └── layout/           # coquille, navigation d'ères
+│   ├── ui/               # primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── game/             # ressources, machines, paliers, badges, bannières, galets, EventModal
+│   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
+│   └── layout/           # coquille, navigation d'ères, SceneBackground, GaletReceptacle
 └── App.tsx               # navigation par état (pas de router)
 ```
+
+Hors `src/`, le dossier `sim/` héberge un harnais de simulation d'équilibrage
+(profils de joueur, boucle headless, visualiseur), exclu de `make check` et
+lancé via `make sim` / `make sim-view`.
 
 ## 3. Modèle de données (définitions statiques)
 
@@ -174,6 +182,7 @@ interface GameState {
   totalComplexityEver: number  // base du calcul de prestige
   discovered: Record<ResourceId, boolean>  // ressources déjà produites (dévoilement collant)
   seenEvents: Record<string, boolean>      // modales narratives déjà montrées (une fois)
+  galets: Record<string, { found: boolean; active: boolean }>  // galets de l'infini (conservés au prestige)
 }
 ```
 
@@ -182,7 +191,7 @@ Règle : tout ce qui dépend du **contenu** (noms, taux, coûts) vit dans les
 
 ## 5. Moteur (tick)
 
-Ceur du jeu : une fonction **pure** qui avance l'état d'un pas de temps.
+Cœur du jeu : une fonction **pure** qui avance l'état d'un pas de temps.
 
 ```ts
 function tick(state: GameState, defs: GameDefs, dt: number): GameState
@@ -214,13 +223,18 @@ Hors `tick` (actions, dans le store / le moteur) :
   toute recette reste aussi automatisable (achat de niveaux -> exécution au
   tick). Variante **`manualProduce`** : produit les sorties **gratuitement** (sans
   consommer), pour les widgets où le geste ne doit pas vider le stock. GAME-DESIGN 7.
+  Le rendement d'un clic suit `clickYield` (= niveau de la première usine de l'ère
+  + 1, multiplié par les galets actifs) : cliquer reste utile et passe à l'échelle
+  avec la progression.
 - **Franchissement de palier** (`unlockNextEra` / `canUnlockNextEra`) : action
   **manuelle** qui débloque l'ère suivante et **ne dépense pas** la Complexité.
   Aucune ère ne se débloque automatiquement (le cap évite la cascade).
 - **Flux** (`graph.ts`) : `netFlows` = **variation réelle** par ressource
-  (simulation d'un tick, pour l'affichage) ; `nominalFlows` = capacité
-  production - demande (ignore le stock) ; `decliningResources` = ressources en
-  **déficit** (alerte "!" qui persiste même à 0). Voir [UI-UX.md](./UI-UX.md).
+  (différence d'un tick simulé, pour l'affichage). Deux alertes en dérivent, sur
+  les seuls flux réels : `decliningResources` (rouge) = ressources qui reculent
+  (consommées plus vite que produites) ; `stalledResources` (jaune) = sortie de
+  convertisseur révélée mais figée autour de zéro (production à l'arrêt). Voir
+  [UI-UX.md](./UI-UX.md).
 
 Déterminisme : le tick **ne lit jamais l'horloge** lui-même ; `dt` est fourni.
 Cela rend le moteur testable et compatible avec le calcul hors-ligne et la
@@ -263,6 +277,17 @@ Implémente la mécanique de [GAME-DESIGN.md](./GAME-DESIGN.md) section 6 :
   (incrémentés), `metaUpgrades`, et les compteurs de méta-progression.
 - Les `metaUpgrades` modifient les paramètres de la prochaine partie
   (multiplicateurs de départ, automatisations débloquées d'office, etc.).
+
+### 8.1 Galets de l'infini (galets.ts, data/galets.ts)
+
+Collectibles de prestige, **conservés au reset** (comme les Échos). Décrits en
+données (`GaletDef` : `effect` = `generatorMultiplier` | `converterMultiplier`,
+borné par `maxEraIndex` et valeur). `discoverableGalets` les rend découvrables
+quand la Complexité atteint le palier de leur ère ; le joueur les active /
+désactive depuis le réceptacle (`GaletReceptacle`). Le moteur applique les
+multiplicateurs actifs (`galetGeneratorMultiplier` / `galetConverterMultiplier`)
+à la production automatique (tick) ET aux gestes manuels (`manualConvert` /
+`manualProduce`), sans toucher au coût des machines.
 
 ## 9. Sauvegarde, export/import, idle hors-ligne (save.ts)
 

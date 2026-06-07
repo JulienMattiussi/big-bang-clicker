@@ -25,7 +25,7 @@ const colorFor = (r: RunResult) => PROFILE_COLOR[r.profileId] ?? 'var(--color-fg
 const isDashed = (r: RunResult) => r.unlockPolicy === 'ready'
 
 function fmtDuration(s: number | null): string {
-  if (s === null) return '—'
+  if (s === null) return '-'
   if (s < 60) return `${Math.round(s)} s`
   if (s < 3600) return `${(s / 60).toFixed(1)} min`
   if (s < 86400) return `${(s / 3600).toFixed(1)} h`
@@ -263,14 +263,14 @@ export function SimViewer() {
                       <td className="px-2 tabular-nums">{fmtDuration(m.grindS)}</td>
                       <td className="px-2 tabular-nums">{m.backTrips}</td>
                       <td className="px-2 tabular-nums">
-                        {c ? `${c.generators.active}/${c.generators.total}` : '—'}
+                        {c ? `${c.generators.active}/${c.generators.total}` : '-'}
                       </td>
                       <td className="px-2 tabular-nums">
-                        {c ? `${c.converters.active}/${c.converters.total}` : '—'}
+                        {c ? `${c.converters.active}/${c.converters.total}` : '-'}
                       </td>
                       <td className="px-2" title={missing ? `Manque : ${missing}` : undefined}>
                         {!c ? (
-                          '—'
+                          '-'
                         ) : c.fullyActivated ? (
                           <span className="text-accent">✓</span>
                         ) : (

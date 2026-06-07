@@ -1,9 +1,12 @@
 import { useId, type ReactElement } from 'react'
 
 /**
- * Drawing of an "infinity pebble": a GREY stone (silhouette varies per pebble)
- * with a painted MOTIF in the pebble's own colour. The matter pebble carries a
- * painted atom in amber. Decorative (aria-hidden); `dim` renders it inactive.
+ * Drawing of an "infinity pebble": a GREY stone (silhouette varies per pebble),
+ * its surface mottled and non-uniform, with a painted MOTIF in the pebble's own
+ * colour - the paint looking worn, scraped off in flecks. The matter pebble
+ * carries a painted atom in amber. Decorative (aria-hidden); `dim` renders it
+ * inactive. The stone grain and paint wear come from per-pebble fractal-noise
+ * filters, so no two silhouettes share the same texture.
  */
 
 /** Irregular pebble silhouettes (viewBox 36x32), one per `shape` index. */
@@ -52,8 +55,13 @@ export function Galet({
   const uid = raw.replace(/[^a-zA-Z0-9]/g, '')
   const stone = `st-${uid}`
   const shadeId = `sh-${uid}`
+  const clipId = `cl-${uid}`
+  const grainId = `gn-${uid}`
+  const wornId = `wo-${uid}`
   const d = PEBBLE_SHAPES[shape % PEBBLE_SHAPES.length]
   const paint = motif ? MOTIFS[motif]?.(color) : null
+  // A distinct noise seed per silhouette so the texture never repeats.
+  const seed = (shape % PEBBLE_SHAPES.length) * 9 + 1
   return (
     <svg
       viewBox="0 0 36 32"
@@ -71,12 +79,32 @@ export function Galet({
           <stop offset="0%" stopColor="var(--color-bg)" stopOpacity="0" />
           <stop offset="100%" stopColor="var(--color-bg)" stopOpacity="0.4" />
         </radialGradient>
+        <clipPath id={clipId}>
+          <path d={d} />
+        </clipPath>
+        {/* Mottled stone grain: fractal noise turned into faint dark speckles. */}
+        <filter id={grainId} x="-10%" y="-10%" width="120%" height="120%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed={seed} result="n" />
+          <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0" />
+        </filter>
+        {/* Worn paint: roughen the strokes, then scrape sparse flecks out of them. */}
+        <filter id={wornId} x="-25%" y="-25%" width="150%" height="150%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.13" numOctaves="2" seed={seed + 4} result="warp" />
+          <feDisplacementMap in="SourceGraphic" in2="warp" scale="0.9" xChannelSelector="R" yChannelSelector="G" result="rough" />
+          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed={seed + 9} result="flecks" />
+          <feColorMatrix in="flecks" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2.5" result="holes" />
+          <feComposite in="rough" in2="holes" operator="in" />
+        </filter>
       </defs>
-      {/* Grey stone body + soft bottom shade. */}
-      <path d={d} fill={`url(#${stone})`} stroke="var(--stone-dark)" strokeWidth="0.6" />
-      <path d={d} fill={`url(#${shadeId})`} />
-      {/* Painted motif (the pebble's colour). */}
-      {paint}
+      {/* Grey stone body, mottled, with a soft bottom shade (clipped to shape). */}
+      <g clipPath={`url(#${clipId})`}>
+        <path d={d} fill={`url(#${stone})`} />
+        <rect x="0" y="0" width="36" height="32" filter={`url(#${grainId})`} />
+        <path d={d} fill={`url(#${shadeId})`} />
+      </g>
+      <path d={d} fill="none" stroke="var(--stone-dark)" strokeWidth="0.6" />
+      {/* Painted motif (the pebble's colour), worn and scraped. */}
+      {paint ? <g filter={`url(#${wornId})`}>{paint}</g> : null}
     </svg>
   )
 }
