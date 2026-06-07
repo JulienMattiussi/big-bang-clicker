@@ -1,6 +1,5 @@
 import type { ReactElement } from 'react'
 import { CoolingWidget } from './CoolingWidget'
-import { GalaxyWidget } from './GalaxyWidget'
 import { AccretionWidget } from './AccretionWidget'
 import { CellWidget } from './CellWidget'
 import { CityWidget } from './CityWidget'
@@ -12,7 +11,6 @@ type WidgetComponent = (props: { className?: string }) => ReactElement
 /** Registry of iconic widgets by identifier (the era's `widget` field). */
 const WIDGETS: Record<string, WidgetComponent> = {
   cooling: CoolingWidget,
-  galaxy: GalaxyWidget,
   accretion: AccretionWidget,
   cell: CellWidget,
   city: CityWidget,

@@ -9,6 +9,8 @@ export const fr = {
   'complexity.source': 'Produit de la Complexité',
   'complexity.reduced': 'réduite, ère antérieure',
   'complexity.toDiscover': 'Quelque chose à découvrir ici fera progresser la Complexité',
+  'alert.declining': 'En baisse : consommée plus vite que produite',
+  'alert.eraDeclining': 'Une ressource est en baisse dans cette ère',
   'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',
@@ -25,6 +27,7 @@ export const fr = {
   'machine.produce': 'Produire',
   'widget.temperature': 'Température',
   'bohr.hint': "Capture l'électron quand il s'approche du noyau",
+  'nursery.hint': 'Chaque clic effondre du gaz ; martèle un point pour allumer une étoile',
 
   'event.continue': 'Continuer',
   'tuto.firstMachine.title': 'Ta première machine',

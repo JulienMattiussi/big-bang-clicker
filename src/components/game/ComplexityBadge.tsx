@@ -23,8 +23,10 @@ export function ComplexityBadge() {
       const current = useGameStore.getState().state.complexity
       const delta = current - previous.current
       previous.current = current
-      if (delta > 0)
-        useFeedbackStore.getState().spawn('complexity', `+${formatNumber(delta)}`, 'gain')
+      // Skip floaters too tiny to render as anything but "+0".
+      const text = formatNumber(delta)
+      if (delta > 0 && text !== formatNumber(0))
+        useFeedbackStore.getState().spawn('complexity', `+${text}`, 'gain')
     }, PULSE_MS)
     return () => clearInterval(timer)
   }, [])

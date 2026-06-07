@@ -235,6 +235,31 @@ export function manualConvert(state: GameState, defs: GameDefs, id: ConverterId)
 }
 
 /**
+ * Produces a recipe's outputs once WITHOUT consuming any input (a "free" manual
+ * production). Used by widgets where the manual gesture shouldn't drain the
+ * player's stock (the inputs stay the fuel of the AUTOMATED recipe). Still
+ * credits Complexity like a normal conversion.
+ */
+export function manualProduce(state: GameState, defs: GameDefs, id: ConverterId): GameState {
+  const conv = defs.converters[id]
+  if (!conv) return state
+  const resources = { ...state.resources }
+  const latestEra = latestUnlockedIndex(state)
+  let gained = 0
+  for (const output of conv.outputs) {
+    resources[output.resource] =
+      (resources[output.resource] ?? 0) + output.amount * resourceMultiplier(state, output.resource)
+    gained += complexityFor(defs, output.resource, output.amount, latestEra)
+  }
+  return {
+    ...state,
+    resources,
+    discovered: discoveredWith(state.discovered, resources),
+    ...creditedComplexity(state, defs, gained),
+  }
+}
+
+/**
  * Advances the state by one time step `dt` (in seconds):
  * 1. generator production;
  * 2. conversions (bounded by available inputs, never a hard block);

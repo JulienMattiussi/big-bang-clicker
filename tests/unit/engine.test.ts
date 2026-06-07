@@ -7,6 +7,7 @@ import {
   canUnlockNextEra,
   costAtLevel,
   manualConvert,
+  manualProduce,
   nextCost,
   tick,
   unlockNextEra,
@@ -146,6 +147,13 @@ describe('conversion manuelle', () => {
     expect(next.resources.proton).toBeCloseTo(1)
     expect(next.complexity).toBeCloseTo(1)
     expect(next.discovered.proton).toBe(true) // sticky discovery
+  })
+
+  it('manualProduce produit la sortie sans rien consommer, et crédite la Complexité', () => {
+    const next = manualProduce(stateWith({ resources: { quark: 5 } }), defs, 'fuse')
+    expect(next.resources.quark).toBe(5) // intrant non consommé
+    expect(next.resources.proton).toBeCloseTo(1)
+    expect(next.complexity).toBeCloseTo(1)
   })
 })
 

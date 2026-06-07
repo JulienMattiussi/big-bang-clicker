@@ -3,8 +3,8 @@ import { IconBadge } from '@/components/ui/IconBadge'
 import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
-import { netFlows } from '@/lib/graph'
-import { revealedResources } from '@/lib/reveal'
+import { decliningResources, netFlows } from '@/lib/graph'
+import { revealedMachines, revealedResources } from '@/lib/reveal'
 import { COMPLEXITY_ERA_DECAY } from '@/lib/engine'
 import { FloaterLayer } from '@/components/ui/FloaterLayer'
 import { formatFixed, formatNumber } from '@/lib/format'
@@ -17,15 +17,25 @@ export function ResourcePanel({ era }: { era: EraDef }) {
   const state = useGameStore((s) => s.state)
   const defs = useGameStore((s) => s.defs)
   const flows = netFlows(state, defs)
+  const declining = decliningResources(state, defs)
   const revealed = revealedResources(state, defs, era)
 
   const eraIndex = (eraId: string) => Number(eraId.slice(1)) || 0
   const latestIndex = state.unlockedEras.reduce((max, id) => Math.max(max, eraIndex(id)), 0)
 
-  // Machines that consume a resource (so the player knows where it goes).
+  // Machines that consume a resource (so the player knows where it goes) -
+  // only the ones already revealed, never a machine from a not-yet-reached era.
   const consumedBy = (id: string) => {
     const names = Object.values(defs.converters)
-      .filter((c) => c.inputs.some((i) => i.resource === id))
+      .filter((c) => {
+        if (!c.inputs.some((i) => i.resource === id)) return false
+        const owner = defs.eras.find((e) => e.id === c.eraId)
+        return (
+          !!owner &&
+          state.unlockedEras.includes(c.eraId) &&
+          revealedMachines(state, defs, owner).has(c.id)
+        )
+      })
       .map((c) => t(c.nameKey as TranslationKey))
     return names.length ? `${t('machine.consumedBy')} : ${names.join(', ')}` : undefined
   }
@@ -66,7 +76,20 @@ export function ResourcePanel({ era }: { era: EraDef }) {
                 className="relative flex items-center justify-between gap-3"
               >
                 <span className="flex min-w-0 items-center gap-2">
-                  <IconBadge icon={def.icon} symbol={def.symbol} kind="resource" />
+                  {/* Notification badge overlapping the icon's corner when the
+                      resource is declining (consumed faster than produced). */}
+                  <span
+                    className="relative inline-flex shrink-0"
+                    title={declining.has(id) ? t('alert.declining') : undefined}
+                  >
+                    <IconBadge icon={def.icon} symbol={def.symbol} kind="resource" />
+                    {declining.has(id) ? (
+                      <span className="pointer-events-none absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] leading-none font-bold text-white shadow">
+                        <span aria-hidden>!</span>
+                        <span className="sr-only">{t('alert.declining')}</span>
+                      </span>
+                    ) : null}
+                  </span>
                   <span className="truncate">{t(def.nameKey as TranslationKey)}</span>
                   {producesComplexity(id) ? (
                     <span title={complexityTip(id)} className="inline-flex shrink-0 text-octarine">

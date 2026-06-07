@@ -11,7 +11,7 @@ import { canAfford, canManualConvert, nextCost } from '@/lib/engine'
 import { revealedMachines } from '@/lib/reveal'
 import { formatFixed, formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
-import type { EraDef, GameDefs, ResourceId } from '@/lib/types'
+import type { ConverterDef, EraDef, GameDefs, ResourceAmount, ResourceId } from '@/lib/types'
 
 type T = (key: TranslationKey) => string
 
@@ -22,6 +22,18 @@ function describeCost(cost: Record<ResourceId, number>, defs: GameDefs, t: T): s
         `${formatNumber(amount)} ${t(defs.resources[id].nameKey as TranslationKey)}`,
     )
     .join(', ')
+}
+
+/** Tooltip for the manual "Produce" button: what one recipe consumes and produces. */
+function describeRecipe(conv: ConverterDef, defs: GameDefs, t: T): string {
+  const side = (list: ResourceAmount[]) =>
+    list
+      .map(
+        (io) =>
+          `${formatNumber(io.amount)} ${t(defs.resources[io.resource].nameKey as TranslationKey)}`,
+      )
+      .join(', ')
+  return `${t('machine.consumes')} ${side(conv.inputs)} → ${t('machine.produces')} ${side(conv.outputs)}`
 }
 
 /** A machine flow entry: a resource and its per-second rate now and next level. */
@@ -90,6 +102,7 @@ interface RowProps {
   /** Converters only: manual craft (one recipe per click) + automation toggle. */
   onCraft?: () => void
   canCraft?: boolean
+  craftTitle?: string
   enabled?: boolean
   onToggle?: () => void
 }
@@ -105,13 +118,14 @@ function MachineRow({
   flows,
   onCraft,
   canCraft,
+  craftTitle,
   enabled,
   onToggle,
 }: RowProps) {
   const toggleLabel = enabled ? t('machine.pause') : t('machine.resume')
   return (
     <li
-      className={`rounded-md border border-border bg-bg/40 p-2 ${enabled === false ? 'opacity-60' : ''}`}
+      className={`flex h-full flex-col rounded-md border border-border bg-bg/40 p-2 ${enabled === false ? 'opacity-60' : ''}`}
     >
       <div className="mb-2 flex items-center gap-2">
         {/* Gear: marks a machine that automates production. */}
@@ -135,17 +149,22 @@ function MachineRow({
         ) : null}
       </div>
       {flows}
-      <div className="flex gap-2">
+      <div className="mt-auto flex gap-2">
         {/* Manual craft (orange = the action you trigger), constant width; then
             automation, which flexes to absorb the variable cost label. */}
         {onCraft ? (
-          <Button className="shrink-0 whitespace-nowrap" disabled={!canCraft} onClick={onCraft}>
+          <Button
+            className="shrink-0 whitespace-nowrap"
+            disabled={!canCraft}
+            title={craftTitle}
+            onClick={onCraft}
+          >
             {t('machine.produce')}
           </Button>
         ) : null}
         <Button
           variant="ghost"
-          className="flex-1 text-center whitespace-nowrap"
+          className="flex-1 text-center"
           disabled={!affordable}
           onClick={onBuy}
         >
@@ -157,7 +176,7 @@ function MachineRow({
 }
 
 /** Machines of the active era (generators and converters) to upgrade. */
-export function PurchasePanel({ era }: { era: EraDef }) {
+export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boolean }) {
   const { t } = useTranslation()
   const state = useGameStore((s) => s.state)
   const defs = useGameStore((s) => s.defs)
@@ -197,7 +216,11 @@ export function PurchasePanel({ era }: { era: EraDef }) {
 
   return (
     <Panel title={t(era.machinesKey as TranslationKey)}>
-      <ul className="flex flex-col gap-2">
+      <ul
+        className={
+          wide ? 'grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3' : 'flex flex-col gap-2'
+        }
+      >
         {era.generators
           .filter((id) => revealed.has(id))
           .map((id) => {
@@ -260,6 +283,7 @@ export function PurchasePanel({ era }: { era: EraDef }) {
                 }}
                 onCraft={() => craft(id)}
                 canCraft={canManualConvert(state, defs, id)}
+                craftTitle={describeRecipe(def, defs, t)}
                 enabled={converterState?.enabled ?? true}
                 onToggle={() => toggleConverter(id)}
                 flows={

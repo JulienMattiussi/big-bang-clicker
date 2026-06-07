@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react'
 import { PeriodicTable } from './PeriodicTable'
 import { BohrAtom } from './BohrAtom'
+import { StarNursery } from './StarNursery'
 import type { EraDef } from '@/lib/types'
 
 /**
@@ -9,6 +10,7 @@ import type { EraDef } from '@/lib/types'
  */
 export const INTERACTIVE_WIDGETS: Record<string, (props: { era: EraDef }) => ReactElement> = {
   bohr: BohrAtom,
+  galaxy: StarNursery,
   periodic: PeriodicTable,
 }
 

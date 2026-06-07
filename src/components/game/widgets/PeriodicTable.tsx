@@ -89,59 +89,65 @@ export function PeriodicTable({ era }: { era: EraDef }) {
   const grid: CSSProperties = { gridTemplateColumns: 'repeat(18, minmax(0, 1fr))' }
 
   return (
-    <div className="flex w-full flex-col items-center gap-3">
+    <div
+      role="group"
+      aria-label={t(era.verbKey as TranslationKey)}
+      className="grid w-full gap-1"
+      style={grid}
+    >
+      {/* The verb sits in the table's empty top-middle (saves vertical space). */}
       <div
-        role="group"
-        aria-label={t(era.verbKey as TranslationKey)}
-        className="grid w-full gap-1"
-        style={grid}
+        style={{ gridColumn: '3 / 13', gridRow: '1 / 3' }}
+        className="flex items-center justify-center"
       >
-        {LAYOUT.map(({ col, row }) => {
-          const cell: CSSProperties = { gridColumnStart: col, gridRowStart: row }
-          const el = elementAt(col, row)
-
-          // Empty slot of the table outline (the recognisable grid / canvas).
-          if (!el || !revealed(el)) {
-            return (
-              <div
-                key={`${col}-${row}`}
-                aria-hidden
-                style={cell}
-                className="aspect-square rounded-md border border-border/40 bg-surface/20"
-              />
-            )
-          }
-
-          const amount = state.resources[el.resource] ?? 0
-          const affordable = el.converter ? canManualConvert(state, defs, el.converter) : true
-          const title = el.converter ? recipe(el.converter) : t(era.verbKey as TranslationKey)
-
-          return (
-            <button
-              key={el.resource}
-              type="button"
-              onClick={() => (el.converter ? onFuse(el.converter) : onBaseClick(el.resource))}
-              disabled={!affordable}
-              title={title}
-              aria-label={`${name(el.resource)}: ${formatFixed(amount)}. ${title}`}
-              style={cell}
-              className={`flex aspect-square flex-col items-center justify-center rounded-md border p-0.5 text-center transition select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-95 ${
-                el.converter
-                  ? affordable
-                    ? 'border-border bg-surface hover:border-accent'
-                    : 'border-border bg-bg/40 opacity-50'
-                  : 'border-accent/60 bg-accent/10 hover:border-accent'
-              }`}
-            >
-              <span className="text-sm leading-none font-bold text-fg">{el.symbol}</span>
-              <span className="mt-0.5 text-[9px] leading-none text-muted tabular-nums">
-                {formatFixed(amount)}
-              </span>
-            </button>
-          )
-        })}
+        <span aria-hidden className="text-lg font-semibold text-fg">
+          {t(era.verbKey as TranslationKey)}
+        </span>
       </div>
-      <span className="text-base font-semibold text-fg">{t(era.verbKey as TranslationKey)}</span>
+      {LAYOUT.map(({ col, row }) => {
+        const cell: CSSProperties = { gridColumnStart: col, gridRowStart: row }
+        const el = elementAt(col, row)
+
+        // Empty slot of the table outline (the recognisable grid / canvas).
+        if (!el || !revealed(el)) {
+          return (
+            <div
+              key={`${col}-${row}`}
+              aria-hidden
+              style={cell}
+              className="aspect-square rounded-md border border-border/40 bg-surface/20"
+            />
+          )
+        }
+
+        const amount = state.resources[el.resource] ?? 0
+        const affordable = el.converter ? canManualConvert(state, defs, el.converter) : true
+        const title = el.converter ? recipe(el.converter) : t(era.verbKey as TranslationKey)
+
+        return (
+          <button
+            key={el.resource}
+            type="button"
+            onClick={() => (el.converter ? onFuse(el.converter) : onBaseClick(el.resource))}
+            disabled={!affordable}
+            title={title}
+            aria-label={`${name(el.resource)}: ${formatFixed(amount)}. ${title}`}
+            style={cell}
+            className={`flex aspect-square flex-col items-center justify-center rounded-md border p-0.5 text-center transition select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-95 ${
+              el.converter
+                ? affordable
+                  ? 'border-border bg-surface hover:border-accent'
+                  : 'border-border bg-bg/40 opacity-50'
+                : 'border-accent/60 bg-accent/10 hover:border-accent'
+            }`}
+          >
+            <span className="text-sm leading-none font-bold text-fg">{el.symbol}</span>
+            <span className="mt-0.5 text-[9px] leading-none text-muted tabular-nums">
+              {formatFixed(amount)}
+            </span>
+          </button>
+        )
+      })}
     </div>
   )
 }

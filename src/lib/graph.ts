@@ -21,6 +21,54 @@ export function netFlows(state: GameState, defs: GameDefs): Record<ResourceId, n
   return flows
 }
 
+/**
+ * NOMINAL net flow per resource: full production capacity (with multipliers)
+ * minus full consumption demand, ignoring current stock. Unlike `netFlows`, a
+ * structural deficit shows here even when the stock has already hit 0 (the
+ * resource is starved, not merely stable). Used for the shortage alert.
+ */
+export function nominalFlows(state: GameState, defs: GameDefs): Record<ResourceId, number> {
+  const mult = (r: ResourceId) =>
+    (state.multipliers[r] ?? 1) * (state.multipliers.global ?? 1) * (state.multipliers.meta ?? 1)
+  const flows: Record<ResourceId, number> = {}
+  const add = (resource: ResourceId, n: number) => {
+    flows[resource] = (flows[resource] ?? 0) + n
+  }
+
+  for (const id in state.generators) {
+    const level = state.generators[id].level
+    if (level <= 0) continue
+    const gen = defs.generators[id]
+    if (!gen) continue
+    add(gen.output, level * gen.baseRate * mult(gen.output))
+  }
+  for (const id in state.converters) {
+    const cState = state.converters[id]
+    if (!cState.enabled || cState.level <= 0) continue
+    const conv = defs.converters[id]
+    if (!conv) continue
+    const cycles = cState.level * conv.baseRate
+    for (const input of conv.inputs) add(input.resource, -input.amount * cycles)
+    for (const output of conv.outputs)
+      add(output.resource, output.amount * cycles * mult(output.resource))
+  }
+  return flows
+}
+
+/**
+ * Resources in deficit: consumption capacity exceeds production capacity, so the
+ * stock is draining (or already starved at 0). Based on nominal flows, so the
+ * alert persists even once the stock reaches 0.
+ */
+export function decliningResources(state: GameState, defs: GameDefs): Set<ResourceId> {
+  const flows = nominalFlows(state, defs)
+  const declining = new Set<ResourceId>()
+  for (const id in flows) {
+    if (flows[id] < -1e-6) declining.add(id)
+  }
+  return declining
+}
+
 /** For each resource, the resources that feed it (direct inputs). */
 export function resourceDependencies(defs: GameDefs): Record<ResourceId, ResourceId[]> {
   const deps: Record<ResourceId, Set<ResourceId>> = {}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { netFlows, resourceDependencies, topologicalOrder } from '@/lib/graph'
+import { decliningResources, netFlows, resourceDependencies, topologicalOrder } from '@/lib/graph'
 import { createInitialState } from '@/lib/save'
 import type { GameDefs } from '@/lib/types'
 
@@ -59,6 +59,28 @@ describe('netFlows', () => {
     const flows = netFlows(state, defs)
     expect(flows.a).toBeCloseTo(0) // produit 2, consommé 2 (borné aux entrées)
     expect(flows.b).toBeCloseTo(2)
+  })
+})
+
+describe('decliningResources', () => {
+  it('repère une ressource consommée plus vite que produite', () => {
+    const state = {
+      ...createInitialState(0),
+      resources: { a: 10 }, // stock présent, pas de générateur actif
+      converters: { makeB: { level: 1, enabled: true } }, // consomme 1 a/s
+    }
+    const declining = decliningResources(state, defs)
+    expect(declining.has('a')).toBe(true) // -1/s
+    expect(declining.has('b')).toBe(false) // +1/s
+  })
+
+  it('reste en déficit même quand le stock est à 0 (ressource affamée)', () => {
+    const state = {
+      ...createInitialState(0),
+      resources: { a: 0 }, // épuisée, mais toujours demandée
+      converters: { makeB: { level: 1, enabled: true } },
+    }
+    expect(decliningResources(state, defs).has('a')).toBe(true)
   })
 })
 

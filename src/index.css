@@ -149,6 +149,66 @@
   }
 }
 
+/* Star nursery (era 2): a star ignites then twinkles in the field. */
+@keyframes star-ignite {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+}
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+.star {
+  animation:
+    star-ignite 0.45s ease-out backwards,
+    star-twinkle 3.2s ease-in-out 0.45s infinite;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .star {
+    animation: none;
+    opacity: 0.8;
+  }
+}
+
+/* Gas-cloud puff around the pointer on each click. */
+@keyframes gas-puff {
+  from {
+    transform: scale(0.4);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+.gas-puff {
+  animation: gas-puff 0.7s ease-out forwards;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .gas-puff {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 /* Event modal entrance (overlay fade + dialog pop). */
 @keyframes overlay-in {
   from {

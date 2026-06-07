@@ -69,9 +69,10 @@ export function GameShell() {
           <section className="flex justify-center py-2">
             <ClickArea era={era} />
           </section>
-          <section className="grid gap-4 md:grid-cols-2">
+          {/* Resources kept narrow so the wide machines panel fits 3 columns. */}
+          <section className="grid gap-4 md:grid-cols-[1fr_3fr]">
             <ResourcePanel era={era} />
-            <PurchasePanel era={era} />
+            <PurchasePanel era={era} wide />
           </section>
         </>
       ) : (
