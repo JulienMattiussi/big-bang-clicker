@@ -84,6 +84,32 @@ export const en: Translations = {
   'map.region': 'Region',
 
   'event.continue': 'Continue',
+  'era.unlocked.eyebrow': 'A new era dawns',
+
+  'memory.button': 'The memory of the universe',
+  'memory.title': 'The eternal memory of the universe',
+  'memory.subtitle': 'Match the symbols two by two before you run out of mistakes.',
+  'memory.reward': 'Reward: doubles the production of',
+  'memory.consumes': 'Consumes',
+  'memory.giveUp': 'Give up',
+  'memory.quit.body': 'If you leave now, the stake is lost. Quit anyway?',
+  'memory.quit.confirm': 'Quit',
+  'memory.quit.cancel': 'Keep playing',
+  'memory.mistakesLeft': 'Mistakes left',
+  'memory.play': 'Attempt',
+  'memory.replay': 'Try again',
+  'memory.close': 'Close',
+  'memory.tooPoor': 'Not enough Complexity',
+  'memory.cardBack': 'Hidden symbol',
+  'memory.win.title': 'The memory is etched',
+  'memory.win.body': "The current era's main resource production is doubled.",
+  'memory.lose.title': 'The memory slips away',
+  'memory.lose.body': 'Too many mistakes. The staked Complexity is lost.',
+  'memory.event.eyebrow': 'A new power awakens',
+  'memory.event.title': 'The eternal memory of the universe',
+  'memory.event.body':
+    "You have just discovered a new way to act upon existence and to progress. The 42 symbols will grant you the answer to the great questions of Life, the Universe, and Everything: match them two by two to commit them to memory, and the era's foremost resource will see its production doubled.",
+
   'tuto.firstMachine.title': 'Your first machine',
   'tuto.firstMachine.body':
     'This is a machine. Click "Produce" to make it by hand, or "Upgrade" to buy levels and automate it. Everything combines: resources from one era feed the next.',

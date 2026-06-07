@@ -148,6 +148,16 @@ function AtmosphereIcon(props: SVGProps<SVGSVGElement>): ReactElement {
   )
 }
 
+/** Custom glyph (card): a playing card with a centred diamond pip. */
+function CardIcon(props: SVGProps<SVGSVGElement>): ReactElement {
+  return (
+    <svg {...GLYPH_PROPS} {...props}>
+      <rect x="5" y="3" width="14" height="18" rx="2" />
+      <path d="M12 8 L14.3 12 L12 16 L9.7 12 Z" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
 type Glyph = LucideIcon | ((props: SVGProps<SVGSVGElement>) => ReactElement)
 
 /**
@@ -166,6 +176,7 @@ const ICONS: Record<string, Glyph> = {
   orbit: Orbit,
   cloud: Cloud,
   atmosphere: AtmosphereIcon,
+  card: CardIcon,
   star: Star,
   disc: Disc,
   ellipse: EllipseIcon,

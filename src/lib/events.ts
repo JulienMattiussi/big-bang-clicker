@@ -7,6 +7,7 @@
 
 import type { GameDefs, GameState } from './types'
 import { revealedMachines } from './reveal'
+import { memoryUnlocked } from './memory'
 
 export type EventTone = 'transition' | 'regression' | 'tutorial'
 
@@ -48,6 +49,17 @@ export function triggeredEvents(state: GameState, defs: GameDefs): GameEvent[] {
       titleKey: 'tuto.firstMachine.title',
       bodyKey: 'tuto.firstMachine.body',
       icon: 'cog',
+    })
+  }
+
+  // Feature unlock: the memory mini-game, announced when oxidation is first leveled.
+  if (memoryUnlocked(state)) {
+    events.push({
+      id: 'feature:memory',
+      tone: 'transition',
+      titleKey: 'memory.event.title',
+      bodyKey: 'memory.event.body',
+      icon: 'card',
     })
   }
 

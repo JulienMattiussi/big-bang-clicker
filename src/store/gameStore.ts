@@ -13,6 +13,7 @@ import { resolveCrisis as runResolveCrisis, updateRisk } from '@/lib/crises'
 import { prestige as runPrestige } from '@/lib/prestige'
 import { applyMeta, buyMeta } from '@/lib/meta'
 import { triggeredEvents } from '@/lib/events'
+import { memoryCost } from '@/lib/memory'
 import {
   applyOffline,
   createInitialState,
@@ -62,6 +63,15 @@ interface GameStore {
   discoverGalet: (id: string) => void
   /** Toggles a found pebble's effect on/off. */
   toggleGalet: (id: string) => void
+  /** Pays the memory game's Complexity cost to start an attempt; false if too poor. */
+  startMemoryGame: () => boolean
+  /** Memory game cleared: doubles (cumulatively) the current era's main resource. */
+  winMemoryGame: () => void
+}
+
+/** The active era (or the first one as a fallback). */
+function currentEra(s: { state: GameState; defs: GameDefs }) {
+  return s.defs.eras.find((e) => e.id === s.state.currentEraId) ?? s.defs.eras[0]
 }
 
 function loadInitialState(now: number): GameState {
@@ -165,5 +175,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return {
         state: { ...s.state, galets: { ...s.state.galets, [id]: { ...galet, active: !galet.active } } },
       }
+    }),
+  startMemoryGame: () => {
+    const s = get()
+    const cost = memoryCost(s.state)
+    if (s.state.complexity < cost) return false
+    set({ state: { ...s.state, complexity: s.state.complexity - cost } })
+    return true
+  },
+  winMemoryGame: () =>
+    set((s) => {
+      const era = currentEra(s)
+      if (!era) return {}
+      const res = era.clickResource
+      const current = s.state.multipliers[res] ?? 1
+      return { state: { ...s.state, multipliers: { ...s.state.multipliers, [res]: current * 2 } } }
     }),
 }))

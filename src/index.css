@@ -1,6 +1,14 @@
 @import 'tailwindcss';
 @import './theme.css';
 
+/* Display font for the "42" emblem on the memory button (data in public/fonts). */
+@font-face {
+  font-family: 'Neogen';
+  src: url('/fonts/Neogen-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-display: swap;
+}
+
 /*
  * Tailwind v4 no longer sets cursor:pointer on buttons by default.
  * Centralized base rule for all active clickable elements.

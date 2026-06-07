@@ -1,9 +1,11 @@
 import type { KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
+import { EraIcon } from '@/components/game/EraIcon'
 import { Galet } from '@/components/game/Galet'
 import { useEventStore } from '@/store/eventStore'
 import { useGameStore } from '@/store/gameStore'
+import { useMemoryStore } from '@/store/memoryStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EventTone } from '@/lib/events'
@@ -19,19 +21,36 @@ const TONE_COLOR: Record<EventTone, string> = {
  * Narrative event modal: era transitions, the first-machine tutorial, crisis
  * (regression) announcements, and the elaborate discovery of an infinity pebble.
  * Shows the front event of the queue; the button dismisses it (next, if any).
+ *
+ * Two "hero" treatments: the infinity-pebble discovery (octarine), and an era
+ * unlock - the same hype, but tinted in the INCOMING era's colour via its
+ * `data-tier` (accent), not octarine.
  */
 export function EventModal() {
   const { t } = useTranslation()
   const event = useEventStore((s) => s.queue[0])
   const dismiss = useEventStore((s) => s.dismiss)
+  const defs = useGameStore((s) => s.defs)
   const galet = useGameStore((s) =>
     event?.galetId ? s.defs.galets.find((g) => g.id === event.galetId) : undefined,
   )
 
   if (!event) return null
 
+  // Era unlock: id is `era:<id>`; look up the era to tint the modal in its tier.
+  const eraId = event.id.startsWith('era:') ? event.id.slice(4) : null
+  const era = eraId ? defs.eras.find((e) => e.id === eraId) : undefined
+  // The memory feature unlock gets its own hero treatment (octarine).
+  const isMemory = event.id === 'feature:memory'
+
+  const handleDismiss = () => {
+    // Closing the memory unlock flashes its button so the player spots the new power.
+    if (isMemory) useMemoryStore.getState().flash()
+    dismiss()
+  }
+
   const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') dismiss()
+    if (e.key === 'Escape') handleDismiss()
   }
 
   return (
@@ -41,11 +60,16 @@ export function EventModal() {
     >
       <div
         key={event.id}
+        data-tier={era ? era.uiTier : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby="event-title"
         className={`modal-in w-full max-w-md rounded-lg border bg-surface p-6 text-fg shadow-xl ${
-          galet ? 'complexity-glow border-octarine/50' : 'border-border'
+          galet || isMemory
+            ? 'complexity-glow border-octarine/50'
+            : era
+              ? 'border-accent/50 shadow-[0_0_45px_-10px_var(--color-accent)]'
+              : 'border-border'
         }`}
       >
         {galet ? (
@@ -83,6 +107,54 @@ export function EventModal() {
               </span>
             </div>
           </div>
+        ) : era ? (
+          // Era unlock: a new era dawns, tinted in the incoming era's colour.
+          <div className="flex flex-col items-center gap-3 text-center">
+            <span className="flex items-center gap-2 text-xs font-semibold tracking-[0.25em] text-accent uppercase">
+              <span aria-hidden>✦</span>
+              {t('era.unlocked.eyebrow')}
+              <span aria-hidden>✦</span>
+            </span>
+            <div className="relative my-1 flex h-28 w-28 items-center justify-center">
+              <div
+                aria-hidden
+                className="bg-breathe absolute inset-0 rounded-full blur-md"
+                style={{
+                  background: 'radial-gradient(circle, var(--color-accent), transparent 68%)',
+                  opacity: 0.5,
+                }}
+              />
+              <EraIcon icon={era.icon} className="relative h-20 w-20" />
+            </div>
+            <h2 id="event-title" className="text-2xl font-bold">
+              {t(event.titleKey as TranslationKey)}
+            </h2>
+            <p className="leading-relaxed text-muted">{t(event.bodyKey as TranslationKey)}</p>
+          </div>
+        ) : isMemory ? (
+          // Major new power: the eternal memory of the universe (octarine hero).
+          <div className="flex flex-col items-center gap-3 text-center">
+            <span className="flex items-center gap-2 text-xs font-semibold tracking-[0.25em] text-octarine uppercase">
+              <span aria-hidden>✦</span>
+              {t('memory.event.eyebrow')}
+              <span aria-hidden>✦</span>
+            </span>
+            <div className="relative my-1 flex h-28 w-28 items-center justify-center">
+              <div
+                aria-hidden
+                className="bg-breathe absolute inset-0 rounded-full blur-md"
+                style={{
+                  background: 'radial-gradient(circle, var(--color-octarine), transparent 68%)',
+                  opacity: 0.5,
+                }}
+              />
+              <Icon name="card" className="relative h-16 w-16 text-octarine" />
+            </div>
+            <h2 id="event-title" className="text-2xl font-bold">
+              {t(event.titleKey as TranslationKey)}
+            </h2>
+            <p className="leading-relaxed text-muted">{t(event.bodyKey as TranslationKey)}</p>
+          </div>
         ) : (
           <>
             <div className="mb-3 flex items-center gap-3">
@@ -97,8 +169,8 @@ export function EventModal() {
           </>
         )}
 
-        <div className="mt-5 flex justify-end">
-          <Button autoFocus onClick={dismiss}>
+        <div className={`mt-5 flex ${galet || era || isMemory ? 'justify-center' : 'justify-end'}`}>
+          <Button autoFocus onClick={handleDismiss}>
             {galet ? t('galet.found.cta') : t('event.continue')}
           </Button>
         </div>

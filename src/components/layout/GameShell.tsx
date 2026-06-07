@@ -8,7 +8,9 @@ import { isFullWidthWidget } from '@/components/game/widgets/interactive'
 import { ResourcePanel } from '@/components/game/ResourcePanel'
 import { PurchasePanel } from '@/components/game/PurchasePanel'
 import { ComplexityBadge } from '@/components/game/ComplexityBadge'
+import { MemoryFeature } from '@/components/game/MemoryFeature'
 import { NextGoal } from '@/components/game/NextGoal'
+import { MilestoneButton } from '@/components/game/MilestoneButton'
 import { EraIcon } from '@/components/game/EraIcon'
 import { PrestigeBanner } from '@/components/game/PrestigeBanner'
 import { CrisisBanner } from '@/components/game/CrisisBanner'
@@ -34,33 +36,49 @@ export function GameShell() {
     >
       {/* Ambient scene background (per era group), behind everything. */}
       <SceneBackground eraIndex={era.index} />
-      {/* Top bar: central objective (Complexity + milestone, centered inline);
-          language and options on the right. */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex flex-1 items-center">
-          <GaletReceptacle />
-        </div>
-        <div className="flex items-center gap-4">
-          <ComplexityBadge />
-          <NextGoal />
-        </div>
-        <div className="flex flex-1 items-center justify-end gap-3">
-          <LanguageSwitch />
-          <SaveMenu />
-        </div>
-      </div>
-
+      {/* Top region. Center: Complexity and the milestone gauge stay on top
+          (their vertical position is unchanged), each with its button directly
+          beneath - memory under Complexity, unlock under the gauge. Left: pebbles
+          then the era title, which lands on the buttons' line (so the buttons
+          never push the title down). Right: language and options. */}
       <header className="flex flex-col gap-3">
-        <div className="flex items-start gap-3">
-          <EraIcon icon={era.icon} className="mt-1 h-9 w-9 shrink-0" />
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              {t(era.nameKey as TranslationKey)}
-            </h1>
-            {/* Reserved height (2 lines): switching language doesn't shift the rest. */}
-            <p className="mt-0.5 min-h-6 max-w-prose leading-snug text-muted italic">
-              {t(era.taglineKey as TranslationKey)}
-            </p>
+        {/* Two-row grid. Row 1 (pebbles / Complexity / milestone gauge / options)
+            always exists thanks to the pills, so row 2 (era title / memory button
+            under Complexity / unlock button under the gauge) stays put: the title
+            shares the buttons' row instead of rising to the pills, and the
+            pebbles keep their reserved slot above the title even when empty. */}
+        <div className="grid grid-cols-[1fr_auto_auto_1fr] items-start gap-x-4 gap-y-1.5">
+          <div className="col-start-1 row-start-1">
+            <GaletReceptacle />
+          </div>
+          <div className="col-start-2 row-start-1 flex justify-center">
+            <ComplexityBadge />
+          </div>
+          <div className="col-start-3 row-start-1 flex justify-center">
+            <NextGoal />
+          </div>
+          <div className="col-start-4 row-start-1 flex justify-end gap-3">
+            <LanguageSwitch />
+            <SaveMenu />
+          </div>
+
+          <div className="col-start-1 row-start-2 flex items-start gap-3">
+            <EraIcon icon={era.icon} className="mt-1 h-9 w-9 shrink-0" />
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight">
+                {t(era.nameKey as TranslationKey)}
+              </h1>
+              {/* Reserved height (2 lines): switching language doesn't shift the rest. */}
+              <p className="mt-0.5 min-h-6 max-w-prose leading-snug text-muted italic">
+                {t(era.taglineKey as TranslationKey)}
+              </p>
+            </div>
+          </div>
+          <div className="col-start-2 row-start-2 flex justify-center">
+            <MemoryFeature />
+          </div>
+          <div className="col-start-3 row-start-2 flex justify-center">
+            <MilestoneButton />
           </div>
         </div>
         <EraTabs />

@@ -84,6 +84,32 @@ export const fr = {
   'map.region': 'Région',
 
   'event.continue': 'Continuer',
+  'era.unlocked.eyebrow': "Une nouvelle ère s'ouvre",
+
+  'memory.button': "La mémoire de l'univers",
+  'memory.title': "La mémoire éternelle de l'univers",
+  'memory.subtitle': 'Retrouve les symboles deux à deux avant d\'épuiser tes erreurs.',
+  'memory.reward': 'Récompense : double la production de',
+  'memory.consumes': 'Consomme',
+  'memory.giveUp': 'Abandonner',
+  'memory.quit.body': 'Si tu pars maintenant, la mise est perdue. Quitter quand même ?',
+  'memory.quit.confirm': 'Quitter',
+  'memory.quit.cancel': 'Continuer la partie',
+  'memory.mistakesLeft': 'Erreurs restantes',
+  'memory.play': 'Tenter',
+  'memory.replay': 'Retenter',
+  'memory.close': 'Fermer',
+  'memory.tooPoor': 'Pas assez de Complexité',
+  'memory.cardBack': 'Symbole caché',
+  'memory.win.title': 'La mémoire est gravée',
+  'memory.win.body': "La production de la ressource principale de l'ère est doublée.",
+  'memory.lose.title': 'La mémoire se dérobe',
+  'memory.lose.body': "Trop d'erreurs. La Complexité misée est perdue.",
+  'memory.event.eyebrow': "Un nouveau pouvoir s'éveille",
+  'memory.event.title': "La mémoire éternelle de l'univers",
+  'memory.event.body':
+    "Tu viens de découvrir un nouveau moyen d'agir sur l'existence et de progresser. Les 42 symboles t'offriront la réponse aux grands problèmes de la vie, de l'Univers et du reste : retrouve-les deux à deux pour en graver la mémoire, et la production de la ressource maîtresse de l'ère en sera doublée.",
+
   'tuto.firstMachine.title': 'Ta première machine',
   'tuto.firstMachine.body':
     "Voici une machine. Clique « Produire » pour produire à la main, ou « Améliorer » pour acheter des niveaux et automatiser. Tout se combine : les ressources d'une ère alimentent la suivante.",
