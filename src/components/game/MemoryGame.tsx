@@ -1,6 +1,7 @@
 import { useState, type KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
+import { EraIcon } from '@/components/game/EraIcon'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { formatFixed } from '@/lib/format'
@@ -97,6 +98,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
   const era = defs.eras.find((e) => e.id === currentEraId) ?? defs.eras[0]
   const mainRes = era ? defs.resources[era.clickResource] : undefined
   const mainName = mainRes ? t(mainRes.nameKey as TranslationKey) : ''
+  const eraName = era ? t(era.nameKey as TranslationKey) : ''
 
   // Always 42 cards (21 pairs): discovered resources first, then top up with
   // others (unknown next-era resources are allowed) to reach the count.
@@ -204,6 +206,15 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                 {t('memory.title')}
               </h2>
               <p className="text-sm text-muted">{t('memory.subtitle')}</p>
+              {era ? (
+                <p className="mt-0.5 flex items-center gap-1.5 text-sm">
+                  <span className="text-muted">{t('memory.forEra')} :</span>
+                  <span data-tier={era.uiTier} className="inline-flex items-center gap-1 font-semibold text-accent">
+                    <EraIcon icon={era.icon} className="h-4 w-4" />
+                    {eraName}
+                  </span>
+                </p>
+              ) : null}
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -289,6 +300,10 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                     {formatFixed(cost)}
                   </span>{' '}
                   {t('app.complexity')}
+                </p>
+                <p className="text-sm text-muted">
+                  {t('memory.mistakesAllowed')} :{' '}
+                  <span className="font-bold tabular-nums text-fg">{MEMORY_MISTAKES}</span>
                 </p>
                 <div className="flex items-center gap-3">
                   {phase !== 'start' ? (

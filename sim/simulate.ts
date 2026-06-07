@@ -17,6 +17,7 @@ import {
 import { readyCrises, resolveCrisis, updateRisk } from '@/lib/crises'
 import { revealedMachines, revealedResources } from '@/lib/reveal'
 import { decliningResources } from '@/lib/graph'
+import { discoverableGalets } from '@/lib/galets'
 import type { EraDef, GameState } from '@/lib/types'
 import type { Completeness, MilestoneStat, ProfileConfig, RunResult, UnlockPolicy } from './types'
 
@@ -158,6 +159,15 @@ export function simulate(
   for (let iter = 0; iter < MAX_ITERS; iter++) {
     state = tick(state, defs, DT)
     state = updateRisk(state, defs, DT)
+
+    // Discover and keep active any reachable infinity pebble (mirrors useGalets),
+    // so their production multipliers actually affect the simulated progression.
+    const newGalets = discoverableGalets(state, defs)
+    if (newGalets.length > 0) {
+      const galets = { ...state.galets }
+      for (const g of newGalets) galets[g.id] = { found: true, active: true }
+      state = { ...state, galets }
+    }
 
     const currentEra = ERA_BY_ID[state.currentEraId] ?? defs.eras[0]
 

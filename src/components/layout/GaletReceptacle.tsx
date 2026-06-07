@@ -26,7 +26,7 @@ export function GaletReceptacle() {
 
   return (
     <div className="relative">
-      <div role="group" aria-label={t('galet.receptacle')} className="galet-tray flex items-center gap-1.5 rounded-full px-2 py-1.5">
+      <div role="group" aria-label={t('galet.receptacle')} className="galet-tray inline-flex w-fit items-center gap-1.5 rounded-full px-2 py-1.5">
         {Array.from({ length: GALET_SLOTS }, (_, i) => {
           const galet = found[i]
           if (!galet) {

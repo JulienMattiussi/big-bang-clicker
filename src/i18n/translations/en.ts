@@ -96,6 +96,8 @@ export const en: Translations = {
   'memory.quit.confirm': 'Quit',
   'memory.quit.cancel': 'Keep playing',
   'memory.mistakesLeft': 'Mistakes left',
+  'memory.mistakesAllowed': 'Mistakes allowed',
+  'memory.forEra': 'Era',
   'memory.play': 'Attempt',
   'memory.replay': 'Try again',
   'memory.close': 'Close',

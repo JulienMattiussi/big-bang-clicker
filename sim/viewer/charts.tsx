@@ -65,7 +65,11 @@ export function LineChart({
   const xMin = X(xMinV)
   const xMax = X(xMaxV)
   const yMin = Y(yLog ? 1 : yMinV)
-  const yMax = Y(yMaxV)
+  // Headroom above the highest point so its value is readable (a gridline sits
+  // above it): round up to the next decade (log) or add 8% (linear).
+  const yMax = yLog
+    ? Math.ceil(Math.log10(Math.max(yMaxV, 10)))
+    : yMaxV + (yMaxV - yMinV) * 0.08
 
   const px = (v: number) => M.left + ((X(v) - xMin) / (xMax - xMin || 1)) * (width - M.left - M.right)
   const py = (v: number) =>

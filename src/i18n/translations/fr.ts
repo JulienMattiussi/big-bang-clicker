@@ -96,6 +96,8 @@ export const fr = {
   'memory.quit.confirm': 'Quitter',
   'memory.quit.cancel': 'Continuer la partie',
   'memory.mistakesLeft': 'Erreurs restantes',
+  'memory.mistakesAllowed': 'Erreurs autorisées',
+  'memory.forEra': 'Ère',
   'memory.play': 'Tenter',
   'memory.replay': 'Retenter',
   'memory.close': 'Fermer',

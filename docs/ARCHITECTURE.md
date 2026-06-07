@@ -42,7 +42,8 @@ src/
 │   ├── meta.ts           # méta-upgrades de prestige
 │   ├── save.ts           # état initial, sérialisation versionnée + migrations, idle, export/import
 │   ├── format.ts         # notation abrégée des grands nombres
-│   └── galets.ts         # galets de l'infini : découverte + galets affectant une machine
+│   ├── galets.ts         # galets de l'infini : découverte + galets affectant une machine
+│   └── memory.ts         # mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), ressource principale
 ├── data/
 │   ├── eras/             # toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence
 │   ├── crises.ts         # définitions de crises
@@ -53,16 +54,18 @@ src/
 │   ├── gameStore.ts      # état de jeu + actions + persistance
 │   ├── feedbackStore.ts  # nombres flottants transitoires (+X / -X)
 │   ├── clickPulse.ts     # signal générique "verbe activé" (widgets passifs, ex. jauge)
-│   └── eventStore.ts     # file des modales d'évènements
-├── i18n/                 # i18n custom (voir section 10)
+│   ├── eventStore.ts     # file des modales d'évènements
+│   └── memoryStore.ts    # signal transitoire du mini-jeu de mémoire (flash du bouton)
+├── i18n/                 # i18n custom (voir section 10) ; locale persistée en localStorage
 ├── hooks/
 │   ├── useTick.ts        # boucle de jeu + autosauvegarde (+ sauvegarde à la fermeture)
 │   ├── useEvents.ts      # détecte et enfile les évènements narratifs
 │   ├── useGalets.ts      # découverte des galets au franchissement de palier
-│   └── useEraMechanic.ts # geste de clic d'une ère (gain de base + complétion gratuite)
+│   ├── useEraMechanic.ts # geste de clic d'une ère (gain de base + complétion gratuite)
+│   └── useMilestone.ts   # données du palier suivant (jauge NextGoal + bouton MilestoneButton)
 ├── components/
 │   ├── ui/               # primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...)
-│   ├── game/             # ressources, machines, paliers, badges, bannières, galets, EventModal
+│   ├── game/             # ressources, machines, paliers, badges, bannières, galets, EventModal, jeu de mémoire (MemoryFeature/MemoryGame/Answer42, police Neogen dans public/fonts)
 │   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
 │   └── layout/           # coquille, navigation d'ères, SceneBackground, GaletReceptacle
 └── App.tsx               # navigation par état (pas de router)
