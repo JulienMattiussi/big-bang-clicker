@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { Answer42 } from '@/components/game/Answer42'
-import { MemoryGame } from '@/components/game/MemoryGame'
+import { Answer42 } from '@/components/game/memory/Answer42'
+import { MemoryGame } from '@/components/game/memory/MemoryGame'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
-import { memoryUnlocked } from '@/lib/memory'
+import { MEMORY_LEVELS, memoryLevel, memoryUnlocked } from '@/lib/memory'
 import { useTranslation } from '@/i18n/useTranslation'
 
 interface Intro {
@@ -24,10 +24,14 @@ interface Intro {
 export function MemoryFeature() {
   const { t } = useTranslation()
   const unlocked = useGameStore((s) => memoryUnlocked(s.state))
-  // Current era's icon, nestled between the 4 and the 2 (the Answer, themed).
+  // Current era's icon, clustered between the digits (the Answer, themed).
   const eraIcon = useGameStore(
-    (s) => (s.defs.eras.find((e) => e.id === s.state.currentEraId) ?? s.defs.eras[0])?.icon ?? 'flame',
+    (s) =>
+      (s.defs.eras.find((e) => e.id === s.state.currentEraId) ?? s.defs.eras[0])?.icon ?? 'flame',
   )
+  // The next attempt's level shapes the emblem: deck size (21/42) and set size.
+  const cfg = useGameStore((s) => MEMORY_LEVELS[memoryLevel(s.state, s.state.currentEraId)])
+  const digits: [string, string] = cfg.cards === 21 ? ['2', '1'] : ['4', '2']
   const highlight = useMemoryStore((s) => s.highlight)
   const clearHighlight = useMemoryStore((s) => s.clearHighlight)
   const [open, setOpen] = useState(false)
@@ -75,7 +79,9 @@ export function MemoryFeature() {
 
   if (!unlocked) return null
 
-  const face = <Answer42 eraIcon={eraIcon} className="h-7 shrink-0" />
+  const face = (
+    <Answer42 eraIcon={eraIcon} digits={digits} count={cfg.group} className="h-7 shrink-0" />
+  )
 
   return (
     <>

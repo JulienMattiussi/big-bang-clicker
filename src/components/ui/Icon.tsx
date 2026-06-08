@@ -1,5 +1,6 @@
 import {
   Atom,
+  Backpack,
   Bomb,
   Brain,
   Building2,
@@ -38,165 +39,33 @@ import {
   Swords,
   Trees,
   Upload,
+  X,
   Users,
   Zap,
   type LucideIcon,
 } from 'lucide-react'
 import type { ReactElement, SVGProps } from 'react'
-
-/** Base SVG props for the custom glyphs (lucide stroke style). */
-const GLYPH_PROPS = {
-  viewBox: '0 0 24 24',
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 2,
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-}
-
-/** Custom glyph (galaxy): an ellipse tilted on the diagonal. */
-function EllipseIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <ellipse cx="12" cy="12" rx="10" ry="5" transform="rotate(-30 12 12)" />
-    </svg>
-  )
-}
-
-/** Custom glyph (electron): a dot on an orbit circle. */
-function ElectronIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <circle cx="12" cy="12" r="8" />
-      <circle cx="20" cy="12" r="2" fill="currentColor" stroke="none" />
-    </svg>
-  )
-}
-
-/** Custom glyph (nucleon): a cluster of balls. */
-function NucleonIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <circle cx="9" cy="10" r="4" />
-      <circle cx="16" cy="10" r="4" />
-      <circle cx="12" cy="16" r="4" />
-    </svg>
-  )
-}
-
-/** Custom glyph (molecule): a water-like ball-and-stick (one O, two H, bent). */
-function MoleculeIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <line x1="12" y1="9" x2="6.5" y2="16" />
-      <line x1="12" y1="9" x2="17.5" y2="16" />
-      <circle cx="12" cy="9" r="3.4" fill="currentColor" stroke="none" />
-      <circle cx="6.5" cy="16.5" r="2.3" fill="currentColor" stroke="none" />
-      <circle cx="17.5" cy="16.5" r="2.3" fill="currentColor" stroke="none" />
-    </svg>
-  )
-}
-
-/** Custom glyph (cell): a membrane with an off-centre nucleus. */
-function CellIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <ellipse cx="12" cy="12" rx="9" ry="7.5" transform="rotate(-12 12 12)" />
-      <circle cx="14.5" cy="13" r="2.4" fill="currentColor" stroke="none" />
-    </svg>
-  )
-}
-
-/** Spikes for the virus glyph (capsid + glycoprotein knobs), precomputed. */
-const VIRUS_SPIKES = Array.from({ length: 8 }, (_, i) => {
-  const a = (i / 8) * Math.PI * 2
-  const c = Math.cos(a)
-  const s = Math.sin(a)
-  return { x1: 12 + c * 6, y1: 12 + s * 6, x2: 12 + c * 9.2, y2: 12 + s * 9.2, kx: 12 + c * 10, ky: 12 + s * 10 }
-})
-
-/** Custom glyph (virus): a capsid hedged with spiked glycoproteins (VIH-like). */
-function VirusIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <circle cx="12" cy="12" r="5.5" />
-      {VIRUS_SPIKES.map((sp, i) => (
-        <g key={i}>
-          <line x1={sp.x1} y1={sp.y1} x2={sp.x2} y2={sp.y2} />
-          <circle cx={sp.kx} cy={sp.ky} r="1.3" fill="currentColor" stroke="none" />
-        </g>
-      ))}
-    </svg>
-  )
-}
-
-/** Gas particles ringing the atmosphere glyph, evenly spaced around the planet. */
-const ATMOSPHERE_DOTS = Array.from({ length: 10 }, (_, i) => {
-  const a = (i / 10) * Math.PI * 2
-  return { cx: 12 + Math.cos(a) * 9.3, cy: 12 + Math.sin(a) * 9.3 }
-})
-
-/** Custom glyph (atmosphere): the Earth ringed by gas particles all around. */
-function AtmosphereIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <circle cx="12" cy="12" r="5.5" />
-      {ATMOSPHERE_DOTS.map((d, i) => (
-        <circle key={i} cx={d.cx} cy={d.cy} r="1" fill="currentColor" stroke="none" />
-      ))}
-    </svg>
-  )
-}
-
-/** Custom glyph (card): a playing card with a centred diamond pip. */
-function CardIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <rect x="5" y="3" width="14" height="18" rx="2" />
-      <path d="M12 8 L14.3 12 L12 16 L9.7 12 Z" fill="currentColor" stroke="none" />
-    </svg>
-  )
-}
-
-/** Custom glyph (organelle): a mitochondrion, an oval ringed by cristae folds. */
-function OrganelleIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <g transform="rotate(-25 12 12)">
-        <ellipse cx="12" cy="12" rx="9.5" ry="5.5" />
-        <path d="M4.5 12 q2.4 -3.6 4.8 0 t4.8 0 t4.8 0" fill="none" />
-      </g>
-    </svg>
-  )
-}
-
-/** Small organelles dotted inside the eukaryote glyph, precomputed. */
-const EUKARYOTE_ORGANELLES = [
-  { cx: 7.2, cy: 8.5 },
-  { cx: 16.5, cy: 9 },
-  { cx: 8, cy: 16 },
-  { cx: 16, cy: 15.5 },
-]
-
-/** Custom glyph (eukaryote): a complex cell, large nucleus ringed by organelles. */
-function EukaryoteIcon(props: SVGProps<SVGSVGElement>): ReactElement {
-  return (
-    <svg {...GLYPH_PROPS} {...props}>
-      <ellipse cx="12" cy="12" rx="9.5" ry="8" transform="rotate(-12 12 12)" />
-      <circle cx="12" cy="12" r="3.2" />
-      {EUKARYOTE_ORGANELLES.map((o, i) => (
-        <circle key={i} cx={o.cx} cy={o.cy} r="1.2" fill="currentColor" stroke="none" />
-      ))}
-    </svg>
-  )
-}
+import {
+  AtmosphereIcon,
+  CardIcon,
+  CellIcon,
+  ComplexCellIcon,
+  DustIcon,
+  ElectronIcon,
+  EllipseIcon,
+  EukaryoteIcon,
+  MoleculeIcon,
+  NucleonIcon,
+  OrganelleIcon,
+  VirusIcon,
+} from './glyphs'
 
 type Glyph = LucideIcon | ((props: SVGProps<SVGSVGElement>) => ReactElement)
 
 /**
  * Icon registry: data only references an identifier (string); the mapping to
- * the icon library lives here (UI). Adding a resource = adding its entry here
- * if its icon does not exist yet.
+ * the icon library (lucide) or a custom glyph (./glyphs) lives here (UI). Adding
+ * a resource = adding its entry here if its icon does not exist yet.
  */
 const ICONS: Record<string, Glyph> = {
   sparkles: Sparkles,
@@ -216,8 +85,10 @@ const ICONS: Record<string, Glyph> = {
   electron: ElectronIcon,
   nucleon: NucleonIcon,
   cell: CellIcon,
+  'complex-cell': ComplexCellIcon,
   organelle: OrganelleIcon,
   eukaryote: EukaryoteIcon,
+  dust: DustIcon,
   molecule: MoleculeIcon,
   virus: VirusIcon,
   hexagon: Hexagon,
@@ -243,6 +114,8 @@ const ICONS: Record<string, Glyph> = {
   network: Network,
   bomb: Bomb,
   skull: Skull,
+  backpack: Backpack,
+  close: X,
   pause: Pause,
   play: Play,
   settings: Settings,

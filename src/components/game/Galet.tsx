@@ -32,7 +32,14 @@ const MOTIFS: Record<string, (color: string) => ReactElement> = {
   // A cell: membrane with an off-centre nucleus.
   cell: (color) => (
     <g transform="translate(18 16)">
-      <ellipse rx="10" ry="8" fill="none" stroke={color} strokeWidth="1.4" transform="rotate(-12)" />
+      <ellipse
+        rx="10"
+        ry="8"
+        fill="none"
+        stroke={color}
+        strokeWidth="1.4"
+        transform="rotate(-12)"
+      />
       <circle cx="2.5" cy="1" r="2.8" fill={color} />
     </g>
   ),
@@ -84,15 +91,49 @@ export function Galet({
         </clipPath>
         {/* Mottled stone grain: fractal noise turned into faint dark speckles. */}
         <filter id={grainId} x="-10%" y="-10%" width="120%" height="120%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.5" numOctaves="3" seed={seed} result="n" />
-          <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0" />
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.5"
+            numOctaves="3"
+            seed={seed}
+            result="n"
+          />
+          <feColorMatrix
+            in="n"
+            type="matrix"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.5 0"
+          />
         </filter>
         {/* Worn paint: roughen the strokes, then scrape sparse flecks out of them. */}
         <filter id={wornId} x="-25%" y="-25%" width="150%" height="150%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.13" numOctaves="2" seed={seed + 4} result="warp" />
-          <feDisplacementMap in="SourceGraphic" in2="warp" scale="0.9" xChannelSelector="R" yChannelSelector="G" result="rough" />
-          <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed={seed + 9} result="flecks" />
-          <feColorMatrix in="flecks" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2.5" result="holes" />
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.13"
+            numOctaves="2"
+            seed={seed + 4}
+            result="warp"
+          />
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="warp"
+            scale="0.9"
+            xChannelSelector="R"
+            yChannelSelector="G"
+            result="rough"
+          />
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.85"
+            numOctaves="2"
+            seed={seed + 9}
+            result="flecks"
+          />
+          <feColorMatrix
+            in="flecks"
+            type="matrix"
+            values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2.5"
+            result="holes"
+          />
           <feComposite in="rough" in2="holes" operator="in" />
         </filter>
       </defs>

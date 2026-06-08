@@ -2,13 +2,15 @@ import { LanguageSwitch } from '@/components/layout/LanguageSwitch'
 import { SaveMenu } from '@/components/layout/SaveMenu'
 import { SceneBackground } from '@/components/layout/SceneBackground'
 import { GaletReceptacle } from '@/components/layout/GaletReceptacle'
+import { EraTransition } from '@/components/layout/EraTransition'
+import { InventoryButton } from '@/components/game/inventory/InventoryButton'
 import { EraTabs } from '@/components/game/EraTabs'
 import { ClickArea } from '@/components/game/ClickArea'
 import { isFullWidthWidget } from '@/components/game/widgets/interactive'
 import { ResourcePanel } from '@/components/game/ResourcePanel'
 import { PurchasePanel } from '@/components/game/PurchasePanel'
 import { ComplexityBadge } from '@/components/game/ComplexityBadge'
-import { MemoryFeature } from '@/components/game/MemoryFeature'
+import { MemoryFeature } from '@/components/game/memory/MemoryFeature'
 import { NextGoal } from '@/components/game/NextGoal'
 import { MilestoneButton } from '@/components/game/MilestoneButton'
 import { EraIcon } from '@/components/game/EraIcon'
@@ -48,8 +50,9 @@ export function GameShell() {
             shares the buttons' row instead of rising to the pills, and the
             pebbles keep their reserved slot above the title even when empty. */}
         <div className="grid grid-cols-[1fr_auto_auto_1fr] items-start gap-x-4 gap-y-1.5">
-          <div className="col-start-1 row-start-1">
+          <div className="col-start-1 row-start-1 flex items-center gap-2">
             <GaletReceptacle />
+            <InventoryButton />
           </div>
           <div className="col-start-2 row-start-1 flex justify-center">
             <ComplexityBadge />
@@ -87,27 +90,30 @@ export function GameShell() {
       <CrisisBanner />
       <PrestigeBanner />
 
-      {isFullWidthWidget(era.widget) ? (
-        // Wide widget (e.g. periodic table): full-width on top, panels below.
-        <>
-          <section className="-mt-2 flex justify-center pb-2">
-            <ClickArea era={era} />
-          </section>
-          {/* Resources kept narrow so the wide machines panel fits 3 columns. */}
-          <section className="grid gap-4 md:grid-cols-[1fr_3fr]">
+      {/* Sliding transition between eras (direction by tab order). */}
+      <EraTransition eraId={era.id} index={era.index} className="flex flex-col gap-4">
+        {isFullWidthWidget(era.widget) ? (
+          // Wide widget (e.g. periodic table): full-width on top, panels below.
+          <>
+            <section className="-mt-2 flex justify-center pb-2">
+              <ClickArea era={era} />
+            </section>
+            {/* Resources kept narrow so the wide machines panel fits 3 columns. */}
+            <section className="grid gap-4 md:grid-cols-[1fr_3fr]">
+              <ResourcePanel era={era} />
+              <PurchasePanel era={era} wide />
+            </section>
+          </>
+        ) : (
+          <section className="grid gap-4 md:grid-cols-[5fr_4fr_5fr]">
             <ResourcePanel era={era} />
-            <PurchasePanel era={era} wide />
+            <div className="flex items-center justify-center py-6">
+              <ClickArea era={era} />
+            </div>
+            <PurchasePanel era={era} />
           </section>
-        </>
-      ) : (
-        <section className="grid gap-4 md:grid-cols-[5fr_4fr_5fr]">
-          <ResourcePanel era={era} />
-          <div className="flex items-center justify-center py-6">
-            <ClickArea era={era} />
-          </div>
-          <PurchasePanel era={era} />
-        </section>
-      )}
+        )}
+      </EraTransition>
     </main>
   )
 }

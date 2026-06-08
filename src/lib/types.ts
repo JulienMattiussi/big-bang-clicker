@@ -215,4 +215,6 @@ export interface GameState {
   seenEvents: Record<string, boolean>
   /** Infinity pebbles: whether each is found and currently active. */
   galets: Record<string, { found: boolean; active: boolean }>
+  /** Memory mini-game: times each era's resource has been boosted (0..3). */
+  memoryLevels: Record<EraId, number>
 }

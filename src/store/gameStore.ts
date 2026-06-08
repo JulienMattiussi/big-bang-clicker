@@ -13,7 +13,7 @@ import { resolveCrisis as runResolveCrisis, updateRisk } from '@/lib/crises'
 import { prestige as runPrestige } from '@/lib/prestige'
 import { applyMeta, buyMeta } from '@/lib/meta'
 import { triggeredEvents } from '@/lib/events'
-import { memoryCost } from '@/lib/memory'
+import { memoryCost, memoryEraMaxed } from '@/lib/memory'
 import {
   applyOffline,
   createInitialState,
@@ -166,14 +166,22 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) =>
       s.state.galets[id]?.found
         ? {}
-        : { state: { ...s.state, galets: { ...s.state.galets, [id]: { found: true, active: true } } } },
+        : {
+            state: {
+              ...s.state,
+              galets: { ...s.state.galets, [id]: { found: true, active: true } },
+            },
+          },
     ),
   toggleGalet: (id) =>
     set((s) => {
       const galet = s.state.galets[id]
       if (!galet?.found) return {}
       return {
-        state: { ...s.state, galets: { ...s.state.galets, [id]: { ...galet, active: !galet.active } } },
+        state: {
+          ...s.state,
+          galets: { ...s.state.galets, [id]: { ...galet, active: !galet.active } },
+        },
       }
     }),
   startMemoryGame: () => {
@@ -186,9 +194,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
   winMemoryGame: () =>
     set((s) => {
       const era = currentEra(s)
-      if (!era) return {}
+      if (!era || memoryEraMaxed(s.state, era.id)) return {}
       const res = era.clickResource
       const current = s.state.multipliers[res] ?? 1
-      return { state: { ...s.state, multipliers: { ...s.state.multipliers, [res]: current * 2 } } }
+      const done = (s.state.memoryLevels[era.id] ?? 0) + 1
+      return {
+        state: {
+          ...s.state,
+          multipliers: { ...s.state.multipliers, [res]: current * 2 },
+          memoryLevels: { ...s.state.memoryLevels, [era.id]: done },
+        },
+      }
     }),
 }))

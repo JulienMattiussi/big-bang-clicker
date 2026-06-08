@@ -266,7 +266,14 @@ export function AccretionDisk({ era }: { era: EraDef }) {
           ))}
 
           {/* Sun: a bright luminous glow, no rays. Outer halo breathes gently. */}
-          <circle cx={CX} cy={CY} r="26" fill="url(#acc-sun)" opacity="0.5" className="widget-pulse" />
+          <circle
+            cx={CX}
+            cy={CY}
+            r="26"
+            fill="url(#acc-sun)"
+            opacity="0.5"
+            className="widget-pulse"
+          />
           <circle cx={CX} cy={CY} r="13" fill="url(#acc-sun)" opacity="0.95" />
           <circle cx={CX} cy={CY} r="6" fill="var(--color-fg)" />
 
@@ -306,12 +313,26 @@ export function AccretionDisk({ era }: { era: EraDef }) {
 
           {/* Dust puffs at each click. */}
           {puffs.map((p) => (
-            <circle key={p.id} className="gas-puff" cx={p.x} cy={p.y} r="4" fill="url(#acc-clump)" />
+            <circle
+              key={p.id}
+              className="gas-puff"
+              cx={p.x}
+              cy={p.y}
+              r="4"
+              fill="url(#acc-clump)"
+            />
           ))}
 
           {/* Planet-formation burst. */}
           {burst ? (
-            <circle key={burst.id} cx={burst.x} cy={burst.y} r="9" fill="url(#acc-burst)" className="light-burst" />
+            <circle
+              key={burst.id}
+              cx={burst.x}
+              cy={burst.y}
+              r="9"
+              fill="url(#acc-burst)"
+              className="light-burst"
+            />
           ) : null}
         </svg>
       </button>

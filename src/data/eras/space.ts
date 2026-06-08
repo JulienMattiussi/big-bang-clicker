@@ -43,7 +43,8 @@ const bundles: EraBundle[] = [
     id: 'e18',
     index: 18,
     uiTier: 'space',
-    icon: 'globe',
+    // Era icon (crowning unification) kept distinct from its resources (district, universe-city).
+    icon: 'crown',
     base: { id: 'district', icon: 'city', tier: 19 },
     combined: { id: 'universeCity', icon: 'globe', tier: 21 },
     consumes: 'cluster',

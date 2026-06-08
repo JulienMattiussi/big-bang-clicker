@@ -2,89 +2,30 @@ import { useState, type KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { EraIcon } from '@/components/game/EraIcon'
+import { EraSymbolCluster } from '@/components/game/memory/Answer42'
+import { CardBack, CardFace } from '@/components/game/memory/MemoryCards'
+import { dealCards, shuffle, type Card } from '@/components/game/memory/memoryDeck'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { formatFixed } from '@/lib/format'
-import { MEMORY_MISTAKES, MEMORY_PAIRS, memoryCost } from '@/lib/memory'
-import type { ResourceDef } from '@/lib/types'
+import {
+  MEMORY_LEVELS,
+  MEMORY_MAX_LEVEL,
+  memoryCost,
+  memoryEraMaxed,
+  memoryLevel,
+  type MemoryLevelConfig,
+} from '@/lib/memory'
 import type { TranslationKey } from '@/i18n/types'
 
 type Phase = 'start' | 'play' | 'won' | 'lost'
-interface Card {
-  key: number
-  res: ResourceDef
-  flipped: boolean
-  matched: boolean
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  }
-  return arr
-}
-
-/** Build a shuffled deck of MEMORY_PAIRS distinct resources, each duplicated. */
-function dealCards(pool: ResourceDef[]): Card[] {
-  const unique: ResourceDef[] = []
-  const seen = new Set<string>()
-  for (const r of pool) {
-    if (r && !seen.has(r.id)) {
-      seen.add(r.id)
-      unique.push(r)
-    }
-  }
-  const chosen = unique.slice(0, MEMORY_PAIRS)
-  const cards = chosen.flatMap((res, i) => [
-    { key: i * 2, res, flipped: false, matched: false },
-    { key: i * 2 + 1, res, flipped: false, matched: false },
-  ])
-  return shuffle(cards)
-}
-
-/** A roughly realistic playing-card back: diamond lattice, frame, centre pip. */
-function CardBack() {
-  const lines = []
-  for (let i = -9; i <= 9; i++) {
-    const o = i * 8
-    lines.push(<line key={`u${i}`} x1={o} y1={0} x2={o + 70} y2={70} />)
-    lines.push(<line key={`d${i}`} x1={o} y1={70} x2={o + 70} y2={0} />)
-  }
-  return (
-    <svg viewBox="0 0 50 70" preserveAspectRatio="none" className="h-full w-full" aria-hidden>
-      <rect width="50" height="70" fill="var(--color-octarine)" fillOpacity="0.14" />
-      <g stroke="var(--color-octarine)" strokeWidth="0.7" opacity="0.5">
-        {lines}
-      </g>
-      <rect x="4" y="4" width="42" height="62" rx="4" fill="none" stroke="var(--color-octarine)" strokeWidth="1.2" opacity="0.85" />
-      <path d="M25 26 L33 35 L25 44 L17 35 Z" fill="var(--color-octarine)" opacity="0.9" />
-      <path d="M25 31 L29.5 35 L25 39 L20.5 35 Z" fill="var(--color-bg)" />
-    </svg>
-  )
-}
-
-/** The card's face: chemical symbol if any, otherwise the resource icon. */
-function CardFace({ res }: { res: ResourceDef }) {
-  const { t } = useTranslation()
-  return (
-    <span className="flex flex-col items-center gap-0.5 text-secondary">
-      {res.symbol ? (
-        <span className="text-xl font-bold">{res.symbol}</span>
-      ) : (
-        <Icon name={res.icon} className="h-9 w-9" />
-      )}
-      <span className="max-w-full truncate px-0.5 text-[10px] text-muted">
-        {t(res.nameKey as TranslationKey)}
-      </span>
-    </span>
-  )
-}
 
 /**
  * Near-fullscreen memory (concentration) game. Staking Complexity deals a board
- * of resource-icon pairs; clearing it (within the mistake budget) doubles the
- * current era's main resource production. See src/lib/memory.ts.
+ * of resource-icon SETS (pairs or triplets, by level); clearing it within the
+ * mistake budget doubles the current era's main resource production. Each era
+ * can be boosted three times, through three escalating levels. See
+ * src/lib/memory.ts.
  */
 export function MemoryGame({ onClose }: { onClose: () => void }) {
   const { t } = useTranslation()
@@ -94,33 +35,38 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
   const startMemoryGame = useGameStore((s) => s.startMemoryGame)
   const winMemoryGame = useGameStore((s) => s.winMemoryGame)
   const cost = useGameStore((s) => memoryCost(s.state))
+  // The level the NEXT attempt plays, and whether this era is fully boosted.
+  const upcomingLevel = useGameStore((s) => memoryLevel(s.state, s.state.currentEraId))
+  const maxed = useGameStore((s) => memoryEraMaxed(s.state, s.state.currentEraId))
+  const upcomingCfg = MEMORY_LEVELS[upcomingLevel]
 
   const era = defs.eras.find((e) => e.id === currentEraId) ?? defs.eras[0]
   const mainRes = era ? defs.resources[era.clickResource] : undefined
   const mainName = mainRes ? t(mainRes.nameKey as TranslationKey) : ''
   const eraName = era ? t(era.nameKey as TranslationKey) : ''
 
-  // Always 42 cards (21 pairs): discovered resources first, then top up with
-  // others (unknown next-era resources are allowed) to reach the count.
-  const makeDeck = () => {
+  // Deck for a given level config: discovered resources first, then top up with
+  // others (unknown next-era resources allowed) to reach the symbol count.
+  const makeDeck = (cfg: MemoryLevelConfig) => {
     const discovered = useGameStore.getState().state.discovered
     const pool = Object.keys(discovered)
       .filter((id) => discovered[id])
       .map((id) => defs.resources[id])
       .filter(Boolean)
     shuffle(pool)
-    if (pool.length < MEMORY_PAIRS) {
+    if (pool.length < cfg.symbols) {
       const extra = Object.values(defs.resources).filter((r) => !discovered[r.id])
       shuffle(extra)
       pool.push(...extra)
     }
-    return dealCards(pool)
+    return dealCards(pool, cfg.symbols, cfg.group)
   }
 
   const [phase, setPhase] = useState<Phase>('start')
+  // Config of the attempt currently being played (captured when dealt).
+  const [cfg, setCfg] = useState<MemoryLevelConfig>(upcomingCfg)
   // Deal a board immediately so it shows (face-down) behind the start text.
-  const [cards, setCards] = useState<Card[]>(makeDeck)
-  const [first, setFirst] = useState<number | null>(null)
+  const [cards, setCards] = useState<Card[]>(() => makeDeck(upcomingCfg))
   const [mistakes, setMistakes] = useState(0)
   const [busy, setBusy] = useState(false)
   const [confirmQuit, setConfirmQuit] = useState(false)
@@ -131,9 +77,13 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
   const affordable = complexity >= cost
 
   const play = () => {
+    if (maxed) return
     if (!startMemoryGame()) return
-    setCards(makeDeck())
-    setFirst(null)
+    // Capture the level afresh (it may have just advanced after a previous win).
+    const lvl = memoryLevel(useGameStore.getState().state, era?.id ?? '')
+    const config = MEMORY_LEVELS[lvl]
+    setCfg(config)
+    setCards(makeDeck(config))
     setMistakes(0)
     setBusy(false)
     setPhase('play')
@@ -144,40 +94,43 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
     const card = cards[i]
     if (!card || card.flipped || card.matched) return
 
-    if (first === null) {
-      setCards((prev) => prev.map((c, idx) => (idx === i ? { ...c, flipped: true } : c)))
-      setFirst(i)
-      return
-    }
-    if (i === first) return
+    // The set in progress = cards already face-up but not yet validated. Derived
+    // from the cards themselves (not a separate state) so it can never desync.
+    const inProgress = cards.filter((c) => c.flipped && !c.matched)
+    const setId = inProgress.length > 0 ? inProgress[0].res.id : card.res.id
+    const matches = card.res.id === setId
+    const count = inProgress.length + 1
 
-    const matchId = cards[first].res.id
-    if (card.res.id === matchId) {
-      // Match: lock both face-up. If that was the last pair, it is a win.
-      setCards((prev) =>
-        prev.map((c) => (c.res.id === matchId ? { ...c, flipped: true, matched: true } : c)),
-      )
-      setFirst(null)
-      const remaining = cards.filter((c) => !c.matched && c.res.id !== matchId).length
-      if (remaining === 0) {
-        winMemoryGame()
-        window.setTimeout(() => setPhase('won'), 450)
-      }
-    } else {
-      // Mismatch: reveal briefly, then flip both back and count the mistake.
-      setCards((prev) => prev.map((c, idx) => (idx === i ? { ...c, flipped: true } : c)))
+    // Flip the clicked card face-up.
+    setCards((prev) => prev.map((c, idx) => (idx === i ? { ...c, flipped: true } : c)))
+
+    if (!matches) {
+      // Mismatch: reveal briefly, then flip the whole attempt back, count it.
       setBusy(true)
       const used = mistakes + 1
       setMistakes(used)
-      const firstIdx = first
+      const hide = new Set([...inProgress.map((c) => c.key), card.key])
       window.setTimeout(() => {
         setCards((prev) =>
-          prev.map((c, idx) => (idx === i || idx === firstIdx ? { ...c, flipped: false } : c)),
+          prev.map((c) => (hide.has(c.key) && !c.matched ? { ...c, flipped: false } : c)),
         )
-        setFirst(null)
         setBusy(false)
-        if (used > MEMORY_MISTAKES) setPhase('lost')
+        if (used > cfg.mistakes) setPhase('lost')
       }, 850)
+      return
+    }
+
+    // Still matching, but the set needs more cards: leave them face-up and wait.
+    if (count < cfg.group) return
+
+    // Set complete: lock every card of this symbol face-up. Win if it was the last.
+    setCards((prev) =>
+      prev.map((c) => (c.res.id === setId ? { ...c, flipped: true, matched: true } : c)),
+    )
+    const remaining = cards.filter((c) => !c.matched && c.res.id !== setId).length
+    if (remaining === 0) {
+      winMemoryGame()
+      window.setTimeout(() => setPhase('won'), 450)
     }
   }
 
@@ -186,6 +139,11 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
     if (confirmQuit) setConfirmQuit(false)
     else requestClose()
   }
+
+  // Wording for the next attempt described by the start/result panels.
+  const goalKey: TranslationKey =
+    upcomingCfg.group === 3 ? 'memory.goal.triplets' : 'memory.goal.pairs'
+  const isHalf = upcomingCfg.cards === 21
 
   return (
     <div
@@ -209,7 +167,10 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
               {era ? (
                 <p className="mt-0.5 flex items-center gap-1.5 text-sm">
                   <span className="text-muted">{t('memory.forEra')} :</span>
-                  <span data-tier={era.uiTier} className="inline-flex items-center gap-1 font-semibold text-accent">
+                  <span
+                    data-tier={era.uiTier}
+                    className="inline-flex items-center gap-1 font-semibold text-accent"
+                  >
                     <EraIcon icon={era.icon} className="h-4 w-4" />
                     {eraName}
                   </span>
@@ -222,7 +183,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
               <span className="text-sm text-muted">
                 {t('memory.mistakesLeft')} :{' '}
                 <span className="font-bold tabular-nums text-fg">
-                  {Math.max(0, MEMORY_MISTAKES - mistakes)}
+                  {Math.max(0, cfg.mistakes - mistakes)}
                 </span>
               </span>
             ) : null}
@@ -269,6 +230,10 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
           {phase !== 'play' ? (
             <div className="absolute inset-0 flex items-center justify-center p-4">
               <div className="modal-in flex max-w-md flex-col items-center gap-3 rounded-xl border border-octarine/40 bg-surface/95 p-6 text-center shadow-2xl backdrop-blur">
+                {/* At level 1 (21 cards): only half the universe's memory is open yet. */}
+                {isHalf ? (
+                  <p className="text-sm text-octarine/90 italic">{t('memory.half')}</p>
+                ) : null}
                 {phase === 'won' ? (
                   <p className="text-lg font-bold text-accent">{t('memory.win.title')}</p>
                 ) : null}
@@ -279,6 +244,11 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                   <p className="text-muted">{t('memory.win.body')}</p>
                 ) : phase === 'lost' ? (
                   <p className="text-muted">{t('memory.lose.body')}</p>
+                ) : maxed ? (
+                  <>
+                    <p className="text-lg font-bold text-accent">{t('memory.maxed.title')}</p>
+                    <p className="text-muted">{t('memory.maxed.body')}</p>
+                  </>
                 ) : (
                   <p className="text-muted">
                     {t('memory.reward')}{' '}
@@ -293,29 +263,58 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                     .
                   </p>
                 )}
-                <p className="text-sm text-muted">
-                  {t('memory.consumes')}{' '}
-                  <span className="inline-flex items-center gap-1 align-middle font-bold text-octarine">
-                    <Icon name="gem" className="h-4 w-4" aria-hidden />
-                    {formatFixed(cost)}
-                  </span>{' '}
-                  {t('app.complexity')}
-                </p>
-                <p className="text-sm text-muted">
-                  {t('memory.mistakesAllowed')} :{' '}
-                  <span className="font-bold tabular-nums text-fg">{MEMORY_MISTAKES}</span>
-                </p>
+
+                {!maxed ? (
+                  <>
+                    {/* Large era-symbol cluster (pair or triplet) between title and rules. */}
+                    {era ? (
+                      <span data-tier={era.uiTier} className="my-1 text-accent">
+                        <EraSymbolCluster eraIcon={era.icon} count={upcomingCfg.group} className="h-20" />
+                      </span>
+                    ) : null}
+                    {/* Level details (board size, set size, mistakes) of the next attempt. */}
+                    <div className="flex flex-col gap-1 text-sm text-muted">
+                      <p>
+                        <span className="font-semibold text-octarine">
+                          {t('memory.level')} {upcomingLevel}/{MEMORY_MAX_LEVEL}
+                        </span>{' '}
+                        - {upcomingCfg.cards} {t('memory.cards')}, {t(goalKey)}
+                      </p>
+                      <p>
+                        {t('memory.consumes')}{' '}
+                        <span className="inline-flex items-center gap-1 align-middle font-bold text-octarine">
+                          <Icon name="gem" className="h-4 w-4" aria-hidden />
+                          {formatFixed(cost)}
+                        </span>{' '}
+                        {t('app.complexity')}
+                      </p>
+                      <p>
+                        {t('memory.mistakesAllowed')} :{' '}
+                        <span className="font-bold tabular-nums text-fg">
+                          {upcomingCfg.mistakes}
+                        </span>
+                      </p>
+                    </div>
+                  </>
+                ) : null}
+
                 <div className="flex items-center gap-3">
-                  {phase !== 'start' ? (
-                    <Button variant="ghost" onClick={onClose}>
-                      {t('memory.giveUp')}
+                  <Button variant="ghost" onClick={onClose}>
+                    {maxed
+                      ? t('memory.close')
+                      : phase === 'start'
+                        ? t('memory.cancel')
+                        : t('memory.giveUp')}
+                  </Button>
+                  {!maxed ? (
+                    <Button onClick={play} disabled={!affordable}>
+                      {phase === 'start' ? t('memory.play') : t('memory.replay')}
                     </Button>
                   ) : null}
-                  <Button onClick={play} disabled={!affordable}>
-                    {phase === 'start' ? t('memory.play') : t('memory.replay')}
-                  </Button>
                 </div>
-                {!affordable ? <p className="text-xs text-muted">{t('memory.tooPoor')}</p> : null}
+                {!maxed && !affordable ? (
+                  <p className="text-xs text-muted">{t('memory.tooPoor')}</p>
+                ) : null}
               </div>
             </div>
           ) : null}

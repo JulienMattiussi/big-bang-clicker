@@ -43,7 +43,8 @@ src/
 │   ├── save.ts           # état initial, sérialisation versionnée + migrations, idle, export/import
 │   ├── format.ts         # notation abrégée des grands nombres
 │   ├── galets.ts         # galets de l'infini : découverte + galets affectant une machine
-│   └── memory.ts         # mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), ressource principale
+│   ├── memory.ts         # mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), 3 niveaux par ère (×2/×4/×8)
+│   └── inventory.ts      # sac à dos : déblocage (apparition d'une ressource) + ressources connues groupées par ère
 ├── data/
 │   ├── eras/             # toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence
 │   ├── crises.ts         # définitions de crises
@@ -55,7 +56,9 @@ src/
 │   ├── feedbackStore.ts  # nombres flottants transitoires (+X / -X)
 │   ├── clickPulse.ts     # signal générique "verbe activé" (widgets passifs, ex. jauge)
 │   ├── eventStore.ts     # file des modales d'évènements
-│   └── memoryStore.ts    # signal transitoire du mini-jeu de mémoire (flash du bouton)
+│   ├── memoryStore.ts    # signal transitoire du mini-jeu de mémoire (flash du bouton)
+│   ├── inventoryStore.ts # signal transitoire du sac à dos (flash/atterrissage du bouton)
+│   └── galetStore.ts     # signal transitoire : galet découvert qui se pose sur son socle (FLIP)
 ├── i18n/                 # i18n custom (voir section 10) ; locale persistée en localStorage
 ├── hooks/
 │   ├── useTick.ts        # boucle de jeu + autosauvegarde (+ sauvegarde à la fermeture)
@@ -64,10 +67,12 @@ src/
 │   ├── useEraMechanic.ts # geste de clic d'une ère (gain de base + complétion gratuite)
 │   └── useMilestone.ts   # données du palier suivant (jauge NextGoal + bouton MilestoneButton)
 ├── components/
-│   ├── ui/               # primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...)
-│   ├── game/             # ressources, machines, paliers, badges, bannières, galets, EventModal, jeu de mémoire (MemoryFeature/MemoryGame/Answer42, police Neogen dans public/fonts)
+│   ├── ui/               # primitives (Button, Panel, Icon + glyphs.tsx, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, bannières, galets, EventModal
+│   │   ├── memory/       # mini-jeu de mémoire : MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42 (+EraSymbolCluster), police Neogen
+│   │   ├── inventory/    # sac à dos : InventoryButton/InventoryModal
 │   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
-│   └── layout/           # coquille, navigation d'ères, SceneBackground, GaletReceptacle
+│   └── layout/           # coquille, navigation d'ères, EraTransition (glissement), SceneBackground, GaletReceptacle
 └── App.tsx               # navigation par état (pas de router)
 ```
 
@@ -186,6 +191,7 @@ interface GameState {
   discovered: Record<ResourceId, boolean>  // ressources déjà produites (dévoilement collant)
   seenEvents: Record<string, boolean>      // modales narratives déjà montrées (une fois)
   galets: Record<string, { found: boolean; active: boolean }>  // galets de l'infini (conservés au prestige)
+  memoryLevels: Record<EraId, number>      // mini-jeu de mémoire : nombre de boosts par ère (0..3)
 }
 ```
 

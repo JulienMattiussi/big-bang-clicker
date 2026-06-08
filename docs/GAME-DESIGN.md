@@ -131,6 +131,37 @@ Formule de prestige (principe, à équilibrer) :
 échos_gagnés = floor( k * sqrt(complexité_totale / seuil_base) )
 ```
 
+### 3.4 Mini-jeu de mémoire (puits de Complexité optionnel)
+
+Débloqué à l'**ère 7** (première oxydation), puis disponible dans chaque ère.
+Un jeu de **concentration** (cartes-ressources à apparier) que l'on tente en
+misant **10% de la Complexité** courante. Le réussir **double** (cumulable) la
+production de la **ressource principale de l'ère courante**.
+
+Chaque ère peut être boostée **trois fois** (×2 -> ×4 -> ×8), via trois niveaux
+de difficulté croissante :
+
+| Niveau | Cartes | À apparier | Erreurs | Symboles distincts |
+|---|---|---|---|---|
+| 1 | 21 | triplets (3) | 15 | 7 |
+| 2 | 42 | paires (2) | 25 | 21 |
+| 3 | 42 | triplets (3) | 30 | 14 |
+
+Le niveau 1 reste petit (7 symboles) pour **ne pas exposer des ressources qui
+n'existent pas encore** trop tôt (anti-spoiler). Le **42** est la Réponse (clin
+d'oeil H2G2, voir [NARRATIVE.md](./NARRATIVE.md)) ; le 21 en est la moitié
+(« la moitié de la mémoire de l'univers »).
+
+### 3.5 Sac à dos (inventaire global)
+
+Outil de **vue d'ensemble** débloqué en milieu de partie (à l'apparition d'une
+ressource donnée, par défaut les microbes de l'ère 6), introduit par une modale
+d'annonce. Il liste **toutes les ressources connues**, groupées par ère
+(colonnes teintées par palier), avec leur **quantité en temps réel** et un badge
+« ! » si la ressource est en déclin ou figée. Cliquer une ressource **saute à
+sa page de production**. Respecte l'anti-spoiler : **jamais** de ressource non
+encore découverte (voir 7.1).
+
 ## 4. Cohabitation des ères
 
 Décision clé : **les ères débloquées continuent de tourner en arrière-plan.**

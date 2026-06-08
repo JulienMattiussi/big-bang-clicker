@@ -255,7 +255,12 @@ export function Endosymbiosis({ era }: { era: EraDef }) {
                     tabIndex={0}
                     aria-label={t('endosymbiosis.organelle')}
                     onClick={(e) =>
-                      engulf(o, i, ring.length, viewBoxPoint(svgRef.current, e.clientX, e.clientY, 100))
+                      engulf(
+                        o,
+                        i,
+                        ring.length,
+                        viewBoxPoint(svgRef.current, e.clientX, e.clientY, 100),
+                      )
                     }
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {

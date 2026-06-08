@@ -234,6 +234,41 @@
   transform-origin: 50% 50%;
   transform-box: fill-box;
 }
+/* Era switch: the panels slide in from the side the new era sits relative to the
+   previous one (later era = from the right, earlier = from the left). */
+@keyframes era-slide-right {
+  from {
+    transform: translateX(5%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes era-slide-left {
+  from {
+    transform: translateX(-5%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.era-slide-right {
+  animation: era-slide-right 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.era-slide-left {
+  animation: era-slide-left 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .era-slide-right,
+  .era-slide-left {
+    animation: none;
+  }
+}
+
 @keyframes bloom {
   0% {
     transform: scale(0.5);
@@ -454,6 +489,30 @@
     0 0 0 1px color-mix(in srgb, var(--color-accent) 45%, var(--color-border)),
     0 0 8px -2px color-mix(in srgb, var(--color-accent) 50%, transparent);
 }
+/* Inventory ("backpack") button: same raised tray finish as the pebble socle,
+   tinted with the accent so it reads as an interactive feature control. */
+.inventory-button {
+  background-image: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-surface) 72%, var(--color-fg)),
+    var(--color-surface) 58%,
+    color-mix(in srgb, var(--color-surface) 78%, var(--color-bg))
+  );
+  border: 1px solid color-mix(in srgb, var(--color-border) 40%, var(--color-accent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-fg) 22%, transparent),
+    inset 0 -2px 4px color-mix(in srgb, var(--color-bg) 70%, transparent),
+    0 4px 10px -5px var(--color-bg),
+    0 0 10px -3px color-mix(in srgb, var(--color-accent) 45%, transparent);
+}
+.inventory-button:hover {
+  border-color: color-mix(in srgb, var(--color-border) 20%, var(--color-accent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--color-fg) 22%, transparent),
+    inset 0 -2px 4px color-mix(in srgb, var(--color-bg) 70%, transparent),
+    0 4px 10px -5px var(--color-bg),
+    0 0 14px -2px color-mix(in srgb, var(--color-accent) 60%, transparent);
+}
 
 /* Blade cursor for the petri-dish cut zone (a little knife, tip = hotspot). */
 .cursor-blade {
@@ -463,46 +522,75 @@
     crosshair;
 }
 
-/* Activity bar under an active machine's title: fills in 5s, loops. */
-@keyframes activity-fill {
-  from {
+/* Activity underlay under an active machine's title. Rather than one fill that
+   snaps back at 100% (reads as a concrete "loading"), two offset waves sweep
+   left to right and fade out near the end: a new front sets off before the
+   previous reaches max, so they overlap a little. This materialises an endless
+   progression, not a finite load. The front crosses in ~5s (3s galet-boosted);
+   the wave's full period is 1.5x that, the idle tail letting the next overlap. */
+@keyframes activity-wave {
+  0% {
     transform: scaleX(0);
+    opacity: 0;
   }
-  to {
+  5% {
+    opacity: 0.85;
+  }
+  53% {
+    opacity: 0.85;
+  }
+  66.7% {
     transform: scaleX(1);
+    opacity: 0;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
   }
 }
-/* Loop speed: 5s normally, 3s when galet-boosted. The -boost variants play a
-   quick 0.5s fill first (on upgrade) then resume looping. */
-.activity-bar,
-.activity-bar-fast,
-.activity-bar-boost,
-.activity-bar-boost-fast {
+/* One-shot brighter sweep replayed on each upgrade (re-keyed in the component). */
+@keyframes activity-flash {
+  0% {
+    transform: scaleX(0);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scaleX(1);
+    opacity: 0;
+  }
+}
+.activity-track {
+  --wave-period: 7.5s;
+}
+.activity-track-fast {
+  --wave-period: 4.5s;
+}
+.activity-wave {
   transform-origin: left center;
+  animation: activity-wave var(--wave-period, 7.5s) linear infinite;
 }
-.activity-bar {
-  animation: activity-fill 5s linear infinite;
+/* Second wave is half a period behind, so its front sets off mid-way through
+   the first, giving the slight overlap. */
+.activity-wave-2 {
+  animation-delay: calc(var(--wave-period, 7.5s) * -0.5);
 }
-.activity-bar-fast {
-  animation: activity-fill 3s linear infinite;
-}
-.activity-bar-boost {
-  animation:
-    activity-fill 0.5s ease-out,
-    activity-fill 5s linear 0.5s infinite;
-}
-.activity-bar-boost-fast {
-  animation:
-    activity-fill 0.5s ease-out,
-    activity-fill 3s linear 0.5s infinite;
+.activity-flash {
+  transform-origin: left center;
+  animation: activity-flash 0.6s ease-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  .activity-bar,
-  .activity-bar-fast,
-  .activity-bar-boost,
-  .activity-bar-boost-fast {
+  .activity-wave,
+  .activity-flash {
     animation: none;
+  }
+  /* Keep a single steady fill, no sweeping. */
+  .activity-wave {
     transform: scaleX(1);
+    opacity: 1;
+  }
+  .activity-wave-2,
+  .activity-flash {
+    display: none;
   }
 }
 

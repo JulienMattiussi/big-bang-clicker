@@ -45,7 +45,8 @@ const bundles: EraBundle[] = [
     id: 'e14',
     index: 14,
     uiTier: 'civilization',
-    icon: 'cpu',
+    // Era icon (industry) kept distinct from its resources (research, technology).
+    icon: 'hammer',
     base: { id: 'research', icon: 'flask', tier: 15 },
     combined: { id: 'technology', icon: 'cpu', tier: 17 },
     consumes: 'empire',

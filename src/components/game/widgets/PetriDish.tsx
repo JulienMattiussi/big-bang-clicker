@@ -113,7 +113,14 @@ export function PetriDish({ era }: { era: EraDef }) {
       const d = Math.random() * (DISH_R - START_R - 4)
       const v = 5 + Math.random() * 6
       const va = Math.random() * Math.PI * 2
-      addCell(CX + Math.cos(a) * d, CY + Math.sin(a) * d, Math.cos(va) * v, Math.sin(va) * v, START_R, 'stable')
+      addCell(
+        CX + Math.cos(a) * d,
+        CY + Math.sin(a) * d,
+        Math.cos(va) * v,
+        Math.sin(va) * v,
+        START_R,
+        'stable',
+      )
     }
     syncCells()
   }, [])
@@ -154,7 +161,10 @@ export function PetriDish({ era }: { era: EraDef }) {
         }
         const g = svg?.querySelector(`[data-cell="${c.id}"]`)
         if (g) {
-          g.setAttribute('transform', `translate(${c.x.toFixed(2)} ${c.y.toFixed(2)}) rotate(${c.rot.toFixed(1)})`)
+          g.setAttribute(
+            'transform',
+            `translate(${c.x.toFixed(2)} ${c.y.toFixed(2)}) rotate(${c.rot.toFixed(1)})`,
+          )
           const el = g.querySelector('ellipse')
           el?.setAttribute('rx', c.r.toFixed(2))
           el?.setAttribute('ry', (c.r * c.aspect).toFixed(2))
@@ -318,7 +328,14 @@ export function PetriDish({ era }: { era: EraDef }) {
 
           {/* Division flash at each cut point. */}
           {splits.map((sp) => (
-            <circle key={sp.id} className="light-burst" cx={sp.x} cy={sp.y} r="5" fill="url(#petri-burst)" />
+            <circle
+              key={sp.id}
+              className="light-burst"
+              cx={sp.x}
+              cy={sp.y}
+              r="5"
+              fill="url(#petri-burst)"
+            />
           ))}
 
           {/* Blade trail (set imperatively while slicing). */}
@@ -333,7 +350,14 @@ export function PetriDish({ era }: { era: EraDef }) {
           />
 
           {burst ? (
-            <circle key={burst.id} cx={burst.x} cy={burst.y} r="14" fill="url(#petri-burst)" className="light-burst" />
+            <circle
+              key={burst.id}
+              cx={burst.x}
+              cy={burst.y}
+              r="14"
+              fill="url(#petri-burst)"
+              className="light-burst"
+            />
           ) : null}
         </svg>
       </div>

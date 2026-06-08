@@ -26,11 +26,13 @@ export const en: Translations = {
   'galet.active': 'active',
   'galet.toggle': 'Click to toggle on / off',
   'galet.matter.name': 'Painted pebble of matter',
-  'galet.matter.desc': 'Tenfold the production of the primary factories from before the Life era (×10 output)',
+  'galet.matter.desc':
+    'Tenfold the production of the primary factories from before the Life era (×10 output)',
   'galet.matter.lore':
     'You have uncovered an exceptional relic, polished by the ages at the very edge of the cosmos: the very first one. An atom is painted on it in amber, the raw matter from which all the rest will arise.',
   'galet.life.name': 'Painted pebble of life',
-  'galet.life.desc': 'Fivefold the production of the secondary factories up to the Life era (×5 output)',
+  'galet.life.desc':
+    'Fivefold the production of the secondary factories up to the Life era (×5 output)',
   'galet.life.lore':
     'A second relic reveals itself, painted with a deep green cell. Where matter was once inert, something, at last, begins to live.',
   'app.unlock': 'Reach the milestone',
@@ -52,7 +54,8 @@ export const en: Translations = {
   'nursery.hint': 'Each click collapses gas; hammer a spot to ignite a star',
 
   // Interactive widgets (eras 4-13): hints and accessible labels.
-  'accretion.hint': 'Click inside the drifting clumps (follow them) to forge planets; elsewhere you gather dust',
+  'accretion.hint':
+    'Click inside the drifting clumps (follow them) to forge planets; elsewhere you gather dust',
   'molecule.hint': 'Link two atoms to draw a bond; complete the molecule',
   'molecule.atom': 'Atom',
   'petri.hint': 'Slash the swimming cells to split them\n3 in one stroke = a bonus microbe',
@@ -88,10 +91,20 @@ export const en: Translations = {
 
   'memory.button': 'The memory of the universe',
   'memory.title': 'The eternal memory of the universe',
-  'memory.subtitle': 'Match the symbols two by two before you run out of mistakes.',
+  'memory.subtitle': 'Match the identical symbols before you run out of mistakes.',
+  'memory.level': 'Level',
+  'memory.cards': 'cards',
+  'memory.goal.pairs': 'matched in pairs (two of a kind)',
+  'memory.goal.triplets': 'matched in triplets (three of a kind)',
+  'memory.half':
+    'For now you only have access to half the memory of the universe. Prove your worth before you reach 42.',
+  'memory.maxed.title': "This era's memory is complete",
+  'memory.maxed.body':
+    "You have engraved this era's entire memory: its production is already x8. There is nothing left to double here.",
   'memory.reward': 'Reward: doubles the production of',
   'memory.consumes': 'Consumes',
   'memory.giveUp': 'Give up',
+  'memory.cancel': 'Cancel',
   'memory.quit.body': 'If you leave now, the stake is lost. Quit anyway?',
   'memory.quit.confirm': 'Quit',
   'memory.quit.cancel': 'Keep playing',
@@ -111,6 +124,16 @@ export const en: Translations = {
   'memory.event.title': 'The eternal memory of the universe',
   'memory.event.body':
     "You have just discovered a new way to act upon existence and to progress. The 42 symbols will grant you the answer to the great questions of Life, the Universe, and Everything: match them two by two to commit them to memory, and the era's foremost resource will see its production doubled.",
+
+  'inventory.button': 'Inventory',
+  'inventory.title': 'Resource inventory',
+  'inventory.hint': 'Click a resource to jump to its production.',
+  'inventory.goto': 'Go to its production',
+  'inventory.close': 'Close',
+  'inventory.event.eyebrow': 'A gift from the universe',
+  'inventory.event.title': 'A bag to keep you organised',
+  'inventory.event.body':
+    'You have so much to manage now... The universe sends you a backpack to keep you organised. See all your known resources at a glance, their live quantities, and jump straight to their production.',
 
   'tuto.firstMachine.title': 'Your first machine',
   'tuto.firstMachine.body':
@@ -283,7 +306,7 @@ export const en: Translations = {
   'era.e7.stock': 'Air',
   'era.e7.machines': 'Photosynthesis',
   'era.e7.verb': 'Oxygenate',
-  'era.e8.name': 'Eukaryotes',
+  'era.e8.name': 'The Complex Cell',
   'era.e8.tagline': 'Better to merge than to digest.',
   'era.e8.stock': 'Cells',
   'era.e8.machines': 'Endosymbiosis',
@@ -313,7 +336,7 @@ export const en: Translations = {
   'era.e13.stock': 'Influence',
   'era.e13.machines': 'Diplomacy & war',
   'era.e13.verb': 'Negotiate',
-  'era.e14.name': 'Technologies',
+  'era.e14.name': 'Industrial Revolution',
   'era.e14.tagline': 'Inventing faster than we think.',
   'era.e14.stock': 'Research',
   'era.e14.machines': 'Labs',
@@ -333,7 +356,7 @@ export const en: Translations = {
   'era.e17.stock': 'Network',
   'era.e17.machines': 'Cosmic bridges',
   'era.e17.verb': 'Connect',
-  'era.e18.name': 'Universe-city',
+  'era.e18.name': 'The Great Unification',
   'era.e18.tagline': 'The whole universe, gathered into one city.',
   'era.e18.stock': 'Universe',
   'era.e18.machines': 'Districts',

@@ -24,11 +24,13 @@ export const fr = {
   'galet.active': 'actif',
   'galet.toggle': 'Clic : activer / désactiver',
   'galet.matter.name': 'Galet peint de la matière',
-  'galet.matter.desc': "Décuple la production des usines primaires d'avant l'ère de la vie (produit ×10)",
+  'galet.matter.desc':
+    "Décuple la production des usines primaires d'avant l'ère de la vie (produit ×10)",
   'galet.matter.lore':
     "Tu viens de découvrir une relique exceptionnelle, polie par les âges aux confins du cosmos : la toute première. Sur sa face, un atome peint à l'ambre, la matière brute dont naîtra tout le reste.",
   'galet.life.name': 'Galet peint de la vie',
-  'galet.life.desc': "Quintuple la production des usines secondaires jusqu'à l'ère de la vie (produit ×5)",
+  'galet.life.desc':
+    "Quintuple la production des usines secondaires jusqu'à l'ère de la vie (produit ×5)",
   'galet.life.lore':
     "Une deuxième relique se révèle, peinte d'une cellule d'un vert profond. Là où la matière n'était qu'inerte, quelque chose, enfin, se met à vivre.",
   'app.unlock': 'Franchir le palier',
@@ -88,10 +90,20 @@ export const fr = {
 
   'memory.button': "La mémoire de l'univers",
   'memory.title': "La mémoire éternelle de l'univers",
-  'memory.subtitle': 'Retrouve les symboles deux à deux avant d\'épuiser tes erreurs.',
+  'memory.subtitle': "Retrouve les symboles identiques avant d'épuiser tes erreurs.",
+  'memory.level': 'Niveau',
+  'memory.cards': 'cartes',
+  'memory.goal.pairs': 'à retrouver deux à deux (paires)',
+  'memory.goal.triplets': 'à retrouver trois par trois (triplets)',
+  'memory.half':
+    "Tu n'as pour l'instant accès qu'à la moitié de la mémoire de l'univers. Prouve ta valeur avant d'atteindre 42.",
+  'memory.maxed.title': "Mémoire de l'ère complète",
+  'memory.maxed.body':
+    "Tu as gravé toute la mémoire de cette ère : sa production est déjà ×8. Il n'y a plus rien à doubler ici.",
   'memory.reward': 'Récompense : double la production de',
   'memory.consumes': 'Consomme',
   'memory.giveUp': 'Abandonner',
+  'memory.cancel': 'Annuler',
   'memory.quit.body': 'Si tu pars maintenant, la mise est perdue. Quitter quand même ?',
   'memory.quit.confirm': 'Quitter',
   'memory.quit.cancel': 'Continuer la partie',
@@ -111,6 +123,16 @@ export const fr = {
   'memory.event.title': "La mémoire éternelle de l'univers",
   'memory.event.body':
     "Tu viens de découvrir un nouveau moyen d'agir sur l'existence et de progresser. Les 42 symboles t'offriront la réponse aux grands problèmes de la vie, de l'Univers et du reste : retrouve-les deux à deux pour en graver la mémoire, et la production de la ressource maîtresse de l'ère en sera doublée.",
+
+  'inventory.button': 'Inventaire',
+  'inventory.title': 'Inventaire des ressources',
+  'inventory.hint': 'Clique une ressource pour aller à sa production.',
+  'inventory.goto': 'Aller à sa production',
+  'inventory.close': 'Fermer',
+  'inventory.event.eyebrow': "Un cadeau de l'univers",
+  'inventory.event.title': "Un sac pour t'organiser",
+  'inventory.event.body':
+    "Tu as tellement de choses à gérer désormais... L'univers t'envoie un sac à dos pour t'organiser. Retrouve d'un coup d'œil toutes tes ressources connues, leur quantité en temps réel, et saute directement à leur production.",
 
   'tuto.firstMachine.title': 'Ta première machine',
   'tuto.firstMachine.body':
@@ -283,7 +305,7 @@ export const fr = {
   'era.e7.stock': 'Air',
   'era.e7.machines': 'Photosynthèse',
   'era.e7.verb': 'Oxygéner',
-  'era.e8.name': 'Eucaryotes',
+  'era.e8.name': 'La cellule complexe',
   'era.e8.tagline': "Mieux vaut s'associer que se digérer.",
   'era.e8.stock': 'Cellules',
   'era.e8.machines': 'Endosymbiose',
@@ -313,7 +335,7 @@ export const fr = {
   'era.e13.stock': 'Influence',
   'era.e13.machines': 'Diplomatie & guerre',
   'era.e13.verb': 'Négocier',
-  'era.e14.name': 'Technologies',
+  'era.e14.name': 'Révolution industrielle',
   'era.e14.tagline': "Inventer plus vite qu'on ne réfléchit.",
   'era.e14.stock': 'Recherche',
   'era.e14.machines': 'Laboratoires',
@@ -333,7 +355,7 @@ export const fr = {
   'era.e17.stock': 'Réseau',
   'era.e17.machines': 'Ponts cosmiques',
   'era.e17.verb': 'Relier',
-  'era.e18.name': 'Ville-univers',
+  'era.e18.name': 'La grande unification',
   'era.e18.tagline': "L'univers entier, réuni en une seule ville.",
   'era.e18.stock': 'Univers',
   'era.e18.machines': 'Districts',

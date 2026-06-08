@@ -30,7 +30,7 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
 | **5** | Briques de la vie | molécules boule-tige | **tracer des liaisons** (graphe à dessiner) |
 | **6** | Premières vies | boîte de Petri | **automate / culture** (diviser, élaguer) |
 | **7** | Grande Oxydation | balance atmosphérique | **équilibre à tenir** (corde raide) |
-| **8** | Eucaryotes | endosymbiose | **glisser-engloutir** (combiner A dans B) |
+| **8** | Eucaryotes | endosymbiose | **cliquer-engloutir** (combiner A dans B) |
 | **9** | Cambrien | atelier du vivant | **assemblage modulaire** (équiper un plan de corps) |
 | **10** | Conquête des terres | arbre du vivant | **arbre qui ramifie** (croissance + extinctions) |
 | **11** | Intelligence | constellation d'idées | **mémoire / séquence** (Simon) |
@@ -132,19 +132,20 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
 
 - **Ressources / recette** : `organelle` -> `eukaryote` (recette
   `endosymbiosis`). Verbe : Fusionner.
-- **Mécanique - glisser-engloutir.** Une grande cellule-hôte au centre ; de
-  petites **organites** (mitochondrie, chloroplaste) dérivent autour. On en
-  **glisse une dans l'hôte** : si elle est compatible / au bon moment, elle est
-  **engloutie** (symbiose) et la cellule gagne une fonction -> produit un
-  eucaryote. Combiner **deux choses distinctes** délibérément.
-- **Progression / nouveauté** : geste de **glisser-déposer combinatoire** (A
-  dans B), différent de la collision passive (ère 4) et du tracé (ère 5).
-- **Gestion de ressources** : la cellule-hôte **accumule des fonctions**
-  (organites internes) ; chaque type d'organite ajoute un bonus -> ressource
-  composite.
-- **Implémentation** : manuel = drag organite -> hôte ; auto = `endosymbiosis`.
-  Anti-frustration = mauvaise organite -> rejetée en douceur, réessaye. a11y =
-  liste d'organites avec bouton "Engloutir". Récurrence : symbioses plus
+- **Mécanique - cliquer-engloutir.** Une grande cellule-hôte (membrane irrégulière,
+  forme légèrement différente à chaque maturation) au centre ; des **organites**
+  aux silhouettes organiques dérivent sur un anneau autour. On en **clique une** :
+  elle **glisse réellement vers l'intérieur** de l'hôte et s'y installe ; les
+  organites restants se **redistribuent uniformément** sur l'anneau. Après en avoir
+  englouti assez, l'hôte **mûrit en eucaryote** (gratuit) et un nouvel anneau
+  réapparaît en fondu. Combiner **deux choses distinctes** délibérément.
+- **Progression / nouveauté** : geste de **combinaison délibérée** (A dans B),
+  différent de la collision passive (ère 4) et du tracé (ère 5).
+- **Gestion de ressources** : chaque organite englouti compte vers la maturation
+  de l'hôte -> produit un eucaryote.
+- **Implémentation** : manuel = clic sur une organite -> trajet vers l'hôte ; auto =
+  `endosymbiosis`. a11y = chaque organite est un bouton (`role="button"`, focus
+  visible) étiqueté "Engloutir", activable au clavier. Récurrence : symbioses plus
   complexes.
 
 ## Ère 9 - Cambrien : atelier du vivant

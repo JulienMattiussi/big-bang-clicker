@@ -6,6 +6,8 @@ import { Galet } from '@/components/game/Galet'
 import { useEventStore } from '@/store/eventStore'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
+import { useInventoryStore } from '@/store/inventoryStore'
+import { useGaletStore } from '@/store/galetStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EventTone } from '@/lib/events'
@@ -42,10 +44,15 @@ export function EventModal() {
   const era = eraId ? defs.eras.find((e) => e.id === eraId) : undefined
   // The memory feature unlock gets its own hero treatment (octarine).
   const isMemory = event.id === 'feature:memory'
+  // The backpack (inventory) unlock: accent hero, then its button settles in.
+  const isBackpack = event.id === 'feature:backpack'
 
   const handleDismiss = () => {
-    // Closing the memory unlock flashes its button so the player spots the new power.
+    // Closing a feature unlock flashes its button so the player spots the new power.
     if (isMemory) useMemoryStore.getState().flash()
+    if (isBackpack) useInventoryStore.getState().flash()
+    // A discovered pebble shrinks into its receptacle socket.
+    if (galet) useGaletStore.getState().flash(galet.id)
     dismiss()
   }
 
@@ -67,7 +74,7 @@ export function EventModal() {
         className={`modal-in w-full max-w-md rounded-lg border bg-surface p-6 text-fg shadow-xl ${
           galet || isMemory
             ? 'complexity-glow border-octarine/50'
-            : era
+            : era || isBackpack
               ? 'border-accent/50 shadow-[0_0_45px_-10px_var(--color-accent)]'
               : 'border-border'
         }`}
@@ -87,7 +94,10 @@ export function EventModal() {
               <div
                 aria-hidden
                 className="bg-breathe absolute inset-0 rounded-full blur-md"
-                style={{ background: `radial-gradient(circle, ${galet.color}, transparent 68%)`, opacity: 0.55 }}
+                style={{
+                  background: `radial-gradient(circle, ${galet.color}, transparent 68%)`,
+                  opacity: 0.55,
+                }}
               />
               <div className="relative">
                 <Galet color={galet.color} motif={galet.motif} shape={galet.shape} size={112} />
@@ -155,6 +165,30 @@ export function EventModal() {
             </h2>
             <p className="leading-relaxed text-muted">{t(event.bodyKey as TranslationKey)}</p>
           </div>
+        ) : isBackpack ? (
+          // New overview unlocked: the backpack (accent hero).
+          <div className="flex flex-col items-center gap-3 text-center">
+            <span className="flex items-center gap-2 text-xs font-semibold tracking-[0.25em] text-accent uppercase">
+              <span aria-hidden>✦</span>
+              {t('inventory.event.eyebrow')}
+              <span aria-hidden>✦</span>
+            </span>
+            <div className="relative my-1 flex h-28 w-28 items-center justify-center">
+              <div
+                aria-hidden
+                className="bg-breathe absolute inset-0 rounded-full blur-md"
+                style={{
+                  background: 'radial-gradient(circle, var(--color-accent), transparent 68%)',
+                  opacity: 0.5,
+                }}
+              />
+              <Icon name="backpack" className="relative h-16 w-16 text-accent" />
+            </div>
+            <h2 id="event-title" className="text-2xl font-bold">
+              {t(event.titleKey as TranslationKey)}
+            </h2>
+            <p className="leading-relaxed text-muted">{t(event.bodyKey as TranslationKey)}</p>
+          </div>
         ) : (
           <>
             <div className="mb-3 flex items-center gap-3">
@@ -169,7 +203,9 @@ export function EventModal() {
           </>
         )}
 
-        <div className={`mt-5 flex ${galet || era || isMemory ? 'justify-center' : 'justify-end'}`}>
+        <div
+          className={`mt-5 flex ${galet || era || isMemory || isBackpack ? 'justify-center' : 'justify-end'}`}
+        >
           <Button autoFocus onClick={handleDismiss}>
             {galet ? t('galet.found.cta') : t('event.continue')}
           </Button>

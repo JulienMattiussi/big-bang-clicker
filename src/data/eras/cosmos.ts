@@ -146,7 +146,7 @@ const bundles: EraBundle[] = [
     uiTier: 'cosmos',
     icon: 'globe',
     widget: 'accretion',
-    base: { id: 'dust', icon: 'sparkles', tier: 5 },
+    base: { id: 'dust', icon: 'dust', tier: 5 },
     combined: { id: 'planet', icon: 'globe', tier: 7 },
     consumes: 'heavyElement',
     generatorId: 'gravity',

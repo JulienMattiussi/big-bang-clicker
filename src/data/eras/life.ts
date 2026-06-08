@@ -46,7 +46,8 @@ const bundles: EraBundle[] = [
     id: 'e8',
     index: 8,
     uiTier: 'life',
-    icon: 'eukaryote',
+    // Era icon (complex cell with organelles) kept distinct from its resources (organelle, eukaryote).
+    icon: 'complex-cell',
     widget: 'endosymbiosis',
     base: { id: 'organelle', icon: 'organelle', tier: 9 },
     combined: { id: 'eukaryote', icon: 'eukaryote', tier: 11 },

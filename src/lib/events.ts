@@ -8,6 +8,7 @@
 import type { GameDefs, GameState } from './types'
 import { revealedMachines } from './reveal'
 import { memoryUnlocked } from './memory'
+import { backpackUnlocked } from './inventory'
 
 export type EventTone = 'transition' | 'regression' | 'tutorial'
 
@@ -60,6 +61,17 @@ export function triggeredEvents(state: GameState, defs: GameDefs): GameEvent[] {
       titleKey: 'memory.event.title',
       bodyKey: 'memory.event.body',
       icon: 'card',
+    })
+  }
+
+  // Feature unlock: the global inventory ("backpack"), announced on its unlock.
+  if (backpackUnlocked(state)) {
+    events.push({
+      id: 'feature:backpack',
+      tone: 'transition',
+      titleKey: 'inventory.event.title',
+      bodyKey: 'inventory.event.body',
+      icon: 'backpack',
     })
   }
 

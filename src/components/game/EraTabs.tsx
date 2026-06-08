@@ -53,8 +53,7 @@ export function EraTabs() {
       })
       const n = metrics.length
       // Baseline: every tab collapsed to its icon, plus the gaps between them.
-      const baseline =
-        metrics.reduce((sum, m) => sum + (m.full - m.cost), 0) + TAB_GAP * (n - 1)
+      const baseline = metrics.reduce((sum, m) => sum + (m.full - m.cost), 0) + TAB_GAP * (n - 1)
       let budget = width - baseline
 
       const show = new Array<boolean>(n).fill(false)
@@ -114,7 +113,9 @@ export function EraTabs() {
             : 'border-border bg-bg text-muted hover:bg-surface hover:text-fg'
         }`}
       >
-        <EraIcon icon={era.icon} className="h-4 w-4 shrink-0" />
+        {/* 24px glyph but -m-0.5 keeps its layout footprint at 20px, so the icon
+            looks bigger while the tab size stays put (it overflows into padding). */}
+        <EraIcon icon={era.icon} className="-m-0.5 h-6 w-6 shrink-0" />
         {showLabel && (
           <span data-label className="whitespace-nowrap">
             {name}

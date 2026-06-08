@@ -102,7 +102,10 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
     ...(isBase ? { isBase: true } : {}),
   })
 
-  const resources: ResourceDef[] = [toResource(base, true), ...links.map((l) => toResource(l.produces))]
+  const resources: ResourceDef[] = [
+    toResource(base, true),
+    ...links.map((l) => toResource(l.produces)),
+  ]
 
   const generators: GeneratorDef[] = [
     {
@@ -111,7 +114,13 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
       nameKey: `gen.${spec.generatorId}`,
       output: base.id,
       baseRate: 1,
-      cost: [{ resource: base.id, base: spec.generatorBase ?? 100, growth: spec.generatorGrowth ?? 1.12 }],
+      cost: [
+        {
+          resource: base.id,
+          base: spec.generatorBase ?? 100,
+          growth: spec.generatorGrowth ?? 1.12,
+        },
+      ],
     },
   ]
 

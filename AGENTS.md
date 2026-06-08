@@ -66,21 +66,22 @@ src/
 │   ├── save.ts           # État initial, sérialisation versionnée + migrations, idle, export/import
 │   ├── format.ts         # Notation abrégée des grands nombres
 │   ├── galets.ts         # Galets de l'infini : découverte + galets affectant une machine
-│   └── memory.ts         # Mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), ressource principale
+│   ├── memory.ts         # Mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), 3 niveaux par ère (×2/×4/×8)
+│   └── inventory.ts      # Sac à dos : déblocage (apparition d'une ressource) + ressources connues groupées par ère
 ├── data/                 # Contenu data-driven (modifiable sans toucher au moteur)
 │   ├── eras/             # Toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence
 │   ├── crises.ts         # Définitions de crises
 │   ├── metaUpgrades.ts   # Définitions des méta-upgrades
 │   ├── galets.ts         # Définitions des galets de l'infini (collectibles conservés au prestige)
 │   └── index.ts          # defs : GameDefs (agrégation typée)
-├── store/                # Stores Zustand : gameStore (persisté) ; feedbackStore, clickPulse, eventStore, memoryStore (transitoires)
+├── store/                # Stores Zustand : gameStore (persisté) ; feedbackStore, clickPulse, eventStore, memoryStore, inventoryStore, galetStore (transitoires)
 ├── i18n/                 # i18n custom (FR source de vérité, EN typé complet) ; locale persistée en localStorage
 ├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales), useGalets (découverte), useEraMechanic (clic d'ère), useMilestone (jauge/bouton de palier)
 ├── components/           # Par domaine ; un composant par fichier
-│   ├── ui/               # Primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...)
-│   ├── game/             # Ressources, machines, paliers, badges, bannières, galets, EventModal, jeu de mémoire (MemoryFeature/MemoryGame/Answer42, police Neogen dans public/fonts)
+│   ├── ui/               # Primitives (Button, Panel, Icon + glyphs.tsx, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── game/             # Ressources, machines, paliers, badges, bannières, galets, EventModal ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal)
 │   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
-│   └── layout/           # Coquille, navigation d'ères, SceneBackground, GaletReceptacle ; LanguageSwitch, SaveMenu
+│   └── layout/           # Coquille, navigation d'ères, EraTransition (glissement), SceneBackground, GaletReceptacle ; LanguageSwitch, SaveMenu
 └── App.tsx               # Navigation par état (pas de router)
 tests/
 ├── helpers.ts            # Helpers partagés (makeState) - éviter la duplication
