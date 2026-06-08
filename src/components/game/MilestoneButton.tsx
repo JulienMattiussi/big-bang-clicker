@@ -14,5 +14,10 @@ export function MilestoneButton() {
   const m = useMilestone()
   if (!m || !m.ready) return null
 
-  return <Button onClick={() => unlockNextEra()}>{t('app.unlock')}</Button>
+  // Same height as the memory button (h-9) so the two sit level on the title row.
+  return (
+    <Button className="h-9" onClick={() => unlockNextEra()}>
+      {t('app.unlock')}
+    </Button>
+  )
 }

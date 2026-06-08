@@ -252,6 +252,30 @@
   transform-origin: 50% 50%;
   transform-box: fill-box;
 }
+/* Endosymbiosis: a clicked organelle slides from the ring into the host. */
+.engulf-travel {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Endosymbiosis: a fresh ring organelle drifts back in once one is engulfed. */
+@keyframes organelle-grow {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+}
+.organelle-grow {
+  animation: organelle-grow 0.8s ease-out backwards;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+/* Endosymbiosis: surviving ring organelles glide to their new even position. */
+.ring-slide {
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+}
 @keyframes widget-shake {
   0%,
   100% {
@@ -274,6 +298,15 @@
   }
   .widget-shake {
     animation: none;
+  }
+  .engulf-travel {
+    transition: none;
+  }
+  .organelle-grow {
+    animation: none;
+  }
+  .ring-slide {
+    transition: none;
   }
 }
 

@@ -158,6 +158,39 @@ function CardIcon(props: SVGProps<SVGSVGElement>): ReactElement {
   )
 }
 
+/** Custom glyph (organelle): a mitochondrion, an oval ringed by cristae folds. */
+function OrganelleIcon(props: SVGProps<SVGSVGElement>): ReactElement {
+  return (
+    <svg {...GLYPH_PROPS} {...props}>
+      <g transform="rotate(-25 12 12)">
+        <ellipse cx="12" cy="12" rx="9.5" ry="5.5" />
+        <path d="M4.5 12 q2.4 -3.6 4.8 0 t4.8 0 t4.8 0" fill="none" />
+      </g>
+    </svg>
+  )
+}
+
+/** Small organelles dotted inside the eukaryote glyph, precomputed. */
+const EUKARYOTE_ORGANELLES = [
+  { cx: 7.2, cy: 8.5 },
+  { cx: 16.5, cy: 9 },
+  { cx: 8, cy: 16 },
+  { cx: 16, cy: 15.5 },
+]
+
+/** Custom glyph (eukaryote): a complex cell, large nucleus ringed by organelles. */
+function EukaryoteIcon(props: SVGProps<SVGSVGElement>): ReactElement {
+  return (
+    <svg {...GLYPH_PROPS} {...props}>
+      <ellipse cx="12" cy="12" rx="9.5" ry="8" transform="rotate(-12 12 12)" />
+      <circle cx="12" cy="12" r="3.2" />
+      {EUKARYOTE_ORGANELLES.map((o, i) => (
+        <circle key={i} cx={o.cx} cy={o.cy} r="1.2" fill="currentColor" stroke="none" />
+      ))}
+    </svg>
+  )
+}
+
 type Glyph = LucideIcon | ((props: SVGProps<SVGSVGElement>) => ReactElement)
 
 /**
@@ -183,6 +216,8 @@ const ICONS: Record<string, Glyph> = {
   electron: ElectronIcon,
   nucleon: NucleonIcon,
   cell: CellIcon,
+  organelle: OrganelleIcon,
+  eukaryote: EukaryoteIcon,
   molecule: MoleculeIcon,
   virus: VirusIcon,
   hexagon: Hexagon,
