@@ -122,7 +122,13 @@ export function clickYield(state: GameState, defs: GameDefs, era: EraDef): numbe
   const genId = era.generators[0]
   if (!genId) return 1
   const level = state.generators[genId]?.level ?? 0
-  return (level + 1) * galetGeneratorMultiplier(state, defs, genId)
+  // Mirror passive production: the era's resource multiplier (memory bonus,
+  // global, meta) boosts the manual click too, not just automation.
+  return (
+    (level + 1) *
+    galetGeneratorMultiplier(state, defs, genId) *
+    resourceMultiplier(state, era.clickResource)
+  )
 }
 
 /** Marks resources currently held (>0) as discovered (sticky, never unset). */

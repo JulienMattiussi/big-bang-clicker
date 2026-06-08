@@ -2,6 +2,7 @@ import { Panel } from '@/components/ui/Panel'
 import { IconBadge } from '@/components/ui/IconBadge'
 import { Icon } from '@/components/ui/Icon'
 import { AlertBadge } from '@/components/ui/AlertBadge'
+import { MemoryBadge } from '@/components/game/memory/MemoryBadge'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { decliningResources, netFlows, stalledResources } from '@/lib/graph'
@@ -21,6 +22,8 @@ export function ResourcePanel({ era }: { era: EraDef }) {
   const declining = decliningResources(state, defs)
   const stalled = stalledResources(state, defs)
   const revealed = revealedResources(state, defs, era)
+  // Memory mini-game boosts this era's main resource: completions -> ×2^n.
+  const memoryBoost = state.memoryLevels?.[era.id] ?? 0
 
   const eraIndex = (eraId: string) => Number(eraId.slice(1)) || 0
   const latestIndex = state.unlockedEras.reduce((max, id) => Math.max(max, eraIndex(id)), 0)
@@ -101,9 +104,13 @@ export function ResourcePanel({ era }: { era: EraDef }) {
                   <span className="truncate">{t(def.nameKey as TranslationKey)}</span>
                   {producesComplexity(id) ? (
                     <span title={complexityTip(id)} className="inline-flex shrink-0 text-octarine">
-                      <Icon name="gem" className="h-3 w-3" aria-hidden />
+                      <Icon name="gem" className="h-5 w-5" aria-hidden />
                       <span className="sr-only">{complexityTip(id)}</span>
                     </span>
+                  ) : null}
+                  {/* Memory mini-game multiplier on this era's main resource. */}
+                  {id === era.clickResource && memoryBoost > 0 ? (
+                    <MemoryBadge factor={2 ** memoryBoost} title={t('memory.badge')} />
                   ) : null}
                 </span>
                 <span className="shrink-0 tabular-nums">

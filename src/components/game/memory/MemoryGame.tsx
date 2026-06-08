@@ -241,7 +241,27 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                   <p className="text-lg font-bold text-muted">{t('memory.lose.title')}</p>
                 ) : null}
                 {phase === 'won' ? (
-                  <p className="text-muted">{t('memory.win.body')}</p>
+                  <p className="text-muted">
+                    {t('memory.win.production')}{' '}
+                    <span className="inline-flex items-center gap-1 align-middle font-semibold text-secondary">
+                      {mainRes?.symbol ? (
+                        <span className="text-sm font-bold">{mainRes.symbol}</span>
+                      ) : mainRes ? (
+                        <Icon name={mainRes.icon} className="h-4 w-4" aria-hidden />
+                      ) : null}
+                      {mainName}
+                    </span>
+                    {' ('}
+                    <span
+                      data-tier={era?.uiTier}
+                      className="inline-flex items-center gap-1 align-middle font-semibold text-accent"
+                    >
+                      <EraIcon icon={era.icon} className="h-4 w-4" />
+                      {eraName}
+                    </span>
+                    {') '}
+                    {t('memory.win.doubled')}
+                  </p>
                 ) : phase === 'lost' ? (
                   <p className="text-muted">{t('memory.lose.body')}</p>
                 ) : maxed ? (
@@ -304,7 +324,9 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                       ? t('memory.close')
                       : phase === 'start'
                         ? t('memory.cancel')
-                        : t('memory.giveUp')}
+                        : phase === 'won'
+                          ? t('memory.stop')
+                          : t('memory.giveUp')}
                   </Button>
                   {!maxed ? (
                     <Button onClick={play} disabled={!affordable}>

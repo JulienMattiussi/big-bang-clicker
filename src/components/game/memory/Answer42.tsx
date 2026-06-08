@@ -61,6 +61,22 @@ export function EraSymbolCluster({
       </span>
     )
   }
+  if (count === 2) {
+    // Overlapping pair, placed absolutely in a wide-ish box so the symbols
+    // clearly overlap (proportionally, at any size).
+    return (
+      <span className={`relative inline-block aspect-11/10 ${className}`} aria-hidden>
+        <Icon
+          name={eraIcon}
+          className="absolute top-1/2 left-0 h-[72%] w-auto -translate-y-1/2 drop-shadow"
+        />
+        <Icon
+          name={eraIcon}
+          className="absolute top-1/2 right-0 z-10 h-[72%] w-auto -translate-y-1/2 drop-shadow"
+        />
+      </span>
+    )
+  }
   return (
     <span className={`relative inline-flex items-center ${className}`} aria-hidden>
       {Array.from({ length: count }, (_, i) => (
