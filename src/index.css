@@ -263,6 +263,32 @@
   animation: era-slide-left 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Era tabs: a label collapses to (or expands from) the icon when the active tab
+   changes, animated via max-width so the row reflows smoothly. */
+.tab-label {
+  overflow: hidden;
+  white-space: nowrap;
+  transition:
+    max-width 0.3s ease,
+    opacity 0.3s ease,
+    margin-left 0.3s ease;
+}
+.tab-label-open {
+  max-width: 12rem;
+  margin-left: 0.25rem;
+  opacity: 1;
+}
+.tab-label-closed {
+  max-width: 0;
+  margin-left: 0;
+  opacity: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab-label {
+    transition: none;
+  }
+}
+
 /* Era 9 (Cambrian): assembly-line conveyor - parts scroll right to left. */
 @keyframes belt-scroll {
   from {

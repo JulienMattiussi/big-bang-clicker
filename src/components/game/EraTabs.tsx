@@ -7,7 +7,7 @@ import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 
 const TAB_BASE =
-  'relative flex items-center gap-1 rounded-full border px-3 py-1.5 text-sm font-medium transition ' +
+  'relative flex items-center rounded-full border px-3 py-1.5 text-sm font-medium transition ' +
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent'
 
 /** flex gap-2 between tabs, in px (used by the fit computation). */
@@ -116,11 +116,11 @@ export function EraTabs() {
         {/* 24px glyph but -m-0.5 keeps its layout footprint at 20px, so the icon
             looks bigger while the tab size stays put (it overflows into padding). */}
         <EraIcon icon={era.icon} className="-m-0.5 h-6 w-6 shrink-0" />
-        {showLabel && (
-          <span data-label className="whitespace-nowrap">
-            {name}
-          </span>
-        )}
+        {/* Label always present (animated collapse/expand); the gap to the icon
+            is its own margin so it disappears cleanly when collapsed. */}
+        <span data-label className={`tab-label ${showLabel ? 'tab-label-open' : 'tab-label-closed'}`}>
+          {name}
+        </span>
         {/* Notification badge overlapping the whole tab's corner:
             red for a declining resource, yellow for a production stalled at zero. */}
         {era.resources.some((r) => declining.has(r)) ? (

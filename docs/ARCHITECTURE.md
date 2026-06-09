@@ -67,7 +67,7 @@ src/
 │   ├── useEraMechanic.ts # geste de clic d'une ère (gain de base + complétion gratuite)
 │   └── useMilestone.ts   # données du palier suivant (jauge NextGoal + bouton MilestoneButton)
 ├── components/
-│   ├── ui/               # primitives (Button, Panel, Icon + glyphs.tsx, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── ui/               # primitives (Button, Panel, Icon + glyphs/ un fichier par glyphe, IconBadge, AlertBadge, FloaterLayer...)
 │   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, bannières, galets, EventModal
 │   │   ├── memory/       # mini-jeu de mémoire : MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42 (+EraSymbolCluster), police Neogen
 │   │   ├── inventory/    # sac à dos : InventoryButton/InventoryModal

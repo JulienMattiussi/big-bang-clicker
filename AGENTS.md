@@ -78,7 +78,7 @@ src/
 ├── i18n/                 # i18n custom (FR source de vérité, EN typé complet) ; locale persistée en localStorage
 ├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales), useGalets (découverte), useEraMechanic (clic d'ère), useMilestone (jauge/bouton de palier)
 ├── components/           # Par domaine ; un composant par fichier
-│   ├── ui/               # Primitives (Button, Panel, Icon + glyphs.tsx, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── ui/               # Primitives (Button, Panel, Icon + glyphs/ un fichier par glyphe, IconBadge, AlertBadge, FloaterLayer...)
 │   ├── game/             # Ressources, machines, paliers, badges, bannières, galets, EventModal ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal)
 │   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
 │   └── layout/           # Coquille, navigation d'ères, EraTransition (glissement), SceneBackground, GaletReceptacle ; LanguageSwitch, SaveMenu
