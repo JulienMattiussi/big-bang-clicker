@@ -41,7 +41,7 @@ export const INTERACTIVE_WIDGETS: Record<string, (props: { era: EraDef }) => Rea
  * Compact ones stay centered in the 3-column layout, like the non-interactive
  * eras.
  */
-const FULLWIDTH_WIDGETS = new Set(['periodic', 'accretion', 'tree', 'city', 'map'])
+const FULLWIDTH_WIDGETS = new Set(['periodic', 'accretion', 'assembly', 'tree', 'city', 'map'])
 
 export function isFullWidthWidget(widget: string): boolean {
   return FULLWIDTH_WIDGETS.has(widget)

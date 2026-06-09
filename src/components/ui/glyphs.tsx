@@ -68,6 +68,33 @@ export function CellIcon(props: SVGProps<SVGSVGElement>): ReactElement {
   )
 }
 
+/** Custom glyph (tissue): a sheet of cells joined together (membrane + nuclei). */
+export function TissueIcon(props: SVGProps<SVGSVGElement>): ReactElement {
+  return (
+    <svg {...GLYPH_PROPS} {...props}>
+      <rect x="4" y="4" width="16" height="16" rx="3" />
+      <path d="M12 4 V20 M4 12 H20" />
+      <circle cx="8" cy="8" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="8" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="8" cy="16" r="1.2" fill="currentColor" stroke="none" />
+      <circle cx="16" cy="16" r="1.2" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+/** Custom glyph (organism): a trilobite, the iconic Cambrian animal. */
+export function TrilobiteIcon(props: SVGProps<SVGSVGElement>): ReactElement {
+  return (
+    <svg {...GLYPH_PROPS} {...props}>
+      <ellipse cx="12" cy="12" rx="7.5" ry="9" />
+      <path d="M12 4 V20" />
+      <path d="M6 9 H18 M5.5 13 H18.5 M7 17 H17" strokeWidth="1.4" />
+      <circle cx="9.4" cy="7.4" r="0.9" fill="currentColor" stroke="none" />
+      <circle cx="14.6" cy="7.4" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
 /** Granules scattered in the complex-cell's cytoplasm, precomputed. */
 const COMPLEX_CELL_GRANULES = [
   { x1: 15.8, y1: 8, x2: 16.9, y2: 7.7 },

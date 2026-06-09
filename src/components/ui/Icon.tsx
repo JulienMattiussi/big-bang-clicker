@@ -57,6 +57,8 @@ import {
   MoleculeIcon,
   NucleonIcon,
   OrganelleIcon,
+  TissueIcon,
+  TrilobiteIcon,
   VirusIcon,
 } from './glyphs'
 
@@ -88,6 +90,8 @@ const ICONS: Record<string, Glyph> = {
   'complex-cell': ComplexCellIcon,
   organelle: OrganelleIcon,
   eukaryote: EukaryoteIcon,
+  trilobite: TrilobiteIcon,
+  tissue: TissueIcon,
   dust: DustIcon,
   molecule: MoleculeIcon,
   virus: VirusIcon,

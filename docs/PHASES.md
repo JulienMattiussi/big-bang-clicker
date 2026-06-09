@@ -204,8 +204,9 @@
 - **Ressources & chaînes** :
   - `eucaryotes -> colonies -> tissus -> organismes`
   - `organismes -> plans d'organisation` (diversification cambrienne)
-- **Widget** : **base de l'arbre phylogénétique** (premières branches qui
-  explosent au Cambrien).
+- **Widget** : **chaîne de montage du vivant** (plein écran) : des pièces de
+  plan de corps défilent sur un tapis, on attrape les bonnes pour assembler des
+  organismes (explosion des formes au Cambrien).
 - **Production** : agrégation cellulaire, différenciation des tissus.
 - **Passage** : organismes prêts à coloniser les terres.
 

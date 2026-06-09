@@ -262,6 +262,60 @@
 .era-slide-left {
   animation: era-slide-left 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
+
+/* Era 9 (Cambrian): assembly-line conveyor - parts scroll right to left. */
+@keyframes belt-scroll {
+  from {
+    left: 100%;
+  }
+  to {
+    left: -16%;
+  }
+}
+.belt-piece {
+  position: absolute;
+  animation: belt-scroll linear forwards;
+}
+/* Assembly timer bar: depletes over the organism's lifetime. */
+@keyframes assembly-timer {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+.assembly-timer {
+  transform-origin: left center;
+  animation: assembly-timer linear forwards;
+}
+/* The assembled organism swims away (success) or dies (time out). */
+@keyframes organism-swim {
+  to {
+    transform: translateX(64px);
+    opacity: 0;
+  }
+}
+@keyframes organism-die {
+  to {
+    transform: scale(0.4) rotate(18deg);
+    opacity: 0;
+  }
+}
+.organism-swim {
+  animation: organism-swim 0.55s ease-in forwards;
+}
+.organism-die {
+  animation: organism-die 0.55s ease-in forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .belt-piece,
+  .assembly-timer,
+  .organism-swim,
+  .organism-die {
+    animation: none;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .era-slide-right,
   .era-slide-left {

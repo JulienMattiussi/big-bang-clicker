@@ -31,7 +31,7 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
 | **6** | Premières vies | boîte de Petri | **automate / culture** (diviser, élaguer) |
 | **7** | Grande Oxydation | balance atmosphérique | **équilibre à tenir** (corde raide) |
 | **8** | Eucaryotes | endosymbiose | **cliquer-engloutir** (combiner A dans B) |
-| **9** | Cambrien | atelier du vivant | **assemblage modulaire** (équiper un plan de corps) |
+| **9** | Cambrien | chaîne de montage (plein écran) | **tapis roulant** (attraper les bonnes pièces) |
 | **10** | Conquête des terres | arbre du vivant | **arbre qui ramifie** (croissance + extinctions) |
 | **11** | Intelligence | constellation d'idées | **mémoire / séquence** (Simon) |
 | **12** | Sociétés | plan de la cité | **placement sur grille** (adjacences) |
@@ -148,24 +148,37 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
   visible) étiqueté "Engloutir", activable au clavier. Récurrence : symbioses plus
   complexes.
 
-## Ère 9 - Cambrien : atelier du vivant
+## Ère 9 - Cambrien : la chaîne de montage du vivant (plein écran)
 
 - **Ressources / recette** : `tissue` -> `organism` (recette `differentiation`).
   Verbe : Assembler.
-- **Mécanique - assemblage modulaire.** Un **plan de corps** (silhouette) avec
-  des emplacements (yeux, membres, carapace, nageoires). On **équipe** les
-  emplacements avec des tissus différenciés (glisser/cliquer une "pièce" sur un
-  slot). Une combinaison complète **produit un organisme** ; des combos
-  particuliers donnent des bonus (explosion des formes du Cambrien).
-- **Progression / nouveauté** : **loadout / personnalisation** (on compose une
-  entité à partir de modules), inédit. Invite à expérimenter des combinaisons.
-- **Gestion de ressources** : les tissus sont des **composants** ; les
-  organismes produits varient selon l'assemblage (qualité/bonus), pas qu'une
-  quantité.
-- **Implémentation** : manuel = équiper les slots ; auto = `differentiation`
-  produit l'organisme "standard". Anti-frustration = combo non optimale =
-  organisme basique, jamais rien. a11y = slots = boutons étiquetés. Récurrence :
-  morphologies avancées aux ères suivantes.
+- **Mécanique - tapis roulant d'usine, contre la montre.** Des **pièces** (œil,
+  nageoire, carapace, segment, queue, plaque) **défilent** de droite à gauche sur
+  un tapis pleine largeur. Un **plan de corps** demande quelques pièces
+  **précises** ; on **clique les bonnes pièces** quand elles passent pour les
+  emboîter. Chaque organisme a une **durée de vie de 5 s** :
+  - rien d'assemblé -> il **meurt** sans rien rapporter ;
+  - partiellement assemblé -> il meurt en rapportant **1 tissu par pièce** posée ;
+  - entièrement assemblé -> il **ne meurt pas**, **nage vers l'extérieur** et
+    produit un **organisme** (la grosse récompense).
+  À chaque issue, un nouveau plan apparaît (timer relancé). Les pièces ratées
+  **sortent du tapis** (légère tension, jamais de pénalité) ; le tapis privilégie
+  un peu les pièces actuellement demandées (anti-frustration).
+- **Contenu** : **10 organismes** réels du Cambrien (Burgess / Chengjiang) :
+  trilobite, Anomalocaris, Opabinia, Hallucigenia, Wiwaxia, Pikaia,
+  Haikouichthys, Marrella, brachiopode, éponge. Chacun = une combinaison de
+  pièces **partagées** (œil, segments, appendice, épine, patte, coquille,
+  nageoire ; seule la fronde de l'éponge est exclusive), si bien que la plupart
+  des pièces servent à plusieurs organismes.
+- **Progression / nouveauté** : **sélection dans un flux** qui défile (timing +
+  reconnaissance), inédit ; et premier widget **pleine largeur** du palier Vie.
+- **Gestion de ressources** : les tissus sont des **composants** attrapés au vol
+  pour produire des organismes.
+- **Implémentation** : manuel = cliquer une pièce qui passe ; auto =
+  `differentiation`. a11y / `prefers-reduced-motion` : cliquer un **emplacement
+  du plan** attrape la prochaine pièce correspondante sur le tapis (sans viser
+  une cible mobile) ; en mouvement réduit, le tapis est figé (pièces présentées
+  statiquement). Récurrence : chaînes de production aux ères industrielles.
 
 ## Ère 10 - Conquête des terres : arbre du vivant
 
