@@ -86,7 +86,12 @@ export function updateRisk(state: GameState, defs: GameDefs, dt: number): GameSt
     const runtime = crises[id] ?? { risk: 0, resolved: false, count: 0 }
     if (runtime.resolved) continue
     const source = def.risk.sourceResource
-    const inc = source ? (state.resources[source] ?? 0) * RISK_RATE * dt : RISK_RATE * dt
+    const level = source ? (state.resources[source] ?? 0) : 0
+    const floor = def.risk.floor ?? 0
+    // Dormant until the source is genuinely over-exploited (above its floor);
+    // risk then builds on the EXCESS, so it ramps up gently past the floor.
+    if (source && level < floor) continue
+    const inc = source ? (level - floor) * RISK_RATE * dt : RISK_RATE * dt
     if (inc <= 0) continue
     crises[id] = { ...runtime, risk: runtime.risk + inc }
     changed = true

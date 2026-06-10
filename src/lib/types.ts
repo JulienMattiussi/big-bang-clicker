@@ -131,7 +131,15 @@ export interface GaletDef {
 export interface CrisisDef {
   id: CrisisId
   eraId: EraId
-  risk: { sourceResource?: ResourceId; threshold: number; telegraph: boolean }
+  // `floor`: risk only builds once the source resource exceeds this level (real
+  // over-exploitation); below it the crisis stays dormant, never triggering on a
+  // barely-developed resource.
+  risk: {
+    sourceResource?: ResourceId
+    threshold: number
+    telegraph: boolean
+    floor?: number
+  }
   trigger: 'threshold' | 'player' | 'probabilistic'
   regression: Effect[]
   rebound: Effect[]

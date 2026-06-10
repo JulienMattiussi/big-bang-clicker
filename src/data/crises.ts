@@ -9,10 +9,18 @@ export const crisisDefs: CrisisDef[] = [
   {
     id: 'extinction',
     eraId: 'e10',
-    risk: { sourceResource: 'fauna', threshold: 200_000, telegraph: true },
+    risk: { sourceResource: 'fauna', threshold: 200_000, telegraph: true, floor: 2_000 },
     trigger: 'threshold',
-    regression: [{ type: 'resetResource', target: 'fauna', value: 0.2 }],
-    rebound: [{ type: 'multiplier', target: 'fauna', value: 3 }],
+    // The extinction hits flora as hard as fauna; both rebound (the post-crisis
+    // "fern spike": devastated land, then a richer recovery).
+    regression: [
+      { type: 'resetResource', target: 'fauna', value: 0.2 },
+      { type: 'resetResource', target: 'flora', value: 0.2 },
+    ],
+    rebound: [
+      { type: 'multiplier', target: 'fauna', value: 3 },
+      { type: 'multiplier', target: 'flora', value: 3 },
+    ],
     textKeys: {
       warnKey: 'crisis.extinction.warn',
       triggerKey: 'crisis.extinction.trigger',

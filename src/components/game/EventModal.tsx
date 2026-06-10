@@ -2,12 +2,14 @@ import type { KeyboardEvent } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { EraIcon } from '@/components/game/EraIcon'
+import { CrisisScene } from '@/components/game/CrisisScene'
 import { Galet } from '@/components/game/Galet'
 import { useEventStore } from '@/store/eventStore'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
 import { useInventoryStore } from '@/store/inventoryStore'
 import { useGaletStore } from '@/store/galetStore'
+import { useCrisisStore, CRISIS_GAMES } from '@/store/crisisStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EventTone } from '@/lib/events'
@@ -46,6 +48,13 @@ export function EventModal() {
   const isMemory = event.id === 'feature:memory'
   // The backpack (inventory) unlock: accent hero, then its button settles in.
   const isBackpack = event.id === 'feature:backpack'
+  // A crisis (regression): a dramatic red hero with the impact illustration.
+  const crisisId = event.id.startsWith('crisis:') ? event.id.slice('crisis:'.length) : null
+  // A crisis with a survival mini-game: the modal IS the call to action, and
+  // closing it drops the player straight into the widget.
+  const crisisGame = crisisId !== null && CRISIS_GAMES.has(crisisId)
+  // A crisis overcome: life springs back (green/accent celebration).
+  const isCrisisWon = event.id.startsWith('crisis-won:')
 
   const handleDismiss = () => {
     // Closing a feature unlock flashes its button so the player spots the new power.
@@ -53,6 +62,12 @@ export function EventModal() {
     if (isBackpack) useInventoryStore.getState().flash()
     // A discovered pebble shrinks into its receptacle socket.
     if (galet) useGaletStore.getState().flash(galet.id)
+    // Confronting a crisis: jump to its era and launch its mini-game on close.
+    if (crisisGame && crisisId) {
+      const eraOfCrisis = defs.crises[crisisId]?.eraId
+      if (eraOfCrisis) useGameStore.getState().setEra(eraOfCrisis)
+      useCrisisStore.getState().start(crisisId)
+    }
     dismiss()
   }
 
@@ -71,12 +86,16 @@ export function EventModal() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="event-title"
-        className={`modal-in w-full max-w-md rounded-lg border bg-surface p-6 text-fg shadow-xl ${
+        className={`w-full max-w-md rounded-lg border bg-surface p-6 text-fg shadow-xl ${
+          crisisId ? 'crisis-modal' : 'modal-in'
+        } ${
           galet || isMemory
             ? 'complexity-glow border-octarine/50'
             : era || isBackpack
               ? 'border-accent/50 shadow-[0_0_45px_-10px_var(--color-accent)]'
-              : 'border-border'
+              : crisisId
+                ? 'border-red-500/50'
+                : 'border-border'
         }`}
       >
         {galet ? (
@@ -189,6 +208,53 @@ export function EventModal() {
             </h2>
             <p className="leading-relaxed text-muted">{t(event.bodyKey as TranslationKey)}</p>
           </div>
+        ) : crisisId ? (
+          // Crisis: a dramatic red hero with the large impact illustration.
+          <div className="flex flex-col items-center gap-3 text-center">
+            <span className="flex items-center gap-2 text-xs font-semibold tracking-[0.25em] text-red-400 uppercase">
+              <Icon name="skull" className="h-3.5 w-3.5" aria-hidden />
+              {t('crisis.eyebrow')}
+              <Icon name="skull" className="h-3.5 w-3.5" aria-hidden />
+            </span>
+            {/* The illustration's accent is forced to danger red (the SVG reads
+                var(--color-accent), inherited from this wrapper). */}
+            <div className="relative my-1 flex h-32 w-full items-center justify-center [--color-accent:#ef4444]">
+              <div
+                aria-hidden
+                className="crisis-flash absolute inset-0 blur-xl"
+                style={{ background: 'radial-gradient(circle, #ef4444, transparent 65%)', opacity: 0.35 }}
+              />
+              <CrisisScene id={crisisId} className="relative h-32 w-auto" />
+            </div>
+            <h2 id="event-title" className="text-2xl font-bold">
+              {t(event.titleKey as TranslationKey)}
+            </h2>
+            <p className="leading-relaxed text-muted">{t(event.bodyKey as TranslationKey)}</p>
+          </div>
+        ) : isCrisisWon ? (
+          // Crisis overcome: life springs back, greener (accent celebration).
+          <div className="flex flex-col items-center gap-3 text-center">
+            <span className="flex items-center gap-2 text-xs font-semibold tracking-[0.25em] text-accent uppercase">
+              <span aria-hidden>✦</span>
+              {t('crisis.overcome.eyebrow')}
+              <span aria-hidden>✦</span>
+            </span>
+            <div className="relative my-1 flex h-28 w-28 items-center justify-center">
+              <div
+                aria-hidden
+                className="bg-breathe absolute inset-0 rounded-full blur-md"
+                style={{
+                  background: 'radial-gradient(circle, var(--color-accent), transparent 68%)',
+                  opacity: 0.5,
+                }}
+              />
+              <Icon name="flora" className="relative h-16 w-16 text-accent" />
+            </div>
+            <h2 id="event-title" className="text-2xl font-bold">
+              {t(event.titleKey as TranslationKey)}
+            </h2>
+            <p className="leading-relaxed text-muted">{t(event.bodyKey as TranslationKey)}</p>
+          </div>
         ) : (
           <>
             <div className="mb-3 flex items-center gap-3">
@@ -204,10 +270,10 @@ export function EventModal() {
         )}
 
         <div
-          className={`mt-5 flex ${galet || era || isMemory || isBackpack ? 'justify-center' : 'justify-end'}`}
+          className={`mt-5 flex ${galet || era || isMemory || isBackpack || crisisId || isCrisisWon ? 'justify-center' : 'justify-end'}`}
         >
           <Button autoFocus onClick={handleDismiss}>
-            {galet ? t('galet.found.cta') : t('event.continue')}
+            {crisisGame ? t('crisis.confront') : galet ? t('galet.found.cta') : t('event.continue')}
           </Button>
         </div>
       </div>

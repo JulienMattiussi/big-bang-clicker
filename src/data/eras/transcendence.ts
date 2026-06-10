@@ -7,7 +7,7 @@ import type { EraDef, GeneratorDef, ResourceDef } from '@/lib/types'
  */
 
 export const era19Resources: ResourceDef[] = [
-  { id: 'tension', eraId: 'e19', nameKey: 'res.tension', icon: 'flame', tier: 20, isBase: true },
+  { id: 'tension', eraId: 'e19', nameKey: 'res.tension', icon: 'zap', tier: 20, isBase: true },
 ]
 
 export const era19Generators: GeneratorDef[] = [

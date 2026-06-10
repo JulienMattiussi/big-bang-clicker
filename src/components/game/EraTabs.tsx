@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { EraIcon } from '@/components/game/EraIcon'
 import { AlertBadge } from '@/components/ui/AlertBadge'
 import { useGameStore } from '@/store/gameStore'
@@ -12,6 +12,10 @@ const TAB_BASE =
 
 /** flex gap-2 between tabs, in px (used by the fit computation). */
 const TAB_GAP = 8
+
+// TEMP DEBUG: in the dev server only (never in tests/prod), also show and allow
+// visiting the next locked era to preview it. Remove when done.
+const DEBUG_SHOW_NEXT_ERA = import.meta.env.MODE === 'development'
 
 /**
  * Navigation across UNLOCKED eras only (cohabitation). "Chip" style distinct
@@ -35,7 +39,19 @@ export function EraTabs() {
   // era ids whose label is shown; null means "not measured yet, show all".
   const [labeled, setLabeled] = useState<Set<string> | null>(null)
 
-  const visible = defs.eras.filter((era) => state.unlockedEras.includes(era.id))
+  const visible = useMemo(() => {
+    const unlocked = defs.eras.filter((era) => state.unlockedEras.includes(era.id))
+    const next = DEBUG_SHOW_NEXT_ERA
+      ? defs.eras.find((era) => !state.unlockedEras.includes(era.id))
+      : undefined
+    return next ? [...unlocked, next] : unlocked
+  }, [defs.eras, state.unlockedEras])
+
+  // Navigate to an era; for the debug-only locked era, force the view directly.
+  const go = (id: string) => {
+    if (state.unlockedEras.includes(id)) setEra(id)
+    else useGameStore.setState((s) => ({ state: { ...s.state, currentEraId: id } }))
+  }
 
   useLayoutEffect(() => {
     const nav = navRef.current
@@ -82,6 +98,7 @@ export function EraTabs() {
     }
 
     fit()
+    if (typeof ResizeObserver === 'undefined') return
     const ro = new ResizeObserver(fit)
     ro.observe(nav)
     return () => ro.disconnect()
@@ -106,7 +123,7 @@ export function EraTabs() {
         aria-current={active ? 'true' : undefined}
         aria-label={showLabel ? undefined : name}
         title={showLabel ? undefined : name}
-        onClick={() => setEra(era.id)}
+        onClick={() => go(era.id)}
         className={`${TAB_BASE} ${
           active
             ? 'cursor-default border-accent bg-surface text-accent'

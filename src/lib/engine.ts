@@ -14,6 +14,7 @@ import type {
   GeneratorId,
   ResourceId,
 } from './types'
+import { isCrisisReady, readyCrises } from './crises'
 
 /** Geometric cost of the next level (0-indexed level). */
 export function costAtLevel(curve: CostCurve, level: number): number {
@@ -195,6 +196,8 @@ export function nextLockedEra(state: GameState, defs: GameDefs): EraDef | undefi
 
 /** True if the player can currently afford the next era's milestone cost. */
 export function canUnlockNextEra(state: GameState, defs: GameDefs): boolean {
+  // A triggered, unresolved crisis blocks progression until it is overcome.
+  if (readyCrises(state, defs).length > 0) return false
   const era = nextLockedEra(state, defs)
   if (!era) return false
   const { resource, amount, complexity } = era.unlock
@@ -343,12 +346,24 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
   let gained = 0
   const latestEra = latestUnlockedIndex(state)
 
+  // Resources frozen by a triggered, unresolved crisis: their production halts
+  // until the crisis is overcome, so the player cannot progress around it.
+  const frozen = new Set<string>()
+  for (const id in defs.crises) {
+    if (!isCrisisReady(state, defs, id)) continue
+    const def = defs.crises[id]
+    if (def.risk.sourceResource) frozen.add(def.risk.sourceResource)
+    for (const e of def.regression) if (e.target) frozen.add(e.target)
+    for (const e of def.rebound) if (e.target) frozen.add(e.target)
+  }
+
   // 1. Generators: direct production.
   for (const id in state.generators) {
     const level = state.generators[id].level
     if (level <= 0) continue
     const gen = defs.generators[id]
     if (!gen) continue
+    if (frozen.has(gen.output)) continue
     resources[gen.output] =
       (resources[gen.output] ?? 0) +
       level *
@@ -364,6 +379,8 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     if (!cState.enabled || cState.level <= 0) continue
     const conv = defs.converters[id]
     if (!conv) continue
+    // A frozen output (crisis) halts the whole recipe: no output, no input drain.
+    if (conv.outputs.some((o) => frozen.has(o.resource))) continue
 
     let cycles = cState.level * conv.baseRate * dt
     for (const input of conv.inputs) {

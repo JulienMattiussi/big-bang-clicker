@@ -1,4 +1,4 @@
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
@@ -32,8 +32,21 @@ function SavePanel({ onDone }: { onDone: () => void }) {
   const exportSave = useGameStore((s) => s.exportSave)
   const importSave = useGameStore((s) => s.importSave)
   const reset = useGameStore((s) => s.reset)
+  const persist = useGameStore((s) => s.persist)
 
-  const [code] = useState(() => exportSave())
+  // The export must reflect the LIVE game state, not a snapshot frozen when the
+  // panel opened (the game keeps ticking). Seed with the state at open, flush to
+  // storage on open, then recompute on every export action (copy/download/select).
+  const [code, setCode] = useState(() => exportSave())
+  useEffect(() => {
+    persist()
+  }, [persist])
+  const refreshCode = () => {
+    const fresh = exportSave()
+    setCode(fresh)
+    return fresh
+  }
+
   const [importText, setImportText] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const [confirmReset, setConfirmReset] = useState(false)
@@ -42,14 +55,14 @@ function SavePanel({ onDone }: { onDone: () => void }) {
   const fieldClass = 'h-16 w-full resize-none rounded-md border border-border bg-bg p-2 text-xs'
 
   const copy = () => {
-    void navigator.clipboard?.writeText(code)
+    void navigator.clipboard?.writeText(refreshCode())
     setStatus('copied')
     // Briefly show the confirmation, then close the menu on success.
     window.setTimeout(onDone, 700)
   }
 
   const download = () => {
-    const blob = new Blob([code], { type: 'text/plain' })
+    const blob = new Blob([refreshCode()], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -91,7 +104,14 @@ function SavePanel({ onDone }: { onDone: () => void }) {
           <span className="block text-xs font-semibold tracking-wide text-muted uppercase">
             {t('save.export')}
           </span>
-          <textarea readOnly aria-label={t('save.export')} value={code} className={fieldClass} />
+          {/* Refresh on focus so a manual select-all also grabs the live state. */}
+          <textarea
+            readOnly
+            aria-label={t('save.export')}
+            value={code}
+            onFocus={refreshCode}
+            className={fieldClass}
+          />
           <div className="flex gap-2">
             <Button variant="ghost" className="flex-1 text-center" onClick={copy}>
               <Icon name="copy" className="mr-1 inline h-4 w-4 align-text-bottom" />

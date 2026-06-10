@@ -85,6 +85,19 @@ function loadInitialState(now: number): GameState {
   return { ...ready, seenEvents }
 }
 
+/**
+ * Stamp + persist a state immediately, returning the store patch. Discrete
+ * progress actions (a level, unlock, prestige, crisis, pebble, memory win) use
+ * this so a hot-reload or quick refresh can't roll them back before the periodic
+ * autosave runs. Continuous, high-frequency changes (tick, clicks) skip it and
+ * rely on the autosave to avoid hammering localStorage.
+ */
+function commit(state: GameState): { state: GameState } {
+  const stamped = { ...state, lastSeen: Date.now() }
+  saveToStorage(stamped)
+  return { state: stamped }
+}
+
 export const useGameStore = create<GameStore>((set, get) => ({
   state: loadInitialState(Date.now()),
   defs,
@@ -93,30 +106,28 @@ export const useGameStore = create<GameStore>((set, get) => ({
   buyGenerator: (id) =>
     set((s) => {
       const next = buyGenerator(s.state, s.defs, id)
-      return next ? { state: next } : {}
+      return next ? commit(next) : {}
     }),
   buyConverter: (id) =>
     set((s) => {
       const next = buyConverter(s.state, s.defs, id)
-      return next ? { state: next } : {}
+      return next ? commit(next) : {}
     }),
   manualConvert: (id) => set((s) => ({ state: runManualConvert(s.state, s.defs, id) })),
   manualProduce: (id) => set((s) => ({ state: runManualProduce(s.state, s.defs, id) })),
   setEra: (id) =>
     set((s) =>
-      s.state.unlockedEras.includes(id) ? { state: { ...s.state, currentEraId: id } } : {},
+      s.state.unlockedEras.includes(id) ? commit({ ...s.state, currentEraId: id }) : {},
     ),
-  unlockNextEra: () => set((s) => ({ state: runUnlockNextEra(s.state, s.defs) })),
+  unlockNextEra: () => set((s) => commit(runUnlockNextEra(s.state, s.defs))),
   toggleConverter: (id) =>
     set((s) => {
       const current = s.state.converters[id]
       if (!current) return {}
-      return {
-        state: {
-          ...s.state,
-          converters: { ...s.state.converters, [id]: { ...current, enabled: !current.enabled } },
-        },
-      }
+      return commit({
+        ...s.state,
+        converters: { ...s.state.converters, [id]: { ...current, enabled: !current.enabled } },
+      })
     }),
   persist: () =>
     set((s) => {
@@ -124,7 +135,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       saveToStorage(state)
       return { state }
     }),
-  resolveCrisis: (id) => set((s) => ({ state: runResolveCrisis(s.state, s.defs, id) })),
+  resolveCrisis: (id) => set((s) => commit(runResolveCrisis(s.state, s.defs, id))),
   exportSave: () => encodeSave(get().state),
   importSave: (encoded) => {
     try {
@@ -155,7 +166,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     saveToStorage(reborn)
     set({ state: reborn })
   },
-  buyMetaUpgrade: (id) => set((s) => ({ state: buyMeta(s.state, s.defs, id) })),
+  buyMetaUpgrade: (id) => set((s) => commit(buyMeta(s.state, s.defs, id))),
   markEventSeen: (id) =>
     set((s) =>
       s.state.seenEvents[id]
@@ -166,29 +177,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) =>
       s.state.galets[id]?.found
         ? {}
-        : {
-            state: {
-              ...s.state,
-              galets: { ...s.state.galets, [id]: { found: true, active: true } },
-            },
-          },
+        : commit({
+            ...s.state,
+            galets: { ...s.state.galets, [id]: { found: true, active: true } },
+          }),
     ),
   toggleGalet: (id) =>
     set((s) => {
       const galet = s.state.galets[id]
       if (!galet?.found) return {}
-      return {
-        state: {
-          ...s.state,
-          galets: { ...s.state.galets, [id]: { ...galet, active: !galet.active } },
-        },
-      }
+      return commit({
+        ...s.state,
+        galets: { ...s.state.galets, [id]: { ...galet, active: !galet.active } },
+      })
     }),
   startMemoryGame: () => {
     const s = get()
     const cost = memoryCost(s.state)
     if (s.state.complexity < cost) return false
-    set({ state: { ...s.state, complexity: s.state.complexity - cost } })
+    set(commit({ ...s.state, complexity: s.state.complexity - cost }))
     return true
   },
   winMemoryGame: () =>
@@ -198,12 +205,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const res = era.clickResource
       const current = s.state.multipliers[res] ?? 1
       const done = (s.state.memoryLevels[era.id] ?? 0) + 1
-      return {
-        state: {
-          ...s.state,
-          multipliers: { ...s.state.multipliers, [res]: current * 2 },
-          memoryLevels: { ...s.state.memoryLevels, [era.id]: done },
-        },
-      }
+      return commit({
+        ...s.state,
+        multipliers: { ...s.state.multipliers, [res]: current * 2 },
+        memoryLevels: { ...s.state.memoryLevels, [era.id]: done },
+      })
     }),
 }))

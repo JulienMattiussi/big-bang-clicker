@@ -89,9 +89,10 @@ export const en: Translations = {
   'assembly.org.marrella': 'Marrella',
   'assembly.org.brachiopod': 'Brachiopod',
   'assembly.org.sponge': 'Sponge',
-  'tree.hint': 'Click a living tip to branch it',
-  'tree.branch': 'Branch',
-  'tree.extinction': 'Extinction',
+  'tree.hint': 'Click a living tip to branch its clade',
+  'tree.branch': 'Branch the clade',
+  'tree.choose': 'Choose a surviving clade: it seeds the next tree',
+  'tree.chooseLineage': 'Choose this clade',
   'memory.watch': 'Watch',
   'memory.repeat': 'Repeat the sequence',
   'memory.idea': 'Idea',
@@ -164,7 +165,17 @@ export const en: Translations = {
     'This is a machine. Click "Produce" to make it by hand, or "Upgrade" to buy levels and automate it. Everything combines: resources from one era feed the next.',
 
   'crisis.title': 'Crisis',
+  'crisis.eyebrow': 'Cataclysm',
   'crisis.resolve': 'Overcome',
+  'crisis.confront': 'Confront',
+  'crisis.overcome.eyebrow': 'Rebirth',
+  'crisis.overcome.title': 'Crisis overcome',
+  'crisis.effect.struck': 'Loss of {pct}% of existing {res}.',
+  'crisis.effect.recovered': 'Crisis overcome: life is thriving, output multiplied by {mult}.',
+  'crisisGame.hint': 'Get the creatures to safety from the meteors: click them to send them diving into a burrow.',
+  'crisisGame.aria': 'Survival zone: save the creatures from the falling meteors.',
+  'crisisGame.saved': 'Creatures sheltered',
+  'crisisGame.creature': 'Shelter this creature',
   'crisis.extinction.warn': 'Pressure on fauna is becoming critical.',
   'crisis.extinction.trigger': 'Mass extinction: the dominant clade collapses.',
   'crisis.extinction.rebound': 'A minor branch thrives: life resumes, more diverse.',
@@ -411,7 +422,7 @@ export const en: Translations = {
   'era.e9.transition':
     'In a geological blink, life invents a thousand body plans. Eyes, shells, fins: evolution goes full prototype mode.',
   'era.e10.transition':
-    'Plants then animals leave the water and set out to conquer the continents. Life, after all, finds a way.',
+    'Plants then animals leave the water and set out to conquer the continents. The tree of life branches into clades: each is a lineage descended from a common ancestor. Life, after all, finds a way.',
   'era.e11.transition':
     'Fire, tools, language. A chatty primate starts asking questions, beginning with "why?".',
   'era.e12.transition':

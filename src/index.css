@@ -289,6 +289,94 @@
   }
 }
 
+/* Crisis card: a pulsing red catastrophe glow + the meteor's impact flash.
+   (Red is the documented crisis exception to the semantic-token rule.) */
+@keyframes crisis-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 38px -14px rgba(239, 68, 68, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 62px -8px rgba(239, 68, 68, 0.72);
+  }
+}
+.crisis-card {
+  box-shadow: 0 0 46px -12px rgba(239, 68, 68, 0.55);
+  animation: crisis-pulse 2.4s ease-in-out infinite;
+}
+@keyframes crisis-flash {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.crisis-flash {
+  animation: crisis-flash 1.8s ease-in-out infinite;
+}
+/* Crisis modal entrance: a sharp impact (overshoot + shake) settling into the
+   pulsing red glow. The shake runs once, then the pulse takes over. */
+@keyframes crisis-impact {
+  0% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(0.99) translateX(-4px);
+  }
+  62% {
+    transform: translateX(4px);
+  }
+  78% {
+    transform: translateX(-2px);
+  }
+  100% {
+    transform: none;
+  }
+}
+.crisis-modal {
+  box-shadow: 0 0 46px -12px rgba(239, 68, 68, 0.55);
+  animation:
+    crisis-impact 0.42s ease-out,
+    crisis-pulse 2.4s ease-in-out 0.42s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .crisis-card,
+  .crisis-flash,
+  .crisis-modal {
+    animation: none;
+  }
+}
+
+/* Tree of life: a new branch draws itself out, then its tip pops in just after
+   (paths use pathLength="1" so the dash is length-independent). */
+@keyframes branch-grow {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.branch-grow {
+  stroke-dasharray: 1;
+  animation: branch-grow 0.4s ease-out;
+}
+.branch-tip {
+  animation: pop-in 0.3s ease-out 0.18s backwards;
+  transform-origin: 50% 50%;
+  transform-box: fill-box;
+}
+@media (prefers-reduced-motion: reduce) {
+  .branch-grow,
+  .branch-tip {
+    animation: none;
+  }
+}
+
 /* Era 9 (Cambrian): assembly-line conveyor - parts scroll right to left. */
 @keyframes belt-scroll {
   from {
@@ -498,6 +586,29 @@
     transform: scale(1.06);
   }
 }
+/* Wind gust applied to ONE stem segment: rest, then a quick one-way bend with a
+   little flutter, then settle. Stacked segments each run this in phase, so the
+   rotation compounds toward the tip and the stem ARCS (curves) rather than
+   pivoting rigidly. Small per-segment angle (it adds up over the segments). */
+@keyframes bg-fern {
+  0%,
+  28% {
+    transform: rotate(0deg);
+  }
+  40% {
+    transform: rotate(3.5deg);
+  }
+  50% {
+    transform: rotate(1.5deg);
+  }
+  60% {
+    transform: rotate(2.8deg);
+  }
+  74%,
+  100% {
+    transform: rotate(0deg);
+  }
+}
 .bg-scene {
   animation: bg-fade-in 0.9s ease-out;
 }
@@ -521,6 +632,9 @@
 .bg-sway {
   animation: bg-sway 14s ease-in-out infinite;
 }
+.bg-fern {
+  animation: bg-fern 7s ease-in-out infinite;
+}
 .bg-pulse {
   animation: bg-pulse 6s ease-in-out infinite;
   transform-origin: 50% 50%;
@@ -533,6 +647,7 @@
   .bg-twinkle,
   .bg-rise,
   .bg-sway,
+  .bg-fern,
   .bg-pulse {
     animation: none;
   }

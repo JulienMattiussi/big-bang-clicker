@@ -63,7 +63,7 @@ export const fr = {
   'balance.gauge': 'Balance atmosphérique',
   'balance.co2': 'CO₂',
   'balance.o2': 'O₂',
-  'endosymbiosis.hint': "Clique une organite pour l'engloutir ; fais mûrir la cellule",
+  'endosymbiosis.hint': "Clique sur un organite pour l'engloutir ; fais mûrir la cellule",
   'endosymbiosis.organelle': 'Organite',
   'assembly.hint': 'Assemble l’organisme avant qu’il ne meure : attrape les bonnes pièces sur le tapis',
   'assembly.plan': 'Plan de corps',
@@ -88,9 +88,10 @@ export const fr = {
   'assembly.org.marrella': 'Marrella',
   'assembly.org.brachiopod': 'Brachiopode',
   'assembly.org.sponge': 'Éponge',
-  'tree.hint': 'Clique une pointe vivante pour la ramifier',
-  'tree.branch': 'Ramifier',
-  'tree.extinction': 'Extinction',
+  'tree.hint': 'Clique sur une pointe vivante pour ramifier son clade',
+  'tree.branch': 'Ramifier le clade',
+  'tree.choose': 'Choisis un clade survivant : il amorce le prochain arbre',
+  'tree.chooseLineage': 'Choisir ce clade',
   'memory.watch': 'Observe',
   'memory.repeat': 'Reproduis la séquence',
   'memory.idea': 'Idée',
@@ -150,7 +151,7 @@ export const fr = {
 
   'inventory.button': 'Inventaire',
   'inventory.title': 'Inventaire des ressources',
-  'inventory.hint': 'Clique une ressource pour aller à sa production.',
+  'inventory.hint': 'Clique sur une ressource pour aller à sa production.',
   'inventory.goto': 'Aller à sa production',
   'inventory.close': 'Fermer',
   'inventory.event.eyebrow': "Un cadeau de l'univers",
@@ -160,10 +161,20 @@ export const fr = {
 
   'tuto.firstMachine.title': 'Ta première machine',
   'tuto.firstMachine.body':
-    "Voici une machine. Clique « Produire » pour produire à la main, ou « Améliorer » pour acheter des niveaux et automatiser. Tout se combine : les ressources d'une ère alimentent la suivante.",
+    "Voici une machine. Clique sur « Produire » pour produire à la main, ou sur « Améliorer » pour acheter des niveaux et automatiser. Tout se combine : les ressources d'une ère alimentent la suivante.",
 
   'crisis.title': 'Crise',
+  'crisis.eyebrow': 'Cataclysme',
   'crisis.resolve': 'Surmonter',
+  'crisis.confront': 'Affronter',
+  'crisis.overcome.eyebrow': 'Renaissance',
+  'crisis.overcome.title': 'Crise surmontée',
+  'crisis.effect.struck': 'Perte de {pct}% de la {res} existante.',
+  'crisis.effect.recovered': 'Crise résolue : la vie foisonne, production multipliée par {mult}.',
+  'crisisGame.hint': 'Mets les créatures à l’abri des météores : clique sur l’une d’elles pour la faire plonger dans un terrier.',
+  'crisisGame.aria': 'Zone de survie : sauve les créatures des chutes de météores.',
+  'crisisGame.saved': 'Créatures sauvées',
+  'crisisGame.creature': 'Mettre cette créature à l’abri',
   'crisis.extinction.warn': 'La pression sur la faune devient critique.',
   'crisis.extinction.trigger': "Extinction de masse : le clade dominant s'effondre.",
   'crisis.extinction.rebound': 'Une branche mineure prospère : la vie repart, plus diverse.',
@@ -410,7 +421,7 @@ export const fr = {
   'era.e9.transition':
     "En un clin d'œil géologique, le vivant invente mille plans de corps. Yeux, carapaces, nageoires : la vie passe en mode prototype.",
   'era.e10.transition':
-    "Plantes puis animaux sortent de l'eau et partent à la conquête des continents. La vie, décidément, trouve toujours un chemin.",
+    "Plantes puis animaux sortent de l'eau et partent à la conquête des continents. L'arbre du vivant se ramifie en clades : chacun est une lignée issue d'un même ancêtre. La vie, décidément, trouve toujours un chemin.",
   'era.e11.transition':
     "Le feu, l'outil, le langage. Un primate bavard se met à poser des questions, à commencer par « pourquoi ? ».",
   'era.e12.transition':

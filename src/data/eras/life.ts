@@ -75,7 +75,7 @@ const bundles: EraBundle[] = [
     uiTier: 'life',
     icon: 'trees',
     widget: 'tree',
-    base: { id: 'flora', icon: 'leaf', tier: 11 },
+    base: { id: 'flora', icon: 'flora', tier: 11 },
     combined: { id: 'fauna', icon: 'paw', tier: 13 },
     consumes: 'organism',
     generatorId: 'plantGrowth',

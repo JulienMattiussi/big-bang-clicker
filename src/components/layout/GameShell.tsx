@@ -16,7 +16,10 @@ import { MilestoneButton } from '@/components/game/MilestoneButton'
 import { EraIcon } from '@/components/game/EraIcon'
 import { PrestigeBanner } from '@/components/game/PrestigeBanner'
 import { CrisisBanner } from '@/components/game/CrisisBanner'
+import { CrisisGame } from '@/components/game/CrisisGame'
 import { useGameStore } from '@/store/gameStore'
+import { useCrisisStore } from '@/store/crisisStore'
+import { readyCrises } from '@/lib/crises'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 
@@ -28,8 +31,22 @@ export function GameShell() {
   const { t } = useTranslation()
   const defs = useGameStore((s) => s.defs)
   const currentEraId = useGameStore((s) => s.state.currentEraId)
+  // A ready crisis takes over the central scene, but ONLY in its own era (it
+  // stays put when the player visits other eras): the banner to confront it,
+  // then the survival mini-game once engaged.
+  const crisisHere = useGameStore((s) =>
+    readyCrises(s.state, s.defs).some((id) => s.defs.crises[id].eraId === s.state.currentEraId),
+  )
+  const fighting = useCrisisStore((s) => s.fighting)
 
   const era = defs.eras.find((e) => e.id === currentEraId) ?? defs.eras[0]
+  const fightingHere = fighting != null && defs.crises[fighting]?.eraId === era.id
+  const central = crisisHere ? (
+    fightingHere ? <CrisisGame /> : <CrisisBanner />
+  ) : (
+    <ClickArea era={era} />
+  )
+
 
   return (
     <main
@@ -87,7 +104,6 @@ export function GameShell() {
         <EraTabs />
       </header>
 
-      <CrisisBanner />
       <PrestigeBanner />
 
       {/* Sliding transition between eras (direction by tab order). */}
@@ -96,7 +112,7 @@ export function GameShell() {
           // Wide widget (e.g. periodic table): full-width on top, panels below.
           <>
             <section className="-mt-2 flex justify-center pb-2">
-              <ClickArea era={era} />
+              {central}
             </section>
             {/* Resources kept narrow so the wide machines panel fits 3 columns. */}
             <section className="grid gap-4 md:grid-cols-[1fr_3fr]">
@@ -108,7 +124,7 @@ export function GameShell() {
           <section className="grid gap-4 md:grid-cols-[5fr_4fr_5fr]">
             <ResourcePanel era={era} />
             <div className="flex items-center justify-center py-6">
-              <ClickArea era={era} />
+              {central}
             </div>
             <PurchasePanel era={era} />
           </section>

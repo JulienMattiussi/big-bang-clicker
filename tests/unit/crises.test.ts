@@ -71,6 +71,29 @@ describe('risque et résolution', () => {
     expect(next.crises.revolte.risk).toBeCloseTo(5)
   })
 
+  it('reste dormante sous le plancher, monte sur l’excès au-dessus', () => {
+    const floored: GameDefs = {
+      ...defs,
+      crises: {
+        ext: {
+          id: 'ext',
+          eraId: 'e10',
+          risk: { sourceResource: 'fauna', threshold: 100, telegraph: true, floor: 2000 },
+          trigger: 'threshold',
+          regression: [],
+          rebound: [],
+          textKeys: { warnKey: '', triggerKey: '', reboundKey: '' },
+        },
+      },
+    }
+    // Below the floor (barely any fauna): the crisis never charges.
+    const dormant = updateRisk(stateWith({ resources: { fauna: 16 } }), floored, 10)
+    expect(dormant.crises.ext?.risk ?? 0).toBe(0)
+    // Above the floor: risk builds on the excess only (2500 - 2000 = 500).
+    const active = updateRisk(stateWith({ resources: { fauna: 2500 } }), floored, 1)
+    expect(active.crises.ext.risk).toBeCloseTo(500)
+  })
+
   it('signale une crise prête au seuil', () => {
     const state = stateWith({ crises: { revolte: { risk: 10, resolved: false, count: 0 } } })
     expect(isCrisisReady(state, defs, 'revolte')).toBe(true)

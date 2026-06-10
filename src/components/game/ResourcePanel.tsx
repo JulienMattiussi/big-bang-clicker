@@ -3,6 +3,7 @@ import { IconBadge } from '@/components/ui/IconBadge'
 import { Icon } from '@/components/ui/Icon'
 import { AlertBadge } from '@/components/ui/AlertBadge'
 import { MemoryBadge } from '@/components/game/memory/MemoryBadge'
+import { ResourceCrisisBadge } from '@/components/game/ResourceCrisisBadge'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { decliningResources, netFlows, stalledResources } from '@/lib/graph'
@@ -112,6 +113,8 @@ export function ResourcePanel({ era }: { era: EraDef }) {
                   {id === era.clickResource && memoryBoost > 0 ? (
                     <MemoryBadge factor={2 ** memoryBoost} title={t('memory.badge')} />
                   ) : null}
+                  {/* Crisis marker: danger once triggered, rebirth once overcome. */}
+                  <ResourceCrisisBadge resourceId={id} />
                 </span>
                 <span className="shrink-0 tabular-nums">
                   {formatFixed(amount)}{' '}
