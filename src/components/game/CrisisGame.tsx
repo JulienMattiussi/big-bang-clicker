@@ -67,7 +67,12 @@ function step(prev: World): World {
   let meteorTimer = prev.meteorTimer - STEP_MS
   const meteors = prev.meteors.map((m) => ({ ...m, y: m.y + m.vy * dt }))
   if (meteorTimer <= 0) {
-    meteors.push({ id: next++, x: rand(12, W - 12), y: -12, vy: (GROUND_Y + 12) / (FALL_MS / 1000) })
+    meteors.push({
+      id: next++,
+      x: rand(12, W - 12),
+      y: -12,
+      vy: (GROUND_Y + 12) / (FALL_MS / 1000),
+    })
     meteorTimer = rand(650, 1300)
   }
   const landed = meteors.filter((m) => m.y >= GROUND_Y)
@@ -150,9 +155,18 @@ function Critter({ kind }: { kind: Kind }) {
     // Bipedal theropod: stiff raised tail, body, neck rising to a snouted head,
     // two digitigrade legs.
     return (
-      <g fill="var(--color-fg)" stroke="var(--color-fg)" strokeLinecap="round" strokeLinejoin="round">
+      <g
+        fill="var(--color-fg)"
+        stroke="var(--color-fg)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M-7 -3 Q-3 -4 0 -4.5 Q2 -4.8 3 -4.2 Q4 -6 4.8 -7.6 Q5.2 -8.3 6 -8.1 Q7 -7.9 6.6 -7.1 Q6 -6.7 5.2 -6.7 Q4.6 -5.7 4 -4.9 Q3.2 -3.9 2.4 -3.5 Q1 -3.1 -1 -3.3 Q-4 -3.3 -7 -3 Z" />
-        <path d="M0.6 -3.3 L1.5 -1.4 L0.5 0 M2.2 -3.1 L3 -1.4 L2.2 0" fill="none" strokeWidth="0.85" />
+        <path
+          d="M0.6 -3.3 L1.5 -1.4 L0.5 0 M2.2 -3.1 L3 -1.4 L2.2 0"
+          fill="none"
+          strokeWidth="0.85"
+        />
         {/* little theropod arm tucked under the chest */}
         <path d="M3.4 -4.1 L4.2 -3.1 L3.7 -2.4" fill="none" strokeWidth="0.55" />
       </g>
@@ -202,7 +216,9 @@ export function CrisisGame() {
     if (!c || c.state !== 'run') return
     setWorld((prev) => ({
       ...prev,
-      creatures: prev.creatures.map((k) => (k.id === id ? { ...k, state: 'saved', t0: prev.time } : k)),
+      creatures: prev.creatures.map((k) =>
+        k.id === id ? { ...k, state: 'saved', t0: prev.time } : k,
+      ),
     }))
     rescue()
     if (won.current) return
@@ -242,8 +258,23 @@ export function CrisisGame() {
         </defs>
         {/* A darkened, blood-red catastrophe sky and a solid ground band. */}
         <rect x="0" y="0" width={W} height={H} fill="#1a0d12" opacity="0.55" />
-        <rect x="0" y={GROUND_Y} width={W} height={H - GROUND_Y} fill="var(--color-fg)" opacity="0.12" />
-        <line x1="0" y1={GROUND_Y} x2={W} y2={GROUND_Y} stroke="var(--color-fg)" strokeOpacity="0.25" strokeWidth="0.6" />
+        <rect
+          x="0"
+          y={GROUND_Y}
+          width={W}
+          height={H - GROUND_Y}
+          fill="var(--color-fg)"
+          opacity="0.12"
+        />
+        <line
+          x1="0"
+          y1={GROUND_Y}
+          x2={W}
+          y2={GROUND_Y}
+          stroke="var(--color-fg)"
+          strokeOpacity="0.25"
+          strokeWidth="0.6"
+        />
 
         {/* Landing-spot shadows telegraph where each meteor will hit. */}
         {world.meteors.map((m) => {
@@ -316,14 +347,22 @@ export function CrisisGame() {
           if (c.state === 'hit') {
             const k = Math.max(0, 1 - age / 320)
             return (
-              <g key={c.id} transform={`translate(${c.x} ${GROUND_Y}) scale(${dir} 1)`} opacity={k} aria-hidden>
+              <g
+                key={c.id}
+                transform={`translate(${c.x} ${GROUND_Y}) scale(${dir} 1)`}
+                opacity={k}
+                aria-hidden
+              >
                 <Critter kind={c.kind} />
               </g>
             )
           }
           return (
             <g key={c.id} className="group">
-              <g transform={`translate(${c.x} ${GROUND_Y}) scale(${dir} 1)`} className="group-hover:brightness-125">
+              <g
+                transform={`translate(${c.x} ${GROUND_Y}) scale(${dir} 1)`}
+                className="group-hover:brightness-125"
+              >
                 <Critter kind={c.kind} />
               </g>
               <circle
@@ -361,7 +400,10 @@ export function CrisisGame() {
           aria-valuemax={CRISIS_GOAL}
           aria-valuenow={saved}
         >
-          <div className="h-full rounded-full bg-accent transition-[width] duration-200" style={{ width: `${pct * 100}%` }} />
+          <div
+            className="h-full rounded-full bg-accent transition-[width] duration-200"
+            style={{ width: `${pct * 100}%` }}
+          />
         </div>
       </div>
     </div>

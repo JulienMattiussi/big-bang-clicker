@@ -6,7 +6,7 @@ const bundles: EraBundle[] = [
     id: 'e11',
     index: 11,
     uiTier: 'civilization',
-    icon: 'brain',
+    icon: 'lightbulb',
     widget: 'memory',
     base: { id: 'tool', icon: 'cog', tier: 12 },
     combined: { id: 'knowledge', icon: 'brain', tier: 14 },

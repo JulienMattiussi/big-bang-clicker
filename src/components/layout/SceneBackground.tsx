@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactElement } from 'react'
+import { Sauropod } from '@/components/layout/Sauropod'
 import { useGameStore } from '@/store/gameStore'
 import { isCrisisReady } from '@/lib/crises'
 
@@ -310,10 +311,26 @@ function lycophyte(x: number, baseY: number, s: number, key: number, seed: numbe
   const fl = { x: x - (4 + jit(seed + 1, 1.4)) * s, y: top - (6 + jit(seed + 2, 1.6)) * s }
   const fr = { x: x + (4 + jit(seed + 3, 1.4)) * s, y: top - (6 + jit(seed + 4, 1.6)) * s }
   const tips = [
-    { x: fl.x - (3 + jit(seed + 5, 1.4)) * s, y: fl.y - (5 + jit(seed + 6, 1.3)) * s, tuft: jit(seed + 20, 0.8) },
-    { x: fl.x + (1.6 + jit(seed + 7, 1.2)) * s, y: fl.y - (5 + jit(seed + 8, 1.3)) * s, tuft: jit(seed + 21, 0.8) },
-    { x: fr.x - (1.6 + jit(seed + 9, 1.2)) * s, y: fr.y - (5 + jit(seed + 10, 1.3)) * s, tuft: jit(seed + 22, 0.8) },
-    { x: fr.x + (3 + jit(seed + 11, 1.4)) * s, y: fr.y - (5 + jit(seed + 12, 1.3)) * s, tuft: jit(seed + 23, 0.8) },
+    {
+      x: fl.x - (3 + jit(seed + 5, 1.4)) * s,
+      y: fl.y - (5 + jit(seed + 6, 1.3)) * s,
+      tuft: jit(seed + 20, 0.8),
+    },
+    {
+      x: fl.x + (1.6 + jit(seed + 7, 1.2)) * s,
+      y: fl.y - (5 + jit(seed + 8, 1.3)) * s,
+      tuft: jit(seed + 21, 0.8),
+    },
+    {
+      x: fr.x - (1.6 + jit(seed + 9, 1.2)) * s,
+      y: fr.y - (5 + jit(seed + 10, 1.3)) * s,
+      tuft: jit(seed + 22, 0.8),
+    },
+    {
+      x: fr.x + (3 + jit(seed + 11, 1.4)) * s,
+      y: fr.y - (5 + jit(seed + 12, 1.3)) * s,
+      tuft: jit(seed + 23, 0.8),
+    },
   ]
   const forks = [
     { p: fl, tips: [tips[0], tips[1]] },
@@ -327,7 +344,10 @@ function lycophyte(x: number, baseY: number, s: number, key: number, seed: numbe
       {/* The first fork (trunk -> fork point) is rigid; the gust's bend COMPOUNDS
           outward - each fork sways at its joint, and each leaf tuft sways again at
           its tip - so the further from the trunk, the more it curves. */}
-      <path d={`M${x} ${top} L${fl.x} ${fl.y} M${x} ${top} L${fr.x} ${fr.y}`} strokeWidth={1.2 * s} />
+      <path
+        d={`M${x} ${top} L${fl.x} ${fl.y} M${x} ${top} L${fr.x} ${fr.y}`}
+        strokeWidth={1.2 * s}
+      />
       {forks.map((fk, fi) => (
         <g
           key={fi}
@@ -374,7 +394,10 @@ function calamites(x: number, baseY: number, s: number, key: number, seed: numbe
           <g key={k} strokeWidth={0.5 * s}>
             <path d={`M${x - 1.6 * s} ${ny} H ${x + 1.6 * s}`} strokeWidth={0.7 * s} />
             {/* The fine leaves of each whorl flutter at the node in the gust. */}
-            <g className="bg-fern" style={{ transformBox: 'view-box', transformOrigin: `${x}px ${ny}px` }}>
+            <g
+              className="bg-fern"
+              style={{ transformBox: 'view-box', transformOrigin: `${x}px ${ny}px` }}
+            >
               <path
                 d={`M${x} ${ny} l${-lL} ${-lL * 0.6} M${x} ${ny} l${-lL * 0.5} ${-lL} M${x} ${ny} l${lR * 0.5} ${-lR} M${x} ${ny} l${lR} ${-lR * 0.6}`}
               />
@@ -419,7 +442,13 @@ interface FernShape {
  *  segments that arc under the wind (see frondSegment). The shape (frond count,
  *  spread, lean, height) varies per tuft so no two ferns look alike. Fresh
  *  green, deliberate for the land scene (not a tier token). */
-function fernTuft(cx: number, baseY: number, s: number, key: number, shape: FernShape): ReactElement {
+function fernTuft(
+  cx: number,
+  baseY: number,
+  s: number,
+  key: number,
+  shape: FernShape,
+): ReactElement {
   return (
     <g
       key={key}
@@ -434,21 +463,6 @@ function fernTuft(cx: number, baseY: number, s: number, key: number, shape: Fern
           {frondSegment(0, shape.segLen)}
         </g>
       ))}
-    </g>
-  )
-}
-
-// Sauropod silhouette auto-traced (Pillow contour) from an Argentinosaurus
-// profile, then simplified. Local units: feet at y=0, height ~24, facing right.
-const SAUROPOD_A =
-  'M44.2 -22.8 L43.9 -23.4 L43.5 -23.6 L43.1 -23.6 L42.6 -24.0 L42.6 -23.8 L42.4 -24.0 L42.1 -23.8 L41.9 -23.9 L41.6 -23.6 L41.4 -23.7 L40.3 -23.1 L39.7 -22.4 L39.4 -22.3 L39.2 -22.0 L39.0 -22.0 L38.8 -21.5 L38.5 -21.4 L38.3 -21.0 L38.1 -21.0 L36.7 -19.4 L35.4 -17.4 L35.2 -17.2 L34.2 -15.3 L33.5 -14.7 L33.3 -14.2 L33.1 -14.2 L33.0 -13.8 L32.7 -13.8 L32.4 -13.3 L32.2 -13.3 L31.5 -12.5 L31.2 -12.4 L30.7 -11.9 L30.2 -11.6 L30.1 -11.7 L29.1 -11.4 L28.2 -10.9 L28.2 -11.0 L26.3 -10.3 L26.2 -10.4 L25.8 -10.3 L25.7 -10.2 L25.6 -10.2 L25.2 -10.2 L24.5 -9.8 L24.4 -9.9 L23.6 -9.5 L23.5 -9.6 L22.7 -9.1 L22.1 -9.0 L21.5 -8.8 L21.4 -8.9 L21.2 -8.7 L19.4 -8.1 L18.3 -7.6 L17.6 -7.5 L14.5 -6.4 L12.7 -6.0 L12.4 -5.8 L11.7 -5.7 L11.4 -5.8 L10.5 -5.6 L10.2 -5.7 L8.3 -5.6 L8.0 -5.8 L7.8 -5.6 L7.5 -5.8 L6.9 -5.7 L6.7 -5.9 L6.4 -5.8 L6.2 -6.0 L5.9 -5.9 L5.7 -6.1 L5.4 -6.0 L5.3 -6.2 L5.0 -6.1 L4.8 -6.3 L4.5 -6.2 L4.3 -6.4 L4.0 -6.4 L3.9 -6.6 L3.7 -6.5 L3.4 -6.6 L3.0 -6.6 L3.0 -6.7 L2.6 -6.6 L2.4 -6.8 L2.2 -6.7 L1.8 -6.9 L1.5 -6.8 L1.3 -7.0 L1.1 -6.8 L0.8 -7.0 L0.6 -6.8 L0.0 -6.8 L2.1 -6.6 L6.8 -5.3 L12.4 -4.5 L14.3 -4.5 L18.2 -5.2 L20.6 -5.3 L20.7 -0.5 L21.0 -0.3 L22.4 -0.4 L22.5 -2.9 L22.8 -3.1 L23.0 -0.2 L23.2 0.0 L24.1 0.0 L24.7 -0.2 L24.8 -3.8 L27.0 -3.7 L29.0 -4.1 L30.0 -4.4 L30.7 -0.2 L30.8 -0.1 L31.8 -0.1 L32.0 -0.2 L32.1 -1.8 L32.6 -0.2 L33.5 -0.1 L33.8 -0.2 L33.9 -0.3 L34.0 -8.1 L36.5 -11.6 L38.6 -15.7 L39.8 -18.4 L40.6 -19.7 L42.5 -21.6 L43.6 -22.3 L44.0 -22.3 L44.2 -22.6 Z'
-
-/** A distant sauropod silhouette (traced from a real Argentinosaurus profile).
- *  `flip` = -1 faces it left. Faint, far in the background. */
-function sauropod(x: number, baseY: number, s: number, flip: number, body: string, key: number): ReactElement {
-  return (
-    <g key={key} transform={`translate(${x} ${baseY}) scale(${flip * s} ${s})`} opacity="0.15">
-      <path d={body} fill="var(--color-fg)" />
     </g>
   )
 }
@@ -478,12 +492,19 @@ function LandScene(): ReactElement {
       <svg className={svgClass} {...svgProps}>
         <Defs />
         {/* Low sun glow. */}
-        <circle cx="72" cy="30" r="30" fill="url(#sb-accent)" opacity="0.5" className="bg-breathe" />
+        <circle
+          cx="72"
+          cy="30"
+          r="30"
+          fill="url(#sb-accent)"
+          opacity="0.5"
+          className="bg-breathe"
+        />
         {/* Sauropods on the horizon, BEHIND the hills (the slopes hide their feet). */}
         {sauropodsGone ? null : (
           <>
-            {sauropod(0, 65, 1.5, 1, SAUROPOD_A, 1)}
-            {sauropod(98, 60, 0.62, -1, SAUROPOD_A, 2)}
+            <Sauropod x={0} baseY={65} s={1.5} />
+            <Sauropod x={98} baseY={60} s={0.62} flip={-1} />
           </>
         )}
         {/* Visible ground: a far slope, then a nearer solid ground band. */}

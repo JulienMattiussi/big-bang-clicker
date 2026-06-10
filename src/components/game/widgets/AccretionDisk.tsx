@@ -15,7 +15,10 @@ const PLANET_CLICKS = 6
 /** Progress decays if you stop clicking the clump (you must follow it). */
 const SUSTAIN_MS = 650
 const HIT_R = 12
-const MAX_PLANETS = 12
+/** Above this many planets, the oldest fades out (discreetly). */
+const MAX_PLANETS = 10
+/** Fade-out duration before the planet is removed (ms). */
+const PLANET_FADE_MS = 700
 /** Planet colours: realistic, muted, varied (never the sun's yellow). */
 const PLANET_COLORS = [
   'var(--planet-1)',
@@ -52,6 +55,11 @@ interface Planet {
   ry: number
   speed: number
   phase: number
+  /** Clock (ms) at birth, so the orbit angle is measured FROM the spawn instant
+   *  and the planet starts exactly at the accretion point. */
+  bornMs: number
+  /** Set when over the cap: the planet fades out, then is removed. */
+  fading?: boolean
 }
 
 /**
@@ -126,7 +134,7 @@ export function AccretionDisk({ era }: { era: EraDef }) {
           ?.setAttribute('transform', `scale(${(1 - 0.55 * k).toFixed(3)})`)
       }
       for (const p of planetsRef.current) {
-        const theta = p.phase + tt * p.speed
+        const theta = p.phase + ((now - p.bornMs) / 1000) * p.speed
         svg
           ?.querySelector(`[data-planet="${p.id}"]`)
           ?.setAttribute(
@@ -144,16 +152,32 @@ export function AccretionDisk({ era }: { era: EraDef }) {
     setPuffs((p) => [...p.slice(-7), { id: nextId.current++, x, y }])
 
   const spawnPlanet = (colorIndex: number, at: { x: number; y: number }) => {
-    const rx = Math.max(14, Math.hypot(at.x - CX, at.y - CY))
+    // Flattened, tilted orbit (ry = 0.4 rx) chosen so it passes EXACTLY through
+    // the accretion point at birth: the planet appears where the dust collapsed
+    // (under the cursor), then orbits from there.
+    const dx = at.x - CX
+    const dy = at.y - CY
+    const rx = Math.max(14, Math.hypot(dx, dy / 0.4))
     const planet: Planet = {
       id: nextId.current++,
       colorIndex,
       rx,
       ry: rx * 0.4,
       speed: 0.1 + Math.random() * 0.14,
-      phase: Math.atan2(at.y - CY, at.x - CX),
+      phase: Math.atan2(dy / 0.4, dx),
+      bornMs: performance.now(),
     }
-    setPlanets((ps) => [...ps.slice(-(MAX_PLANETS - 1)), planet])
+    // Over the cap, the oldest solid planet fades out (then is removed) rather
+    // than vanishing abruptly.
+    const solid = planetsRef.current.filter((p) => !p.fading)
+    const fadeId = solid.length + 1 > MAX_PLANETS ? solid[0].id : undefined
+    setPlanets((ps) => {
+      const next = [...ps, planet]
+      return fadeId === undefined ? next : next.map((p) => (p.id === fadeId ? { ...p, fading: true } : p))
+    })
+    if (fadeId !== undefined) {
+      window.setTimeout(() => setPlanets((ps) => ps.filter((p) => p.id !== fadeId)), PLANET_FADE_MS)
+    }
     setBurst({ id: nextId.current++, x: at.x, y: at.y, color: PLANET_COLORS[colorIndex] })
   }
 
@@ -279,7 +303,11 @@ export function AccretionDisk({ era }: { era: EraDef }) {
 
           {/* Orbiting planets (varied colours), moved by rAF. */}
           {planets.map((p) => (
-            <g key={p.id} data-planet={p.id}>
+            <g
+              key={p.id}
+              data-planet={p.id}
+              style={{ opacity: p.fading ? 0 : 1, transition: `opacity ${PLANET_FADE_MS}ms ease` }}
+            >
               <circle className="pop-in" r="2.8" fill={PLANET_COLORS[p.colorIndex]} />
               {/* Shaded terminator (makes it a sphere, not a flat tint). */}
               <circle r="2.8" fill="url(#acc-shade)" />

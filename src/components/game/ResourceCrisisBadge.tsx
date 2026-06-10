@@ -35,17 +35,17 @@ export function ResourceCrisisBadge({ resourceId }: { resourceId: string }) {
   if (!resolved && !active) return null
 
   // Spell out the concrete effects on THIS resource, in plain language.
-  const stockCut = def.regression.find((e) => e.target === resourceId && e.type === 'resetResource')?.value
+  const stockCut = def.regression.find(
+    (e) => e.target === resourceId && e.type === 'resetResource',
+  )?.value
   const boost = def.rebound.find((e) => e.target === resourceId && e.type === 'multiplier')?.value
   const loss = stockCut != null ? Math.round((1 - stockCut) * 100) : null
   const resName = t(defs.resources[resourceId]?.nameKey as TranslationKey)
 
   let tip: string
   if (resolved) {
-    // Simple, upbeat: the crisis is over and life thrives.
     tip = t('crisis.effect.recovered').replace('{mult}', String(boost ?? 1))
   } else {
-    // While the crisis rages: the dramatic line plus the concrete loss.
     const narrative = t(def.textKeys.triggerKey as TranslationKey)
     tip =
       loss != null
@@ -53,7 +53,10 @@ export function ResourceCrisisBadge({ resourceId }: { resourceId: string }) {
         : narrative
   }
   return (
-    <span title={tip} className={`inline-flex shrink-0 ${resolved ? 'text-accent' : 'text-red-400'}`}>
+    <span
+      title={tip}
+      className={`inline-flex shrink-0 ${resolved ? 'text-accent' : 'text-red-400'}`}
+    >
       <Icon name={resolved ? 'sparkles' : 'skull'} className="h-5 w-5" aria-hidden />
       <span className="sr-only">{tip}</span>
     </span>

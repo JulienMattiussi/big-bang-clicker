@@ -65,7 +65,8 @@ export const fr = {
   'balance.o2': 'O₂',
   'endosymbiosis.hint': "Clique sur un organite pour l'engloutir ; fais mûrir la cellule",
   'endosymbiosis.organelle': 'Organite',
-  'assembly.hint': 'Assemble l’organisme avant qu’il ne meure : attrape les bonnes pièces sur le tapis',
+  'assembly.hint':
+    'Assemble l’organisme avant qu’il ne meure : attrape les bonnes pièces sur le tapis',
   'assembly.plan': 'Plan de corps',
   'assembly.combo': 'Combo',
   'assembly.wanted': 'Pièce recherchée',
@@ -171,7 +172,8 @@ export const fr = {
   'crisis.overcome.title': 'Crise surmontée',
   'crisis.effect.struck': 'Perte de {pct}% de la {res} existante.',
   'crisis.effect.recovered': 'Crise résolue : la vie foisonne, production multipliée par {mult}.',
-  'crisisGame.hint': 'Mets les créatures à l’abri des météores : clique sur l’une d’elles pour la faire plonger dans un terrier.',
+  'crisisGame.hint':
+    'Mets les créatures à l’abri des météores : clique sur l’une d’elles pour la faire plonger dans un terrier.',
   'crisisGame.aria': 'Zone de survie : sauve les créatures des chutes de météores.',
   'crisisGame.saved': 'Créatures sauvées',
   'crisisGame.creature': 'Mettre cette créature à l’abri',

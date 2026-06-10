@@ -56,7 +56,7 @@ fond de scène par palier, modales d'évènements). Arborescence :
 src/
 ├── lib/                  # Logique pure, zéro React (entièrement testée)
 │   ├── types.ts          # Types du domaine (Era, Resource, Generator, Converter, Crisis, GameState...)
-│   ├── engine.ts         # Tick, coûts (arrondis), achats, conversion manuelle, multiplicateurs de galets, clickYield, palier
+│   ├── engine.ts         # Tick, coûts (arrondis), achats, conversion manuelle, multiplicateurs de galets, clickYield, palier ; gèle la production des ressources touchées par une crise active et bloque le palier tant qu'elle n'est pas résolue
 │   ├── graph.ts          # Flux nets réels + alertes (ressources en déclin / production à zéro), dépendances, tri
 │   ├── reveal.ts         # Dévoilement progressif (machines / ressources)
 │   ├── events.ts         # Évènements narratifs déclenchés (transitions, crises, tuto)
@@ -74,12 +74,12 @@ src/
 │   ├── metaUpgrades.ts   # Définitions des méta-upgrades
 │   ├── galets.ts         # Définitions des galets de l'infini (collectibles conservés au prestige)
 │   └── index.ts          # defs : GameDefs (agrégation typée)
-├── store/                # Stores Zustand : gameStore (persisté) ; feedbackStore, clickPulse, eventStore, memoryStore, inventoryStore, galetStore (transitoires)
+├── store/                # Stores Zustand : gameStore (persisté ; sauve aussitôt les actions de progression discrètes) ; feedbackStore, clickPulse, eventStore, memoryStore, inventoryStore, galetStore, crisisStore (transitoires)
 ├── i18n/                 # i18n custom (FR source de vérité, EN typé complet) ; locale persistée en localStorage
 ├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales), useGalets (découverte), useEraMechanic (clic d'ère), useMilestone (jauge/bouton de palier)
 ├── components/           # Par domaine ; un composant par fichier
 │   ├── ui/               # Primitives (Button, Panel, Icon + glyphs/ un fichier par glyphe, IconBadge, AlertBadge, FloaterLayer...)
-│   ├── game/             # Ressources, machines, paliers, badges, bannières, galets, EventModal ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal)
+│   ├── game/             # Ressources, machines, paliers, badges, galets ; modales d'évènements (EventModal + EventHero, layout « hero » partagé typé) ; crise (CrisisBanner, CrisisGame plein écran, CrisisScene, ResourceCrisisBadge) ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal)
 │   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
 │   └── layout/           # Coquille, navigation d'ères, EraTransition (glissement), SceneBackground, GaletReceptacle ; LanguageSwitch, SaveMenu
 └── App.tsx               # Navigation par état (pas de router)
@@ -206,9 +206,13 @@ pas seulement à constater.
    occurrence tolérée). Recherche : `grep -rnP "[\x{2014}\x{2013}]"`.
 3. **Couleurs en dur** : les composants n'utilisent que les jetons sémantiques.
    Exceptions documentées et tolérées : badges d'alerte (`bg-red-500` /
-   `bg-yellow-400`), bannière de crise, scrim de modale (`bg-black/60`), dégradé
-   de température de `CoolingWidget`, et `theme.css` / `index.css` (CSS brut
-   autorisé). Tout nouveau hex hors de ces cas est à remplacer par un jeton.
+   `bg-yellow-400`), bannière de crise et glow rouge danger (`EventHero`,
+   `CrisisScene`, `#ef4444`), scrim de modale (`bg-black/60`), dégradé de
+   température de `CoolingWidget`, **verts du feuillage du décor terrestre**
+   (`SceneBackground` ère 10), **couleurs d'illustration du mini-jeu de crise**
+   (`CrisisGame` : ciel rouge sombre, météore/flammes), et `theme.css` /
+   `index.css` (CSS brut autorisé). Tout nouveau hex hors de ces cas est à
+   remplacer par un jeton.
 4. **i18n** : parité stricte FR/EN (même nombre de clés), tout texte via `t()`,
    aucune chaîne affichée en dur.
 5. **Accessibilité** (voir la checklist « Principes produit » ci-dessus) :
@@ -221,7 +225,15 @@ pas seulement à constater.
    code mort (export non importé et non testé), fichiers < ~300 lignes.
 7. **Commentaires** : utiles seulement (le pourquoi / le non-évident) ; supprimer
    ceux qui paraphrasent le code.
-8. **Documentation** : AGENTS.md (arborescence, règles), `docs/` et `README.md`
+8. **Icônes uniques** : un même glyphe ne représente JAMAIS deux entités
+   différentes. Chaque icône (onglet d'ère, ressource, générateur...) est propre
+   à une seule chose ; en cas de collision, changer l'un des deux (en général
+   l'onglet d'ère, en gardant la ressource = l'objet littéral). Exception : les
+   ressources à symbole chimique (`symbol`) affichent leur **symbole** (C, He,
+   Si...), pas leur glyphe `icon`, donc ne créent pas de doublon visuel. Pour
+   vérifier : extraire tous les `icon:` des données d'ères et confirmer l'unicité
+   (en ignorant les ressources à `symbol`).
+9. **Documentation** : AGENTS.md (arborescence, règles), `docs/` et `README.md`
    reflètent l'état réel du code (nouvelles ères, widgets, systèmes).
 
 ---

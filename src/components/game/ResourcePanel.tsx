@@ -8,7 +8,7 @@ import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { decliningResources, netFlows, stalledResources } from '@/lib/graph'
 import { revealedMachines, revealedResources } from '@/lib/reveal'
-import { COMPLEXITY_ERA_DECAY } from '@/lib/engine'
+import { COMPLEXITY_ERA_DECAY, complexityPerUnit } from '@/lib/engine'
 import { FloaterLayer } from '@/components/ui/FloaterLayer'
 import { formatFixed, formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
@@ -57,8 +57,9 @@ export function ResourcePanel({ era }: { era: EraDef }) {
   const complexityTip = (id: string) => {
     const def = defs.resources[id]
     const gap = latestIndex - eraIndex(def.eraId)
-    const recency = gap <= 0 ? 1 : 1 / COMPLEXITY_ERA_DECAY ** gap
-    const perUnit = `${t('complexity.source')} : +${formatFixed(def.tier * recency)}/u`
+    // Value from the engine's single source, so the tooltip never drifts from
+    // what is actually credited.
+    const perUnit = `${t('complexity.source')} : +${formatFixed(complexityPerUnit(defs, id, latestIndex))}/u`
     return gap > 0
       ? `${perUnit} (${t('complexity.reduced')} ÷${formatNumber(COMPLEXITY_ERA_DECAY ** gap)})`
       : perUnit

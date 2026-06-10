@@ -172,7 +172,8 @@ export const en: Translations = {
   'crisis.overcome.title': 'Crisis overcome',
   'crisis.effect.struck': 'Loss of {pct}% of existing {res}.',
   'crisis.effect.recovered': 'Crisis overcome: life is thriving, output multiplied by {mult}.',
-  'crisisGame.hint': 'Get the creatures to safety from the meteors: click them to send them diving into a burrow.',
+  'crisisGame.hint':
+    'Get the creatures to safety from the meteors: click them to send them diving into a burrow.',
   'crisisGame.aria': 'Survival zone: save the creatures from the falling meteors.',
   'crisisGame.saved': 'Creatures sheltered',
   'crisisGame.creature': 'Shelter this creature',

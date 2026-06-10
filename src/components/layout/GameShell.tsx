@@ -42,11 +42,14 @@ export function GameShell() {
   const era = defs.eras.find((e) => e.id === currentEraId) ?? defs.eras[0]
   const fightingHere = fighting != null && defs.crises[fighting]?.eraId === era.id
   const central = crisisHere ? (
-    fightingHere ? <CrisisGame /> : <CrisisBanner />
+    fightingHere ? (
+      <CrisisGame />
+    ) : (
+      <CrisisBanner />
+    )
   ) : (
     <ClickArea era={era} />
   )
-
 
   return (
     <main
@@ -111,9 +114,7 @@ export function GameShell() {
         {isFullWidthWidget(era.widget) ? (
           // Wide widget (e.g. periodic table): full-width on top, panels below.
           <>
-            <section className="-mt-2 flex justify-center pb-2">
-              {central}
-            </section>
+            <section className="-mt-2 flex justify-center pb-2">{central}</section>
             {/* Resources kept narrow so the wide machines panel fits 3 columns. */}
             <section className="grid gap-4 md:grid-cols-[1fr_3fr]">
               <ResourcePanel era={era} />
@@ -123,9 +124,7 @@ export function GameShell() {
         ) : (
           <section className="grid gap-4 md:grid-cols-[5fr_4fr_5fr]">
             <ResourcePanel era={era} />
-            <div className="flex items-center justify-center py-6">
-              {central}
-            </div>
+            <div className="flex items-center justify-center py-6">{central}</div>
             <PurchasePanel era={era} />
           </section>
         )}

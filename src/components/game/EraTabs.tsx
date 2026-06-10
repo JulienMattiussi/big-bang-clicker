@@ -13,10 +13,6 @@ const TAB_BASE =
 /** flex gap-2 between tabs, in px (used by the fit computation). */
 const TAB_GAP = 8
 
-// TEMP DEBUG: in the dev server only (never in tests/prod), also show and allow
-// visiting the next locked era to preview it. Remove when done.
-const DEBUG_SHOW_NEXT_ERA = import.meta.env.MODE === 'development'
-
 /**
  * Navigation across UNLOCKED eras only (cohabitation). "Chip" style distinct
  * from the verb button: the active tab is an accent outline (non-clickable),
@@ -39,19 +35,10 @@ export function EraTabs() {
   // era ids whose label is shown; null means "not measured yet, show all".
   const [labeled, setLabeled] = useState<Set<string> | null>(null)
 
-  const visible = useMemo(() => {
-    const unlocked = defs.eras.filter((era) => state.unlockedEras.includes(era.id))
-    const next = DEBUG_SHOW_NEXT_ERA
-      ? defs.eras.find((era) => !state.unlockedEras.includes(era.id))
-      : undefined
-    return next ? [...unlocked, next] : unlocked
-  }, [defs.eras, state.unlockedEras])
-
-  // Navigate to an era; for the debug-only locked era, force the view directly.
-  const go = (id: string) => {
-    if (state.unlockedEras.includes(id)) setEra(id)
-    else useGameStore.setState((s) => ({ state: { ...s.state, currentEraId: id } }))
-  }
+  const visible = useMemo(
+    () => defs.eras.filter((era) => state.unlockedEras.includes(era.id)),
+    [defs.eras, state.unlockedEras],
+  )
 
   useLayoutEffect(() => {
     const nav = navRef.current
@@ -123,7 +110,7 @@ export function EraTabs() {
         aria-current={active ? 'true' : undefined}
         aria-label={showLabel ? undefined : name}
         title={showLabel ? undefined : name}
-        onClick={() => go(era.id)}
+        onClick={() => setEra(era.id)}
         className={`${TAB_BASE} ${
           active
             ? 'cursor-default border-accent bg-surface text-accent'
@@ -135,7 +122,10 @@ export function EraTabs() {
         <EraIcon icon={era.icon} className="-m-0.5 h-6 w-6 shrink-0" />
         {/* Label always present (animated collapse/expand); the gap to the icon
             is its own margin so it disappears cleanly when collapsed. */}
-        <span data-label className={`tab-label ${showLabel ? 'tab-label-open' : 'tab-label-closed'}`}>
+        <span
+          data-label
+          className={`tab-label ${showLabel ? 'tab-label-open' : 'tab-label-closed'}`}
+        >
           {name}
         </span>
         {/* Notification badge overlapping the whole tab's corner:

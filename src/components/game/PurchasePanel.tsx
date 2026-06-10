@@ -5,8 +5,10 @@ import { useTranslation } from '@/i18n/useTranslation'
 import {
   canAfford,
   canManualConvert,
-  galetConverterMultiplier,
-  galetGeneratorMultiplier,
+  converterCyclesPerSec,
+  converterOutputMultiplier,
+  converterOutputPerSec,
+  generatorPerSec,
   nextCost,
 } from '@/lib/engine'
 import { revealedMachines } from '@/lib/reveal'
@@ -20,7 +22,14 @@ import {
 } from '@/components/game/MachineRow'
 import { formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
-import type { ConverterDef, EraDef, GaletDef, GameDefs, ResourceAmount, ResourceId } from '@/lib/types'
+import type {
+  ConverterDef,
+  EraDef,
+  GaletDef,
+  GameDefs,
+  ResourceAmount,
+  ResourceId,
+} from '@/lib/types'
 
 function describeCost(cost: Record<ResourceId, number>, defs: GameDefs, t: T): string {
   return Object.entries(cost)
@@ -104,10 +113,13 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
     const def = defs.converters[id]
     if (!canManualConvert(state, defs, id)) return
     manualConvert(id)
-    const g = galetConverterMultiplier(state, defs, id) // pebble boost on the output
     for (const i of def.inputs) spawn(`res:${i.resource}`, `-${formatNumber(i.amount)}`, 'spend')
     for (const o of def.outputs)
-      spawn(`res:${o.resource}`, `+${formatNumber(o.amount * g)}`, 'resource')
+      spawn(
+        `res:${o.resource}`,
+        `+${formatNumber(o.amount * converterOutputMultiplier(state, defs, id, o.resource))}`,
+        'resource',
+      )
   }
 
   return (
@@ -119,14 +131,13 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
             const def = defs.generators[id]
             const level = state.generators[id]?.level ?? 0
             const cost = nextCost(def.cost, level)
-            const gMult = galetGeneratorMultiplier(state, defs, id) // pebble boost
             const produce: FlowEntry[] = [
               {
                 icon: defs.resources[def.output].icon,
                 symbol: defs.resources[def.output].symbol,
                 name: t(defs.resources[def.output].nameKey as TranslationKey),
-                perSec: level * def.baseRate * gMult,
-                nextPerSec: (level + 1) * def.baseRate * gMult,
+                perSec: generatorPerSec(state, defs, id, level),
+                nextPerSec: generatorPerSec(state, defs, id, level + 1),
               },
             ]
             return (
@@ -154,15 +165,24 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
             const converterState = state.converters[id]
             const level = converterState?.level ?? 0
             const cost = nextCost(def.cost, level)
-            const cycles = level * def.baseRate
-            const nextCycles = (level + 1) * def.baseRate
-            const cMult = galetConverterMultiplier(state, defs, id) // pebble boost (output only)
-            const toFlow = (resource: ResourceId, amount: number): FlowEntry => ({
+            const cycles = converterCyclesPerSec(defs, id, level)
+            const nextCycles = converterCyclesPerSec(defs, id, level + 1)
+            // Consumption is the plain recipe rate; production carries the output
+            // multipliers (memory / crisis / pebbles), via the engine helper.
+            const consumeFlow = (resource: ResourceId, amount: number): FlowEntry => ({
               icon: defs.resources[resource].icon,
               symbol: defs.resources[resource].symbol,
               name: t(defs.resources[resource].nameKey as TranslationKey),
               perSec: amount * cycles,
               nextPerSec: amount * nextCycles,
+              era: eraTag(resource),
+            })
+            const produceFlow = (resource: ResourceId, amount: number): FlowEntry => ({
+              icon: defs.resources[resource].icon,
+              symbol: defs.resources[resource].symbol,
+              name: t(defs.resources[resource].nameKey as TranslationKey),
+              perSec: converterOutputPerSec(state, defs, id, resource, amount, level),
+              nextPerSec: converterOutputPerSec(state, defs, id, resource, amount, level + 1),
               era: eraTag(resource),
             })
             return (
@@ -187,8 +207,8 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
                 flows={
                   <MachineFlows
                     t={t}
-                    consume={def.inputs.map((i) => toFlow(i.resource, i.amount))}
-                    produce={def.outputs.map((o) => toFlow(o.resource, o.amount * cMult))}
+                    consume={def.inputs.map((i) => consumeFlow(i.resource, i.amount))}
+                    produce={def.outputs.map((o) => produceFlow(o.resource, o.amount))}
                   />
                 }
               />

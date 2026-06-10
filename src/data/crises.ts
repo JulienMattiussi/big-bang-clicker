@@ -18,8 +18,8 @@ export const crisisDefs: CrisisDef[] = [
       { type: 'resetResource', target: 'flora', value: 0.2 },
     ],
     rebound: [
-      { type: 'multiplier', target: 'fauna', value: 3 },
-      { type: 'multiplier', target: 'flora', value: 3 },
+      { type: 'multiplier', target: 'fauna', value: 10 },
+      { type: 'multiplier', target: 'flora', value: 10 },
     ],
     textKeys: {
       warnKey: 'crisis.extinction.warn',

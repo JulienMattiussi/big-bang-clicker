@@ -6,7 +6,7 @@ const bundles: EraBundle[] = [
     id: 'e5',
     index: 5,
     uiTier: 'life',
-    icon: 'dna',
+    icon: 'dna-strand',
     widget: 'molecule',
     base: { id: 'molecule', icon: 'molecule', tier: 6 },
     combined: { id: 'rna', icon: 'dna', tier: 8 },

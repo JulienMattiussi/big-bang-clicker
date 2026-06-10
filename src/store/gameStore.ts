@@ -116,9 +116,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   manualConvert: (id) => set((s) => ({ state: runManualConvert(s.state, s.defs, id) })),
   manualProduce: (id) => set((s) => ({ state: runManualProduce(s.state, s.defs, id) })),
   setEra: (id) =>
-    set((s) =>
-      s.state.unlockedEras.includes(id) ? commit({ ...s.state, currentEraId: id }) : {},
-    ),
+    set((s) => (s.state.unlockedEras.includes(id) ? commit({ ...s.state, currentEraId: id }) : {})),
   unlockNextEra: () => set((s) => commit(runUnlockNextEra(s.state, s.defs))),
   toggleConverter: (id) =>
     set((s) => {

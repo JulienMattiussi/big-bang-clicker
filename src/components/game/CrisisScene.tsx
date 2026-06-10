@@ -42,7 +42,11 @@ export function CrisisScene({
         <circle key={i} cx={x} cy={y} r="1" fill="var(--color-fg)" opacity="0.35" />
       ))}
       {/* Planet / horizon. */}
-      <path d="M0 118 Q120 92 240 118 L240 140 L0 140 Z" fill="var(--color-fg)" fillOpacity="0.12" />
+      <path
+        d="M0 118 Q120 92 240 118 L240 140 L0 140 Z"
+        fill="var(--color-fg)"
+        fillOpacity="0.12"
+      />
       <path
         d="M0 118 Q120 92 240 118"
         stroke="var(--color-fg)"

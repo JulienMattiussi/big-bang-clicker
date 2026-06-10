@@ -30,7 +30,7 @@ export const era19: EraDef = {
   machinesKey: 'era.e19.machines',
   verbKey: 'era.e19.verb',
   clickResource: 'tension',
-  icon: 'flame',
+  icon: 'burst',
   uiTier: 'transcendence',
   widget: 'cooling',
   unlock: { complexity: 80_000_000_000 },

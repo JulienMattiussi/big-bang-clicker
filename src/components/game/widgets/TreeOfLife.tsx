@@ -22,8 +22,7 @@ interface TreeNode {
   depth: number
 }
 
-const kids = (nodes: TreeNode[], i: number) =>
-  nodes.flatMap((n, j) => (n.parent === i ? [j] : []))
+const kids = (nodes: TreeNode[], i: number) => nodes.flatMap((n, j) => (n.parent === i ? [j] : []))
 
 /**
  * Pre-generate the WHOLE tree up front (structure + each branch's random target

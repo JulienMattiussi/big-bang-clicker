@@ -17,7 +17,9 @@ export function CrisisBanner() {
 
   // Only the crisis(es) belonging to the era currently shown (a crisis stays
   // localised to its era).
-  const ready = readyCrises(state, defs).filter((id) => defs.crises[id].eraId === state.currentEraId)
+  const ready = readyCrises(state, defs).filter(
+    (id) => defs.crises[id].eraId === state.currentEraId,
+  )
   if (ready.length === 0) return null
 
   return (

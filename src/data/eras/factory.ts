@@ -35,6 +35,8 @@ export interface ChainLink {
   nameKey?: string
   /** Recipes per second at level 1 (default 0.5). */
   baseRate?: number
+  /** Units produced per recipe (default 1). */
+  outputAmount?: number
   /** Level-up cost curve (default: 250 of the base resource, growth 1.15). */
   cost?: CostCurve[]
 }
@@ -51,6 +53,8 @@ export interface SimpleEraSpec {
   generatorBase?: number
   /** Generator cost growth per level (default 1.12). */
   generatorGrowth?: number
+  /** Generator output per level (default 1); raises its productivity. */
+  generatorRate?: number
   /** Complexity needed to unlock the era; omit for the starting era. */
   unlockComplexity?: number
 
@@ -58,6 +62,9 @@ export interface SimpleEraSpec {
   combined?: EraResourceSpec
   consumes?: string
   converterId?: string
+  /** Units of `combined` produced per recipe (default 1); raises output without
+   *  touching consumption. */
+  converterOutput?: number
 
   // --- General multi-recipe form (takes precedence over the terse fields). ---
   chain?: ChainLink[]
@@ -84,6 +91,7 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
         {
           produces: spec.combined,
           converterId: spec.converterId,
+          outputAmount: spec.converterOutput,
           inputs: [
             { resource: base.id, amount: 10 },
             { resource: spec.consumes, amount: 1 },
@@ -113,7 +121,7 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
       eraId: id,
       nameKey: `gen.${spec.generatorId}`,
       output: base.id,
-      baseRate: 1,
+      baseRate: spec.generatorRate ?? 1,
       cost: [
         {
           resource: base.id,
@@ -129,7 +137,7 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
     eraId: id,
     nameKey: l.nameKey ?? `conv.${l.converterId}`,
     inputs: l.inputs,
-    outputs: [{ resource: l.produces.id, amount: 1 }],
+    outputs: [{ resource: l.produces.id, amount: l.outputAmount ?? 1 }],
     baseRate: l.baseRate ?? 0.5,
     cost: l.cost ?? [{ resource: base.id, base: 250, growth: 1.15 }],
   }))

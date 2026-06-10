@@ -39,7 +39,7 @@ export interface MemoryLevelConfig {
  */
 export const MEMORY_LEVELS: Record<number, MemoryLevelConfig> = {
   1: { cards: 21, group: 3, symbols: 7, mistakes: 15 },
-  2: { cards: 42, group: 2, symbols: 21, mistakes: 25 },
+  2: { cards: 42, group: 2, symbols: 21, mistakes: 28 },
   3: { cards: 42, group: 3, symbols: 14, mistakes: 30 },
 }
 

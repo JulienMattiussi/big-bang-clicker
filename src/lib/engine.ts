@@ -114,6 +114,57 @@ export function galetConverterMultiplier(
   return conv ? galetMachineMultiplier(state, defs, conv.eraId, 'converterMultiplier') : 1
 }
 
+// --- Production rates (the SINGLE source the tick AND the UI both read, so the
+// "x/s" shown on a machine can never diverge from what is actually produced). ---
+
+/** A generator's output per second at `level` (all multipliers included). */
+export function generatorPerSec(
+  state: GameState,
+  defs: GameDefs,
+  id: GeneratorId,
+  level: number,
+): number {
+  const gen = defs.generators[id]
+  if (!gen) return 0
+  return (
+    level * gen.baseRate * resourceMultiplier(state, gen.output) * galetGeneratorMultiplier(state, defs, id)
+  )
+}
+
+/** A converter's recipe rate (cycles/s) at `level`, uncapped (the input cap is
+ *  tick-only; the machine panel shows this theoretical rate). */
+export function converterCyclesPerSec(defs: GameDefs, id: ConverterId, level: number): number {
+  const conv = defs.converters[id]
+  return conv ? level * conv.baseRate : 0
+}
+
+/** Combined multiplier on ONE converter product (resource bonuses x its pebbles).
+ *  The single source the tick, manual recipes, floaters and panel all reuse, so
+ *  every "amount produced" agrees. Consumption is never multiplied. */
+export function converterOutputMultiplier(
+  state: GameState,
+  defs: GameDefs,
+  id: ConverterId,
+  resource: ResourceId,
+): number {
+  return resourceMultiplier(state, resource) * galetConverterMultiplier(state, defs, id)
+}
+
+/** Per-second amount of one converter PRODUCT at `level` (output multipliers
+ *  included). Consumption rates use plain `inputAmount * cycles` (no multiplier). */
+export function converterOutputPerSec(
+  state: GameState,
+  defs: GameDefs,
+  id: ConverterId,
+  resource: ResourceId,
+  amount: number,
+  level: number,
+): number {
+  return (
+    amount * converterCyclesPerSec(defs, id, level) * converterOutputMultiplier(state, defs, id, resource)
+  )
+}
+
 /**
  * Yield of one manual "verb" action from a widget: it scales with the era's
  * primary generator level (level + 1, so 1 at level 0, 66 at level 65) and with
@@ -239,18 +290,25 @@ function latestUnlockedIndex(state: GameState): number {
   return max
 }
 
-/** Raw Complexity from producing `amount` of a resource, decayed by era recency. */
+/** Complexity produced PER UNIT of a resource (its tier, decayed by how many eras
+ *  back it belongs). Single source of truth: the engine credit AND the UI tooltip
+ *  both read this, so the displayed "+x/u" can never diverge from what's granted. */
+export function complexityPerUnit(defs: GameDefs, resource: ResourceId, latestEra: number): number {
+  const def = defs.resources[resource]
+  const tier = def?.tier ?? 0
+  const gap = latestEra - eraIndexFromId(def?.eraId ?? '')
+  const recency = gap <= 0 ? 1 : 1 / COMPLEXITY_ERA_DECAY ** gap
+  return tier * recency
+}
+
+/** Raw Complexity from producing `amount` of a resource (amount x per-unit). */
 function complexityFor(
   defs: GameDefs,
   resource: ResourceId,
   amount: number,
   latestEra: number,
 ): number {
-  const def = defs.resources[resource]
-  const tier = def?.tier ?? 0
-  const gap = latestEra - eraIndexFromId(def?.eraId ?? '')
-  const recency = gap <= 0 ? 1 : 1 / COMPLEXITY_ERA_DECAY ** gap
-  return amount * tier * recency
+  return amount * complexityPerUnit(defs, resource, latestEra)
 }
 
 /** Applies the next-milestone cap to a raw Complexity gain (no passive overshoot). */
@@ -289,13 +347,11 @@ export function manualConvert(state: GameState, defs: GameDefs, id: ConverterId)
     resources[input.resource] = (resources[input.resource] ?? 0) - input.amount
   }
   const latestEra = latestUnlockedIndex(state)
-  const galet = galetConverterMultiplier(state, defs, id)
   let gained = 0
   for (const output of conv.outputs) {
-    resources[output.resource] =
-      (resources[output.resource] ?? 0) +
-      output.amount * resourceMultiplier(state, output.resource) * galet
-    gained += complexityFor(defs, output.resource, output.amount, latestEra)
+    const produced = output.amount * converterOutputMultiplier(state, defs, id, output.resource)
+    resources[output.resource] = (resources[output.resource] ?? 0) + produced
+    gained += complexityFor(defs, output.resource, produced, latestEra)
   }
   return {
     ...state,
@@ -316,13 +372,11 @@ export function manualProduce(state: GameState, defs: GameDefs, id: ConverterId)
   if (!conv) return state
   const resources = { ...state.resources }
   const latestEra = latestUnlockedIndex(state)
-  const galet = galetConverterMultiplier(state, defs, id)
   let gained = 0
   for (const output of conv.outputs) {
-    resources[output.resource] =
-      (resources[output.resource] ?? 0) +
-      output.amount * resourceMultiplier(state, output.resource) * galet
-    gained += complexityFor(defs, output.resource, output.amount, latestEra)
+    const produced = output.amount * converterOutputMultiplier(state, defs, id, output.resource)
+    resources[output.resource] = (resources[output.resource] ?? 0) + produced
+    gained += complexityFor(defs, output.resource, produced, latestEra)
   }
   return {
     ...state,
@@ -364,13 +418,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     const gen = defs.generators[id]
     if (!gen) continue
     if (frozen.has(gen.output)) continue
-    resources[gen.output] =
-      (resources[gen.output] ?? 0) +
-      level *
-        gen.baseRate *
-        dt *
-        resourceMultiplier(state, gen.output) *
-        galetGeneratorMultiplier(state, defs, id)
+    resources[gen.output] = (resources[gen.output] ?? 0) + generatorPerSec(state, defs, id, level) * dt
   }
 
   // 2. Converters: combination, bounded by available inputs.
@@ -390,15 +438,16 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     }
     if (cycles <= 0) continue
 
-    const convGalet = galetConverterMultiplier(state, defs, id)
     for (const input of conv.inputs) {
       resources[input.resource] = (resources[input.resource] ?? 0) - input.amount * cycles
     }
     for (const output of conv.outputs) {
-      resources[output.resource] =
-        (resources[output.resource] ?? 0) +
-        output.amount * cycles * resourceMultiplier(state, output.resource) * convGalet
-      gained += complexityFor(defs, output.resource, output.amount * cycles, latestEra)
+      // Complexity follows the ACTUAL output (multipliers included), so a memory
+      // bonus / crisis rebound / galet boosts progression as much as the stock.
+      const produced =
+        output.amount * cycles * converterOutputMultiplier(state, defs, id, output.resource)
+      resources[output.resource] = (resources[output.resource] ?? 0) + produced
+      gained += complexityFor(defs, output.resource, produced, latestEra)
     }
   }
 

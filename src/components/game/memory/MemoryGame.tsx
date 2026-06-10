@@ -1,5 +1,6 @@
-import { useState, type KeyboardEvent } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
+import { Modal } from '@/components/ui/Modal'
 import { Icon } from '@/components/ui/Icon'
 import { EraIcon } from '@/components/game/EraIcon'
 import { EraSymbolCluster } from '@/components/game/memory/Answer42'
@@ -134,11 +135,8 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
     }
   }
 
-  const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key !== 'Escape') return
-    if (confirmQuit) setConfirmQuit(false)
-    else requestClose()
-  }
+  // Escape backs out of the quit confirmation first, otherwise requests close.
+  const onEscape = () => (confirmQuit ? setConfirmQuit(false) : requestClose())
 
   // Wording for the next attempt described by the start/result panels.
   const goalKey: TranslationKey =
@@ -146,217 +144,213 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
   const isHalf = upcomingCfg.cards === 21
 
   return (
-    <div
-      className="modal-overlay fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      onKeyDown={onKeyDown}
+    <Modal
+      onClose={onEscape}
+      labelledBy="memory-title"
+      className="modal-in relative flex h-full max-h-[92vh] w-full max-w-5xl flex-col rounded-lg border border-octarine/40 bg-surface p-6 text-fg shadow-xl"
     >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="memory-title"
-        className="modal-in relative flex h-full max-h-[92vh] w-full max-w-5xl flex-col rounded-lg border border-octarine/40 bg-surface p-6 text-fg shadow-xl"
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Icon name="card" className="h-10 w-10 shrink-0 text-octarine" />
-            <div>
-              <h2 id="memory-title" className="text-xl font-bold">
-                {t('memory.title')}
-              </h2>
-              <p className="text-sm text-muted">{t('memory.subtitle')}</p>
-              {era ? (
-                <p className="mt-0.5 flex items-center gap-1.5 text-sm">
-                  <span className="text-muted">{t('memory.forEra')} :</span>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <Icon name="card" className="h-10 w-10 shrink-0 text-octarine" />
+          <div>
+            <h2 id="memory-title" className="text-xl font-bold">
+              {t('memory.title')}
+            </h2>
+            <p className="text-sm text-muted">{t('memory.subtitle')}</p>
+            {era ? (
+              <p className="mt-0.5 flex items-center gap-1.5 text-sm">
+                <span className="text-muted">{t('memory.forEra')} :</span>
+                <span
+                  data-tier={era.uiTier}
+                  className="inline-flex items-center gap-1 font-semibold text-accent"
+                >
+                  <EraIcon icon={era.icon} className="h-4 w-4" />
+                  {eraName}
+                </span>
+              </p>
+            ) : null}
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          {phase === 'play' ? (
+            <span className="text-sm text-muted">
+              {t('memory.mistakesLeft')} :{' '}
+              <span className="font-bold tabular-nums text-fg">
+                {Math.max(0, cfg.mistakes - mistakes)}
+              </span>
+            </span>
+          ) : null}
+          <Button variant="ghost" onClick={requestClose}>
+            {t('memory.close')}
+          </Button>
+        </div>
+      </div>
+
+      <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto py-4">
+        {/* Board: interactive while playing, dimmed behind the panel otherwise. */}
+        <div
+          className={`grid w-full max-w-xl grid-cols-7 gap-2 transition duration-300 ${
+            phase === 'play' ? '' : 'pointer-events-none scale-[0.98] opacity-30 blur-[2px]'
+          }`}
+        >
+          {cards.map((c, i) => {
+            const up = c.flipped || c.matched
+            // Tint a revealed face in its resource's era palette (data-tier).
+            const tier = defs.eras.find((e) => e.id === c.res.eraId)?.uiTier
+            return (
+              <button
+                key={c.key}
+                type="button"
+                data-tier={up ? tier : undefined}
+                onClick={() => flip(i)}
+                disabled={phase !== 'play' || up || busy}
+                aria-label={up ? t(c.res.nameKey as TranslationKey) : t('memory.cardBack')}
+                className={`flex aspect-5/7 items-center justify-center overflow-hidden rounded-md border transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                  c.matched
+                    ? 'border-accent/70 bg-accent/15 opacity-80'
+                    : up
+                      ? 'border-accent bg-accent/10'
+                      : 'border-octarine/40 bg-bg hover:brightness-125'
+                }`}
+              >
+                {up ? <CardFace res={c.res} /> : <CardBack />}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Start / won / lost panel, centred over the (dimmed) board. */}
+        {phase !== 'play' ? (
+          <div className="absolute inset-0 flex items-center justify-center p-4">
+            <div className="modal-in flex max-w-md flex-col items-center gap-3 rounded-xl border border-octarine/40 bg-surface/95 p-6 text-center shadow-2xl backdrop-blur">
+              {/* At level 1 (21 cards): only half the universe's memory is open yet. */}
+              {isHalf ? (
+                <p className="text-sm text-octarine/90 italic">{t('memory.half')}</p>
+              ) : null}
+              {phase === 'won' ? (
+                <p className="text-lg font-bold text-accent">{t('memory.win.title')}</p>
+              ) : null}
+              {phase === 'lost' ? (
+                <p className="text-lg font-bold text-muted">{t('memory.lose.title')}</p>
+              ) : null}
+              {phase === 'won' ? (
+                <p className="text-muted">
+                  {t('memory.win.production')}{' '}
+                  <span className="inline-flex items-center gap-1 align-middle font-semibold text-secondary">
+                    {mainRes?.symbol ? (
+                      <span className="text-sm font-bold">{mainRes.symbol}</span>
+                    ) : mainRes ? (
+                      <Icon name={mainRes.icon} className="h-4 w-4" aria-hidden />
+                    ) : null}
+                    {mainName}
+                  </span>
+                  {' ('}
                   <span
-                    data-tier={era.uiTier}
-                    className="inline-flex items-center gap-1 font-semibold text-accent"
+                    data-tier={era?.uiTier}
+                    className="inline-flex items-center gap-1 align-middle font-semibold text-accent"
                   >
                     <EraIcon icon={era.icon} className="h-4 w-4" />
                     {eraName}
                   </span>
+                  {') '}
+                  {t('memory.win.doubled')}
                 </p>
-              ) : null}
-            </div>
-          </div>
-          <div className="flex items-center gap-4">
-            {phase === 'play' ? (
-              <span className="text-sm text-muted">
-                {t('memory.mistakesLeft')} :{' '}
-                <span className="font-bold tabular-nums text-fg">
-                  {Math.max(0, cfg.mistakes - mistakes)}
-                </span>
-              </span>
-            ) : null}
-            <Button variant="ghost" onClick={requestClose}>
-              {t('memory.close')}
-            </Button>
-          </div>
-        </div>
-
-        <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-y-auto py-4">
-          {/* Board: interactive while playing, dimmed behind the panel otherwise. */}
-          <div
-            className={`grid w-full max-w-xl grid-cols-7 gap-2 transition duration-300 ${
-              phase === 'play' ? '' : 'pointer-events-none scale-[0.98] opacity-30 blur-[2px]'
-            }`}
-          >
-            {cards.map((c, i) => {
-              const up = c.flipped || c.matched
-              // Tint a revealed face in its resource's era palette (data-tier).
-              const tier = defs.eras.find((e) => e.id === c.res.eraId)?.uiTier
-              return (
-                <button
-                  key={c.key}
-                  type="button"
-                  data-tier={up ? tier : undefined}
-                  onClick={() => flip(i)}
-                  disabled={phase !== 'play' || up || busy}
-                  aria-label={up ? t(c.res.nameKey as TranslationKey) : t('memory.cardBack')}
-                  className={`flex aspect-5/7 items-center justify-center overflow-hidden rounded-md border transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-                    c.matched
-                      ? 'border-accent/70 bg-accent/15 opacity-80'
-                      : up
-                        ? 'border-accent bg-accent/10'
-                        : 'border-octarine/40 bg-bg hover:brightness-125'
-                  }`}
-                >
-                  {up ? <CardFace res={c.res} /> : <CardBack />}
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Start / won / lost panel, centred over the (dimmed) board. */}
-          {phase !== 'play' ? (
-            <div className="absolute inset-0 flex items-center justify-center p-4">
-              <div className="modal-in flex max-w-md flex-col items-center gap-3 rounded-xl border border-octarine/40 bg-surface/95 p-6 text-center shadow-2xl backdrop-blur">
-                {/* At level 1 (21 cards): only half the universe's memory is open yet. */}
-                {isHalf ? (
-                  <p className="text-sm text-octarine/90 italic">{t('memory.half')}</p>
-                ) : null}
-                {phase === 'won' ? (
-                  <p className="text-lg font-bold text-accent">{t('memory.win.title')}</p>
-                ) : null}
-                {phase === 'lost' ? (
-                  <p className="text-lg font-bold text-muted">{t('memory.lose.title')}</p>
-                ) : null}
-                {phase === 'won' ? (
-                  <p className="text-muted">
-                    {t('memory.win.production')}{' '}
-                    <span className="inline-flex items-center gap-1 align-middle font-semibold text-secondary">
-                      {mainRes?.symbol ? (
-                        <span className="text-sm font-bold">{mainRes.symbol}</span>
-                      ) : mainRes ? (
-                        <Icon name={mainRes.icon} className="h-4 w-4" aria-hidden />
-                      ) : null}
-                      {mainName}
-                    </span>
-                    {' ('}
-                    <span
-                      data-tier={era?.uiTier}
-                      className="inline-flex items-center gap-1 align-middle font-semibold text-accent"
-                    >
-                      <EraIcon icon={era.icon} className="h-4 w-4" />
-                      {eraName}
-                    </span>
-                    {') '}
-                    {t('memory.win.doubled')}
-                  </p>
-                ) : phase === 'lost' ? (
-                  <p className="text-muted">{t('memory.lose.body')}</p>
-                ) : maxed ? (
-                  <>
-                    <p className="text-lg font-bold text-accent">{t('memory.maxed.title')}</p>
-                    <p className="text-muted">{t('memory.maxed.body')}</p>
-                  </>
-                ) : (
-                  <p className="text-muted">
-                    {t('memory.reward')}{' '}
-                    <span className="inline-flex items-center gap-1 align-middle font-semibold text-secondary">
-                      {mainRes?.symbol ? (
-                        <span className="text-sm font-bold">{mainRes.symbol}</span>
-                      ) : mainRes ? (
-                        <Icon name={mainRes.icon} className="h-4 w-4" aria-hidden />
-                      ) : null}
-                      {mainName}
-                    </span>
-                    .
-                  </p>
-                )}
-
-                {!maxed ? (
-                  <>
-                    {/* Large era-symbol cluster (pair or triplet) between title and rules. */}
-                    {era ? (
-                      <span data-tier={era.uiTier} className="my-1 text-accent">
-                        <EraSymbolCluster eraIcon={era.icon} count={upcomingCfg.group} className="h-20" />
-                      </span>
+              ) : phase === 'lost' ? (
+                <p className="text-muted">{t('memory.lose.body')}</p>
+              ) : maxed ? (
+                <>
+                  <p className="text-lg font-bold text-accent">{t('memory.maxed.title')}</p>
+                  <p className="text-muted">{t('memory.maxed.body')}</p>
+                </>
+              ) : (
+                <p className="text-muted">
+                  {t('memory.reward')}{' '}
+                  <span className="inline-flex items-center gap-1 align-middle font-semibold text-secondary">
+                    {mainRes?.symbol ? (
+                      <span className="text-sm font-bold">{mainRes.symbol}</span>
+                    ) : mainRes ? (
+                      <Icon name={mainRes.icon} className="h-4 w-4" aria-hidden />
                     ) : null}
-                    {/* Level details (board size, set size, mistakes) of the next attempt. */}
-                    <div className="flex flex-col gap-1 text-sm text-muted">
-                      <p>
-                        <span className="font-semibold text-octarine">
-                          {t('memory.level')} {upcomingLevel}/{MEMORY_MAX_LEVEL}
-                        </span>{' '}
-                        - {upcomingCfg.cards} {t('memory.cards')}, {t(goalKey)}
-                      </p>
-                      <p>
-                        {t('memory.consumes')}{' '}
-                        <span className="inline-flex items-center gap-1 align-middle font-bold text-octarine">
-                          <Icon name="gem" className="h-4 w-4" aria-hidden />
-                          {formatFixed(cost)}
-                        </span>{' '}
-                        {t('app.complexity')}
-                      </p>
-                      <p>
-                        {t('memory.mistakesAllowed')} :{' '}
-                        <span className="font-bold tabular-nums text-fg">
-                          {upcomingCfg.mistakes}
-                        </span>
-                      </p>
-                    </div>
-                  </>
-                ) : null}
+                    {mainName}
+                  </span>
+                  .
+                </p>
+              )}
 
-                <div className="flex items-center gap-3">
-                  <Button variant="ghost" onClick={onClose}>
-                    {maxed
-                      ? t('memory.close')
-                      : phase === 'start'
-                        ? t('memory.cancel')
-                        : phase === 'won'
-                          ? t('memory.stop')
-                          : t('memory.giveUp')}
-                  </Button>
-                  {!maxed ? (
-                    <Button onClick={play} disabled={!affordable}>
-                      {phase === 'start' ? t('memory.play') : t('memory.replay')}
-                    </Button>
+              {!maxed ? (
+                <>
+                  {/* Large era-symbol cluster (pair or triplet) between title and rules. */}
+                  {era ? (
+                    <span data-tier={era.uiTier} className="my-1 text-accent">
+                      <EraSymbolCluster
+                        eraIcon={era.icon}
+                        count={upcomingCfg.group}
+                        className="h-20"
+                      />
+                    </span>
                   ) : null}
-                </div>
-                {!maxed && !affordable ? (
-                  <p className="text-xs text-muted">{t('memory.tooPoor')}</p>
+                  {/* Level details (board size, set size, mistakes) of the next attempt. */}
+                  <div className="flex flex-col gap-1 text-sm text-muted">
+                    <p>
+                      <span className="font-semibold text-octarine">
+                        {t('memory.level')} {upcomingLevel}/{MEMORY_MAX_LEVEL}
+                      </span>{' '}
+                      - {upcomingCfg.cards} {t('memory.cards')}, {t(goalKey)}
+                    </p>
+                    <p>
+                      {t('memory.consumes')}{' '}
+                      <span className="inline-flex items-center gap-1 align-middle font-bold text-octarine">
+                        <Icon name="gem" className="h-4 w-4" aria-hidden />
+                        {formatFixed(cost)}
+                      </span>{' '}
+                      {t('app.complexity')}
+                    </p>
+                    <p>
+                      {t('memory.mistakesAllowed')} :{' '}
+                      <span className="font-bold tabular-nums text-fg">{upcomingCfg.mistakes}</span>
+                    </p>
+                  </div>
+                </>
+              ) : null}
+
+              <div className="flex items-center gap-3">
+                <Button variant="ghost" onClick={onClose}>
+                  {maxed
+                    ? t('memory.close')
+                    : phase === 'start'
+                      ? t('memory.cancel')
+                      : phase === 'won'
+                        ? t('memory.stop')
+                        : t('memory.giveUp')}
+                </Button>
+                {!maxed ? (
+                  <Button onClick={play} disabled={!affordable}>
+                    {phase === 'start' ? t('memory.play') : t('memory.replay')}
+                  </Button>
                 ) : null}
               </div>
-            </div>
-          ) : null}
-        </div>
-
-        {/* Quit confirmation: leaving mid-game forfeits the staked Complexity. */}
-        {confirmQuit ? (
-          <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/60 p-4">
-            <div className="modal-in flex max-w-sm flex-col items-center gap-4 rounded-xl border border-octarine/40 bg-surface p-6 text-center shadow-2xl">
-              <p className="leading-relaxed text-fg">{t('memory.quit.body')}</p>
-              <div className="flex gap-3">
-                <Button variant="ghost" onClick={() => setConfirmQuit(false)}>
-                  {t('memory.quit.cancel')}
-                </Button>
-                <Button onClick={onClose}>{t('memory.quit.confirm')}</Button>
-              </div>
+              {!maxed && !affordable ? (
+                <p className="text-xs text-muted">{t('memory.tooPoor')}</p>
+              ) : null}
             </div>
           </div>
         ) : null}
       </div>
-    </div>
+
+      {/* Quit confirmation: leaving mid-game forfeits the staked Complexity. */}
+      {confirmQuit ? (
+        <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-black/60 p-4">
+          <div className="modal-in flex max-w-sm flex-col items-center gap-4 rounded-xl border border-octarine/40 bg-surface p-6 text-center shadow-2xl">
+            <p className="leading-relaxed text-fg">{t('memory.quit.body')}</p>
+            <div className="flex gap-3">
+              <Button variant="ghost" onClick={() => setConfirmQuit(false)}>
+                {t('memory.quit.cancel')}
+              </Button>
+              <Button onClick={onClose}>{t('memory.quit.confirm')}</Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </Modal>
   )
 }

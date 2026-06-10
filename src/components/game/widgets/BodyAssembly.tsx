@@ -112,9 +112,7 @@ function PartGlyph({ id, filled }: { id: PartId; filled: boolean }): ReactElemen
             <rect key={k} x="4" y={6 + k * 5} width="16" height="3.4" rx="1.7" fill={f} {...s} />
           ))
         : null}
-      {id === 'appendage' ? (
-        <path d="M5 5 Q21 7 17 20 Q13 12 5 11 Z" fill={f} {...s} />
-      ) : null}
+      {id === 'appendage' ? <path d="M5 5 Q21 7 17 20 Q13 12 5 11 Z" fill={f} {...s} /> : null}
       {id === 'spine' ? (
         <>
           <polygon points="3,20 6,7 9,20" fill={f} {...s} />
@@ -268,7 +266,12 @@ export function BodyAssembly({ era }: { era: EraDef }) {
   useEffect(() => {
     if (status === null) return
     const tm = setTimeout(() => {
-      setPlan(makePlan(planRef.current.org, beltRef.current.map((p) => p.id)))
+      setPlan(
+        makePlan(
+          planRef.current.org,
+          beltRef.current.map((p) => p.id),
+        ),
+      )
       setStatus(null)
       setCycle((c) => c + 1)
     }, EXIT_MS)
