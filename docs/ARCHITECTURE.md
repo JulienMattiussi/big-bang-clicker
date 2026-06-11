@@ -33,11 +33,11 @@ Voir aussi [AGENTS.md](../AGENTS.md). Détail data-driven :
 src/
 ├── lib/                  # logique pure (zéro React, testée)
 │   ├── types.ts          # types du domaine (Def + State)
-│   ├── engine.ts         # tick, coûts (arrondis), achats, conversion manuelle, multiplicateurs de galets, clickYield, palier
+│   ├── engine.ts         # tick, coûts (arrondis), achats, conversion manuelle, débits single-source (generatorPerSec/converterOutputPerSec, réutilisés par l'UI), Complexité = production réelle (complexityPerUnit), palier (gelé en crise)
 │   ├── graph.ts          # flux nets réels + alertes (déclin / production à zéro), dépendances, tri
 │   ├── reveal.ts         # dévoilement progressif (machines / ressources)
 │   ├── events.ts         # évènements narratifs déclenchés (transitions, crises, tuto)
-│   ├── crises.ts         # risque, déclenchement, effets
+│   ├── crises.ts         # risque (plancher + excès), déclenchement, gel de production, régression/rebond
 │   ├── prestige.ts       # Échos, reset New Game+
 │   ├── meta.ts           # méta-upgrades de prestige
 │   ├── save.ts           # état initial, sérialisation versionnée + migrations, idle, export/import
@@ -52,13 +52,14 @@ src/
 │   ├── galets.ts         # définitions des galets de l'infini
 │   └── index.ts          # agrégation typée (defs)
 ├── store/                # stores Zustand (gameStore persisté ; les autres transitoires)
-│   ├── gameStore.ts      # état de jeu + actions + persistance
+│   ├── gameStore.ts      # état de jeu + actions + persistance (sauve AUSSITÔT les actions de progression discrètes : achat, déblocage, prestige, crise, galet, mémoire)
 │   ├── feedbackStore.ts  # nombres flottants transitoires (+X / -X)
 │   ├── clickPulse.ts     # signal générique "verbe activé" (widgets passifs, ex. jauge)
-│   ├── eventStore.ts     # file des modales d'évènements
+│   ├── eventStore.ts     # file des modales d'évènements (transitions, crises, import de save...)
 │   ├── memoryStore.ts    # signal transitoire du mini-jeu de mémoire (flash du bouton)
 │   ├── inventoryStore.ts # signal transitoire du sac à dos (flash/atterrissage du bouton)
-│   └── galetStore.ts     # signal transitoire : galet découvert qui se pose sur son socle (FLIP)
+│   ├── galetStore.ts     # signal transitoire : galet découvert qui se pose sur son socle (FLIP)
+│   └── crisisStore.ts    # mini-jeu de crise en cours (id + créatures sauvées ; transitoire)
 ├── i18n/                 # i18n custom (voir section 10) ; locale persistée en localStorage
 ├── hooks/
 │   ├── useTick.ts        # boucle de jeu + autosauvegarde (+ sauvegarde à la fermeture)
@@ -67,8 +68,8 @@ src/
 │   ├── useEraMechanic.ts # geste de clic d'une ère (gain de base + complétion gratuite)
 │   └── useMilestone.ts   # données du palier suivant (jauge NextGoal + bouton MilestoneButton)
 ├── components/
-│   ├── ui/               # primitives (Button, Panel, Icon + glyphs/ un fichier par glyphe, IconBadge, AlertBadge, FloaterLayer...)
-│   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, bannières, galets, EventModal
+│   ├── ui/               # primitives (Button, Panel, Modal (scrim/dialog/Escape partagés), Icon + glyphs/ un fichier par glyphe, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, galets ; modales (EventModal + EventHero, layout « hero » partagé) ; crise (CrisisBanner, CrisisGame plein écran, CrisisScene, ResourceCrisisBadge)
 │   │   ├── memory/       # mini-jeu de mémoire : MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42 (+EraSymbolCluster), police Neogen
 │   │   ├── inventory/    # sac à dos : InventoryButton/InventoryModal
 │   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
@@ -208,22 +209,26 @@ function tick(state: GameState, defs: GameDefs, dt: number): GameState
 
 Étapes d'un tick :
 
-1. **Production des générateurs** : pour chaque générateur, `output +=
-   level * baseRate * multiplicateurs * dt`.
+1. **Production des générateurs** : via `generatorPerSec(state, defs, id, level)`
+   (`level * baseRate * multiplicateurs`) - **la même fonction** que celle lue par
+   le panneau machines, pour que l'affichage ne diverge jamais de la production
+   réelle. Idem côté convertisseurs (`converterOutputPerSec` / `converterOutputMultiplier`).
 2. **Conversions (usines)** : pour chaque convertisseur actif, calculer le
    nombre de cycles réalisables sur `dt` **limité par les entrées
    disponibles**. Consommer les entrées, produire les sorties.
    - **Pas de blocage dur** (règle GAME-DESIGN 3.1ter) : la consommation est
      clampée aux stocks disponibles ; les ressources de base gardent une
      production minimale.
-3. **Complexité** : chaque conversion crédite de la Complexité, **pondérée par
-   le `tier`** de la sortie (plus c'est profond, plus ça rapporte) ET
-   **décroissante avec l'ancienneté de l'ère** (`COMPLEXITY_ERA_DECAY = 50` :
-   une ère antérieure rapporte ÷50, ÷2500 deux ères plus tôt...), puis
-   **plafonnée au coût du prochain palier** (pas de dépassement passif). La
-   Complexité ne **recule que sur les crises**.
-4. **Risque des crises** : mis à jour par `updateRisk` (composé avec `tick`
-   dans le store), voir section 7.
+3. **Complexité** : chaque conversion crédite de la Complexité = quantité
+   **réellement produite** (multiplicateurs inclus : mémoire, galets, rebond de
+   crise, méta) × `complexityPerUnit` (le `tier` de la sortie **décroissant avec
+   l'ancienneté de l'ère**, `COMPLEXITY_ERA_DECAY = 50`). Source unique
+   `complexityPerUnit` (le tooltip de l'UI la relit, pas de formule dupliquée).
+   Puis **plafonnée au coût du prochain palier**. La Complexité ne **recule que
+   sur les crises**.
+4. **Risque & gel des crises** : `updateRisk` (composé avec `tick`) ; tant qu'une
+   crise est déclenchée non résolue, la **production de ses ressources est gelée**
+   (et `canUnlockNextEra` renvoie `false`), voir section 7.
 
 Hors `tick` (actions, dans le store / le moteur) :
 
@@ -268,15 +273,21 @@ mise en arrière-plan** de la page (`pagehide` / `visibilitychange`).
 
 Implémente la mécanique de [GAME-DESIGN.md](./GAME-DESIGN.md) section 6 :
 
-- **Montée du risque** : la jauge `crises[id].risk` augmente selon
-  `risk.sourceResource` (sur-exploitation) ou une règle dédiée.
+- **Montée du risque** : la jauge `crises[id].risk` monte sur l'**excès** de
+  `risk.sourceResource` au-dessus d'un **`floor`** (dormante en dessous : pas de
+  crise sur une ressource à peine développée).
 - **Déclenchement** : `threshold` (auto au seuil), `player` (action explicite),
   ou `probabilistic` (au-delà d'un seuil).
-- **Régression** : applique `regression` (ex : `resetResource`,
-  `resetGenerator` partiels). Jamais de reset total ni de blocage.
-- **Rebond** : applique `rebound` (ex : `transformResource` pour changer une
-  ressource en une meilleure, `multiplier` permanent, `unlock`).
-- Bénéfice **net positif à terme** garanti par l'équilibrage.
+- **Gel + porte** : tant que `isCrisisReady` est vrai, le `tick` **gèle la
+  production** des ressources touchées (source + cibles régression/rebond) et
+  `canUnlockNextEra` renvoie `false` : on ne peut pas progresser sans résoudre.
+- **Régression** puis **rebond** (`resetResource` partiel puis `multiplier`
+  permanent, etc.). Bénéfice **net positif à terme**. Jamais de cul-de-sac.
+- **Résolution interactive** : une crise peut exposer un **mini-jeu** (composant,
+  hors `crises.ts`) au lieu d'un bouton. L'extinction (ère 10) : `CrisisGame`
+  plein écran (sauver 50 créatures), piloté par `crisisStore` (transitoire) ;
+  `CrisisBanner` annonce/lance, `CrisisScene` illustre, `ResourceCrisisBadge`
+  marque les ressources touchées. Voir [GAME-DESIGN](./GAME-DESIGN.md) 6.4.
 
 ## 8. Prestige (prestige.ts)
 

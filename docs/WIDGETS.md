@@ -1,8 +1,9 @@
 # Big Bang Clicker - Catalogue de conception des widgets-mécaniques
 
-> **Statut : implémentés.** Les 10 widgets des ères 4 à 13 décrits ici sont
-> codés et branchés (`src/components/game/widgets/`, registre `interactive.ts`).
-> Ce document reste la référence de conception.
+> **Statut : implémentés.** Les widgets des ères 4 à 13 décrits ici sont codés et
+> branchés (`src/components/game/widgets/`, registre `interactive.ts`), plus un
+> widget de **crise** plein écran (survie à l'extinction, ère 10). Ce document
+> reste la référence de conception.
 >
 > Conception des widgets des **ères 4 à 13** (les ères 0-3 étaient déjà
 > implémentées). Respecte le
@@ -206,6 +207,16 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
    racine --+--- (branche B) === vivante, produit
             o--- (branche C)  X  eteinte (extinction) -> une mineure rebondit
 ```
+
+### Crise (ère 10) - survie à l'extinction (plein écran)
+
+Une crise peut se résoudre par son **propre mini-jeu**, pas seulement un bouton.
+À l'extinction de masse, la modale d'annonce porte **« Affronter »** : la fermer
+lance un widget plein écran où des **météores tombent au hasard** sur toute la
+largeur tandis que de petites **créatures** (rats, raptors) errent au sol. On les
+**clique pour les faire plonger dans un terrier** (en pente) avant qu'un impact
+ne les fauche ; **50 sauvetages** surmontent la crise. Voir [GAME-DESIGN](./GAME-DESIGN.md)
+section 6.4 (`CrisisGame`, `CrisisBanner`, `CrisisScene`, `crisisStore`).
 
 ## Ère 11 - Intelligence : constellation d'idées (mémoire)
 

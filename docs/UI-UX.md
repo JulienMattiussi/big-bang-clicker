@@ -175,8 +175,15 @@ conteneurs HTML.
 - **Dark mode** d'abord (thème cosmique sombre), clair en option.
 - **Typo** : une police lisible pour l'UI, éventuellement une police d'accent
   pour le narratif. Pas de tiret long dans les textes (règle dépôt).
-- **Composants UI primitifs** : `Button`, `Panel`, `Resource`, `Number`
-  (formaté via `lib/format.ts`), `Tooltip`, `Tab`. Réutilisés partout.
+- **Composants UI primitifs** : `Button`, `Panel`, `Modal` (scrim + dialog +
+  Escape + ARIA, partagé par toutes les modales), `Icon` (+ `glyphs/`), `Number`
+  (formaté via `lib/format.ts`). Réutilisés partout.
+- **Icônes uniques** : un glyphe ne représente **jamais deux choses
+  différentes** (onglet d'ère, ressource, générateur...). En cas de collision, on
+  change l'un des deux (en général l'onglet d'ère, la ressource gardant l'objet
+  littéral). Exception : les ressources à symbole chimique affichent leur
+  **symbole** (C, He...), pas leur glyphe. Voir [AGENTS](../AGENTS.md) (checkup,
+  point 8).
 - **Animations** : sobres et informatives (une combinaison réussie, un
   déblocage). Respecter `prefers-reduced-motion`.
 - **Responsive** : desktop en 3 colonnes ; mobile en colonnes empilées avec la

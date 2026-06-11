@@ -2,9 +2,10 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
+import { useEventStore } from '@/store/eventStore'
 import { useTranslation } from '@/i18n/useTranslation'
 
-type Status = 'idle' | 'copied' | 'ok' | 'error'
+type Status = 'idle' | 'copied' | 'error'
 
 /** Save management menu: export, import, reset. */
 export function SaveMenu() {
@@ -33,6 +34,21 @@ function SavePanel({ onDone }: { onDone: () => void }) {
   const importSave = useGameStore((s) => s.importSave)
   const reset = useGameStore((s) => s.reset)
   const persist = useGameStore((s) => s.persist)
+  const enqueue = useEventStore((s) => s.enqueue)
+
+  // Confirm a successful import with a modal (the imported state replaced the
+  // game), then close the menu. Failures keep their inline message.
+  const onImported = (ok: boolean) => {
+    if (!ok) return setStatus('error')
+    enqueue({
+      id: 'save:imported',
+      tone: 'transition',
+      titleKey: 'save.imported.title',
+      bodyKey: 'save.imported.body',
+      icon: 'upload',
+    })
+    onDone()
+  }
 
   // The export must reflect the LIVE game state, not a snapshot frozen when the
   // panel opened (the game keeps ticking). Seed with the state at open, flush to
@@ -72,14 +88,12 @@ function SavePanel({ onDone }: { onDone: () => void }) {
     window.setTimeout(onDone, 400)
   }
 
-  const doImport = () => setStatus(importSave(importText.trim()) ? 'ok' : 'error')
+  const doImport = () => onImported(importSave(importText.trim()))
 
   // Import directly from a chosen file (no copy-paste).
   const importFromFile = async (file: File) => {
     const text = await file.text()
-    const ok = importSave(text.trim())
-    setStatus(ok ? 'ok' : 'error')
-    if (ok) window.setTimeout(onDone, 700)
+    onImported(importSave(text.trim()))
   }
 
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -162,9 +176,6 @@ function SavePanel({ onDone }: { onDone: () => void }) {
             <Icon name="upload" className="mr-1 inline h-4 w-4 align-text-bottom" />
             {t('save.import')}
           </Button>
-          {status === 'ok' ? (
-            <p className="text-xs text-accent">{t('save.importSuccess')}</p>
-          ) : null}
           {status === 'error' ? (
             <p className="text-xs text-red-400">{t('save.importError')}</p>
           ) : null}

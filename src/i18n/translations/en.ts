@@ -213,7 +213,8 @@ export const en: Translations = {
   'save.download': 'Download',
   'save.importPlaceholder': 'Paste your save code here',
   'save.importError': 'Invalid save code',
-  'save.importSuccess': 'Save imported',
+  'save.imported.title': 'Save imported',
+  'save.imported.body': 'Your progress has been restored from the save.',
   'save.reset': 'Reset',
   'save.resetConfirm': 'Confirm reset?',
 
@@ -228,7 +229,7 @@ export const en: Translations = {
   'res.helium': 'Helium',
   'res.carbon': 'Carbon',
   'res.silicon': 'Silicon',
-  'res.heavyElement': 'Heavy elements',
+  'res.heavyElement': 'Iron',
   'res.dust': 'Dust',
   'res.planet': 'Planet',
   'res.molecule': 'Molecules',

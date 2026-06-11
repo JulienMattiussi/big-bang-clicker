@@ -213,7 +213,8 @@ export const fr = {
   'save.download': 'Télécharger',
   'save.importPlaceholder': 'Colle ici ton code de sauvegarde',
   'save.importError': 'Code de sauvegarde invalide',
-  'save.importSuccess': 'Sauvegarde importée',
+  'save.imported.title': 'Sauvegarde importée',
+  'save.imported.body': 'Ta progression a été restaurée à partir de la sauvegarde.',
   'save.reset': 'Réinitialiser',
   'save.resetConfirm': 'Confirmer la réinitialisation ?',
 
@@ -228,7 +229,7 @@ export const fr = {
   'res.helium': 'Hélium',
   'res.carbon': 'Carbone',
   'res.silicon': 'Silicium',
-  'res.heavyElement': 'Éléments lourds',
+  'res.heavyElement': 'Fer',
   'res.dust': 'Poussière',
   'res.planet': 'Planète',
   'res.molecule': 'Molécules',

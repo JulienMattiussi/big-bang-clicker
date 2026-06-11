@@ -83,14 +83,15 @@ export function AtmosphereBalance({ era }: { era: EraDef }) {
           aria-valuenow={Math.round(pos)}
           className="relative h-7 flex-1 overflow-hidden rounded-full border border-border"
           style={{
-            backgroundImage:
-              'linear-gradient(90deg, var(--color-secondary), var(--color-surface) 45%, var(--color-accent))',
+            // CO2 (blue) -> a GREEN plateau over the exact target zone -> O2
+            // (orange). Green is a deliberate "safe zone" colour (not a tier token).
+            backgroundImage: `linear-gradient(90deg, var(--color-secondary), #22c55e ${ZONE_LO}%, #22c55e ${ZONE_HI}%, var(--color-accent))`,
           }}
         >
-          {/* Green target zone. */}
+          {/* Target-zone delimiters (the band itself is green from the gradient). */}
           <div
             aria-hidden
-            className="absolute inset-y-0 border-x border-fg/30 bg-fg/10"
+            className="absolute inset-y-0 border-x border-fg/40"
             style={{ left: `${ZONE_LO}%`, width: `${ZONE_HI - ZONE_LO}%` }}
           />
           {/* Needle. */}

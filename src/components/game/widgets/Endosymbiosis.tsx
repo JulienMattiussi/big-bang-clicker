@@ -246,8 +246,13 @@ export function Endosymbiosis({ era }: { era: EraDef }) {
               >
                 {/* Inner group fades in on mount (.organelle-grow) without
                     disturbing the slide transform on the outer group. */}
-                <g className="organelle-grow">
-                  <path d={SHAPES[o.shape]} fill={o.tint} opacity="0.9" />
+                <g className="organelle-grow group">
+                  <path
+                    d={SHAPES[o.shape]}
+                    fill={o.tint}
+                    opacity="0.9"
+                    className="transition group-hover:brightness-125"
+                  />
                   <circle
                     r="6"
                     fill="transparent"
@@ -268,7 +273,7 @@ export function Endosymbiosis({ era }: { era: EraDef }) {
                         engulf(o, i, ring.length, null)
                       }
                     }}
-                    className="cursor-pointer outline-none focus-visible:stroke-accent"
+                    className="cursor-pointer outline-none transition hover:stroke-accent focus-visible:stroke-accent"
                     strokeWidth="2"
                   />
                 </g>

@@ -108,7 +108,9 @@ La **Complexité** est le fil conducteur qui traverse toutes les ères. Elle se
 gagne surtout en **réalisant des combinaisons** : plus une ressource est haute
 dans le graphe (plus sa chaîne de production est profonde), plus elle rapporte
 de Complexité. Le thème et la mécanique coïncident : la complexité émerge de la
-combinaison. La Complexité :
+combinaison. Elle suit la production **réelle** : tout multiplicateur de sortie
+(mémoire, galets, rebond de crise, méta-upgrades de prestige) accélère donc la
+Complexité **autant que** le stock. La Complexité :
 
 - est la **monnaie de progression** : franchir un palier d'ère coûte de la
   Complexité (et/ou exige un seuil de ressource locale) ;
@@ -242,17 +244,22 @@ les Échos, prend ici tout son sens.)
 
 ### 6.1 Structure d'une crise (4 temps)
 
-1. **Montée du risque** : une jauge de tension s'accumule, souvent par
-   **sur-exploitation** d'une ressource ou par une course en avant. Toujours
-   **télégraphiée** (le joueur voit venir).
+1. **Montée du risque** : une jauge de tension s'accumule par
+   **sur-exploitation** d'une ressource. Elle reste **dormante** tant que la
+   ressource n'a pas dépassé un **plancher** (pas de crise sur une ressource à
+   peine développée), puis monte sur l'**excès** au-dessus de ce plancher.
+   Toujours **télégraphiée**.
 2. **Déclenchement** : à un seuil scripté, par choix du joueur, ou de façon
    probabiliste au-delà d'un seuil.
 3. **Régression** : perte **partielle** (une ressource s'effondre, la
-   production chute, des structures sont détruites). Jamais une perte totale, ni
-   un blocage.
-4. **Rebond** : reconstruction puis **amélioration permanente** : une ressource
-   se transforme en une meilleure, un multiplicateur, une mécanique débloquée,
-   ou un changement narratif/structurel.
+   production chute). Jamais une perte totale ni un cul-de-sac. Tant que la
+   crise n'est pas résolue, la **production des ressources touchées est gelée**
+   et le **passage à l'ère suivante est bloqué** : porte **temporaire** (toujours
+   résolvable), pas un mur définitif.
+4. **Rebond** : reconstruction puis **amélioration permanente** : un
+   multiplicateur de production durable (qui, comme tous les multiplicateurs,
+   accélère aussi la Complexité - cf. section 3.2), une ressource transformée, ou
+   un changement narratif/structurel.
 
 ### 6.2 Règles
 
@@ -290,6 +297,23 @@ les Échos, prend ici tout son sens.)
 
 D'autres crises pourront être ajoutées dans le même esprit (krachs économiques,
 pandémies...), avec parcimonie.
+
+### 6.4 Résolution interactive (implémenté : extinction, ère 10)
+
+Une crise peut se **surmonter par un mini-jeu plein écran** plutôt que par un
+simple bouton. La première crise codée, l'**extinction de masse** :
+
+- **Déclenchement** : risque ∝ excès de **faune** au-dessus d'un plancher.
+- **Annonce** : modale dramatique (illustration d'impact) dont le bouton
+  **« Affronter »** lance le widget.
+- **Mini-jeu** : des météores tombent sur toute la largeur ; on **clique les
+  créatures** (rats, raptors) pour les faire plonger dans un terrier. Sauver
+  **50 créatures** surmonte la crise.
+- **Effets** : régression (faune **et** flore ×0.2) puis rebond (×10) ; pendant
+  la crise, faune/flore gelées et palier bloqué. Une **modale « Renaissance »**
+  conclut.
+- **Lisibilité** : un badge sur les ressources touchées (crâne pendant, étincelles
+  après) résume la situation ; le décor (sauropodes) disparaît au déclenchement.
 
 ## 7. Renouvellement : un verbe par ère
 

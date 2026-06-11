@@ -22,8 +22,9 @@ puissante.
 
 Conception **terminée** (voir `docs/`). **Jouable de bout en bout** : moteur
 data-driven, les 20 ères, prestige (Échos) + méta-upgrades + galets de l'infini
-(collectibles conservés au prestige), crises, recettes manuelles +
-automatisables, fond de scène évolutif, modales d'évènements narratifs, et des widgets
+(collectibles conservés au prestige), crises (dont une **crise jouable** : un
+mini-jeu de survie plein écran), recettes manuelles + automatisables, fond de
+scène évolutif, modales d'évènements narratifs, et des widgets
 interactifs aux mécaniques distinctes pour les ères 0 à 13 (jauge, atome de Bohr,
 pépinière d'étoiles, tableau périodique, disque d'accrétion, modèle moléculaire,
 boîte de Petri, balance atmosphérique, endosymbiose, atelier du vivant, arbre du

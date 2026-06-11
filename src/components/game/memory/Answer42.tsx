@@ -91,9 +91,9 @@ export function EraSymbolCluster({
 }
 
 /**
- * Memory emblem: two playing cards framing a cluster of the current era's
- * symbol. The two digits spell the deck size ("42" or "21"), and the number of
- * stacked symbols (2 or 3) tells whether the level wants pairs or triplets.
+ * Memory emblem: the two playing cards on the left (their digits spell the deck
+ * size, "42" or "21"), then a cluster of the current era's symbol on the right
+ * (2 or 3 stacked symbols = pairs or triplets).
  */
 export function Answer42({
   eraIcon,
@@ -108,9 +108,11 @@ export function Answer42({
 }) {
   return (
     <span className={`relative inline-flex items-center gap-1.5 text-bg ${className}`} aria-hidden>
-      <PlayCard digit={digits[0]} />
+      <span className="inline-flex h-full items-center gap-0.5">
+        <PlayCard digit={digits[0]} />
+        <PlayCard digit={digits[1]} />
+      </span>
       <EraSymbolCluster eraIcon={eraIcon} count={count} className="z-10 h-full" />
-      <PlayCard digit={digits[1]} />
     </span>
   )
 }

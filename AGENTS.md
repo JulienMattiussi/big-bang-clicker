@@ -208,7 +208,8 @@ pas seulement à constater.
    Exceptions documentées et tolérées : badges d'alerte (`bg-red-500` /
    `bg-yellow-400`), bannière de crise et glow rouge danger (`EventHero`,
    `CrisisScene`, `#ef4444`), scrim de modale (`bg-black/60`), dégradé de
-   température de `CoolingWidget`, **verts du feuillage du décor terrestre**
+   température de `CoolingWidget`, **vert de la zone cible d'`AtmosphereBalance`**
+   (`#22c55e`), **verts du feuillage du décor terrestre**
    (`SceneBackground` ère 10), **couleurs d'illustration du mini-jeu de crise**
    (`CrisisGame` : ciel rouge sombre, météore/flammes), et `theme.css` /
    `index.css` (CSS brut autorisé). Tout nouveau hex hors de ces cas est à
