@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 
 /** A lightweight SVG line chart (linear or log axes). No chart dependency. */
 export interface LinePoint {
@@ -9,6 +9,8 @@ export interface LineSeries {
   key: string
   color: string
   dashed?: boolean
+  /** 0-1; older snapshots are drawn fainter so overlaid runs stay legible. */
+  opacity?: number
   points: LinePoint[]
 }
 
@@ -22,9 +24,12 @@ interface Props {
   fmtY?: (v: number) => string
   /** Explicit x tick positions (e.g. one vertical line per era). */
   xTickValues?: number[]
+  /** Optional extra content under each x tick (e.g. the era icon), centred on
+   *  the tick. Rendered above the text label. */
+  renderXTick?: (v: number) => ReactNode
 }
 
-const M = { top: 14, right: 16, bottom: 34, left: 64 }
+const M = { top: 14, right: 16, bottom: 44, left: 64 }
 
 function ticksFor(minV: number, maxV: number, log: boolean): number[] {
   if (log) {
@@ -48,6 +53,7 @@ export function LineChart({
   fmtX = (v) => `${v}`,
   fmtY = (v) => `${v}`,
   xTickValues,
+  renderXTick,
 }: Props): ReactElement {
   const pts = series.flatMap((s) => s.points)
   if (!pts.length) return <div className="p-4 text-sm text-muted">Aucune donnée</div>
@@ -96,7 +102,10 @@ export function LineChart({
       {xTicks.map((v, i) => (
         <g key={`x${i}`}>
           <line x1={px(v)} y1={M.top} x2={px(v)} y2={height - M.bottom} stroke="var(--color-border)" strokeWidth="0.5" opacity="0.5" />
-          <text x={px(v)} y={height - M.bottom + 14} textAnchor="middle" className="fill-muted text-[10px]">
+          {renderXTick ? (
+            <g transform={`translate(${px(v)} ${height - M.bottom + 4})`}>{renderXTick(v)}</g>
+          ) : null}
+          <text x={px(v)} y={height - M.bottom + (renderXTick ? 32 : 14)} textAnchor="middle" className="fill-muted text-[10px]">
             {fmtX(v)}
           </text>
         </g>
@@ -108,6 +117,7 @@ export function LineChart({
             key={s.key}
             fill="none"
             stroke={s.color}
+            strokeOpacity={s.opacity ?? 1}
             strokeWidth="1.8"
             strokeDasharray={s.dashed ? '5 4' : undefined}
             strokeLinejoin="round"

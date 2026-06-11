@@ -129,7 +129,7 @@ function feederDeficit(state: GameState, era: EraDef): boolean {
 export function simulate(
   profile: ProfileConfig,
   policy: UnlockPolicy,
-  meta: { gitCommit: string; defsHash: string; generatedAt: string },
+  meta: { runId: string; runLabel: string; gitCommit: string; defsHash: string; generatedAt: string },
 ): RunResult {
   let state = applyMeta(createInitialState(0, defs.eras[0]?.id), defs)
 
@@ -271,6 +271,8 @@ export function simulate(
     profileLabel: profile.label,
     unlockPolicy: policy,
     config: profile,
+    runId: meta.runId,
+    runLabel: meta.runLabel,
     gitCommit: meta.gitCommit,
     defsHash: meta.defsHash,
     generatedAt: meta.generatedAt,

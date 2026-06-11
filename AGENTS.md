@@ -91,8 +91,8 @@ tests/
 sim/                      # Harnais de simulation d'équilibrage (exclu de make check)
 ├── profiles.ts           # Profils de joueur (minimal, idle, casual, active, optimal)
 ├── simulate.ts           # Boucle de simulation headless (temps/palier, retours arrière, activation)
-├── run.sim.ts            # Génère sim/results/*.json (make sim)
-└── viewer/               # Visualisation comparée des runs (make sim-view)
+├── run.sim.ts            # Écrit un snapshot daté par `make sim` (sim/results/<runId>/), élague les vieux
+└── viewer/               # Visualisation comparée ; superpose plusieurs snapshots successifs (make sim-view)
 ```
 
 ---

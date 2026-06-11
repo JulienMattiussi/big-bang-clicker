@@ -59,7 +59,7 @@ export const fr = {
   'petri.hint':
     "Tranche les cellules qui nagent pour les diviser\n3 d'un seul geste = un microbe en plus",
   'petri.divide': 'Diviser une cellule',
-  'balance.hint': "Garde l'aiguille dans la zone verte ; pousse sans déclencher la catastrophe",
+  'balance.hint': "Garde l'aiguille dans la zone verte ; trouve l'équilibre dans la force",
   'balance.gauge': 'Balance atmosphérique',
   'balance.co2': 'CO₂',
   'balance.o2': 'O₂',

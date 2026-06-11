@@ -70,6 +70,10 @@ export interface RunResult {
   profileLabel: string
   unlockPolicy: UnlockPolicy
   config: ProfileConfig
+  /** Snapshot this run belongs to (one `make sim` invocation): a sortable id and
+   *  a readable label, so successive runs can be overlaid and told apart. */
+  runId: string
+  runLabel: string
   /** Short git commit and a hash of the game data, to know which balance this is. */
   gitCommit: string
   defsHash: string

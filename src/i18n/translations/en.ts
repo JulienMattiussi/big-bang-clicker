@@ -60,7 +60,7 @@ export const en: Translations = {
   'molecule.atom': 'Atom',
   'petri.hint': 'Slash the swimming cells to split them\n3 in one stroke = a bonus microbe',
   'petri.divide': 'Split a cell',
-  'balance.hint': 'Keep the needle in the green zone; push without triggering the catastrophe',
+  'balance.hint': 'Keep the needle in the green zone; bring balance to the Force',
   'balance.gauge': 'Atmospheric balance',
   'balance.co2': 'CO₂',
   'balance.o2': 'O₂',

@@ -11,9 +11,14 @@ joueur active toutes les étapes d'une ère avant de passer à la suivante.
 ```sh
 make start          # le jeu tourne sur http://localhost:1138 (tu peux jouer)
 make sim            # lance les simulations (processus séparé, ~2-3 min)
-                    # -> écrit sim/results/*.json
+                    # -> écrit un SNAPSHOT daté dans sim/results/<runId>/
 # ouvre http://localhost:1138/sim/viewer/  dans un autre onglet
 ```
+
+Chaque `make sim` crée un **snapshot** (un dossier daté). Le viewer charge tous
+les snapshots : coche-en plusieurs pour **superposer** des runs successifs
+(avant/après un changement d'équilibrage) et les comparer. Les anciens snapshots
+sont élagués au-delà des 8 plus récents.
 
 `make sim` tourne dans un **processus Node distinct** (via Vitest, juste comme
 runner TS) : il ne touche pas au serveur de dev, tu peux continuer à jouer

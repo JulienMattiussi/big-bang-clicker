@@ -2,17 +2,32 @@ import { useState } from 'react'
 import { defs } from '@/data'
 import { fr } from '@/i18n/translations/fr'
 import { formatNumber } from '@/lib/format'
+import { Icon } from '@/components/ui/Icon'
 import { LineChart, type LineSeries } from './charts'
 import type { RunResult } from '../types'
 
-// Load every result JSON at build/dev time (drop a file -> it appears here).
-const modules = import.meta.glob('../results/*.json', { eager: true }) as Record<
+/** Era icon by index, for labelling the x axis of the milestone chart. */
+const ERA_ICON: Record<number, string> = Object.fromEntries(
+  defs.eras.map((e) => [e.index, e.icon]),
+)
+
+// Load every snapshot's result JSON (one folder per `make sim`). Drop/refresh a
+// snapshot and it appears here on reload.
+const modules = import.meta.glob('../results/*/*.json', { eager: true }) as Record<
   string,
   { default: RunResult }
 >
 const ALL_RUNS: RunResult[] = Object.values(modules)
   .map((m) => m.default)
-  .sort((a, b) => a.label.localeCompare(b.label))
+  .sort((a, b) => b.runId.localeCompare(a.runId) || a.label.localeCompare(b.label))
+
+/** Snapshots (one per `make sim`), newest first. */
+const SNAPSHOTS = [...new Map(ALL_RUNS.map((r) => [r.runId, r.runLabel])).entries()]
+  .sort((a, b) => b[0].localeCompare(a[0]))
+  .map(([id, label]) => ({ id, label }))
+
+/** Distinct profile x policy combos (shared across snapshots). */
+const RUN_KINDS = [...new Map(ALL_RUNS.map((r) => [`${r.profileId}__${r.unlockPolicy}`, r])).values()]
 
 const PROFILE_COLOR: Record<string, string> = {
   minimal: 'var(--color-era-2)',
@@ -21,6 +36,8 @@ const PROFILE_COLOR: Record<string, string> = {
   active: 'var(--color-accent)',
   optimal: 'var(--color-octarine)',
 }
+const runKey = (r: RunResult) => `${r.profileId}__${r.unlockPolicy}`
+const uid = (r: RunResult) => `${r.runId}__${runKey(r)}`
 const colorFor = (r: RunResult) => PROFILE_COLOR[r.profileId] ?? 'var(--color-fg)'
 const isDashed = (r: RunResult) => r.unlockPolicy === 'ready'
 
@@ -38,8 +55,12 @@ function machineName(id: string): string {
 }
 
 export function SimViewer() {
-  const [included, setIncluded] = useState<Set<string>>(new Set(ALL_RUNS.map((r) => r.label)))
-  const [detail, setDetail] = useState<string>(ALL_RUNS[0]?.label ?? '')
+  // By default overlay only the newest snapshot; tick more to compare.
+  const [snapsOn, setSnapsOn] = useState<Set<string>>(
+    new Set(SNAPSHOTS.slice(0, 1).map((s) => s.id)),
+  )
+  const [kindsOn, setKindsOn] = useState<Set<string>>(new Set(RUN_KINDS.map(runKey)))
+  const [detail, setDetail] = useState<string>(ALL_RUNS[0] ? uid(ALL_RUNS[0]) : '')
 
   if (ALL_RUNS.length === 0) {
     return (
@@ -53,65 +74,96 @@ export function SimViewer() {
     )
   }
 
-  const runs = ALL_RUNS.filter((r) => included.has(r.label))
-  const toggle = (label: string) =>
-    setIncluded((prev) => {
-      const next = new Set(prev)
-      if (next.has(label)) next.delete(label)
-      else next.add(label)
-      return next
-    })
+  const runs = ALL_RUNS.filter((r) => snapsOn.has(r.runId) && kindsOn.has(runKey(r)))
+  const toggleSet = (set: Set<string>, id: string) => {
+    const next = new Set(set)
+    if (next.has(id)) next.delete(id)
+    else next.add(id)
+    return next
+  }
+
+  // Older snapshots are drawn fainter so the newest stays prominent.
+  const activeSnaps = SNAPSHOTS.filter((s) => snapsOn.has(s.id))
+  const snapOpacity = (rid: string) => {
+    const i = activeSnaps.findIndex((s) => s.id === rid)
+    return i <= 0 ? 1 : Math.max(0.25, 1 - i * 0.35)
+  }
 
   const meta = ALL_RUNS[0]
-  const mixedDefs = ALL_RUNS.some((r) => r.defsHash !== meta.defsHash)
-  const detailRun = ALL_RUNS.find((r) => r.label === detail) ?? runs[0]
+  const mixedDefs = runs.some((r) => r.defsHash !== runs[0]?.defsHash)
+  const detailRun = ALL_RUNS.find((r) => uid(r) === detail) ?? runs[0]
 
-  // Chart A: cumulative time to unlock each era (era index vs time, log time).
+  // Chart A: cumulative time to unlock each era. Chart B: complexity over time.
   const timeSeries: LineSeries[] = runs.map((r) => ({
-    key: r.label,
+    key: uid(r),
     color: colorFor(r),
     dashed: isDashed(r),
+    opacity: snapOpacity(r.runId),
     points: r.milestones
       .filter((m) => m.unlockedAtS !== null)
       .map((m) => ({ x: m.eraIndex, y: Math.max(m.unlockedAtS ?? 1, 1) })),
   }))
-
-  // Chart B: complexity over time.
   const complexitySeries: LineSeries[] = runs.map((r) => ({
-    key: r.label,
+    key: uid(r),
     color: colorFor(r),
     dashed: isDashed(r),
+    opacity: snapOpacity(r.runId),
     points: r.series.map((p) => ({ x: Math.max(p.t, 1), y: Math.max(p.complexity, 1) })),
   }))
 
-  // One vertical gridline per era on chart 1.
   const maxEra = Math.max(0, ...runs.map((r) => r.finalEraIndex))
   const eraTicks = Array.from({ length: maxEra + 1 }, (_, i) => i)
 
+  // Table rows grouped by profile x policy then snapshot, for easy comparison.
+  const tableRuns = [...runs].sort(
+    (a, b) => runKey(a).localeCompare(runKey(b)) || b.runId.localeCompare(a.runId),
+  )
+
   return (
     <main data-tier="cosmos" className="min-h-screen bg-bg p-6 text-fg">
-      <header className="mb-6">
+      <header className="mb-5">
         <h1 className="text-2xl font-bold">Simulations d'équilibrage</h1>
         <p className="mt-1 text-sm text-muted">
-          données <code className="text-fg">{meta.defsHash}</code> · commit{' '}
-          <code className="text-fg">{meta.gitCommit}</code> · {meta.generatedAt.slice(0, 16).replace('T', ' ')}
+          {activeSnaps.length} snapshot(s) superposé(s) · dernier : données{' '}
+          <code className="text-fg">{meta.defsHash}</code> · commit{' '}
+          <code className="text-fg">{meta.gitCommit}</code>
           {mixedDefs ? (
-            <span className="ml-2 text-accent">⚠ runs issus de données différentes</span>
+            <span className="ml-2 text-accent">⚠ snapshots issus de données différentes</span>
           ) : null}
         </p>
       </header>
 
-      {/* Run toggles + legend: one line per unlock policy (asap above ready). */}
+      {/* Snapshot picker (one per `make sim`): tick several to overlay them. */}
+      <section className="mb-4">
+        <span className="text-xs font-semibold text-muted uppercase">Snapshots</span>
+        <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1">
+          {SNAPSHOTS.map((s, i) => (
+            <label key={s.id} className="flex cursor-pointer items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={snapsOn.has(s.id)}
+                onChange={() => setSnapsOn((prev) => toggleSet(prev, s.id))}
+              />
+              <span style={{ opacity: snapsOn.has(s.id) ? snapOpacity(s.id) : 0.4 }}>
+                {s.label}
+                {i === 0 ? <span className="ml-1 text-xs text-muted">(dernier)</span> : null}
+              </span>
+            </label>
+          ))}
+        </div>
+      </section>
+
+      {/* Profile x policy toggles (apply to every selected snapshot). */}
       <section className="mb-6 flex flex-col gap-1.5">
         {(['asap', 'ready'] as const).map((policy) => (
           <div key={policy} className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <span className="w-12 shrink-0 text-xs font-semibold text-muted uppercase">{policy}</span>
-            {ALL_RUNS.filter((r) => r.unlockPolicy === policy).map((r) => (
-              <label key={r.label} className="flex cursor-pointer items-center gap-2 text-sm">
+            {RUN_KINDS.filter((r) => r.unlockPolicy === policy).map((r) => (
+              <label key={runKey(r)} className="flex cursor-pointer items-center gap-2 text-sm">
                 <input
                   type="checkbox"
-                  checked={included.has(r.label)}
-                  onChange={() => toggle(r.label)}
+                  checked={kindsOn.has(runKey(r))}
+                  onChange={() => setKindsOn((prev) => toggleSet(prev, runKey(r)))}
                 />
                 <span
                   aria-hidden
@@ -124,7 +176,7 @@ export function SimViewer() {
           </div>
         ))}
         <span className="mt-1 text-xs text-muted">
-          (couleur = profil · plein = ASAP · pointillé = prêt)
+          (couleur = profil · plein = ASAP · pointillé = prêt · opacité = ancienneté du snapshot)
         </span>
       </section>
 
@@ -143,6 +195,14 @@ export function SimViewer() {
             xTickValues={eraTicks}
             fmtX={(v) => `e${Math.round(v)}`}
             fmtY={(v) => fmtDuration(v)}
+            renderXTick={(v) => {
+              const icon = ERA_ICON[Math.round(v)]
+              return icon ? (
+                <foreignObject x={-8} y={0} width={16} height={16}>
+                  <Icon name={icon} className="h-4 w-4 text-muted" />
+                </foreignObject>
+              ) : null
+            }}
           />
         </figure>
         <figure className="rounded-lg border border-border bg-surface/40 p-3">
@@ -166,6 +226,7 @@ export function SimViewer() {
           <thead className="text-xs text-muted">
             <tr className="border-b border-border">
               <th className="py-2 pr-4">Run</th>
+              <th className="px-2">Snapshot</th>
               <th className="px-2">Ère atteinte</th>
               <th className="px-2">Temps total</th>
               <th className="px-2">Paliers franchis</th>
@@ -174,33 +235,31 @@ export function SimViewer() {
             </tr>
           </thead>
           <tbody>
-            {runs.map((r, i) => {
+            {tableRuns.map((r, i) => {
               const left = r.milestones.filter((m) => m.completeness !== null)
               const full = left.filter((m) => m.completeness?.fullyActivated).length
               const partial = left.length - full
               const reached = r.milestones.filter((m) => m.unlockedAtS !== null).length - 1
               const backTrips = r.milestones.reduce((s, m) => s + m.backTrips, 0)
-              // Pairs (same player's asap/ready) sit next to each other: a strong
-              // border opens each pair, a faint one links the two rows, and groups
-              // alternate background.
-              const startsPair = i === 0 || runs[i - 1].profileId !== r.profileId
-              const groupOrdinal = runs
-                .slice(0, i + 1)
-                .filter((x, j, arr) => j === 0 || arr[j - 1].profileId !== x.profileId).length
-              const tint = groupOrdinal % 2 === 0 ? 'bg-bg/40' : ''
+              const startsKind = i === 0 || runKey(tableRuns[i - 1]) !== runKey(r)
               return (
                 <tr
-                  key={r.label}
-                  className={`${startsPair ? 'border-t-2 border-border' : 'border-t border-border/20'} ${tint}`}
+                  key={uid(r)}
+                  className={startsKind ? 'border-t-2 border-border' : 'border-t border-border/20'}
                 >
                   <td className="py-2 pr-4 pl-2">
                     <span
                       aria-hidden
                       className="mr-2 inline-block h-0 w-5 border-t-2 align-middle"
-                      style={{ borderColor: colorFor(r), borderStyle: isDashed(r) ? 'dashed' : 'solid' }}
+                      style={{
+                        borderColor: colorFor(r),
+                        borderStyle: isDashed(r) ? 'dashed' : 'solid',
+                        opacity: snapOpacity(r.runId),
+                      }}
                     />
                     {r.profileLabel} <span className="text-muted">· {r.unlockPolicy}</span>
                   </td>
+                  <td className="px-2 text-xs text-muted">{r.runLabel}</td>
                   <td className="px-2">
                     {r.milestones[r.finalEraIndex]?.eraName} (e{r.finalEraIndex})
                     {r.stuck ? <span className="ml-1 text-accent">mur</span> : null}
@@ -229,8 +288,8 @@ export function SimViewer() {
             className="rounded border border-border bg-surface px-2 py-1 text-sm"
           >
             {ALL_RUNS.map((r) => (
-              <option key={r.label} value={r.label}>
-                {r.label}
+              <option key={uid(r)} value={uid(r)}>
+                {r.profileLabel} · {r.unlockPolicy} · {r.runLabel}
               </option>
             ))}
           </select>
