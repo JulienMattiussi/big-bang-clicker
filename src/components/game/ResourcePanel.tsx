@@ -25,6 +25,8 @@ export function ResourcePanel({ era }: { era: EraDef }) {
   const revealed = revealedResources(state, defs, era)
   // Memory mini-game boosts this era's main resource: completions -> ×2^n.
   const memoryBoost = state.memoryLevels?.[era.id] ?? 0
+  // Idea-constellation bonus doubles this era's Complexity per cleared 10-sequence.
+  const complexityBoost = 2 ** (state.complexityBoosts?.[era.id] ?? 0)
 
   const eraIndex = (eraId: string) => Number(eraId.slice(1)) || 0
   const latestIndex = state.unlockedEras.reduce((max, id) => Math.max(max, eraIndex(id)), 0)
@@ -105,7 +107,15 @@ export function ResourcePanel({ era }: { era: EraDef }) {
                   </span>
                   <span className="truncate">{t(def.nameKey as TranslationKey)}</span>
                   {producesComplexity(id) ? (
-                    <span title={complexityTip(id)} className="inline-flex shrink-0 text-octarine">
+                    <span
+                      title={complexityTip(id)}
+                      className="inline-flex shrink-0 items-center gap-0.5 text-octarine"
+                    >
+                      {/* Idea-constellation Complexity multiplier on this era, shown
+                          before the diamond. */}
+                      {complexityBoost > 1 ? (
+                        <span className="text-xs font-bold tabular-nums">×{complexityBoost}</span>
+                      ) : null}
                       <Icon name="gem" className="h-5 w-5" aria-hidden />
                       <span className="sr-only">{complexityTip(id)}</span>
                     </span>

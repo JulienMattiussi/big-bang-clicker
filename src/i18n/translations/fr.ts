@@ -104,6 +104,10 @@ export const fr = {
   'memory.idea': 'Idée',
   'memory.success': 'Idée fulgurante !',
   'memory.fail': 'Idée perdue, on recommence',
+  'idea.bonus.max': 'Bonus maximal atteint',
+  'idea.bonus.title': 'Esprit en éveil',
+  'idea.bonus.body':
+    'Dix idées reproduites sans faute : une révélation. La Complexité de cette ère est désormais DOUBLÉE (effet permanent, cumulable).',
   'city.hint': 'Choisis un bâtiment, place-le ; les bons voisinages font la cité',
   'city.empty': 'Parcelle vide',
   'city.house': 'Habitation',

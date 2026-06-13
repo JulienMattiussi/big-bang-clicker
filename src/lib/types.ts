@@ -235,4 +235,7 @@ export interface GameState {
   galets: Record<string, { found: boolean; active: boolean }>
   /** Memory mini-game: times each era's resource has been boosted (0..3). */
   memoryLevels: Record<EraId, number>
+  /** Idea-constellation (Simon) bonus: times a full 10-sequence was cleared in an
+   *  era. The engine derives a x2 Complexity multiplier per clear for that era. */
+  complexityBoosts: Record<EraId, number>
 }

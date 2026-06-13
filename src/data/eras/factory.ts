@@ -77,8 +77,24 @@ export interface EraBundle {
   converters: ConverterDef[]
 }
 
+/**
+ * Late-game progression easing. From era LATE_FROM onward (and ONLY from there -
+ * the earlier eras are untouched, their balance is good), production is raised and
+ * consumption lowered, COMPOUNDING per era past the threshold, to counter the
+ * x3.16/era milestone growth once the big side-mechanic boosts (galets <= era 9,
+ * crisis rebound <= era 10) no longer apply. Tunable; validated via `make sim`.
+ */
+const LATE_FROM = 11
+const LATE_PROD = 1.55 // production x LATE_PROD^(idx - LATE_FROM + 1)
+const LATE_CONSUMPTION = 0.92 // converter inputs x LATE_CONSUMPTION^(idx - LATE_FROM + 1)
+
 export function buildEra(spec: SimpleEraSpec): EraBundle {
   const { id, base } = spec
+  // Era index (e11 -> 11). Late eras get an easing multiplier; earlier ones get 1.
+  const eraIdx = Number(id.slice(1)) || 0
+  const steps = Math.max(0, eraIdx - LATE_FROM + 1)
+  const prodMult = LATE_PROD ** steps
+  const consMult = LATE_CONSUMPTION ** steps
 
   // The terse form is just a one-link chain (base*10 + consumes*1 -> combined).
   const links: ChainLink[] =
@@ -121,7 +137,7 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
       eraId: id,
       nameKey: `gen.${spec.generatorId}`,
       output: base.id,
-      baseRate: spec.generatorRate ?? 1,
+      baseRate: (spec.generatorRate ?? 1) * prodMult,
       cost: [
         {
           resource: base.id,
@@ -136,8 +152,9 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
     id: l.converterId,
     eraId: id,
     nameKey: l.nameKey ?? `conv.${l.converterId}`,
-    inputs: l.inputs,
-    outputs: [{ resource: l.produces.id, amount: l.outputAmount ?? 1 }],
+    // Late eras: cheaper inputs (consMult <= 1) and a bigger output (prodMult >= 1).
+    inputs: l.inputs.map((i) => ({ ...i, amount: i.amount * consMult })),
+    outputs: [{ resource: l.produces.id, amount: (l.outputAmount ?? 1) * prodMult }],
     baseRate: l.baseRate ?? 0.5,
     cost: l.cost ?? [{ resource: base.id, base: 250, growth: 1.15 }],
   }))

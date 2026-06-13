@@ -104,6 +104,10 @@ export const en: Translations = {
   'memory.idea': 'Idea',
   'memory.success': 'Flash of insight!',
   'memory.fail': 'Idea lost, try again',
+  'idea.bonus.max': 'Maximum bonus reached',
+  'idea.bonus.title': 'A mind awakening',
+  'idea.bonus.body':
+    'Ten ideas reproduced flawlessly: a revelation. This era’s Complexity is now DOUBLED (permanent, stacks).',
   'city.hint': 'Pick a building and place it; good neighbours make the city',
   'city.empty': 'Empty plot',
   'city.house': 'House',

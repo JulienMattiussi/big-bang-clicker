@@ -48,5 +48,6 @@ export function prestige(state: GameState, now: number): GameState {
     seenEvents: {},
     galets: state.galets ?? {},
     memoryLevels: {},
+    complexityBoosts: {},
   }
 }

@@ -20,6 +20,8 @@ export interface GameEvent {
   icon?: string
   /** When set, the modal shows this infinity pebble's drawing (discovery). */
   galetId?: string
+  /** When set, the modal shows a big "xN diamond" (Complexity-doubled reward). */
+  complexityFactor?: number
 }
 
 /** All events whose condition is currently satisfied (regardless of "seen"). */

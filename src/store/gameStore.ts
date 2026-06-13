@@ -6,6 +6,7 @@ import {
   buyGenerator,
   manualConvert as runManualConvert,
   manualProduce as runManualProduce,
+  MAX_COMPLEXITY_BOOST,
   tick,
   unlockNextEra as runUnlockNextEra,
 } from '@/lib/engine'
@@ -72,6 +73,9 @@ interface GameStore {
   startMemoryGame: () => boolean
   /** Memory game cleared: doubles (cumulatively) the current era's main resource. */
   winMemoryGame: () => void
+  /** Idea-constellation 10-sequence cleared: doubles the current era's Complexity.
+   *  Returns the new boost count (for a unique announcement). */
+  awardComplexityBoost: () => number
 }
 
 function loadInitialState(now: number): { state: GameState; tampered: boolean } {
@@ -200,4 +204,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     return true
   },
   winMemoryGame: () => set((s) => commit(memoryWin(s.state, s.defs))),
+  awardComplexityBoost: () => {
+    const era = get().state.currentEraId
+    const count = Math.min((get().state.complexityBoosts[era] ?? 0) + 1, MAX_COMPLEXITY_BOOST)
+    set((s) => commit({ ...s.state, complexityBoosts: { ...s.state.complexityBoosts, [era]: count } }))
+    return count
+  },
 }))

@@ -9,6 +9,7 @@ import {
   canAfford,
   canUnlockNextEra,
   manualProduce,
+  MAX_COMPLEXITY_BOOST,
   nextCost,
   nextLockedEra,
   tick,
@@ -36,6 +37,10 @@ const MAX_BUYS_PER_DECISION = 40
  *  and how many times a profile retries a level before giving up on it. */
 const MEMORY_INTERVAL_S = 30
 const MEMORY_MAX_TRIES = 5
+/** Idea constellation (Simon, widget 'memory'): a skilled profile clears a full
+ *  10-sequence about this often, doubling the era's Complexity (capped). */
+const SIMON_INTERVAL_S = 900
+const SIMON_MIN_SKILL = 1 // completesPerSecond >= this (active/optimal): clears a 10-run
 
 /** Deterministic PRNG (mulberry32) seeded per run, so memory outcomes are
  *  reproducible (the sim never reads true randomness). */
@@ -181,6 +186,7 @@ export function simulate(
   const rng = makeRng(`${profile.id}:${policy}`)
   const memoryTries: Record<string, number> = {}
   let nextMemoryT = 0
+  let nextSimonT = SIMON_INTERVAL_S
 
   for (let iter = 0; iter < MAX_ITERS; iter++) {
     state = tick(state, defs, DT)
@@ -207,6 +213,22 @@ export function simulate(
       if (wg && !state.galets[wg.id]?.found && convLevel >= WIDGET_GALET_LEVEL) {
         state = { ...state, galets: { ...state.galets, [wg.id]: { found: true, active: true } } }
       }
+    }
+
+    // Idea constellation (Simon, widget 'memory'): a skilled profile periodically
+    // clears a full 10-sequence, doubling this era's Complexity (capped at x8).
+    if (
+      profile.completesPerSecond >= SIMON_MIN_SKILL &&
+      currentEra.widget === 'memory' &&
+      t >= nextSimonT &&
+      (state.complexityBoosts[currentEra.id] ?? 0) < MAX_COMPLEXITY_BOOST
+    ) {
+      const era = currentEra.id
+      state = {
+        ...state,
+        complexityBoosts: { ...state.complexityBoosts, [era]: (state.complexityBoosts[era] ?? 0) + 1 },
+      }
+      nextSimonT = t + SIMON_INTERVAL_S
     }
 
     // Manual actions. Two modes:

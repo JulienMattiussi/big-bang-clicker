@@ -38,6 +38,7 @@ export function createInitialState(now: number, firstEraId: EraId = ''): GameSta
     seenEvents: {},
     galets: {},
     memoryLevels: {},
+    complexityBoosts: {},
   }
 }
 

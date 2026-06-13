@@ -380,7 +380,8 @@ function CellsScene(): ReactElement {
   }, [])
 
   return (
-    <svg ref={svgRef} className={svgClass} {...svgProps}>
+    // Gentle soft-focus, like the terrestrial scene, so the cells recede behind the window.
+    <svg ref={svgRef} className={svgClass} {...svgProps} style={{ filter: 'blur(2.5px)' }}>
       <Defs />
       {CELLS.map((c, i) => (
         <g key={i} data-cell={i} transform={`translate(${c.x} ${c.y}) rotate(${c.rot})`}>
@@ -404,7 +405,8 @@ function CellsScene(): ReactElement {
 
 function SeaScene(): ReactElement {
   return (
-    <div className="absolute inset-0">
+    // A light soft-focus (lighter than the cells/land scenes) on the marine decor.
+    <div className="absolute inset-0" style={{ filter: 'blur(1.5px)' }}>
       <div className="bg-sway absolute inset-0">
         <svg className={svgClass} {...svgProps}>
           <Defs />
@@ -634,7 +636,9 @@ function LandScene(): ReactElement {
     return !!e && (e.resolved || isCrisisReady(s.state, s.defs, 'extinction'))
   })
   return (
-    <div className="absolute inset-0">
+    // A gentle soft-focus on the whole terrestrial decor (much lighter than the
+    // intelligence era's blur), so it recedes a touch behind the window.
+    <div className="absolute inset-0" style={{ filter: 'blur(3px)' }}>
       {/* Drifting clouds. */}
       <div className="bg-drift absolute inset-0">
         <svg className={svgClass} {...svgProps}>

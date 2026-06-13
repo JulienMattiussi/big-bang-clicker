@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
+import { useGameStore } from '@/store/gameStore'
+import { useEventStore } from '@/store/eventStore'
+import { MAX_COMPLEXITY_BOOST } from '@/lib/engine'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
 
@@ -20,6 +23,8 @@ const NODE_COLORS = [
 ]
 const FAIL_COLOR = 'var(--danger)'
 const START_LEN = 2
+/** Sequence cap. Clearing a full MAX_SEQ run doubles the era's Complexity (bonus). */
+const MAX_SEQ = 10
 const FLASH_MS = 600
 /** How long the success/failure flash stays up (ms). */
 const FEEDBACK_MS = 700
@@ -35,6 +40,9 @@ const FEEDBACK_MS = 700
 export function IdeaConstellation({ era }: { era: EraDef }) {
   const { t } = useTranslation()
   const { verb, gainBase, complete } = useEraMechanic(era)
+  // Complexity-boost bonus for this era, capped (x8 = MAX_COMPLEXITY_BOOST clears).
+  const boostCount = useGameStore((s) => s.state.complexityBoosts[era.id] ?? 0)
+  const boostMaxed = boostCount >= MAX_COMPLEXITY_BOOST
 
   const [phase, setPhase] = useState<'watch' | 'input'>('watch')
   const [active, setActive] = useState<number | null>(null)
@@ -127,9 +135,30 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
         setPhase('watch')
         setFeedback('success') // clear win signal: the whole constellation blooms
         succeededRef.current = seq.length
+        const cleared = seq.length
         timers.current.push(
           window.setTimeout(() => {
-            seqRef.current = [...seqRef.current, randomNode()] // grow by one (cumulative)
+            if (cleared >= MAX_SEQ) {
+              // Pinnacle: a full 10-sequence DOUBLES the era's Complexity (announced),
+              // until the cap is reached; then you start over from the beginning.
+              const gs = useGameStore.getState()
+              const era0 = gs.state.currentEraId
+              if ((gs.state.complexityBoosts[era0] ?? 0) < MAX_COMPLEXITY_BOOST) {
+                const count = gs.awardComplexityBoost()
+                useEventStore.getState().enqueue({
+                  id: `idea:bonus:${era0}:${count}`,
+                  tone: 'transition',
+                  titleKey: 'idea.bonus.title',
+                  bodyKey: 'idea.bonus.body',
+                  icon: 'brain',
+                  complexityFactor: 2 ** count,
+                })
+              }
+              succeededRef.current = 0
+              seqRef.current = Array.from({ length: START_LEN }, randomNode)
+            } else {
+              seqRef.current = [...seqRef.current, randomNode()] // grow by one (cumulative)
+            }
             playRound()
           }, FEEDBACK_MS + 250),
         )
@@ -250,6 +279,12 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
               ? t('memory.watch')
               : t('memory.repeat')}
       </span>
+      {/* Bonus capped: tell the player so they are not frustrated chasing more. */}
+      {boostMaxed ? (
+        <span className="text-xs font-semibold text-octarine">
+          {t('idea.bonus.max')} (×{2 ** MAX_COMPLEXITY_BOOST})
+        </span>
+      ) : null}
       {/* Screen-reader equivalent of the flashing pattern and the outcome. */}
       <span className="sr-only" aria-live="polite">
         {feedback === 'success'
