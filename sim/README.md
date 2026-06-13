@@ -28,12 +28,18 @@ sont écrits, le viewer se recharge tout seul (HMR).
 
 ## Ce qui est simulé
 
-- **4 profils** (`profiles.ts`) : idle (full auto), casual, actif, optimal.
-  La compétence aux mini-jeux des widgets est abstraite en *clics + completes par
-  seconde* (pas le mini-jeu au pixel).
+- **5 profils** (`profiles.ts`) : minimal (bootstrap), idle (full auto), casual,
+  actif, optimal. La compétence aux mini-jeux des widgets est abstraite en *clics
+  + completes par seconde* (pas le mini-jeu au pixel).
 - **2 politiques de déblocage** : `asap` (franchit dès que possible) et `ready`
-  (attend d'avoir développé l'ère) -> 8 runs.
-- Aléa (crises) **déterministe** : runs reproductibles et comparables.
+  (attend d'avoir développé l'ère).
+- **Mini-jeu de mémoire** : les profils qui y jouent (casual/actif/optimal) ont un
+  **taux de réussite par niveau** (`memoryWinRate`) ; le sim mise 10% de Complexité
+  et applique le ×2 cumulatif en cas de succès (réutilise `memoryStart`/`memoryWin`).
+- **Galets** : les galets "palier" sont découverts+activés comme en jeu ; le galet
+  **widget** (diversité, ère 9) est activé pour les profils qui jouent les widgets,
+  une fois la machine de l'ère au niveau requis (borne haute de l'effet).
+- Aléa (crises, mémoire) **déterministe** : runs reproductibles et comparables.
 
 ## Métriques (par run, dans le JSON)
 

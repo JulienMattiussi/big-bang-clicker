@@ -31,6 +31,8 @@ export const PROFILES: ProfileConfig[] = [
     completesPerSecond: 0.3,
     decisionIntervalS: 3,
     strategy: 'cheapest',
+    // Plays memory occasionally; rarely clears the hardest level.
+    memoryWinRate: [0.85, 0.5, 0.2],
   },
   {
     id: 'active',
@@ -39,6 +41,7 @@ export const PROFILES: ProfileConfig[] = [
     completesPerSecond: 1,
     decisionIntervalS: 2,
     strategy: 'cheapest',
+    memoryWinRate: [0.95, 0.78, 0.5],
   },
   {
     id: 'optimal',
@@ -47,6 +50,7 @@ export const PROFILES: ProfileConfig[] = [
     completesPerSecond: 2,
     decisionIntervalS: 1,
     strategy: 'tierFirst',
+    memoryWinRate: [1, 0.9, 0.75],
   },
 ]
 

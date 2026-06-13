@@ -115,8 +115,13 @@ export function readyCrises(state: GameState, defs: GameDefs): CrisisId[] {
 export function resolveCrisis(state: GameState, defs: GameDefs, id: CrisisId): GameState {
   const def = defs.crises[id]
   if (!def) return state
-  let next = applyEffects(state, def.regression)
-  next = applyEffects(next, def.rebound)
+  // Apply only the STOCK effects once (resetResource, transformResource...). The
+  // permanent rebound MULTIPLIERS are NOT baked here: the engine derives them from
+  // this crisis's resolve count, so tuning a rebound value re-applies to existing
+  // saves. See docs/ARCHITECTURE.md section 8.2.
+  const stock = (e: Effect) => e.type !== 'multiplier'
+  let next = applyEffects(state, def.regression.filter(stock))
+  next = applyEffects(next, def.rebound.filter(stock))
   const runtime = next.crises[id] ?? { risk: 0, resolved: false, count: 0 }
   return {
     ...next,

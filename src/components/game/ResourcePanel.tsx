@@ -59,7 +59,7 @@ export function ResourcePanel({ era }: { era: EraDef }) {
     const gap = latestIndex - eraIndex(def.eraId)
     // Value from the engine's single source, so the tooltip never drifts from
     // what is actually credited.
-    const perUnit = `${t('complexity.source')} : +${formatFixed(complexityPerUnit(defs, id, latestIndex))}/u`
+    const perUnit = `${t('complexity.source')} : +${formatFixed(complexityPerUnit(state, defs, id, latestIndex))}/u`
     return gap > 0
       ? `${perUnit} (${t('complexity.reduced')} ÷${formatNumber(COMPLEXITY_ERA_DECAY ** gap)})`
       : perUnit

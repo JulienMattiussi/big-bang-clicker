@@ -1,20 +1,25 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react'
 import { useEraMechanic } from './useEraMechanic'
 import { OrganismGlyph } from './OrganismGlyph'
+import { Galet } from '@/components/game/Galet'
+import { announceGalet } from '@/hooks/useGalets'
+import { widgetGaletForEra } from '@/lib/galets'
+import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
 
-/** Body parts that ride the conveyor; identity is the SHAPE, colour is a hint. */
+/** Body parts that ride the conveyor; the SHAPE is the identity, and each part
+ *  now has its OWN rainbow hue so they are easy to tell apart at a glance. */
 const PARTS = [
-  { id: 'eye', color: 'var(--color-accent)' },
-  { id: 'segment', color: 'var(--color-secondary)' },
-  { id: 'appendage', color: 'var(--color-octarine)' },
-  { id: 'spine', color: 'var(--color-secondary)' },
-  { id: 'leg', color: 'var(--color-accent)' },
-  { id: 'shell', color: 'var(--color-octarine)' },
-  { id: 'fin', color: 'var(--color-secondary)' },
-  { id: 'frond', color: 'var(--color-accent)' },
+  { id: 'eye', color: 'var(--part-1)' },
+  { id: 'segment', color: 'var(--part-2)' },
+  { id: 'appendage', color: 'var(--part-3)' },
+  { id: 'spine', color: 'var(--part-4)' },
+  { id: 'leg', color: 'var(--part-5)' },
+  { id: 'shell', color: 'var(--part-6)' },
+  { id: 'fin', color: 'var(--part-7)' },
+  { id: 'frond', color: 'var(--part-8)' },
 ] as const
 type PartId = (typeof PARTS)[number]['id']
 const PART_IDS = PARTS.map((p) => p.id)
@@ -42,19 +47,28 @@ const ORGANISMS: { id: string; parts: PartId[] }[] = [
  *  SPAWN_MS = parts closer together on the belt). */
 const SPAWN_MS = 1000
 const BELT_MS = 11000
-/** Bias: this share of spawns is a currently-needed part (anti-frustration). */
-const NEEDED_BIAS = 0.55
+/** Organisms queued ahead of the current one (the production plan), so the next
+ *  one can be pre-stocked before its turn. */
+const QUEUE_AHEAD = 2
 /** Each organism lives this long before it dies; EXIT_MS = its leave animation. */
 const CYCLE_MS = 5000
 const EXIT_MS = 550
 /** Combo: +1 per organism completed in time, reset on a miss, capped here. */
 const COMBO_CAP = 100
+/** The era's main converter must reach this level before the pebble can appear. */
+const GALET_UNLOCK_LEVEL = 2
+/** The diversity pebble surfaces on the belt about once every 20-30 parts. */
+const GALET_MIN = 20
+const GALET_MAX = 30
+const galetEvery = () => GALET_MIN + Math.floor(Math.random() * (GALET_MAX - GALET_MIN + 1))
 
 interface Piece {
   key: number
   id: PartId
   /** ms already elapsed on the belt at spawn (>0 only for the start pre-fill). */
   age: number
+  /** This piece is the diversity pebble riding the belt (clicked to discover it). */
+  galet?: boolean
 }
 interface Slot {
   id: PartId
@@ -65,23 +79,29 @@ interface Plan {
   slots: Slot[]
 }
 
-/**
- * A fresh body plan. Never repeats `prevOrg`, and - when belt contents are known
- * - prefers an organism with at least 2 of its parts already on the belt (then
- * at least 1), so the new organism is achievable right away.
- */
-function makePlan(prevOrg?: string, beltIds?: PartId[]): Plan {
-  let pool = ORGANISMS.filter((o) => o.id !== prevOrg)
-  if (pool.length === 0) pool = ORGANISMS
-  if (beltIds && beltIds.length > 0) {
-    const present = (o: (typeof ORGANISMS)[number]) =>
-      o.parts.filter((p) => beltIds.includes(p)).length
-    const withTwo = pool.filter((o) => present(o) >= 2)
-    const withOne = pool.filter((o) => present(o) >= 1)
-    pool = withTwo.length > 0 ? withTwo : withOne.length > 0 ? withOne : pool
-  }
-  const org = pool[Math.floor(Math.random() * pool.length)]
-  return { org: org.id, slots: org.parts.map((id) => ({ id, filled: false })) }
+/** The parts a given organism is made of. */
+function partsOf(orgId: string): PartId[] {
+  return ORGANISMS.find((o) => o.id === orgId)?.parts ?? []
+}
+
+/** A random organism id, avoiding the ones already in the queue (no repeats). */
+function pickOrg(exclude: string[]): string {
+  const pool = ORGANISMS.filter((o) => !exclude.includes(o.id))
+  const src = pool.length > 0 ? pool : ORGANISMS
+  return src[Math.floor(Math.random() * src.length)].id
+}
+
+/** A fresh, empty body plan for an organism. */
+function planFor(orgId: string): Plan {
+  return { org: orgId, slots: partsOf(orgId).map((id) => ({ id, filled: false })) }
+}
+
+/** The starting queue: a current plan plus QUEUE_AHEAD distinct upcoming organisms. */
+function freshQueue(): { plan: Plan; upcoming: string[] } {
+  const upcoming: string[] = []
+  const current = pickOrg([])
+  for (let i = 0; i < QUEUE_AHEAD; i++) upcoming.push(pickOrg([current, ...upcoming]))
+  return { plan: planFor(current), upcoming }
 }
 
 /** One body part as a fillable glyph (solid when acquired, dim outline otherwise). */
@@ -172,9 +192,20 @@ export function BodyAssembly({ era }: { era: EraDef }) {
     () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
   )
 
+  // The diversity pebble: it rides this belt once the era's main converter reaches
+  // GALET_UNLOCK_LEVEL, until the player clicks it (then it is found for good).
+  const defs = useGameStore((s) => s.defs)
+  const galetDef = widgetGaletForEra(defs, era.id)
+  const galetFound = useGameStore((s) => (galetDef ? !!s.state.galets[galetDef.id]?.found : false))
+  const converterLevel = useGameStore((s) => s.state.converters[era.converters[0]]?.level ?? 0)
+  const galetEligible = !!galetDef && !galetFound && converterLevel >= GALET_UNLOCK_LEVEL
+
   const nextId = useRef(0)
   const [belt, setBelt] = useState<Piece[]>([])
-  const [plan, setPlan] = useState<Plan>(makePlan)
+  // The current plan plus the upcoming organisms (the production queue), as one
+  // state so the upcoming list can be seeded distinct from the current organism.
+  const [queue, setQueue] = useState(freshQueue)
+  const { plan, upcoming } = queue
   // Each organism lives one CYCLE_MS; `cycle` keys it, `status` drives its exit.
   const [cycle, setCycle] = useState(0)
   const [status, setStatus] = useState<'died' | 'swam' | null>(null)
@@ -189,6 +220,10 @@ export function BodyAssembly({ era }: { era: EraDef }) {
   useEffect(() => {
     planRef.current = plan
   }, [plan])
+  const upcomingRef = useRef(upcoming)
+  useEffect(() => {
+    upcomingRef.current = upcoming
+  }, [upcoming])
   const beltRef = useRef(belt)
   useEffect(() => {
     beltRef.current = belt
@@ -197,22 +232,18 @@ export function BodyAssembly({ era }: { era: EraDef }) {
   useEffect(() => {
     statusRef.current = status
   }, [status])
+  const galetEligibleRef = useRef(galetEligible)
+  useEffect(() => {
+    galetEligibleRef.current = galetEligible
+  }, [galetEligible])
+  // Whether a pebble is currently on the belt (so we never spawn a second one).
+  const galetOnBeltRef = useRef(false)
 
   // Conveyor: spawn a part on a timer; each part is removed after it has crossed.
   useEffect(() => {
     const timers = new Set<ReturnType<typeof setTimeout>>()
     let last: PartId | null = null
-    const spawn = (age = 0) => {
-      const needed = planRef.current.slots.filter((s) => !s.filled).map((s) => s.id)
-      let id =
-        needed.length > 0 && Math.random() < NEEDED_BIAS
-          ? needed[Math.floor(Math.random() * needed.length)]
-          : PART_IDS[Math.floor(Math.random() * PART_IDS.length)]
-      // Never spawn the same part twice in a row.
-      if (id === last) {
-        const others = PART_IDS.filter((p) => p !== last)
-        id = others[Math.floor(Math.random() * others.length)]
-      }
+    const emit = (id: PartId, age = 0) => {
       last = id
       const key = nextId.current++
       setBelt((b) => [...b, { key, id, age }])
@@ -225,11 +256,67 @@ export function BodyAssembly({ era }: { era: EraDef }) {
       )
       timers.add(tm)
     }
-    // Start with a FULL belt (parts already mid-way), so the first organism is
-    // achievable: pre-fill from the oldest (about to exit) to the one entering now.
-    for (let age = BELT_MS - SPAWN_MS; age > 0; age -= SPAWN_MS) spawn(age)
-    spawn(0)
-    const iv = setInterval(() => spawn(0), SPAWN_MS)
+    const pick = (ids: readonly PartId[]) => ids[Math.floor(Math.random() * ids.length)]
+    // The diversity pebble as a special belt item (clicked to discover it).
+    const emitGalet = () => {
+      galetOnBeltRef.current = true
+      const key = nextId.current++
+      setBelt((b) => [...b, { key, id: PART_IDS[0], age: 0, galet: true }])
+      const tm = setTimeout(() => {
+        setBelt((b) => b.filter((p) => p.key !== key))
+        galetOnBeltRef.current = false
+        timers.delete(tm)
+      }, BELT_MS)
+      timers.add(tm)
+    }
+    // Two-tier guarantee, so the belt always holds every part of BOTH the current
+    // and the immediate next organism. 1) a current part absent from the belt is
+    // produced first (the current one stays completable); 2) then a NEXT part absent
+    // from the belt, so the next organism is fully stocked before it ever arrives;
+    // 3) once both are covered, keep the belt lively with current parts.
+    const chooseId = (): PartId => {
+      const onBelt = new Set(beltRef.current.filter((p) => !p.galet).map((p) => p.id))
+      const curMissing = planRef.current.slots.filter((s) => !s.filled).map((s) => s.id)
+      const curAbsent = curMissing.filter((id) => !onBelt.has(id))
+      if (curAbsent.length > 0) return pick(curAbsent)
+      const next = upcomingRef.current[0]
+      const nextAbsent = next ? partsOf(next).filter((id) => !onBelt.has(id)) : []
+      if (nextAbsent.length > 0) return pick(nextAbsent)
+      const pool = curMissing.length > 0 ? curMissing : partsOf(planRef.current.org)
+      let id = pick(pool) ?? PART_IDS[0]
+      // Never spawn the same part twice in a row (the guarantee branches are exempt).
+      if (id === last) {
+        const others = PART_IDS.filter((p) => p !== last)
+        id = pick(others)
+      }
+      return id
+    }
+    // Pre-fill a FULL belt that already covers BOTH first organisms: each distinct
+    // part they need gets a fresh copy (longest belt life), older ages get current
+    // fillers. So nothing the player needs early is about to scroll off.
+    const ages: number[] = []
+    for (let age = SPAWN_MS; age < BELT_MS; age += SPAWN_MS) ages.push(age)
+    const curOrg = planRef.current.org
+    const needed = [...new Set([...partsOf(curOrg), ...partsOf(upcomingRef.current[0])])]
+    const curParts = partsOf(curOrg)
+    ages.forEach((age, i) => emit(i < needed.length ? needed[i] : pick(curParts), age))
+    emit(chooseId(), 0)
+    // Every tick spawns a part; every ~20-30 parts SEEN, if eligible and not
+    // already out, the diversity pebble surfaces (it keeps coming back until
+    // clicked). The counter starts at the pre-fill count, so the cadence is in
+    // items the player actually sees, not just the ones added afterwards.
+    let sinceGalet = ages.length + 1
+    let every = galetEvery()
+    const tick = () => {
+      emit(chooseId(), 0)
+      sinceGalet++
+      if (galetEligibleRef.current && !galetOnBeltRef.current && sinceGalet >= every) {
+        emitGalet()
+        sinceGalet = 0
+        every = galetEvery()
+      }
+    }
+    const iv = setInterval(tick, SPAWN_MS)
     return () => {
       clearInterval(iv)
       timers.forEach(clearTimeout)
@@ -262,16 +349,14 @@ export function BodyAssembly({ era }: { era: EraDef }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cycle])
 
-  // After the exit animation, the next organism (a fresh body plan) appears.
+  // After the exit animation, the queue advances: the next organism becomes
+  // current and a fresh one is drawn at the tail (kept distinct from the queue).
   useEffect(() => {
     if (status === null) return
     const tm = setTimeout(() => {
-      setPlan(
-        makePlan(
-          planRef.current.org,
-          beltRef.current.map((p) => p.id),
-        ),
-      )
+      const [next, ...rest] = upcomingRef.current
+      const tail = pickOrg([next, ...rest])
+      setQueue({ plan: planFor(next), upcoming: [...rest, tail] })
       setStatus(null)
       setCycle((c) => c + 1)
     }, EXIT_MS)
@@ -285,16 +370,28 @@ export function BodyAssembly({ era }: { era: EraDef }) {
     if (slotIdx === -1) return false
     setBelt((b) => b.filter((p) => p.key !== key))
     const willComplete = plan.slots.filter((s) => s.filled).length + 1 === plan.slots.length
-    setPlan((prev) => ({
-      ...prev,
-      slots: prev.slots.map((sl, i) => (i === slotIdx ? { ...sl, filled: true } : sl)),
+    setQueue((q) => ({
+      ...q,
+      plan: {
+        ...q.plan,
+        slots: q.plan.slots.map((sl, i) => (i === slotIdx ? { ...sl, filled: true } : sl)),
+      },
     }))
     if (willComplete) resolve('swam')
     return true
   }
 
+  // Click the pebble on the belt: discover it (modal + receptacle), once.
+  const grabGalet = (key: number) => {
+    if (!galetDef) return
+    setBelt((b) => b.filter((p) => p.key !== key))
+    galetOnBeltRef.current = false
+    announceGalet(galetDef)
+  }
+
   const clickPiece = (piece: Piece) => {
-    grab(piece.key, piece.id)
+    if (piece.galet) grabGalet(piece.key)
+    else grab(piece.key, piece.id)
   }
 
   // Click a plan slot: grab the earliest matching part on the belt (keyboard path).
@@ -302,39 +399,49 @@ export function BodyAssembly({ era }: { era: EraDef }) {
     if (status !== null) return
     const slot = plan.slots[i]
     if (!slot || slot.filled) return
-    const piece = belt.find((p) => p.id === slot.id)
+    const piece = belt.find((p) => !p.galet && p.id === slot.id)
     if (piece) grab(piece.key, piece.id)
   }
 
   const partName = (id: PartId) => t(`assembly.part.${id}` as TranslationKey)
   const orgName = t(`assembly.org.${plan.org}` as TranslationKey)
+  const nextOrg = upcoming[0]
+  const nextName = nextOrg ? t(`assembly.org.${nextOrg}` as TranslationKey) : ''
 
-  const pieceButton = (piece: Piece, moving: boolean) => (
-    <button
-      key={piece.key}
-      type="button"
-      tabIndex={-1}
-      aria-label={partName(piece.id)}
-      onClick={() => clickPiece(piece)}
-      style={
-        moving
-          ? {
-              color: colorOf(piece.id),
-              animationDuration: `${BELT_MS}ms`,
-              // Negative delay places a pre-filled part already part-way across.
-              animationDelay: piece.age ? `-${piece.age}ms` : undefined,
-            }
-          : { color: colorOf(piece.id) }
-      }
-      className={
-        moving
-          ? 'belt-piece top-1/2 flex h-16 w-16 -translate-y-1/2 items-center justify-center rounded-lg border border-border bg-surface transition hover:brightness-125'
-          : 'pop-in flex h-16 w-16 shrink-0 items-center justify-center rounded-lg border border-border bg-surface transition hover:brightness-125'
-      }
-    >
-      <PartGlyph id={piece.id} filled />
-    </button>
-  )
+  const pieceButton = (piece: Piece, moving: boolean) => {
+    const gd = piece.galet ? galetDef : undefined
+    return (
+      <button
+        key={piece.key}
+        type="button"
+        tabIndex={-1}
+        aria-label={gd ? t(gd.nameKey as TranslationKey) : partName(piece.id)}
+        onClick={() => clickPiece(piece)}
+        style={{
+          color: gd ? undefined : colorOf(piece.id),
+          ...(moving
+            ? {
+                animationDuration: `${BELT_MS}ms`,
+                // Negative delay places a pre-filled part already part-way across.
+                animationDelay: piece.age ? `-${piece.age}ms` : undefined,
+              }
+            : {}),
+        }}
+        className={[
+          moving ? 'belt-piece top-1/2 -translate-y-1/2' : 'pop-in shrink-0',
+          'flex h-16 w-16 items-center justify-center rounded-lg border bg-surface transition hover:brightness-125',
+          // The pebble stands out (octarine ring) as the special, clickable relic.
+          gd ? 'border-octarine ring-2 ring-octarine/60' : 'border-border',
+        ].join(' ')}
+      >
+        {gd ? (
+          <Galet color={gd.color} motif={gd.motif} shape={gd.shape} size={44} />
+        ) : (
+          <PartGlyph id={piece.id} filled />
+        )}
+      </button>
+    )
+  }
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
@@ -380,6 +487,21 @@ export function BodyAssembly({ era }: { era: EraDef }) {
             ))}
           </ul>
         </div>
+
+        {/* Up next: a discreet preview of the queued organism, so the player can
+            anticipate which parts to keep an eye on. */}
+        {nextOrg ? (
+          <div
+            className="ml-2 flex flex-col items-center gap-1 border-l border-border/50 pl-4 text-muted"
+            aria-label={`${t('assembly.next')} : ${nextName}`}
+          >
+            <span className="text-[0.65rem] font-semibold uppercase tracking-wide">
+              {t('assembly.next')}
+            </span>
+            <OrganismGlyph id={nextOrg} className="h-12 w-auto opacity-60" />
+            <span className="text-xs">{nextName}</span>
+          </div>
+        ) : null}
       </div>
 
       {/* Combo: consecutive organisms completed in time (resets on a miss). */}

@@ -15,9 +15,10 @@ import {
   unlockNextEra,
 } from '@/lib/engine'
 import { readyCrises, resolveCrisis, updateRisk } from '@/lib/crises'
+import { memoryUnlocked, memoryLevel, memoryEraMaxed, memoryStart, memoryWin } from '@/lib/memory'
 import { revealedMachines, revealedResources } from '@/lib/reveal'
 import { decliningResources } from '@/lib/graph'
-import { discoverableGalets } from '@/lib/galets'
+import { discoverableGalets, widgetGaletForEra } from '@/lib/galets'
 import type { EraDef, GameState } from '@/lib/types'
 import type { Completeness, MilestoneStat, ProfileConfig, RunResult, UnlockPolicy } from './types'
 
@@ -27,7 +28,27 @@ const READY_STALL_S = 600 // "ready" policy: unlock anyway if stuck this long wh
 const GLOBAL_STALL_S = 5400 // 90 min with no progress and unable to unlock -> wall
 const SAMPLE_INTERVAL_S = 120
 const MAX_SAMPLES = 4000
+/** Level the era's main converter must reach before its widget pebble can be
+ *  found (mirrors GALET_UNLOCK_LEVEL in the assembly widget). */
+const WIDGET_GALET_LEVEL = 2
 const MAX_BUYS_PER_DECISION = 40
+/** Memory: minimum game-seconds between attempts (an occasional deliberate act),
+ *  and how many times a profile retries a level before giving up on it. */
+const MEMORY_INTERVAL_S = 30
+const MEMORY_MAX_TRIES = 5
+
+/** Deterministic PRNG (mulberry32) seeded per run, so memory outcomes are
+ *  reproducible (the sim never reads true randomness). */
+function makeRng(seedStr: string): () => number {
+  let seed = 0x9e3779b9
+  for (let i = 0; i < seedStr.length; i++) seed = (Math.imul(seed ^ seedStr.charCodeAt(i), 0x85ebca6b) | 0) >>> 0
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
 
 const ERA_BY_ID: Record<string, EraDef> = Object.fromEntries(defs.eras.map((e) => [e.id, e]))
 
@@ -155,6 +176,11 @@ export function simulate(
   let completeCarry = 0
   let stuck = false
   const decisionEvery = Math.max(1, Math.round(profile.decisionIntervalS / DT))
+  // Memory (era 7+): a deterministic RNG drives per-level success; a cooldown
+  // spaces attempts and a per-level try counter lets a profile give up.
+  const rng = makeRng(`${profile.id}:${policy}`)
+  const memoryTries: Record<string, number> = {}
+  let nextMemoryT = 0
 
   for (let iter = 0; iter < MAX_ITERS; iter++) {
     state = tick(state, defs, DT)
@@ -170,6 +196,18 @@ export function simulate(
     }
 
     const currentEra = ERA_BY_ID[state.currentEraId] ?? defs.eras[0]
+
+    // Widget pebble (e.g. the Cambrian diversity galet, clicked off the belt):
+    // only a profile that plays the widgets finds it, and only while in its era
+    // once the main converter is leveled enough. idle/minimal never click it.
+    if (profile.completesPerSecond > 0) {
+      const wg = widgetGaletForEra(defs, state.currentEraId)
+      const conv = currentEra.converters[0]
+      const convLevel = conv ? (state.converters[conv]?.level ?? 0) : 0
+      if (wg && !state.galets[wg.id]?.found && convLevel >= WIDGET_GALET_LEVEL) {
+        state = { ...state, galets: { ...state.galets, [wg.id]: { found: true, active: true } } }
+      }
+    }
 
     // Manual actions. Two modes:
     let clicks = 0
@@ -217,6 +255,25 @@ export function simulate(
       const starved = feederDeficit(state, currentEra)
       if (starved && !wasStarved) milestones[currentEra.index].backTrips++
       wasStarved = starved
+    }
+
+    // Memory: an occasional stake of 10% Complexity that, on success, doubles the
+    // era's main resource (and thus its Complexity yield). Spaced by a cooldown;
+    // a profile gives up a level after MEMORY_MAX_TRIES failures.
+    const rates = profile.memoryWinRate
+    if (rates && t >= nextMemoryT && memoryUnlocked(state) && !memoryEraMaxed(state, currentEra.id)) {
+      const level = memoryLevel(state, currentEra.id)
+      const key = `${currentEra.id}:${level}`
+      const rate = rates[level - 1] ?? 0
+      if (rate > 0 && (memoryTries[key] ?? 0) < MEMORY_MAX_TRIES) {
+        const staked = memoryStart(state)
+        if (staked) {
+          state = staked
+          memoryTries[key] = (memoryTries[key] ?? 0) + 1
+          nextMemoryT = t + MEMORY_INTERVAL_S
+          if (rng() < rate) state = memoryWin(state, defs)
+        }
+      }
     }
 
     const next = nextLockedEra(state, defs)

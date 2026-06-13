@@ -20,8 +20,11 @@ export function NextGoal() {
       </span>
       <div className="flex items-center gap-2">
         <IconBadge icon={m.icon} kind={m.kind} />
+        {/* Extra precision on the current value: a near-but-not-reached milestone
+            must read as "almost" (e.g. 2.48M), not as a misleading "2.5M / 2.5M"
+            while ~50k of Complexity are still being ground out. */}
         <span className="flex-1 text-right text-xs tabular-nums text-muted">
-          {formatFixed(m.current)} / {formatNumber(m.target)}
+          {formatFixed(m.current, 2)} / {formatNumber(m.target)}
         </span>
       </div>
       <div
@@ -30,10 +33,15 @@ export function NextGoal() {
         aria-valuemin={0}
         aria-valuemax={m.target}
         aria-valuenow={Math.floor(m.current)}
-        aria-valuetext={`${formatFixed(m.current)} / ${formatNumber(m.target)}`}
+        aria-valuetext={`${formatFixed(m.current, 2)} / ${formatNumber(m.target)}`}
         className="h-1.5 w-full overflow-hidden rounded-full bg-border"
       >
-        <div className={`h-full rounded-full ${m.barColor}`} style={{ width: `${m.pct}%` }} />
+        {/* Keep a sliver unfilled until it is actually crossable: a visually full
+            bar must mean the unlock button is there. */}
+        <div
+          className={`h-full rounded-full ${m.barColor}`}
+          style={{ width: `${m.ready ? 100 : Math.min(99, m.pct)}%` }}
+        />
       </div>
     </div>
   )

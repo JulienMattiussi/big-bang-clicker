@@ -163,14 +163,28 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
   - entièrement assemblé -> il **ne meurt pas**, **nage vers l'extérieur** et
     produit un **organisme** (la grosse récompense).
   À chaque issue, un nouveau plan apparaît (timer relancé). Les pièces ratées
-  **sortent du tapis** (légère tension, jamais de pénalité) ; le tapis privilégie
-  un peu les pièces actuellement demandées (anti-frustration).
+  **sortent du tapis** (légère tension, jamais de pénalité).
+- **File de production + garantie d'approvisionnement (anti-frustration).** Une
+  **file de 3 organismes** (le courant + 2 à venir) ; un **aperçu "À venir"**
+  montre discrètement le prochain. Le tapis suit une **garantie à deux étages** :
+  (1) une pièce de l'organisme **courant** absente du tapis est produite en
+  priorité, donc il reste toujours complétable à temps ; (2) sinon, une pièce du
+  **suivant** absente est produite, si bien qu'il est déjà approvisionné quand il
+  arrive (plus d'attente d'un défilement complet). Le compteur d'apparition du
+  galet (voir plus bas) part du pré-remplissage, pour compter en pièces *vues*.
 - **Contenu** : **10 organismes** réels du Cambrien (Burgess / Chengjiang) :
   trilobite, Anomalocaris, Opabinia, Hallucigenia, Wiwaxia, Pikaia,
   Haikouichthys, Marrella, brachiopode, éponge. Chacun = une combinaison de
   pièces **partagées** (œil, segments, appendice, épine, patte, coquille,
   nageoire ; seule la fronde de l'éponge est exclusive), si bien que la plupart
-  des pièces servent à plusieurs organismes.
+  des pièces servent à plusieurs organismes. Chaque pièce a sa **propre teinte**
+  d'arc-en-ciel (palette `--part-1..8`) : la forme reste l'identité, la couleur
+  aide à les distinguer d'un coup d'oeil.
+- **Galet de la diversité (découverte par widget).** Une fois `differentiation`
+  au niveau 2, un **galet peint en arc-en-ciel** défile sur le tapis (~toutes les
+  20-30 pièces, cerclé d'octarine) tant qu'il n'est pas cliqué. Au clic, il est
+  découvert (modale + rangement au réceptacle) et octuple la Complexité jusqu'à
+  l'ère cambrienne. Voir [ARCHITECTURE.md](./ARCHITECTURE.md) section 8.1.
 - **Progression / nouveauté** : **sélection dans un flux** qui défile (timing +
   reconnaissance), inédit ; et premier widget **pleine largeur** du palier Vie.
 - **Gestion de ressources** : les tissus sont des **composants** attrapés au vol

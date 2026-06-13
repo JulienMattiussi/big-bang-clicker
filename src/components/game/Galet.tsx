@@ -43,6 +43,29 @@ const MOTIFS: Record<string, (color: string) => ReactElement> = {
       <circle cx="2.5" cy="1" r="2.8" fill={color} />
     </g>
   ),
+  // A painted rainbow: concentric arcs, red (outer) to purple (inner). Self-coloured
+  // from the rainbow tokens (the `color` argument is ignored), like a child's rock.
+  rainbow: () => {
+    const cx = 18
+    const cy = 19
+    const drip = { filter: 'blur(0.6px)' }
+    return (
+      // Slight tilt so it reads as hand-painted, not aligned to the screen axis.
+      <g fill="none" strokeWidth="1.5" strokeLinecap="round" transform="rotate(-7 18 16)">
+        {[1, 2, 3, 4, 5, 6].map((n, i) => {
+          const r = 9.5 - i * 1.45
+          return (
+            <g key={n} stroke={`var(--galet-rainbow-${n})`}>
+              <path d={`M ${cx - r} ${cy} A ${r} ${r} 0 0 1 ${cx + r} ${cy}`} />
+              {/* Paint that ran/bled at the two ends, softened (blurred). */}
+              <path d={`M ${cx - r} ${cy} q -0.6 1.5 -0.2 2.6`} opacity="0.8" style={drip} />
+              <path d={`M ${cx + r} ${cy} q 0.6 1.5 0.2 2.6`} opacity="0.8" style={drip} />
+            </g>
+          )
+        })}
+      </g>
+    )
+  },
 }
 
 export function Galet({

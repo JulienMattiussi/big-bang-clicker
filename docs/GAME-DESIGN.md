@@ -309,7 +309,7 @@ simple bouton. La première crise codée, l'**extinction de masse** :
 - **Mini-jeu** : des météores tombent sur toute la largeur ; on **clique les
   créatures** (rats, raptors) pour les faire plonger dans un terrier. Sauver
   **50 créatures** surmonte la crise.
-- **Effets** : régression (faune **et** flore ×0.2) puis rebond (×10) ; pendant
+- **Effets** : régression (faune **et** flore ×0.2) puis rebond (×20) ; pendant
   la crise, faune/flore gelées et palier bloqué. Une **modale « Renaissance »**
   conclut.
 - **Lisibilité** : un badge sur les ressources touchées (crâne pendant, étincelles
@@ -435,6 +435,11 @@ Règles concrètes :
 - **Export / import** : sérialisation JSON de l'état complet, versionnée, avec
   migrations. Export en fichier téléchargeable + presse-papier ; import par
   collage ou fichier. Détail dans [ARCHITECTURE.md](./ARCHITECTURE.md).
+- **Intégrité (anti-triche de base)** : la save porte une **empreinte** ; une
+  sauvegarde modifiée hors du jeu (localStorage, fichier exporté) est **rejetée**
+  (clin d'oeil "on ne hack pas l'univers"). Les saves existantes restent valides
+  (signées au prochain save). Ralentisseur assumé, pas une sécurité absolue (jeu
+  front-end open source) : détail et portée dans [ARCHITECTURE.md](./ARCHITECTURE.md) section 9.
 
 ## 11. Langue
 

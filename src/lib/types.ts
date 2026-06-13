@@ -101,11 +101,13 @@ export interface MetaUpgradeDef {
 /** Effect of an "infinity pebble" (galet) when active. */
 export interface GaletEffect {
   /**
-   * Multiplies the output of machines of eras with index <= maxEraIndex:
+   * What the pebble multiplies, for resources/machines of eras with index <=
+   * maxEraIndex:
    * - generatorMultiplier: primary factories (generators);
-   * - converterMultiplier: secondary factories (converters/recipes).
+   * - converterMultiplier: secondary factories (converters/recipes);
+   * - complexityMultiplier: the Complexity gained from those eras' resources.
    */
-  type: 'generatorMultiplier' | 'converterMultiplier'
+  type: 'generatorMultiplier' | 'converterMultiplier' | 'complexityMultiplier'
   maxEraIndex: number
   value: number
 }
@@ -123,7 +125,15 @@ export interface GaletDef {
   motif: string
   /** Stone silhouette index (each pebble has a different shape). */
   shape?: number
-  /** Discovered when this era's milestone becomes reachable (before crossing). */
+  /**
+   * How the pebble is found:
+   * - 'milestone' (default): automatically when this era's milestone becomes
+   *   reachable (before crossing it);
+   * - 'widget': by clicking it inside the era's interactive widget (it is not
+   *   handed out by the milestone path; the widget drives its discovery).
+   */
+  discovery?: 'milestone' | 'widget'
+  /** Era tying the pebble to a milestone ('milestone') or a widget ('widget'). */
   discoverEraId: EraId
   effect: GaletEffect
 }

@@ -33,6 +33,11 @@ export const fr = {
     "Quintuple la production des usines secondaires jusqu'à l'ère de la vie (produit ×5)",
   'galet.life.lore':
     "Une deuxième relique se révèle, peinte d'une cellule d'un vert profond. Là où la matière n'était qu'inerte, quelque chose, enfin, se met à vivre.",
+  'galet.diversity.name': 'Galet peint de la diversité',
+  'galet.diversity.desc':
+    "Octuple la Complexité tirée des ressources jusqu'à l'ère cambrienne (×8)",
+  'galet.diversity.lore':
+    "Emportée par le tapis parmi les fragments du vivant, une relique aux mille couleurs : la diversité elle-même. L'explosion cambrienne a peint sur la pierre tout ce que la vie pouvait devenir.",
   'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',
@@ -68,6 +73,7 @@ export const fr = {
   'assembly.hint':
     'Assemble l’organisme avant qu’il ne meure : attrape les bonnes pièces sur le tapis',
   'assembly.plan': 'Plan de corps',
+  'assembly.next': 'À venir',
   'assembly.combo': 'Combo',
   'assembly.wanted': 'Pièce recherchée',
   'assembly.fitted': 'posée',
@@ -213,6 +219,10 @@ export const fr = {
   'save.download': 'Télécharger',
   'save.importPlaceholder': 'Colle ici ton code de sauvegarde',
   'save.importError': 'Code de sauvegarde invalide',
+  'save.importTampered': 'Sauvegarde modifiée : on ne hack pas l’univers.',
+  'save.tampered.title': 'On ne hack pas l’univers',
+  'save.tampered.body':
+    'Ta sauvegarde a été modifiée hors du jeu : son empreinte ne correspond plus. Belle tentative, mais l’entropie ne se triche pas. On repart de zéro.',
   'save.imported.title': 'Sauvegarde importée',
   'save.imported.body': 'Ta progression a été restaurée à partir de la sauvegarde.',
   'save.reset': 'Réinitialiser',

@@ -5,7 +5,10 @@ import {
   canAfford,
   canManualConvert,
   canUnlockNextEra,
+  complexityPerUnit,
+  converterOutputPerSec,
   costAtLevel,
+  generatorPerSec,
   manualConvert,
   manualProduce,
   nextCost,
@@ -243,5 +246,163 @@ describe('décroissance de Complexité par ère', () => {
     )
     expect(recent.complexity).toBeCloseTo(1)
     expect(old.complexity).toBeCloseTo(1 / 50)
+  })
+})
+
+// La source unique des taux : les helpers que l'UI et le moteur réutilisent.
+// On vérifie surtout que la Complexité suit les multiplicateurs (memory/galet),
+// le bug que Julien a diagnostiqué (le stock multiplié mais pas la Complexité).
+describe('calculs consolidés (source unique)', () => {
+  it('generatorPerSec applique niveau x baseRate x multiplicateur de ressource', () => {
+    const state = stateWith({ multipliers: { quark: 3 } })
+    expect(generatorPerSec(state, defs, 'quarkGen', 2)).toBeCloseTo(6) // 2 x 1 x 3
+  })
+
+  it('converterOutputPerSec applique le multiplicateur de sortie (pas la conso)', () => {
+    const state = stateWith({ multipliers: { proton: 10 } })
+    expect(converterOutputPerSec(state, defs, 'fuse', 'proton', 1, 1)).toBeCloseTo(10)
+  })
+
+  it('complexityPerUnit = tier x décroissance par ère', () => {
+    const s = stateWith({})
+    expect(complexityPerUnit(s, defs, 'proton', 0)).toBeCloseTo(1) // tier 1, ère courante
+    expect(complexityPerUnit(s, defs, 'proton', 1)).toBeCloseTo(1 / 50) // une ère en retard
+  })
+
+  it('un galet de Complexité actif multiplie le gain (jusqu à son maxEraIndex)', () => {
+    const galetDefs: GameDefs = {
+      ...defs,
+      galets: [
+        {
+          id: 'div',
+          nameKey: '',
+          descKey: '',
+          loreKey: '',
+          color: '',
+          motif: '',
+          discoverEraId: 'e0',
+          effect: { type: 'complexityMultiplier', maxEraIndex: 0, value: 3 },
+        },
+      ],
+    }
+    const on = stateWith({ galets: { div: { found: true, active: true } } })
+    expect(complexityPerUnit(on, galetDefs, 'proton', 0)).toBeCloseTo(3) // tier 1 x1 x3
+    // Inactif (ou non trouvé) -> pas de bonus.
+    const off = stateWith({ galets: { div: { found: true, active: false } } })
+    expect(complexityPerUnit(off, galetDefs, 'proton', 0)).toBeCloseTo(1)
+  })
+
+  it('la Complexité du tick suit le multiplicateur de sortie (stock ET Complexité x10)', () => {
+    const state = stateWith({
+      resources: { quark: 30 },
+      converters: { fuse: { level: 1, enabled: true } },
+      multipliers: { proton: 10 },
+    })
+    const next = tick(state, defs, 1)
+    expect(next.resources.proton).toBeCloseTo(10) // 1 produit x10
+    expect(next.complexity).toBeCloseTo(10) // et la Complexité aussi, pas 1
+  })
+
+  it('manualProduce crédite la Complexité sur la quantité multipliée', () => {
+    const state = stateWith({ resources: { quark: 5 }, multipliers: { proton: 4 } })
+    const next = manualProduce(state, defs, 'fuse')
+    expect(next.resources.proton).toBeCloseTo(4)
+    expect(next.complexity).toBeCloseTo(4)
+  })
+})
+
+// Une crise déclenchée gèle la production des ressources touchées et verrouille
+// le franchissement de palier tant qu'elle n'est pas résolue.
+describe('gel de production et palier pendant une crise', () => {
+  const crisisDefs: GameDefs = {
+    ...defs,
+    eras: [
+      { id: 'e0', unlock: {} } as unknown as EraDef,
+      { id: 'e1', unlock: { complexity: 100 } } as unknown as EraDef,
+    ],
+    crises: {
+      ext: {
+        id: 'ext',
+        eraId: 'e0',
+        risk: { sourceResource: 'quark', threshold: 10, telegraph: true },
+        trigger: 'threshold',
+        regression: [{ type: 'resetResource', target: 'proton', value: 0 }],
+        rebound: [],
+        textKeys: { warnKey: '', triggerKey: '', reboundKey: '' },
+      },
+    },
+  }
+  const ready = { ext: { risk: 100, resolved: false, count: 0 } }
+
+  it('gèle le générateur de la ressource source et le convertisseur produisant la cible', () => {
+    const state = stateWith({
+      resources: { quark: 30 },
+      generators: { quarkGen: { level: 2 } },
+      converters: { fuse: { level: 1, enabled: true } },
+      crises: ready,
+    })
+    const next = tick(state, crisisDefs, 1)
+    expect(next.resources.quark).toBe(30) // générateur gelé (sortie quark)
+    expect(next.resources.proton ?? 0).toBe(0) // recette gelée (sortie proton)
+    expect(next.complexity).toBe(0)
+  })
+
+  it('reprend la production une fois la crise résolue', () => {
+    const resolved = { ext: { risk: 100, resolved: true, count: 1 } }
+    const state = stateWith({
+      resources: { quark: 30 },
+      generators: { quarkGen: { level: 2 } },
+      crises: resolved,
+    })
+    expect(tick(state, crisisDefs, 1).resources.quark).toBeCloseTo(32)
+  })
+
+  it('bloque le franchissement de palier tant qu une crise est déclenchée', () => {
+    const state = stateWith({ unlockedEras: ['e0'], complexity: 150, crises: ready })
+    expect(canUnlockNextEra(state, crisisDefs)).toBe(false)
+    // Résolue, le palier redevient franchissable.
+    const cleared = { ...state, crises: { ext: { risk: 100, resolved: true, count: 1 } } }
+    expect(canUnlockNextEra(cleared, crisisDefs)).toBe(true)
+  })
+})
+
+// Les multiplicateurs de mémoire et de rebond de crise ne sont PAS gravés dans la
+// save : le moteur les DÉRIVE des niveaux/compteurs persistés + des données, donc
+// un ajustement des valeurs se répercute sur une partie en cours.
+describe('multiplicateurs dérivés (mémoire + crise), rétroactifs', () => {
+  const derivedDefs = (reboundValue: number): GameDefs => ({
+    ...defs,
+    eras: [{ id: 'e7', clickResource: 'beast', generators: ['beastGen'] } as unknown as EraDef],
+    generators: {
+      beastGen: { id: 'beastGen', eraId: 'e7', nameKey: '', output: 'beast', baseRate: 1, cost: [] },
+    },
+    crises: {
+      ext: {
+        id: 'ext',
+        eraId: 'e7',
+        risk: { threshold: 1, telegraph: false },
+        trigger: 'threshold',
+        regression: [],
+        rebound: [{ type: 'multiplier', target: 'beast', value: reboundValue }],
+        textKeys: { warnKey: '', triggerKey: '', reboundKey: '' },
+      },
+    },
+  })
+
+  it('la mémoire dérive 2^niveau sur la production (rien dans multipliers)', () => {
+    const s = stateWith({ memoryLevels: { e7: 2 } })
+    expect(generatorPerSec(s, derivedDefs(10), 'beastGen', 1)).toBeCloseTo(4) // 2^2
+  })
+
+  it('un rebond de crise résolue dérive value^count, et un ajustement se répercute', () => {
+    const s = stateWith({ crises: { ext: { risk: 0, resolved: true, count: 1 } } })
+    expect(generatorPerSec(s, derivedDefs(10), 'beastGen', 1)).toBeCloseTo(10)
+    // Même save, donnée passée de 10 à 20 -> rétroactif (pas de valeur gravée).
+    expect(generatorPerSec(s, derivedDefs(20), 'beastGen', 1)).toBeCloseTo(20)
+  })
+
+  it('non résolue (count 0) : pas de bonus', () => {
+    const s = stateWith({ crises: { ext: { risk: 0, resolved: false, count: 0 } } })
+    expect(generatorPerSec(s, derivedDefs(20), 'beastGen', 1)).toBeCloseTo(1)
   })
 })

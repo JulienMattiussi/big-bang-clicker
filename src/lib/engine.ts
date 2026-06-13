@@ -9,12 +9,14 @@ import type {
   CostCurve,
   EraDef,
   EraId,
+  GaletEffect,
   GameDefs,
   GameState,
   GeneratorId,
   ResourceId,
 } from './types'
 import { isCrisisReady, readyCrises } from './crises'
+import { MEMORY_BOOST } from './memory'
 
 /** Geometric cost of the next level (0-indexed level). */
 export function costAtLevel(curve: CostCurve, level: number): number {
@@ -68,12 +70,49 @@ function spend(
   return next
 }
 
-/** Production multiplier for a resource (specific x global x prestige meta). */
-function resourceMultiplier(state: GameState, resource: ResourceId): number {
+/**
+ * Multiplier from cleared memory games on a resource: each win on its era doubles
+ * it. DERIVED from the persisted level (not baked into `multipliers`), so tuning
+ * MEMORY_BOOST retroactively re-applies to existing saves.
+ */
+function memoryResourceMultiplier(state: GameState, defs: GameDefs, resource: ResourceId): number {
+  const era = defs.eras.find((e) => e.clickResource === resource)
+  const level = era ? (state.memoryLevels?.[era.id] ?? 0) : 0
+  return MEMORY_BOOST ** level
+}
+
+/**
+ * Permanent multiplier from RESOLVED crises whose rebound multiplies `target`.
+ * DERIVED from each crisis's resolve count and the data value (not baked into
+ * `multipliers`), so tuning a rebound value re-applies to existing saves.
+ */
+function crisisReboundMultiplier(state: GameState, defs: GameDefs, target: string): number {
+  let m = 1
+  for (const id in defs.crises) {
+    const count = state.crises?.[id]?.count ?? 0
+    if (count <= 0) continue
+    for (const e of defs.crises[id].rebound) {
+      if (e.type === 'multiplier' && e.target === target) m *= (e.value ?? 1) ** count
+    }
+  }
+  return m
+}
+
+/**
+ * Production multiplier for a resource. The direct `multipliers` record now only
+ * carries the prestige meta (and a manual slot); the per-resource memory bonus and
+ * the crisis rebounds are DERIVED from persisted levels/counts, so adjusting their
+ * data values always re-applies (the save stores the effect as a level/flag, never
+ * a baked multiplier). See docs/ARCHITECTURE.md section 8.2.
+ */
+function resourceMultiplier(state: GameState, defs: GameDefs, resource: ResourceId): number {
   return (
     (state.multipliers[resource] ?? 1) *
     (state.multipliers.global ?? 1) *
-    (state.multipliers.meta ?? 1)
+    (state.multipliers.meta ?? 1) *
+    memoryResourceMultiplier(state, defs, resource) *
+    crisisReboundMultiplier(state, defs, resource) *
+    crisisReboundMultiplier(state, defs, 'global')
   )
 }
 
@@ -82,7 +121,7 @@ function galetMachineMultiplier(
   state: GameState,
   defs: GameDefs,
   eraId: EraId,
-  type: 'generatorMultiplier' | 'converterMultiplier',
+  type: GaletEffect['type'],
 ): number {
   const eraIdx = eraIndexFromId(eraId)
   let m = 1
@@ -114,6 +153,11 @@ export function galetConverterMultiplier(
   return conv ? galetMachineMultiplier(state, defs, conv.eraId, 'converterMultiplier') : 1
 }
 
+/** Multiplier from active pebbles on the Complexity gained from an era's resources. */
+export function galetComplexityMultiplier(state: GameState, defs: GameDefs, eraId: EraId): number {
+  return galetMachineMultiplier(state, defs, eraId, 'complexityMultiplier')
+}
+
 // --- Production rates (the SINGLE source the tick AND the UI both read, so the
 // "x/s" shown on a machine can never diverge from what is actually produced). ---
 
@@ -127,7 +171,7 @@ export function generatorPerSec(
   const gen = defs.generators[id]
   if (!gen) return 0
   return (
-    level * gen.baseRate * resourceMultiplier(state, gen.output) * galetGeneratorMultiplier(state, defs, id)
+    level * gen.baseRate * resourceMultiplier(state, defs, gen.output) * galetGeneratorMultiplier(state, defs, id)
   )
 }
 
@@ -147,7 +191,7 @@ export function converterOutputMultiplier(
   id: ConverterId,
   resource: ResourceId,
 ): number {
-  return resourceMultiplier(state, resource) * galetConverterMultiplier(state, defs, id)
+  return resourceMultiplier(state, defs, resource) * galetConverterMultiplier(state, defs, id)
 }
 
 /** Per-second amount of one converter PRODUCT at `level` (output multipliers
@@ -179,7 +223,7 @@ export function clickYield(state: GameState, defs: GameDefs, era: EraDef): numbe
   return (
     (level + 1) *
     galetGeneratorMultiplier(state, defs, genId) *
-    resourceMultiplier(state, era.clickResource)
+    resourceMultiplier(state, defs, era.clickResource)
   )
 }
 
@@ -291,24 +335,31 @@ function latestUnlockedIndex(state: GameState): number {
 }
 
 /** Complexity produced PER UNIT of a resource (its tier, decayed by how many eras
- *  back it belongs). Single source of truth: the engine credit AND the UI tooltip
- *  both read this, so the displayed "+x/u" can never diverge from what's granted. */
-export function complexityPerUnit(defs: GameDefs, resource: ResourceId, latestEra: number): number {
+ *  back it belongs, boosted by any active Complexity pebble covering its era).
+ *  Single source of truth: the engine credit AND the UI tooltip both read this, so
+ *  the displayed "+x/u" can never diverge from what's granted. */
+export function complexityPerUnit(
+  state: GameState,
+  defs: GameDefs,
+  resource: ResourceId,
+  latestEra: number,
+): number {
   const def = defs.resources[resource]
   const tier = def?.tier ?? 0
   const gap = latestEra - eraIndexFromId(def?.eraId ?? '')
   const recency = gap <= 0 ? 1 : 1 / COMPLEXITY_ERA_DECAY ** gap
-  return tier * recency
+  return tier * recency * galetComplexityMultiplier(state, defs, def?.eraId ?? '')
 }
 
 /** Raw Complexity from producing `amount` of a resource (amount x per-unit). */
 function complexityFor(
+  state: GameState,
   defs: GameDefs,
   resource: ResourceId,
   amount: number,
   latestEra: number,
 ): number {
-  return amount * complexityPerUnit(defs, resource, latestEra)
+  return amount * complexityPerUnit(state, defs, resource, latestEra)
 }
 
 /** Applies the next-milestone cap to a raw Complexity gain (no passive overshoot). */
@@ -351,7 +402,7 @@ export function manualConvert(state: GameState, defs: GameDefs, id: ConverterId)
   for (const output of conv.outputs) {
     const produced = output.amount * converterOutputMultiplier(state, defs, id, output.resource)
     resources[output.resource] = (resources[output.resource] ?? 0) + produced
-    gained += complexityFor(defs, output.resource, produced, latestEra)
+    gained += complexityFor(state, defs, output.resource, produced, latestEra)
   }
   return {
     ...state,
@@ -376,7 +427,7 @@ export function manualProduce(state: GameState, defs: GameDefs, id: ConverterId)
   for (const output of conv.outputs) {
     const produced = output.amount * converterOutputMultiplier(state, defs, id, output.resource)
     resources[output.resource] = (resources[output.resource] ?? 0) + produced
-    gained += complexityFor(defs, output.resource, produced, latestEra)
+    gained += complexityFor(state, defs, output.resource, produced, latestEra)
   }
   return {
     ...state,
@@ -447,7 +498,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
       const produced =
         output.amount * cycles * converterOutputMultiplier(state, defs, id, output.resource)
       resources[output.resource] = (resources[output.resource] ?? 0) + produced
-      gained += complexityFor(defs, output.resource, produced, latestEra)
+      gained += complexityFor(state, defs, output.resource, produced, latestEra)
     }
   }
 

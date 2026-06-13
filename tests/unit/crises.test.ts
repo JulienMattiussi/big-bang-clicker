@@ -113,9 +113,11 @@ describe('risque et résolution', () => {
     })
     const next = resolveCrisis(state, defs, 'revolte')
     expect(next.resources.production).toBe(0) // régression
-    expect(next.resources.esclaves).toBe(0) // rebond : transformation
+    expect(next.resources.esclaves).toBe(0) // rebond : transformation (stock)
     expect(next.resources.citoyens).toBe(10)
-    expect(next.multipliers.global).toBe(2)
+    // Le multiplicateur du rebond n'est PAS gravé : il est dérivé du compteur par
+    // le moteur (resourceMultiplier), donc un ajustement de données se répercute.
+    expect(next.multipliers.global ?? 1).toBe(1)
     expect(next.crises.revolte.resolved).toBe(true)
     expect(next.crises.revolte.count).toBe(1)
   })

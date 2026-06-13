@@ -13,7 +13,8 @@ puissante.
 
 - 100% front-end, aucune donnée envoyée à un serveur.
 - Sauvegarde automatique en `localStorage`, avec **export / import** de la
-  progression.
+  progression et une **empreinte d'intégrité** (une sauvegarde modifiée hors du
+  jeu est rejetée ; ralentisseur anti-triche, pas une sécurité absolue).
 - Français par défaut, anglais proposé.
 - Contenu des ères "réalistes" fidèle à l'état actuel des connaissances
   scientifiques (voir [docs/SCIENCE.md](./docs/SCIENCE.md)).

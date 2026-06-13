@@ -49,8 +49,10 @@ Objectif : un moteur qui sait jouer **une** ère, piloté par des données.
 - [x] Crises (`crises.ts`) : risque, déclenchement, régression/rebond.
 - [x] Prestige (`prestige.ts`) : calcul des Échos, reset New Game+.
 - [x] Store Zustand (`gameStore`) + boucle de tick (`useTick`).
-- [x] Sauvegarde localStorage + idle hors-ligne + export/import versionné.
-- [x] Tests unitaires (37 tests : moteur, graph, crises, prestige, save, tick).
+- [x] Sauvegarde localStorage + idle hors-ligne + export/import versionné, avec
+      empreinte d'intégrité (rejet d'une save modifiée ; cf. ARCHITECTURE 9).
+- [x] Tests unitaires (moteur, graph, crises, prestige, save+intégrité, galets,
+      inventaire, méta, mémoire) : on teste la mécanique, pas les nombres.
 - [x] i18n bilingue (FR par défaut, EN proposé) : clés typées, store, hook,
       sélecteur de langue dans l'UI, persistance localStorage.
 - [ ] Reste à venir : `settingsStore` (dark mode, plafond idle), et le

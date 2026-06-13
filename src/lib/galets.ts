@@ -6,14 +6,30 @@
 
 import type { GaletDef, GameDefs, GameState } from './types'
 
-/** Pebbles whose milestone is reachable now and that are not yet found. */
+/** Pebbles whose milestone is reachable now and that are not yet found. Pebbles
+ *  found through a widget (discovery: 'widget') are excluded: their widget drives
+ *  their discovery, not the milestone threshold. */
 export function discoverableGalets(state: GameState, defs: GameDefs): GaletDef[] {
   return defs.galets.filter((galet) => {
+    if (galet.discovery === 'widget') return false
     if (state.galets?.[galet.id]?.found) return false
     const era = defs.eras.find((e) => e.id === galet.discoverEraId)
     const threshold = era?.unlock.complexity
     return threshold !== undefined && state.complexity >= threshold
   })
+}
+
+/** The widget-discovered pebble tied to `eraId` (found or not), if any. The era's
+ *  interactive widget uses it to know whether to surface the pebble for a click. */
+export function widgetGaletForEra(defs: GameDefs, eraId: string): GaletDef | undefined {
+  return defs.galets.find((g) => g.discovery === 'widget' && g.discoverEraId === eraId)
+}
+
+/** Found pebbles that boost the Complexity gain (for the effect badge on the meter). */
+export function galetsAffectingComplexity(state: GameState, defs: GameDefs): GaletDef[] {
+  return defs.galets.filter(
+    (g) => g.effect.type === 'complexityMultiplier' && state.galets?.[g.id]?.found,
+  )
 }
 
 /** Found pebbles affecting a machine of `eraId` for the given effect type. */

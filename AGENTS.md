@@ -63,10 +63,11 @@ src/
 │   ├── crises.ts         # Crises : risque, déclenchement, régression/rebond
 │   ├── prestige.ts       # Échos + reset New Game+
 │   ├── meta.ts           # Méta-upgrades de prestige
-│   ├── save.ts           # État initial, sérialisation versionnée + migrations, idle, export/import
+│   ├── save.ts           # État initial, sérialisation versionnée + migrations, idle, export/import ; enveloppe SIGNÉE (intégrité) : rejet de toute save non signée ou modifiée
+│   ├── integrity.ts      # Empreinte légère (cyrb53 + sel) anti-triche de save : ralentisseur, pas inviolable (jeu front-end open source)
 │   ├── format.ts         # Notation abrégée des grands nombres
-│   ├── galets.ts         # Galets de l'infini : découverte + galets affectant une machine
-│   ├── memory.ts         # Mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), 3 niveaux par ère (×2/×4/×8)
+│   ├── galets.ts         # Galets de l'infini : découverte (palier OU widget), galets affectant générateur/convertisseur/Complexité
+│   ├── memory.ts         # Mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), 3 niveaux par ère (×2/×4/×8) ; helpers purs partagés avec le sim
 │   └── inventory.ts      # Sac à dos : déblocage (apparition d'une ressource) + ressources connues groupées par ère
 ├── data/                 # Contenu data-driven (modifiable sans toucher au moteur)
 │   ├── eras/             # Toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence

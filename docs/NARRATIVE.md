@@ -76,6 +76,15 @@
   brillent en **octarine**, et les réunir tous débloque un effet puissant (un
   "claquement de doigts" optionnel, qui pourrait même être une crise-récompense
   assumée, cf. section 6). Collection longue durée qui récompense la rejouabilité.
+  - **Galet de la diversité (implémenté, ère 9)** : au-delà des six pierres, un
+    galet peint **arc-en-ciel** trouvé en cliquant dessus sur le tapis du widget
+    cambrien (l'explosion de la diversité = l'explosion de la Complexité, qu'il
+    octuple). Son foyer reste le réceptacle ; son effet se matérialise sous le
+    diamant de la pastille de Complexité.
+- **"On ne hack pas l'univers" (clin d'oeil anti-triche)** : si une sauvegarde a
+  été modifiée hors du jeu (empreinte invalide), le message de rejet est une
+  pirouette ("l'entropie ne se triche pas"), plutôt qu'une erreur sèche. Cf.
+  [ARCHITECTURE.md](./ARCHITECTURE.md) section 9.
 - **Octarine (Disque-monde)** : la réserver, en touche **discrète**, aux
   éléments rares ou magiques (lueur d'un easter egg, le 42, un secret de
   prestige). Tag couleur `--octarine` déjà posé dans `src/theme.css`. Un

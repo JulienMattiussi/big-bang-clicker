@@ -52,6 +52,25 @@
   --stone-dark: #6b7280;
   --galet-matter: #f5b042; /* amber - primordial matter, painted as an atom */
   --galet-life: #3fbf6f; /* green - life, painted as a cell */
+  --galet-diversity: #c061f0; /* violet - solid stand-in for glows; its motif is painted rainbow */
+  /* Rainbow bands of the diversity pebble's painted motif (concentric arcs, one
+     colour per token; referenced by the Galet 'rainbow' motif). */
+  --galet-rainbow-1: #ff4d4d;
+  --galet-rainbow-2: #ffae42;
+  --galet-rainbow-3: #ffe14d;
+  --galet-rainbow-4: #4dd964;
+  --galet-rainbow-5: #4db8ff;
+  --galet-rainbow-6: #c061f0;
+  /* Cambrian body parts (assembly widget): one distinct hue per part, spanning a
+     rainbow so the player tells them apart at a glance (shape stays the identity). */
+  --part-1: #ef5350;
+  --part-2: #ff9f40;
+  --part-3: #ffd54f;
+  --part-4: #9ccc65;
+  --part-5: #26a69a;
+  --part-6: #42a5f5;
+  --part-7: #7e6ce0;
+  --part-8: #ec6fc4;
 }
 
 /* LIFE tier: organic, warm greens. */

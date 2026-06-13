@@ -1,15 +1,19 @@
 import { describe, it, expect } from 'vitest'
 import {
   SAVE_VERSION,
+  TAMPER_ERROR,
   applyOffline,
   createInitialState,
   deserialize,
   exportSave,
   importSave,
   migrate,
+  parseSaved,
   serialize,
+  serializeSigned,
 } from '@/lib/save'
-import type { GameDefs } from '@/lib/types'
+import { sign } from '@/lib/integrity'
+import type { GameDefs, GameState } from '@/lib/types'
 
 const defs: GameDefs = {
   eras: [],
@@ -56,6 +60,13 @@ describe('migrations', () => {
     const old = { ...createInitialState(0), version: 0 }
     expect(migrate(old).version).toBe(SAVE_VERSION)
   })
+
+  it('v2 -> v3 : purge les multiplicateurs gravés (désormais dérivés)', () => {
+    const v2 = { ...createInitialState(0), version: 2, multipliers: { fauna: 10, global: 1.5 } }
+    const migrated = migrate(v2)
+    expect(migrated.version).toBe(SAVE_VERSION)
+    expect(migrated.multipliers).toEqual({})
+  })
 })
 
 describe('idle hors-ligne', () => {
@@ -77,5 +88,37 @@ describe('export / import', () => {
   it('fait un aller-retour fidèle', () => {
     const state = { ...createInitialState(7), complexity: 123, resources: { quark: 5 } }
     expect(importSave(exportSave(state))).toEqual(state)
+  })
+})
+
+describe('intégrité', () => {
+  it('accepte une enveloppe signée par le jeu (aller-retour)', () => {
+    const state = { ...createInitialState(7), complexity: 123 }
+    expect(parseSaved(serializeSigned(state))).toEqual(state)
+  })
+
+  it('rejette une enveloppe dont les données ont été modifiées', () => {
+    const env = JSON.parse(serializeSigned(createInitialState(7)))
+    const hacked = { ...JSON.parse(env.d), complexity: 999_999 }
+    const raw = JSON.stringify({ d: JSON.stringify(hacked), s: env.s })
+    expect(() => parseSaved(raw)).toThrow(TAMPER_ERROR)
+  })
+
+  it('rejette toute sauvegarde non signée (données brutes, plus de tolérance legacy)', () => {
+    const bareOld = serialize({ ...createInitialState(0), version: 1 })
+    const bareCurrent = serialize(createInitialState(0))
+    expect(() => parseSaved(bareOld)).toThrow(TAMPER_ERROR)
+    expect(() => parseSaved(bareCurrent)).toThrow(TAMPER_ERROR)
+  })
+
+  it("survit à l'ajout d'une variable depuis la sauvegarde (aucun faux rejet)", () => {
+    // Save d'une version antérieure qui ne connaissait pas encore un champ : on
+    // signe les octets TELS QU'ILS ÉTAIENT, le champ manquant est rajouté après.
+    const old: Partial<GameState> = { ...createInitialState(7) }
+    delete old.memoryLevels
+    const d = JSON.stringify(old)
+    const envelope = JSON.stringify({ d, s: sign(d) })
+    const loaded = parseSaved(envelope)
+    expect(loaded.memoryLevels).toEqual({}) // restauré par défaut, pas de rejet
   })
 })

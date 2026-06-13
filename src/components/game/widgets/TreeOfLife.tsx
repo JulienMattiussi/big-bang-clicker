@@ -238,8 +238,13 @@ export function TreeOfLife({ era }: { era: EraDef }) {
                         : 'var(--color-muted)'
                   }
                   opacity={tip || terminal ? 1 : 0.6}
-                  className="group-hover:brightness-125"
-                  style={{ transition: 'fill 0.6s ease, filter 0.15s ease' }}
+                  // On completion, the tips blink once left to right (delay by x):
+                  // a clear "the tree is complete, choose a clade" signal.
+                  className={`group-hover:brightness-125 ${choosable ? 'tree-signal' : ''}`}
+                  style={{
+                    transition: 'fill 0.6s ease, filter 0.15s ease',
+                    ...(choosable ? { animationDelay: `${(pos[i].x / 200) * 0.6}s` } : {}),
+                  }}
                 />
                 {clickable ? (
                   <circle

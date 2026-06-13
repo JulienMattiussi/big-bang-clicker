@@ -5,7 +5,7 @@ import { useGameStore } from '@/store/gameStore'
 import { useEventStore } from '@/store/eventStore'
 import { useTranslation } from '@/i18n/useTranslation'
 
-type Status = 'idle' | 'copied' | 'error'
+type Status = 'idle' | 'copied' | 'error' | 'tampered'
 
 /** Save management menu: export, import, reset. */
 export function SaveMenu() {
@@ -38,8 +38,8 @@ function SavePanel({ onDone }: { onDone: () => void }) {
 
   // Confirm a successful import with a modal (the imported state replaced the
   // game), then close the menu. Failures keep their inline message.
-  const onImported = (ok: boolean) => {
-    if (!ok) return setStatus('error')
+  const onImported = (result: 'ok' | 'invalid' | 'tampered') => {
+    if (result !== 'ok') return setStatus(result === 'tampered' ? 'tampered' : 'error')
     enqueue({
       id: 'save:imported',
       tone: 'transition',
@@ -82,7 +82,7 @@ function SavePanel({ onDone }: { onDone: () => void }) {
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
-    link.download = 'big-bang-clicker-save.txt'
+    link.download = 'big-bang-clicker.sav'
     link.click()
     URL.revokeObjectURL(url)
     window.setTimeout(onDone, 400)
@@ -146,7 +146,7 @@ function SavePanel({ onDone }: { onDone: () => void }) {
           <input
             ref={fileRef}
             type="file"
-            accept=".txt,.json,text/plain,application/json"
+            accept=".sav,.txt,.json,text/plain,application/json"
             className="sr-only"
             aria-hidden
             tabIndex={-1}
@@ -178,6 +178,9 @@ function SavePanel({ onDone }: { onDone: () => void }) {
           </Button>
           {status === 'error' ? (
             <p className="text-xs text-red-400">{t('save.importError')}</p>
+          ) : null}
+          {status === 'tampered' ? (
+            <p className="text-xs text-red-400">{t('save.importTampered')}</p>
           ) : null}
         </section>
 

@@ -1,4 +1,4 @@
-import type { EraDef, GameState, ResourceId } from './types'
+import type { GameDefs, GameState } from './types'
 
 /**
  * "Memory" mini-game: spend Complexity to play a concentration game with
@@ -17,6 +17,9 @@ export const MEMORY_UNLOCK_LEVEL = 1
 
 /** Times an era's main resource can be boosted (x2 -> x4 -> x8). */
 export const MEMORY_MAX_LEVEL = 3
+/** Factor applied per cleared level. The win only persists the LEVEL; the engine
+ *  derives MEMORY_BOOST^level live, so tuning this re-applies to existing saves. */
+export const MEMORY_BOOST = 2
 
 export interface MemoryLevelConfig {
   /** Total cards dealt on the board. */
@@ -63,12 +66,27 @@ export function memoryEraMaxed(state: GameState, eraId: string): boolean {
   return memoryCompletions(state, eraId) >= MEMORY_MAX_LEVEL
 }
 
-/** The current era's main (base) resource: the one the reward doubles. */
-export function memoryMainResource(era: EraDef): ResourceId {
-  return era.clickResource
-}
-
 /** Complexity cost of one attempt: 10% of the current Complexity. */
 export function memoryCost(state: GameState): number {
   return Math.max(1, Math.round(state.complexity * 0.1))
+}
+
+/** Pays the attempt's stake (10% Complexity). Returns the new state, or `null`
+ *  if the player can't afford it. Pure: the store and the sim both reuse this. */
+export function memoryStart(state: GameState): GameState | null {
+  const cost = memoryCost(state)
+  if (state.complexity < cost) return null
+  return { ...state, complexity: state.complexity - cost }
+}
+
+/** Records a win for the CURRENT era: +1 level (the engine derives the resource
+ *  multiplier as MEMORY_BOOST^level). No-op if the era is already maxed. Pure
+ *  (shared by store and sim). */
+export function memoryWin(state: GameState, defs: GameDefs): GameState {
+  const era = defs.eras.find((e) => e.id === state.currentEraId) ?? defs.eras[0]
+  if (!era || memoryEraMaxed(state, era.id)) return state
+  return {
+    ...state,
+    memoryLevels: { ...state.memoryLevels, [era.id]: (state.memoryLevels[era.id] ?? 0) + 1 },
+  }
 }

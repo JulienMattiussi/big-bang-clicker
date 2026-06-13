@@ -27,7 +27,7 @@ describe('SaveMenu', () => {
     const code = useGameStore.getState().exportSave()
     useGameStore.getState().reset()
     expect(useGameStore.getState().state.resources.particule ?? 0).toBe(0)
-    expect(useGameStore.getState().importSave(code)).toBe(true)
+    expect(useGameStore.getState().importSave(code)).toBe('ok')
     expect(useGameStore.getState().state.resources.particule).toBe(5)
   })
 })

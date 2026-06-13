@@ -6,11 +6,16 @@
 
 import type { EraId, GameDefs, GameState } from './types'
 import { tick } from './engine'
+import { sign } from './integrity'
 
-export const SAVE_VERSION = 1
+/** v2 introduced the signed save envelope; v3 stopped baking memory/crisis
+ *  multipliers into `multipliers` (now derived from levels/counts). */
+export const SAVE_VERSION = 3
 export const SAVE_KEY = 'big-bang-clicker:save'
 /** Cap on the offline-idle credit (anti clock-cheat). */
 export const DEFAULT_OFFLINE_CAP_SECONDS = 60 * 60 * 8
+/** Thrown when a save fails its integrity check (edited outside the game). */
+export const TAMPER_ERROR = 'save-tampered'
 
 export function createInitialState(now: number, firstEraId: EraId = ''): GameState {
   return {
@@ -43,7 +48,13 @@ type Migration = (state: GameState) => GameState
  * never break a save without a migration.
  */
 const migrations: Record<number, Migration> = {
-  // 1: (state) => ({ ...state, version: 2 /* new field... */ }),
+  // v1 -> v2: the signed envelope is a storage-layer concern, no state change.
+  1: (state) => ({ ...state, version: 2 }),
+  // v2 -> v3: memory/crisis multipliers are no longer baked into `multipliers`
+  // (the engine derives them from memoryLevels + crisis counts). Drop the baked
+  // values so they are not double-counted; meta is recomputed by applyMeta on
+  // load, memory/crisis are derived live (so the current data values apply).
+  2: (state) => ({ ...state, multipliers: {}, version: 3 }),
 }
 
 export function migrate(state: GameState): GameState {
@@ -72,6 +83,40 @@ export function deserialize(raw: string): GameState {
   return withDefaults(migrate(JSON.parse(raw) as GameState))
 }
 
+/** Signed envelope written by the game: the serialized state plus its fingerprint. */
+interface SignedSave {
+  d: string
+  s: string
+}
+
+/** Serializes a state into a signed envelope `{ d, s }` (the on-disk format). */
+export function serializeSigned(state: GameState): string {
+  const d = serialize(state)
+  return JSON.stringify({ d, s: sign(d) } satisfies SignedSave)
+}
+
+/**
+ * Parses a stored/imported payload, verifying integrity. Only a **signed envelope**
+ * `{ d, s }` is accepted; anything else (unsigned/bare data, stripped envelope) is
+ * rejected with TAMPER_ERROR. The legacy tolerance for unsigned saves was a
+ * transition aid and has been removed now that all saves are signed.
+ *
+ * RESILIENT TO GAME EVOLUTION (do not break these two invariants):
+ * 1. We verify the EXACT stored bytes `parsed.d` against `parsed.s`, never a
+ *    re-serialization. Adding a field to the game later cannot change those bytes,
+ *    so a legit untouched save still matches.
+ * 2. Verification happens BEFORE deserialize() (migrate + withDefaults). New
+ *    fields are added AFTER the check, so a save made before a field existed is
+ *    accepted and simply gains the field's default. Likewise, the integrity SALT
+ *    must stay constant forever, or every existing save would wrongly be rejected.
+ */
+export function parseSaved(raw: string): GameState {
+  const parsed = JSON.parse(raw) as Partial<SignedSave>
+  if (typeof parsed.d !== 'string' || typeof parsed.s !== 'string') throw new Error(TAMPER_ERROR)
+  if (sign(parsed.d) !== parsed.s) throw new Error(TAMPER_ERROR)
+  return deserialize(parsed.d)
+}
+
 /**
  * Credits production accumulated since `lastSeen`, capped. Updates `lastSeen`.
  * Call on resume.
@@ -90,18 +135,33 @@ export function applyOffline(
 
 export function saveToStorage(state: GameState): void {
   try {
-    localStorage.setItem(SAVE_KEY, serialize(state))
+    localStorage.setItem(SAVE_KEY, serializeSigned(state))
   } catch {
     // Storage unavailable (private mode, quota...): ignore silently.
   }
 }
 
-export function loadFromStorage(): GameState | null {
+/** Result of a load: the state (null when none/rejected) and whether a stored save
+ *  was rejected for failing its integrity check (so the UI can react). */
+export interface LoadResult {
+  state: GameState | null
+  tampered: boolean
+}
+
+export function loadFromStorage(): LoadResult {
+  let raw: string | null = null
   try {
-    const raw = localStorage.getItem(SAVE_KEY)
-    return raw ? deserialize(raw) : null
+    raw = localStorage.getItem(SAVE_KEY)
   } catch {
-    return null
+    return { state: null, tampered: false }
+  }
+  if (!raw) return { state: null, tampered: false }
+  try {
+    return { state: parseSaved(raw), tampered: false }
+  } catch (e) {
+    // A failed integrity check is reported so the player learns the save was
+    // rejected; any other parse error just yields a fresh game.
+    return { state: null, tampered: e instanceof Error && e.message === TAMPER_ERROR }
   }
 }
 
@@ -118,12 +178,13 @@ function fromBase64(b64: string): string {
   return new TextDecoder().decode(bytes)
 }
 
-/** Exportable string (base64 of JSON), for copy or download. */
+/** Exportable string (base64 of the signed envelope), for copy or download. */
 export function exportSave(state: GameState): string {
-  return toBase64(serialize(state))
+  return toBase64(serializeSigned(state))
 }
 
-/** Rebuilds a state from an exported string (validated and migrated). */
+/** Rebuilds a state from an exported string (integrity-checked and migrated).
+ *  Throws TAMPER_ERROR if the code was edited, or on any malformed input. */
 export function importSave(encoded: string): GameState {
-  return deserialize(fromBase64(encoded.trim()))
+  return parseSaved(fromBase64(encoded.trim()))
 }

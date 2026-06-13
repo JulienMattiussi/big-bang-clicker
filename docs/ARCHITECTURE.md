@@ -40,10 +40,11 @@ src/
 │   ├── crises.ts         # risque (plancher + excès), déclenchement, gel de production, régression/rebond
 │   ├── prestige.ts       # Échos, reset New Game+
 │   ├── meta.ts           # méta-upgrades de prestige
-│   ├── save.ts           # état initial, sérialisation versionnée + migrations, idle, export/import
+│   ├── save.ts           # état initial, sérialisation versionnée + migrations, idle, export/import, enveloppe SIGNÉE (intégrité) + tolérance des saves legacy
+│   ├── integrity.ts      # empreinte légère (cyrb53 + sel) anti-triche de save ; rejet d'une save modifiée (ralentisseur, pas inviolable, cf. section 9)
 │   ├── format.ts         # notation abrégée des grands nombres
-│   ├── galets.ts         # galets de l'infini : découverte + galets affectant une machine
-│   ├── memory.ts         # mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), 3 niveaux par ère (×2/×4/×8)
+│   ├── galets.ts         # galets de l'infini : découverte (palier OU widget), galets affectant générateur/convertisseur/Complexité
+│   ├── memory.ts         # mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), 3 niveaux par ère (×2/×4/×8) ; helpers purs (memoryStart/memoryWin) réutilisés par le store ET le sim
 │   └── inventory.ts      # sac à dos : déblocage (apparition d'une ressource) + ressources connues groupées par ère
 ├── data/
 │   ├── eras/             # toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence
@@ -64,7 +65,7 @@ src/
 ├── hooks/
 │   ├── useTick.ts        # boucle de jeu + autosauvegarde (+ sauvegarde à la fermeture)
 │   ├── useEvents.ts      # détecte et enfile les évènements narratifs
-│   ├── useGalets.ts      # découverte des galets au franchissement de palier
+│   ├── useGalets.ts      # découverte des galets au franchissement de palier (announceGalet, partagé avec la découverte par widget)
 │   ├── useEraMechanic.ts # geste de clic d'une ère (gain de base + complétion gratuite)
 │   └── useMilestone.ts   # données du palier suivant (jauge NextGoal + bouton MilestoneButton)
 ├── components/
@@ -183,8 +184,8 @@ interface GameState {
   generators: Record<string, { level: number }>
   converters: Record<string, { level: number; enabled: boolean }>
   upgrades: Record<string, boolean>
-  crises: Record<string, { risk: number; resolved: boolean; count: number }>
-  multipliers: Record<string, number>  // par ressource + clés 'global' et 'meta'
+  crises: Record<string, { risk: number; resolved: boolean; count: number }>  // count : nb de résolutions (le moteur dérive le rebond ^count)
+  multipliers: Record<string, number>  // surtout 'meta' (recalculé) ; mémoire/crises N'Y écrivent plus (dérivés, cf. 8.2)
   complexity: number           // méta-ressource (plafonnée au prochain palier)
   echoes: number               // monnaie de prestige
   metaUpgrades: Record<string, boolean>
@@ -302,13 +303,53 @@ Implémente la mécanique de [GAME-DESIGN.md](./GAME-DESIGN.md) section 6 :
 ### 8.1 Galets de l'infini (galets.ts, data/galets.ts)
 
 Collectibles de prestige, **conservés au reset** (comme les Échos). Décrits en
-données (`GaletDef` : `effect` = `generatorMultiplier` | `converterMultiplier`,
-borné par `maxEraIndex` et valeur). `discoverableGalets` les rend découvrables
-quand la Complexité atteint le palier de leur ère ; le joueur les active /
+données (`GaletDef` : `effect` = `generatorMultiplier` | `converterMultiplier` |
+`complexityMultiplier`, borné par `maxEraIndex` et valeur). Le joueur les active /
 désactive depuis le réceptacle (`GaletReceptacle`). Le moteur applique les
-multiplicateurs actifs (`galetGeneratorMultiplier` / `galetConverterMultiplier`)
-à la production automatique (tick) ET aux gestes manuels (`manualConvert` /
-`manualProduce`), sans toucher au coût des machines.
+multiplicateurs actifs à la production automatique (tick) ET aux gestes manuels
+(`manualConvert` / `manualProduce`), sans toucher au coût des machines :
+`galetGeneratorMultiplier` (générateurs), `galetConverterMultiplier`
+(convertisseurs), `galetComplexityMultiplier` (Complexité gagnée, appliqué dans
+`complexityPerUnit`, donc le moteur ET le tooltip "+x/u" en tiennent compte).
+
+**Deux modes de découverte** (`GaletDef.discovery`) :
+- `'milestone'` (défaut) : `discoverableGalets` les rend découvrables quand la
+  Complexité atteint le palier de leur ère ; `useGalets` les annonce.
+- `'widget'` : trouvés en **cliquant** le galet qui apparaît dans le widget de
+  l'ère (ex. le **galet de la diversité**, ère 9 : il défile sur le tapis
+  d'assemblage une fois `differentiation` au niveau 2, ~toutes les 20-30 pièces ;
+  au clic, `announceGalet` ouvre la modale). `discoverableGalets` les **exclut**
+  (le widget pilote leur découverte). Helper : `widgetGaletForEra`.
+
+Un galet de Complexité matérialise son effet **sous le diamant de la pastille de
+Complexité** (`galetsAffectingComplexity`), comme les autres galets s'affichent
+sur les machines qu'ils accélèrent. Le galet de la diversité est peint en
+**arc-en-ciel** (motif `rainbow` dans `Galet.tsx`, bandes concentriques colorées).
+
+### 8.2 Effets dérivés : stock en valeur, effets en niveau/booléen (règle)
+
+**Règle d'architecture des sauvegardes** : le **stock** (ressources, Complexité,
+Échos) est persisté en **valeur** ; un **effet** (multiplicateur, bonus) ne l'est
+**jamais** en valeur calculée, mais via un **booléen ou un niveau**, et le moteur
+en **dérive** le multiplicateur depuis les **données** à chaque tick. Ainsi, tout
+ajustement d'une valeur dans `data/` se **répercute sur les parties en cours** ;
+graver le multiplicateur le figerait pour toujours dans la save.
+
+Sources de multiplicateur, toutes dérivées :
+- **Méta-upgrades** : booléens `metaUpgrades[id]` -> `applyMeta` recalcule
+  `multipliers.meta` au chargement (`meta.ts`).
+- **Galets** : `{ found, active }` -> `galet*Multiplier` lus en direct (`engine.ts`).
+- **Mémoire** : niveau `memoryLevels[era]` -> le moteur applique `MEMORY_BOOST^niveau`
+  (`memoryResourceMultiplier`). `memoryWin` n'incrémente **que** le niveau.
+- **Rebonds de crise** : compteur `crises[id].count` -> le moteur applique
+  `valeur^count` (`crisisReboundMultiplier`). `resolveCrisis` n'applique **que**
+  les effets de **stock** (resetResource, transformResource), jamais les
+  `multiplier`.
+
+Le champ `multipliers` ne porte donc plus que la clé `meta` (recalculée) et un
+éventuel multiplicateur direct ; mémoire et crises n'y écrivent plus. La migration
+v2 -> v3 purge les valeurs gravées des anciennes saves (recalculées ensuite). Voir
+section 9.
 
 ## 9. Sauvegarde, export/import, idle hors-ligne (save.ts)
 
@@ -316,17 +357,38 @@ multiplicateurs actifs (`galetGeneratorMultiplier` / `galetConverterMultiplier`)
   via une **autosauvegarde** périodique (`useTick`, ~10 s) ET **à la fermeture /
   mise en arrière-plan** de la page (`pagehide` / `visibilitychange`), pour ne
   rien perdre entre deux autosauvegardes.
-- **Versioning + migrations** : `GameState.version` ; un tableau de migrations
-  `vN -> vN+1` s'applique à la lecture. Pour un **ajout de champ**, on n'ajoute
-  pas forcément de migration : `withDefaults` complète les champs manquants à
-  partir de l'état initial (ex : `discovered` ajouté ainsi, sans migration).
-  Une vraie évolution incompatible, elle, ajoute une migration.
+- **Versioning + migrations** : `GameState.version` (actuellement **3**) ; un
+  tableau de migrations `vN -> vN+1` s'applique à la lecture. Pour un **ajout de
+  champ**, on n'ajoute pas forcément de migration : `withDefaults` complète les
+  champs manquants à partir de l'état initial (ex : `discovered` ajouté ainsi).
+  Une vraie évolution incompatible ajoute une migration : ex. **v2 -> v3** purge
+  les multiplicateurs gravés (mémoire/crises désormais dérivés, cf. 8.2).
 - **Idle hors-ligne** : à la reprise, `elapsed = now - lastSeen`, **plafonné**
   (anti-triche d'horloge). On crédite la production accumulée (tick en gros pas
   ou approximation fermée). Plafond réglable dans `settingsStore`.
-- **Export / import** : `JSON.stringify(state)` (optionnellement encodé base64)
-  proposé en téléchargement et en copie presse-papier ; import par collage ou
-  fichier, **validé et migré** avant application.
+- **Export / import** : `JSON.stringify(state)` encodé base64, proposé en
+  téléchargement et en copie presse-papier ; import par collage ou fichier,
+  **validé et migré** avant application.
+- **Intégrité (anti-triche de save, `integrity.ts`)** : la save est écrite dans
+  une **enveloppe signée** `{ d, s }` (en localStorage ET à l'export), où `s` est
+  une empreinte (cyrb53 + sel) de `d`. Au chargement / import, on recalcule et on
+  compare ; une discordance = save modifiée hors du jeu -> **rejet** (partie neuve
+  + clin d'oeil "on ne hack pas l'univers", ou import refusé). Un cas distinct
+  (`'tampered'` vs `'invalid'`) sépare le hack du simple code malformé.
+  - **Seules les enveloppes signées sont acceptées** : toute save non signée
+    (données brutes, ou enveloppe déshabillée) est rejetée. La tolérance legacy
+    (introduite avec `SAVE_VERSION = 2`) a été retirée, la transition étant faite.
+  - **Résiste aux évolutions du jeu** (à ne jamais casser) : on vérifie les
+    **octets exacts** sauvegardés (`d`), jamais une re-sérialisation, et **avant**
+    la migration. Ajouter un champ plus tard ne change pas ces octets : la save
+    reste valide et gagne le défaut du champ via `withDefaults`. Donc le **sel**
+    doit rester constant à vie (sinon toutes les saves seraient rejetées).
+  - **Portée assumée** : jeu 100% front-end et open source -> le sel est dans le
+    bundle. C'est un **ralentisseur** contre l'édition facile (localStorage,
+    fichier exporté), pas une protection contre l'édition de l'état **en mémoire**
+    (devtools) ni un re-signe par qui lit le code. But : décourager la triche de
+    base. Éditer le localStorage en cours de partie n'a aucun effet (l'état vit en
+    mémoire, relu seulement au chargement, où l'empreinte le rejette).
 
 ## 10. i18n (custom léger)
 

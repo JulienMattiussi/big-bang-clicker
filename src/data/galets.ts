@@ -31,6 +31,20 @@ export const galetDefs: GaletDef[] = [
     discoverEraId: 'e7',
     effect: { type: 'converterMultiplier', maxEraIndex: 6, value: 5 },
   },
+  {
+    id: 'diversity',
+    nameKey: 'galet.diversity.name',
+    descKey: 'galet.diversity.desc',
+    loreKey: 'galet.diversity.lore',
+    color: 'var(--galet-diversity)',
+    motif: 'rainbow',
+    shape: 2,
+    // Found by CLICKING it as it rides the Cambrian assembly belt (era 9), not by a
+    // milestone. Boosts the Complexity gained from every era up to the Cambrian.
+    discovery: 'widget',
+    discoverEraId: 'e9',
+    effect: { type: 'complexityMultiplier', maxEraIndex: 9, value: 8 },
+  },
 ]
 
 /** Planned size of the collection (a wink at the six infinity stones). */

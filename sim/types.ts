@@ -25,6 +25,13 @@ export interface ProfileConfig {
    *   to start automation), then hands off; `clicksPerSecond` caps the burst.
    */
   clickMode?: 'rate' | 'bootstrap'
+  /**
+   * Memory mini-game success rate PER LEVEL (index 0 = level 1, ... up to
+   * MEMORY_MAX_LEVEL). Omit (or empty) for profiles that never play memory. Once
+   * unlocked, the profile stakes 10% Complexity per attempt and, on success,
+   * doubles the era's main-resource multiplier (so it also speeds Complexity).
+   */
+  memoryWinRate?: number[]
 }
 
 /** Per-era completeness at the moment the player leaves that era. */

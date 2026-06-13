@@ -35,6 +35,11 @@ export const en: Translations = {
     'Fivefold the production of the secondary factories up to the Life era (×5 output)',
   'galet.life.lore':
     'A second relic reveals itself, painted with a deep green cell. Where matter was once inert, something, at last, begins to live.',
+  'galet.diversity.name': 'Painted pebble of diversity',
+  'galet.diversity.desc':
+    'Eightfold the Complexity drawn from resources up to the Cambrian era (×8)',
+  'galet.diversity.lore':
+    'Carried along the belt among the fragments of life, a relic of a thousand colours: diversity itself. The Cambrian explosion painted onto the stone all that life could become.',
   'app.unlock': 'Reach the milestone',
   'lang.label': 'Language',
   'nav.eras': 'Eras',
@@ -68,6 +73,7 @@ export const en: Translations = {
   'endosymbiosis.organelle': 'Organelle',
   'assembly.hint': 'Assemble the organism before it dies: grab the right parts off the conveyor',
   'assembly.plan': 'Body plan',
+  'assembly.next': 'Up next',
   'assembly.combo': 'Combo',
   'assembly.wanted': 'Wanted part',
   'assembly.fitted': 'fitted',
@@ -213,6 +219,10 @@ export const en: Translations = {
   'save.download': 'Download',
   'save.importPlaceholder': 'Paste your save code here',
   'save.importError': 'Invalid save code',
+  'save.importTampered': 'Save tampered with: you don’t hack the universe.',
+  'save.tampered.title': 'You don’t hack the universe',
+  'save.tampered.body':
+    'Your save was edited outside the game: its fingerprint no longer matches. Nice try, but entropy can’t be cheated. Back to square one.',
   'save.imported.title': 'Save imported',
   'save.imported.body': 'Your progress has been restored from the save.',
   'save.reset': 'Reset',

@@ -377,6 +377,31 @@
   }
 }
 
+/* Era 10 (tree of life): a one-shot blink of a leaf. Applied with a per-leaf
+   animation-delay keyed to its x, it ripples left to right across the tips the
+   moment the tree is complete, signalling that a surviving clade can be chosen. */
+@keyframes tree-signal {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  45% {
+    transform: scale(1.6);
+    filter: brightness(1.9);
+  }
+}
+.tree-signal {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tree-signal 0.45s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tree-signal {
+    animation: none;
+  }
+}
+
 /* Era 9 (Cambrian): assembly-line conveyor - parts scroll right to left. */
 @keyframes belt-scroll {
   from {
