@@ -40,7 +40,7 @@ src/
 │   ├── crises.ts         # risque (plancher + excès), déclenchement, gel de production, régression/rebond
 │   ├── prestige.ts       # Échos, reset New Game+
 │   ├── meta.ts           # méta-upgrades de prestige
-│   ├── save.ts           # état initial, sérialisation versionnée + migrations, idle, export/import, enveloppe SIGNÉE (intégrité) + tolérance des saves legacy
+│   ├── save.ts           # état initial, sérialisation versionnée + migrations, idle, export/import, enveloppe SIGNÉE (intégrité) ; rejet de toute save non signée ou modifiée
 │   ├── integrity.ts      # empreinte légère (cyrb53 + sel) anti-triche de save ; rejet d'une save modifiée (ralentisseur, pas inviolable, cf. section 9)
 │   ├── format.ts         # notation abrégée des grands nombres
 │   ├── galets.ts         # galets de l'infini : découverte (palier OU widget), galets affectant générateur/convertisseur/Complexité
