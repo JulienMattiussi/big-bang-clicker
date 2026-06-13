@@ -381,6 +381,17 @@ Vue d'ensemble :
 - Certaines ères débloquent des **mécaniques bonus** (mini-systèmes) décrites
   dans [PHASES.md](./PHASES.md), à introduire progressivement pour ne pas
   noyer le joueur.
+- **Easing tardif (à partir de l'ère 11 seulement)** : les seuils croissent en
+  ×3,16/ère, et après l'ère 10 les gros boosts annexes (galets ≤ ère 9, rebond de
+  crise ≤ ère 10) ne s'appliquent plus. Pour éviter la divergence ("éternité"), le
+  factory applique aux ères >= `LATE_FROM` une production ↑ et une consommation ↓
+  **composées par ère** (`LATE_PROD`/`LATE_CONSUMPTION`). Les ères 0-10 restent
+  strictement intactes. Calibré via `make sim`.
+- **Accélérateur de skill (constellation Simon, ère 11)** : reproduire une
+  séquence de 10 idées **double la Complexité de l'ère** (cumulable, plafonné à
+  `MAX_COMPLEXITY_BOOST` clears, soit ×32). Levier actif, réservé aux joueurs qui
+  maîtrisent le mini-jeu ; persisté en compteur, multiplicateur dérivé (cf.
+  [ARCHITECTURE.md](./ARCHITECTURE.md) 8.2).
 
 ### 7.1 Découverte progressive (anti-spoiler)
 

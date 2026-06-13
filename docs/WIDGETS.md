@@ -236,22 +236,24 @@ section 6.4 (`CrisisGame`, `CrisisBanner`, `CrisisScene`, `crisisStore`).
 
 - **Ressources / recette** : `tool` -> `knowledge` (recette `learning`). Verbe :
   Apprendre.
-- **Mécanique - mémoire / séquence (Simon).** Des "idées" (nœuds d'une
-  constellation) **s'illuminent dans un ordre** ; le joueur **reproduit la
-  séquence** en cliquant les nœuds dans le bon ordre (apprendre = retenir et
-  transmettre). Réussir produit du `knowledge` ; les séquences **s'allongent**
-  avec le niveau.
-- **Progression / nouveauté** : pure mécanique de **mémoire**, inédite et
-  cérébrale - colle au thème de l'éveil de l'esprit. Casse franchement la
-  routine.
-- **Gestion de ressources** : le `knowledge` récompense la **performance**
-  (longueur de séquence réussie), introduisant une ressource liée à l'habileté
-  cognitive.
+- **Mécanique - séquence façon vrai Simon.** Six "idées" (nœuds), **chacune sa
+  couleur** (la couleur aide à mémoriser, la forme/numéro reste l'identité ;
+  petit point coloré au survol). La séquence **s'illumine dans un ordre**, le
+  joueur la **reproduit**. Elle est **cumulative** : +1 nœud à chaque réussite,
+  **plafonnée à 10** ; une erreur **repart de zéro** avec une nouvelle séquence.
+  Signaux nets : floraison à la réussite, flash rouge + secousse à l'échec, et un
+  **compteur d'étapes**.
+- **Récompenses** : **chaque clic** produit du `tool` (base) - **doublé** sur le
+  bon nœud ; **valider la séquence** produit du `knowledge` (secondaire) ×sa
+  longueur. **Pinacle** : réussir une séquence de **10** **double la Complexité de
+  l'ère** (modale + ×N devant le diamant des ressources), cumulable jusqu'à un
+  cap (×32) ; au cap, un "Bonus maximal atteint" évite de frustrer le joueur.
+- **Progression / nouveauté** : pure mécanique de **mémoire/skill**, cérébrale -
+  colle à l'éveil de l'esprit, et offre un **levier actif** d'accélération de la
+  Complexité de l'ère (cf. [GAME-DESIGN.md](./GAME-DESIGN.md) section 8).
 - **Implémentation** : manuel = reproduire la séquence ; auto = `learning`
-  (transmission passive du savoir). Anti-frustration = une erreur = séquence
-  plus courte validée (savoir partiel), jamais zéro. a11y = nœuds = boutons
-  numérotés, séquence aussi annoncée (aria-live) pour ne pas dépendre du seul
-  visuel. Récurrence : sciences, paradigmes.
+  (transmission passive). a11y = nœuds = boutons numérotés, séquence + issue
+  annoncées (aria-live). Récurrence : sciences, paradigmes.
 
 ## Ère 12 - Sociétés : plan de la cité
 

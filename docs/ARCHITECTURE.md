@@ -47,7 +47,7 @@ src/
 │   ├── memory.ts         # mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), 3 niveaux par ère (×2/×4/×8) ; helpers purs (memoryStart/memoryWin) réutilisés par le store ET le sim
 │   └── inventory.ts      # sac à dos : déblocage (apparition d'une ressource) + ressources connues groupées par ère
 ├── data/
-│   ├── eras/             # toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence
+│   ├── eras/             # toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence ; easing tardif (LATE_FROM) : prod ↑ / conso ↓ composées à partir de l'ère 11, ères 0-10 intactes
 │   ├── crises.ts         # définitions de crises
 │   ├── metaUpgrades.ts   # définitions des méta-upgrades
 │   ├── galets.ts         # définitions des galets de l'infini
@@ -74,7 +74,7 @@ src/
 │   │   ├── memory/       # mini-jeu de mémoire : MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42 (+EraSymbolCluster), police Neogen
 │   │   ├── inventory/    # sac à dos : InventoryButton/InventoryModal
 │   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
-│   └── layout/           # coquille, navigation d'ères, EraTransition (glissement), SceneBackground, GaletReceptacle
+│   └── layout/           # coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier), GaletReceptacle
 └── App.tsx               # navigation par état (pas de router)
 ```
 
@@ -194,6 +194,7 @@ interface GameState {
   seenEvents: Record<string, boolean>      // modales narratives déjà montrées (une fois)
   galets: Record<string, { found: boolean; active: boolean }>  // galets de l'infini (conservés au prestige)
   memoryLevels: Record<EraId, number>      // mini-jeu de mémoire : nombre de boosts par ère (0..3)
+  complexityBoosts: Record<EraId, number>  // constellation Simon : 10-séquences réussies par ère (le moteur dérive x2^n sur la Complexité de l'ère, cap MAX_COMPLEXITY_BOOST)
 }
 ```
 
@@ -345,6 +346,9 @@ Sources de multiplicateur, toutes dérivées :
   `valeur^count` (`crisisReboundMultiplier`). `resolveCrisis` n'applique **que**
   les effets de **stock** (resetResource, transformResource), jamais les
   `multiplier`.
+- **Bonus constellation (Simon)** : compteur `complexityBoosts[era]` -> le moteur
+  applique `COMPLEXITY_BOOST^n` à la Complexité de l'ère (dans `complexityPerUnit`),
+  plafonné à `MAX_COMPLEXITY_BOOST` clears. Gagné en reproduisant une séquence de 10.
 
 Le champ `multipliers` ne porte donc plus que la clé `meta` (recalculée) et un
 éventuel multiplicateur direct ; mémoire et crises n'y écrivent plus. La migration

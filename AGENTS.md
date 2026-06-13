@@ -70,7 +70,7 @@ src/
 │   ├── memory.ts         # Mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), 3 niveaux par ère (×2/×4/×8) ; helpers purs partagés avec le sim
 │   └── inventory.ts      # Sac à dos : déblocage (apparition d'une ressource) + ressources connues groupées par ère
 ├── data/                 # Contenu data-driven (modifiable sans toucher au moteur)
-│   ├── eras/             # Toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence
+│   ├── eras/             # Toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence ; easing tardif (LATE_FROM, prod ↑ / conso ↓ composées) à partir de l'ère 11 seulement
 │   ├── crises.ts         # Définitions de crises
 │   ├── metaUpgrades.ts   # Définitions des méta-upgrades
 │   ├── galets.ts         # Définitions des galets de l'infini (collectibles conservés au prestige)
@@ -82,7 +82,7 @@ src/
 │   ├── ui/               # Primitives (Button, Panel, Icon + glyphs/ un fichier par glyphe, IconBadge, AlertBadge, FloaterLayer...)
 │   ├── game/             # Ressources, machines, paliers, badges, galets ; modales d'évènements (EventModal + EventHero, layout « hero » partagé typé) ; crise (CrisisBanner, CrisisGame plein écran, CrisisScene, ResourceCrisisBadge) ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal)
 │   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
-│   └── layout/           # Coquille, navigation d'ères, EraTransition (glissement), SceneBackground, GaletReceptacle ; LanguageSwitch, SaveMenu
+│   └── layout/           # Coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier + shared.ts/Defs.tsx), GaletReceptacle ; LanguageSwitch, SaveMenu
 └── App.tsx               # Navigation par état (pas de router)
 tests/
 ├── helpers.ts            # Helpers partagés (makeState) - éviter la duplication
@@ -211,7 +211,7 @@ pas seulement à constater.
    `CrisisScene`, `#ef4444`), scrim de modale (`bg-black/60`), dégradé de
    température de `CoolingWidget`, **vert de la zone cible d'`AtmosphereBalance`**
    (`#22c55e`), **verts du feuillage du décor terrestre**
-   (`SceneBackground` ère 10), **couleurs d'illustration du mini-jeu de crise**
+   (`scenes/LandScene` ère 10), **couleurs d'illustration du mini-jeu de crise**
    (`CrisisGame` : ciel rouge sombre, météore/flammes), et `theme.css` /
    `index.css` (CSS brut autorisé). Tout nouveau hex hors de ces cas est à
    remplacer par un jeton.
