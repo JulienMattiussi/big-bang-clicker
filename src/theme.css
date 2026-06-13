@@ -35,6 +35,8 @@
   /* Octarine: the eighth color (Discworld wink), reserved for rare/magical
      elements. Defined here, inherited by all tiers. */
   --octarine: #b026ff;
+  /* Danger red, for failure flashes (e.g. a missed Simon sequence) and alarms. */
+  --danger: #ef4444;
   /* Dedicated era-icon colors (duotone), distinct from accent and secondary.
      Constant identity from one tier to the next. */
   --era: #f472b6;
@@ -61,8 +63,8 @@
   --galet-rainbow-4: #4dd964;
   --galet-rainbow-5: #4db8ff;
   --galet-rainbow-6: #c061f0;
-  /* Cambrian body parts (assembly widget): one distinct hue per part, spanning a
-     rainbow so the player tells them apart at a glance (shape stays the identity). */
+  /* Distinct-hue palette spanning a rainbow, for widgets that need to tell items
+     apart at a glance: Cambrian body parts (assembly), constellation ideas (Simon). */
   --part-1: #ef5350;
   --part-2: #ff9f40;
   --part-3: #ffd54f;

@@ -102,6 +102,8 @@ export const fr = {
   'memory.watch': 'Observe',
   'memory.repeat': 'Reproduis la séquence',
   'memory.idea': 'Idée',
+  'memory.success': 'Idée fulgurante !',
+  'memory.fail': 'Idée perdue, on recommence',
   'city.hint': 'Choisis un bâtiment, place-le ; les bons voisinages font la cité',
   'city.empty': 'Parcelle vide',
   'city.house': 'Habitation',

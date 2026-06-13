@@ -8,7 +8,7 @@ const bundles: EraBundle[] = [
     uiTier: 'civilization',
     icon: 'lightbulb',
     widget: 'memory',
-    base: { id: 'tool', icon: 'cog', tier: 12 },
+    base: { id: 'tool', icon: 'axe', tier: 12 },
     combined: { id: 'knowledge', icon: 'brain', tier: 14 },
     consumes: 'fauna',
     generatorId: 'toolmaking',

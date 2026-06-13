@@ -1,5 +1,6 @@
 import {
   Atom,
+  Axe,
   Backpack,
   Bomb,
   Brain,
@@ -88,6 +89,7 @@ const ICONS: Record<string, Glyph> = {
   'circle-dot': CircleDot,
   zap: Zap,
   atom: Atom,
+  axe: Axe,
   cog: Cog,
   gem: Gem,
   flame: Flame,

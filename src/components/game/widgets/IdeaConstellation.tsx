@@ -8,15 +8,29 @@ const NODES = Array.from({ length: 6 }, (_, i) => {
   const a = -Math.PI / 2 + (i / 6) * Math.PI * 2
   return { x: 50 + Math.cos(a) * 34, y: 50 + Math.sin(a) * 34 }
 })
+/** One distinct hue per idea, so colour (not just position) helps memorise.
+ *  Octarine replaces the orange (--part-2), too close to the yellow (--part-3). */
+const NODE_COLORS = [
+  'var(--part-1)', // red
+  'var(--color-octarine)', // octarine
+  'var(--part-3)', // yellow
+  'var(--part-4)', // green
+  'var(--part-5)', // teal
+  'var(--part-6)', // blue
+]
+const FAIL_COLOR = 'var(--danger)'
 const START_LEN = 2
 const FLASH_MS = 600
+/** How long the success/failure flash stays up (ms). */
+const FEEDBACK_MS = 700
 
 /**
- * Era 11 (Intelligence): a constellation of ideas. Watch the sequence light up,
- * then reproduce it by clicking the ideas in order (+1 tool each). Repeat the
- * whole pattern and the insight crystallises into knowledge (free); the sequence
- * then grows by one. A wrong step just shortens it - learning, never punished.
- * A pure memory mechanic, unlike any other era.
+ * Era 11 (Intelligence): a constellation of ideas (a Simon-style memory game).
+ * Watch the sequence light up, then reproduce it by clicking the ideas in order.
+ * EVERY click yields the base resource (the RIGHT one doubles it); reproducing the
+ * whole sequence yields the secondary resource and the pattern grows by one. A
+ * wrong step just shortens it - learning, never hard-punished. Each idea has its
+ * own colour; clear success/fail flashes and a step indicator guide the player.
  */
 export function IdeaConstellation({ era }: { era: EraDef }) {
   const { t } = useTranslation()
@@ -26,8 +40,15 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
   const [active, setActive] = useState<number | null>(null)
   const [announce, setAnnounce] = useState('')
   const [wrong, setWrong] = useState(0)
+  // Clear feedback flash on a completed or failed sequence.
+  const [feedback, setFeedback] = useState<'success' | 'fail' | null>(null)
+  // Sequence length and how many steps the player has reproduced (the indicator).
+  const [seqLen, setSeqLen] = useState(START_LEN)
+  const [step, setStep] = useState(0)
+  const [hovered, setHovered] = useState<number | null>(null)
 
   const seqRef = useRef<number[]>([])
+  const succeededRef = useRef(0) // length of the last fully-cleared sequence
   const posRef = useRef(0)
   const phaseRef = useRef<'watch' | 'input'>('watch')
   const timers = useRef<number[]>([])
@@ -37,14 +58,21 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
     timers.current = []
   }
 
-  const startRound = (len: number) => {
+  const randomNode = () => Math.floor(Math.random() * NODES.length)
+
+  /** Plays the CURRENT sequence (seqRef): flashes each idea, then hands over. Like
+   *  a real Simon, on a SUCCESS the sequence grows by one (cumulative, same prefix);
+   *  on a MISS it resets to a FRESH sequence of START_LEN (back to the start). */
+  const playRound = () => {
     clearTimers()
-    const seq = Array.from({ length: len }, () => Math.floor(Math.random() * NODES.length))
-    seqRef.current = seq
+    const seq = seqRef.current
     posRef.current = 0
     phaseRef.current = 'watch'
     setPhase('watch')
     setActive(null)
+    setFeedback(null)
+    setSeqLen(seq.length)
+    setStep(0)
     setAnnounce(seq.map((n) => n + 1).join(' '))
     // Flash each idea in turn, then hand over to the player.
     seq.forEach((node, k) => {
@@ -67,7 +95,12 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
   useEffect(() => {
     // Defer the first round to a timeout so the effect body doesn't setState
     // synchronously (and the sequence is generated outside of render).
-    timers.current.push(window.setTimeout(() => startRound(START_LEN), 200))
+    timers.current.push(
+      window.setTimeout(() => {
+        seqRef.current = Array.from({ length: START_LEN }, randomNode)
+        playRound()
+      }, 200),
+    )
     return clearTimers
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -80,22 +113,39 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
   const clickIdea = (i: number) => {
     if (phaseRef.current !== 'input') return
     const seq = seqRef.current
-    if (i === seq[posRef.current]) {
-      gainBase()
+    const correct = i === seq[posRef.current]
+    // Every click yields the base resource (a fired neuron); the RIGHT one doubles
+    // it. Completing the whole sequence yields the secondary resource (complete()).
+    gainBase(correct ? 2 : 1)
+    if (correct) {
       flash(i)
       posRef.current += 1
+      setStep(posRef.current)
       if (posRef.current >= seq.length) {
-        complete() // full sequence reproduced: knowledge crystallises
+        complete(seq.length) // reward scales with the length of the cleared sequence
         phaseRef.current = 'watch'
         setPhase('watch')
-        timers.current.push(window.setTimeout(() => startRound(seq.length + 1), 750))
+        setFeedback('success') // clear win signal: the whole constellation blooms
+        succeededRef.current = seq.length
+        timers.current.push(
+          window.setTimeout(() => {
+            seqRef.current = [...seqRef.current, randomNode()] // grow by one (cumulative)
+            playRound()
+          }, FEEDBACK_MS + 250),
+        )
       }
     } else {
-      setWrong((w) => w + 1) // gentle miss: shorten and retry
+      setWrong((w) => w + 1)
+      setFeedback('fail') // clear miss signal: a red flash + shake
       phaseRef.current = 'watch'
       setPhase('watch')
+      // A miss sends you back to the start: a fresh sequence of START_LEN.
+      succeededRef.current = 0
       timers.current.push(
-        window.setTimeout(() => startRound(Math.max(START_LEN, seq.length - 1)), 750),
+        window.setTimeout(() => {
+          seqRef.current = Array.from({ length: START_LEN }, randomNode)
+          playRound()
+        }, FEEDBACK_MS + 250),
       )
     }
   }
@@ -125,17 +175,26 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
             />
           )
         })}
-        {NODES.map((n, i) => (
+        {NODES.map((n, i) => {
+          // Lit when flashing, or for everyone during a success/fail flash.
+          const lit = active === i || feedback !== null
+          const fill = feedback === 'fail' ? FAIL_COLOR : NODE_COLORS[i]
+          return (
           <g key={i}>
             <circle
               cx={n.x}
               cy={n.y}
-              r={active === i ? 8 : 6}
-              fill={active === i ? 'var(--color-accent)' : 'var(--color-surface)'}
-              stroke="var(--color-secondary)"
+              r={lit ? 8 : 6}
+              fill={fill}
+              fillOpacity={lit ? 1 : 0.3}
+              stroke={fill}
               strokeWidth="1.6"
-              className={active === i ? 'pop-in' : undefined}
+              style={{ transition: 'r 0.18s ease, fill 0.18s ease, fill-opacity 0.18s ease' }}
             />
+            {/* Hover/focus affordance: a small dot of the idea's own colour. */}
+            {hovered === i && !lit ? (
+              <circle cx={n.x} cy={n.y} r="2.6" fill={NODE_COLORS[i]} pointerEvents="none" />
+            ) : null}
             <circle
               cx={n.x}
               cy={n.y}
@@ -146,6 +205,10 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
               aria-disabled={phase === 'watch'}
               aria-label={`${t('memory.idea')} ${i + 1}`}
               onClick={() => clickIdea(i)}
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered((h) => (h === i ? null : h))}
+              onFocus={() => setHovered(i)}
+              onBlur={() => setHovered((h) => (h === i ? null : h))}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault()
@@ -156,15 +219,46 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
               strokeWidth="2"
             />
           </g>
-        ))}
+          )
+        })}
       </svg>
       <span className="text-base font-semibold text-fg">{verb}</span>
-      <span className="text-xs text-muted">
-        {phase === 'watch' ? t('memory.watch') : t('memory.repeat')}
+      {/* Step indicator: one dot per step of the current sequence, filled as the
+          player reproduces it. */}
+      <div className="flex items-center gap-1.5" role="presentation">
+        {Array.from({ length: seqLen }, (_, k) => (
+          <span
+            key={k}
+            className={`h-2 w-2 rounded-full transition-colors ${k < step ? 'bg-accent' : 'bg-border'}`}
+          />
+        ))}
+      </div>
+      <span
+        className={`text-xs ${
+          feedback === 'success'
+            ? 'font-semibold text-octarine'
+            : feedback === 'fail'
+              ? 'font-semibold text-red-400'
+              : 'text-muted'
+        }`}
+      >
+        {feedback === 'success'
+          ? t('memory.success')
+          : feedback === 'fail'
+            ? t('memory.fail')
+            : phase === 'watch'
+              ? t('memory.watch')
+              : t('memory.repeat')}
       </span>
-      {/* Screen-reader equivalent of the flashing pattern. */}
+      {/* Screen-reader equivalent of the flashing pattern and the outcome. */}
       <span className="sr-only" aria-live="polite">
-        {phase === 'watch' ? `${t('memory.watch')}: ${announce}` : t('memory.repeat')}
+        {feedback === 'success'
+          ? t('memory.success')
+          : feedback === 'fail'
+            ? t('memory.fail')
+            : phase === 'watch'
+              ? `${t('memory.watch')}: ${announce}`
+              : t('memory.repeat')}
       </span>
     </div>
   )

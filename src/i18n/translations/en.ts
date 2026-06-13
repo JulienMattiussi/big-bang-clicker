@@ -102,6 +102,8 @@ export const en: Translations = {
   'memory.watch': 'Watch',
   'memory.repeat': 'Repeat the sequence',
   'memory.idea': 'Idea',
+  'memory.success': 'Flash of insight!',
+  'memory.fail': 'Idea lost, try again',
   'city.hint': 'Pick a building and place it; good neighbours make the city',
   'city.empty': 'Empty plot',
   'city.house': 'House',

@@ -41,14 +41,14 @@ export function useEraMechanic(era: EraDef) {
     spawn(`res:${era.clickResource}`, `+${formatNumber(amount)}`, 'resource')
   }
 
-  /** Produces the recipe output once (free), with a floating +x on each output. */
-  const complete = () => {
-    if (!recipeId) return
+  /** Produces the recipe output `times` (free), with one floating +total per output. */
+  const complete = (times = 1) => {
+    if (!recipeId || times <= 0) return
     const conv = useGameStore.getState().defs.converters[recipeId]
     if (!conv) return
-    manualProduce(recipeId)
+    for (let k = 0; k < times; k++) manualProduce(recipeId)
     for (const o of conv.outputs)
-      spawn(`res:${o.resource}`, `+${formatNumber(o.amount)}`, 'resource')
+      spawn(`res:${o.resource}`, `+${formatNumber(o.amount * times)}`, 'resource')
   }
 
   return { verb, name, gainBase, complete, baseResource: era.clickResource }
