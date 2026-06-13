@@ -1,7 +1,7 @@
 import type { ReactElement, SVGProps } from 'react'
 import { GLYPH_PROPS } from './glyphProps'
 
-/** Spikes for the virus glyph (capsid + glycoprotein knobs), precomputed. */
+/** Spikes for the virus glyph (capsid + glycoprotein knobs). */
 const SPIKES = Array.from({ length: 8 }, (_, i) => {
   const a = (i / 8) * Math.PI * 2
   const c = Math.cos(a)

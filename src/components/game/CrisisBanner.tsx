@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import { CrisisScene } from '@/components/game/CrisisScene'
+import { CrisisScene } from '@/components/art/CrisisScene'
 import { useGameStore } from '@/store/gameStore'
 import { useCrisisStore, CRISIS_GAMES } from '@/store/crisisStore'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -31,7 +31,6 @@ export function CrisisBanner() {
             key={id}
             className="crisis-card modal-in flex w-full max-w-lg flex-col items-center gap-3 rounded-xl border border-red-500/50 bg-red-500/10 p-6 text-center"
           >
-            {/* Big symbolic illustration (meteor impact for the mass extinction). */}
             <CrisisScene id={id} className="h-28 w-auto" />
             <div className="flex items-center gap-2 text-red-400">
               <Icon name="skull" className="h-5 w-5" />

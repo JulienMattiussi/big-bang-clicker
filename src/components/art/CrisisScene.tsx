@@ -54,11 +54,10 @@ export function CrisisScene({
         strokeWidth="1.2"
         fill="none"
       />
-      {/* Impact flash (pulsing). */}
       <circle className="crisis-flash" cx="72" cy="113" r="48" fill="url(#crisis-flash)" />
-      {/* A secondary debris streak. */}
+      {/* Secondary debris streak (diagonal sliver). */}
       <path d="M150 30 L156 38 L120 70 L116 63 Z" fill="url(#crisis-trail)" opacity="0.5" />
-      {/* Main meteor trail + head. */}
+      {/* Main meteor trail (top-right to horizon) + glowing head. */}
       <path d="M196 10 L205 22 L84 110 L70 103 Z" fill="url(#crisis-trail)" />
       <circle cx="198" cy="14" r="10" fill="url(#crisis-flash)" />
       <circle cx="198" cy="14" r="4.5" fill="var(--color-accent)" />

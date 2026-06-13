@@ -1,7 +1,7 @@
 import type { ReactElement, SVGProps } from 'react'
 import { GLYPH_PROPS } from './glyphProps'
 
-/** Small organelles dotted inside the eukaryote glyph, precomputed. */
+/** Precomputed once at module load (not per render). */
 const ORGANELLES = [
   { cx: 7.2, cy: 8.5 },
   { cx: 16.5, cy: 9 },

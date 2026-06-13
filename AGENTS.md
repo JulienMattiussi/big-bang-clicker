@@ -79,8 +79,9 @@ src/
 ├── i18n/                 # i18n custom (FR source de vérité, EN typé complet) ; locale persistée en localStorage
 ├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales), useGalets (découverte), useEraMechanic (clic d'ère), useMilestone (jauge/bouton de palier)
 ├── components/           # Par domaine ; un composant par fichier
-│   ├── ui/               # Primitives (Button, Panel, Icon + glyphs/ un fichier par glyphe, IconBadge, AlertBadge, FloaterLayer...)
-│   ├── game/             # Ressources, machines, paliers, badges, galets ; modales d'évènements (EventModal + EventHero, layout « hero » partagé typé) ; crise (CrisisBanner, CrisisGame plein écran, CrisisScene, ResourceCrisisBadge) ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal)
+│   ├── ui/               # Primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── art/              # GRAPHISME exclusivement : glyphs/ (icônes custom du registre Icon), illustrations (Galet, Sauropod, OrganismGlyph, PartGlyph, CrisisCreatures, CrisisScene)
+│   ├── game/             # Ressources, machines, paliers, badges, galets ; modales d'évènements (EventModal + EventHero, layout « hero » partagé typé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge) ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal)
 │   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
 │   └── layout/           # Coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier + shared.ts/Defs.tsx), GaletReceptacle ; LanguageSwitch, SaveMenu
 └── App.tsx               # Navigation par état (pas de router)
@@ -212,7 +213,7 @@ pas seulement à constater.
    température de `CoolingWidget`, **vert de la zone cible d'`AtmosphereBalance`**
    (`#22c55e`), **verts du feuillage du décor terrestre**
    (`scenes/LandScene` ère 10), **couleurs d'illustration du mini-jeu de crise**
-   (`CrisisGame` : ciel rouge sombre, météore/flammes), et `theme.css` /
+   (`CrisisGame` ciel rouge sombre + `art/CrisisCreatures` météore/flammes), et `theme.css` /
    `index.css` (CSS brut autorisé). Tout nouveau hex hors de ces cas est à
    remplacer par un jeton.
 4. **i18n** : parité stricte FR/EN (même nombre de clés), tout texte via `t()`,

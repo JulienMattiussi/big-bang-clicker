@@ -4,8 +4,8 @@ import { Modal } from '@/components/ui/Modal'
 import { Icon } from '@/components/ui/Icon'
 import { EraIcon } from '@/components/game/EraIcon'
 import { EventHero, type HeroTone } from '@/components/game/EventHero'
-import { CrisisScene } from '@/components/game/CrisisScene'
-import { Galet } from '@/components/game/Galet'
+import { CrisisScene } from '@/components/art/CrisisScene'
+import { Galet } from '@/components/art/Galet'
 import { useEventStore } from '@/store/eventStore'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
@@ -184,7 +184,6 @@ export function EventModal() {
             </h2>
           </div>
           <p className="mb-5 leading-relaxed text-muted">{body}</p>
-          {/* Complexity-doubled reward: a big "xN diamond" under the text. */}
           {event.complexityFactor ? (
             <div className="mb-2 flex items-center justify-center gap-2 text-octarine">
               <span className="text-4xl font-extrabold tabular-nums">×{event.complexityFactor}</span>

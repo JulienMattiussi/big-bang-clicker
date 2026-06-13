@@ -48,9 +48,7 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
   const [active, setActive] = useState<number | null>(null)
   const [announce, setAnnounce] = useState('')
   const [wrong, setWrong] = useState(0)
-  // Clear feedback flash on a completed or failed sequence.
   const [feedback, setFeedback] = useState<'success' | 'fail' | null>(null)
-  // Sequence length and how many steps the player has reproduced (the indicator).
   const [seqLen, setSeqLen] = useState(START_LEN)
   const [step, setStep] = useState(0)
   const [hovered, setHovered] = useState<number | null>(null)
@@ -82,7 +80,6 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
     setSeqLen(seq.length)
     setStep(0)
     setAnnounce(seq.map((n) => n + 1).join(' '))
-    // Flash each idea in turn, then hand over to the player.
     seq.forEach((node, k) => {
       timers.current.push(window.setTimeout(() => setActive(node), k * FLASH_MS + 350))
       timers.current.push(
@@ -188,7 +185,6 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
         role="group"
         aria-label={verb}
       >
-        {/* Faint links between neighbouring ideas. */}
         {NODES.map((n, i) => {
           const m = NODES[(i + 1) % NODES.length]
           return (
@@ -252,8 +248,6 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
         })}
       </svg>
       <span className="text-base font-semibold text-fg">{verb}</span>
-      {/* Step indicator: one dot per step of the current sequence, filled as the
-          player reproduces it. */}
       <div className="flex items-center gap-1.5" role="presentation">
         {Array.from({ length: seqLen }, (_, k) => (
           <span

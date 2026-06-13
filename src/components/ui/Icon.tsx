@@ -75,7 +75,7 @@ import {
   TissueIcon,
   TrilobiteIcon,
   VirusIcon,
-} from './glyphs'
+} from '@/components/art/glyphs'
 
 type Glyph = LucideIcon | ((props: SVGProps<SVGSVGElement>) => ReactElement)
 

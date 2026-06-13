@@ -90,7 +90,6 @@ function SavePanel({ onDone }: { onDone: () => void }) {
 
   const doImport = () => onImported(importSave(importText.trim()))
 
-  // Import directly from a chosen file (no copy-paste).
   const importFromFile = async (file: File) => {
     const text = await file.text()
     onImported(importSave(text.trim()))
@@ -142,7 +141,6 @@ function SavePanel({ onDone }: { onDone: () => void }) {
           <span className="block text-xs font-semibold tracking-wide text-muted uppercase">
             {t('save.import')}
           </span>
-          {/* Import from a file (no copy-paste needed). */}
           <input
             ref={fileRef}
             type="file"

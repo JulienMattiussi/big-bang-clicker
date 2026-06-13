@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react'
-import { Sauropod } from '@/components/layout/Sauropod'
+import { Sauropod } from '@/components/art/Sauropod'
 import { useGameStore } from '@/store/gameStore'
 import { isCrisisReady } from '@/lib/crises'
 import { Defs } from './Defs'
@@ -191,7 +191,6 @@ export function LandScene(): ReactElement {
     // A gentle soft-focus on the whole terrestrial decor (much lighter than the
     // intelligence era's blur), so it recedes a touch behind the window.
     <div className="absolute inset-0" style={{ filter: 'blur(3px)' }}>
-      {/* Drifting clouds. */}
       <div className="bg-drift absolute inset-0">
         <svg className={svgClass} {...svgProps}>
           <g fill="var(--color-fg)" opacity="0.06">
@@ -203,7 +202,6 @@ export function LandScene(): ReactElement {
       </div>
       <svg className={svgClass} {...svgProps}>
         <Defs />
-        {/* Low sun glow. */}
         <circle
           cx="72"
           cy="30"

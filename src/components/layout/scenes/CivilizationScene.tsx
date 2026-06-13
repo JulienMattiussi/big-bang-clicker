@@ -182,15 +182,12 @@ export function CivilizationScene(): ReactElement {
         </filter>
       </defs>
       <g filter="url(#sb-soft)" opacity="0.7">
-        {/* Dendrites / axons (filled ribbons), all rooted in a neuron. */}
         {SYN_FIBRES.map((f, i) => (
           <path key={`f${i}`} d={f.d} fill={f.color} opacity={f.o} />
         ))}
-        {/* Synaptic boutons: each dendrite ends in a small terminal (not in the void). */}
         {SYN_TERMINALS.map((tn, i) => (
           <circle key={`t${i}`} cx={tn.x} cy={tn.y} r={tn.r} fill="var(--color-accent)" opacity="0.4" />
         ))}
-        {/* Neuron cell bodies: an irregular glowing blob, pulsing in place. */}
         {SYN_SOMAS.map((s, i) => (
           <g
             key={`m${i}`}
@@ -201,7 +198,6 @@ export function CivilizationScene(): ReactElement {
             <path d={s.blob} fill="var(--color-fg)" opacity="0.5" />
           </g>
         ))}
-        {/* Synaptic sparks firing along the fibres. */}
         {SYN_SPARKS.map((s, i) => (
           <circle
             key={`k${i}`}

@@ -69,8 +69,9 @@ src/
 │   ├── useEraMechanic.ts # geste de clic d'une ère (gain de base + complétion gratuite)
 │   └── useMilestone.ts   # données du palier suivant (jauge NextGoal + bouton MilestoneButton)
 ├── components/
-│   ├── ui/               # primitives (Button, Panel, Modal (scrim/dialog/Escape partagés), Icon + glyphs/ un fichier par glyphe, IconBadge, AlertBadge, FloaterLayer...)
-│   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, galets ; modales (EventModal + EventHero, layout « hero » partagé) ; crise (CrisisBanner, CrisisGame plein écran, CrisisScene, ResourceCrisisBadge)
+│   ├── ui/               # primitives (Button, Panel, Modal (scrim/dialog/Escape partagés), Icon, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── art/              # graphisme exclusivement : glyphs/ (icônes custom du registre Icon) + illustrations (Galet, Sauropod, OrganismGlyph, PartGlyph, CrisisCreatures, CrisisScene)
+│   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, galets ; modales (EventModal + EventHero, layout « hero » partagé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge)
 │   │   ├── memory/       # mini-jeu de mémoire : MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42 (+EraSymbolCluster), police Neogen
 │   │   ├── inventory/    # sac à dos : InventoryButton/InventoryModal
 │   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish...) routés par interactive.ts ; helper svgCoords.ts

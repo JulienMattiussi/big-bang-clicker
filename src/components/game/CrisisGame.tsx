@@ -3,193 +3,16 @@ import { useCrisisStore, CRISIS_GOAL } from '@/store/crisisStore'
 import { useGameStore } from '@/store/gameStore'
 import { useEventStore } from '@/store/eventStore'
 import { useTranslation } from '@/i18n/useTranslation'
-
-// Play field in viewBox units. The width matches the rendered box aspect
-// (max-w-5xl over h-72 ~ 3.55:1) so the scene fills the full width instead of
-// being letterboxed by preserveAspectRatio.
-const W = 356
-const H = 100
-const GROUND_Y = 82
-const STEP_MS = 80
-const FALL_MS = 1500
-const IMPACT_R = 19
-const TARGET_ALIVE = 9
-
-type Kind = 'rat' | 'raptor'
-interface Creature {
-  id: number
-  x: number
-  vx: number
-  kind: Kind
-  state: 'run' | 'saved' | 'hit'
-  t0: number
-}
-interface Meteor {
-  id: number
-  x: number
-  y: number
-  vy: number
-}
-interface Flash {
-  id: number
-  x: number
-  born: number
-}
-interface World {
-  creatures: Creature[]
-  meteors: Meteor[]
-  flashes: Flash[]
-  next: number
-  time: number
-  meteorTimer: number
-  creatureTimer: number
-}
-
-const rand = (a: number, b: number) => a + Math.random() * (b - a)
-
-const freshWorld = (): World => ({
-  creatures: [],
-  meteors: [],
-  flashes: [],
-  next: 1,
-  time: 0,
-  meteorTimer: 600,
-  creatureTimer: 0,
-})
-
-/** Advances the world one STEP_MS tick (pure: returns a new world). */
-function step(prev: World): World {
-  const dt = STEP_MS / 1000
-  const time = prev.time + STEP_MS
-  let next = prev.next
-
-  // Meteors fall; spawn on a random cadence.
-  let meteorTimer = prev.meteorTimer - STEP_MS
-  const meteors = prev.meteors.map((m) => ({ ...m, y: m.y + m.vy * dt }))
-  if (meteorTimer <= 0) {
-    meteors.push({
-      id: next++,
-      x: rand(12, W - 12),
-      y: -12,
-      vy: (GROUND_Y + 12) / (FALL_MS / 1000),
-    })
-    meteorTimer = rand(650, 1300)
-  }
-  const landed = meteors.filter((m) => m.y >= GROUND_Y)
-  const flashes = prev.flashes.filter((f) => time - f.born < 520)
-  for (const m of landed) flashes.push({ id: next++, x: m.x, born: time })
-
-  // Creatures wander and bounce; meteors wipe any caught in the open.
-  let creatures = prev.creatures.map((c) => {
-    if (c.state === 'run' && landed.some((m) => Math.abs(c.x - m.x) < IMPACT_R)) {
-      return { ...c, state: 'hit' as const, t0: time }
-    }
-    if (c.state !== 'run') return c
-    let x = c.x + c.vx * dt
-    let vx = c.vx
-    if (x < 6) {
-      x = 6
-      vx = Math.abs(vx)
-    } else if (x > W - 6) {
-      x = W - 6
-      vx = -Math.abs(vx)
-    }
-    return { ...c, x, vx }
-  })
-
-  // Keep a few creatures alive.
-  let creatureTimer = prev.creatureTimer - STEP_MS
-  const aliveRun = creatures.filter((c) => c.state === 'run').length
-  if (aliveRun < TARGET_ALIVE && creatureTimer <= 0) {
-    creatures.push({
-      id: next++,
-      x: rand(14, W - 14),
-      vx: rand(7, 15) * (Math.random() < 0.5 ? -1 : 1),
-      kind: Math.random() < 0.5 ? 'rat' : 'raptor',
-      state: 'run',
-      t0: time,
-    })
-    creatureTimer = rand(350, 700)
-  }
-
-  // Drop spent creatures (sheltered / hit) once their little animation is done.
-  creatures = creatures.filter(
-    (c) => !(c.state === 'saved' && time - c.t0 > 360) && !(c.state === 'hit' && time - c.t0 > 320),
-  )
-
-  return {
-    creatures,
-    meteors: meteors.filter((m) => m.y < GROUND_Y),
-    flashes,
-    next,
-    time,
-    meteorTimer,
-    creatureTimer,
-  }
-}
-
-/** A falling meteor: a cratered rocky head leading, with a flame trailing up
- *  behind it. Drawn at the local origin (rock centre); the caller translates it. */
-function Meteor() {
-  return (
-    <g aria-hidden>
-      {/* Flame trailing upward (the meteor falls downward). */}
-      <path
-        d="M-2.8 0 Q-3.3 -5 -1.6 -8 L-2.3 -11.5 L-0.6 -8 L0 -14 L0.7 -8 L2.3 -10.8 Q3.3 -5 2.8 0 Z"
-        fill="#f4641e"
-      />
-      <path d="M-1.5 0 Q-1.7 -4 -0.6 -6.5 L0 -9.8 L0.7 -6.5 Q1.7 -4 1.5 0 Z" fill="#ffcf3f" />
-      {/* Cratered rocky head. */}
-      <circle cx="0" cy="0" r="2.8" fill="#5b5b5b" stroke="#2e2e2e" strokeWidth="0.5" />
-      <circle cx="-0.9" cy="-0.6" r="0.75" fill="#3f3f3f" />
-      <circle cx="0.9" cy="0.5" r="0.55" fill="#3f3f3f" />
-      <circle cx="-0.1" cy="1.1" r="0.4" fill="#3f3f3f" />
-    </g>
-  )
-}
-
-/** A small creature silhouette - a rat or a raptor (the survivors of the
- *  extinction) - feet at the local origin, facing right (mirror via the parent). */
-function Critter({ kind }: { kind: Kind }) {
-  if (kind === 'raptor') {
-    // Bipedal theropod: stiff raised tail, body, neck rising to a snouted head,
-    // two digitigrade legs.
-    return (
-      <g
-        fill="var(--color-fg)"
-        stroke="var(--color-fg)"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M-7 -3 Q-3 -4 0 -4.5 Q2 -4.8 3 -4.2 Q4 -6 4.8 -7.6 Q5.2 -8.3 6 -8.1 Q7 -7.9 6.6 -7.1 Q6 -6.7 5.2 -6.7 Q4.6 -5.7 4 -4.9 Q3.2 -3.9 2.4 -3.5 Q1 -3.1 -1 -3.3 Q-4 -3.3 -7 -3 Z" />
-        <path
-          d="M0.6 -3.3 L1.5 -1.4 L0.5 0 M2.2 -3.1 L3 -1.4 L2.2 0"
-          fill="none"
-          strokeWidth="0.85"
-        />
-        {/* little theropod arm tucked under the chest */}
-        <path d="M3.4 -4.1 L4.2 -3.1 L3.7 -2.4" fill="none" strokeWidth="0.55" />
-      </g>
-    )
-  }
-  // Rodent: rounded body, head with a pointed snout and ear, long trailing tail.
-  return (
-    <g fill="var(--color-fg)" stroke="var(--color-fg)" strokeLinecap="round" strokeLinejoin="round">
-      <ellipse cx="-0.4" cy="-1.8" rx="3" ry="1.5" />
-      <path d="M2 -2.5 Q4.3 -3 5.1 -1.9 Q5.3 -1.2 4.2 -1.1 Q3.1 -1.1 2.2 -1.7 Z" />
-      <circle cx="2.5" cy="-3.1" r="0.75" />
-      <path d="M-3.3 -1.9 q-3 -0.2 -4.4 1.1" fill="none" strokeWidth="0.6" />
-      <path d="M-1.4 -0.5 V0 M1 -0.6 V0" fill="none" strokeWidth="0.7" />
-    </g>
-  )
-}
+import { GROUND_Y, H, IMPACT_R, STEP_MS, W, freshWorld, step, type World } from './crisisWorld'
+import { CritterGlyph, MeteorGlyph } from '@/components/art/CrisisCreatures'
 
 /**
  * Crisis survival mini-game (mass extinction): meteors rain down at random across
  * the full width while little creatures wander the ground. Click a creature to
  * send it diving into a burrow (sheltered); meteors wipe out any still in the
  * open. Shelter CRISIS_GOAL creatures and life springs back: the crisis resolves
- * and a victory modal is queued.
+ * and a victory modal is queued. The world/tick lives in crisisWorld.ts, the art
+ * in art/CrisisCreatures.tsx.
  */
 export function CrisisGame() {
   const { t } = useTranslation()
@@ -204,8 +27,6 @@ export function CrisisGame() {
   const won = useRef(false)
 
   useEffect(() => {
-    // The component mounts fresh for each fight, so useState's initial world is
-    // already clean; just run the loop.
     won.current = false
     const handle = setInterval(() => setWorld(step), STEP_MS)
     return () => clearInterval(handle)
@@ -256,7 +77,6 @@ export function CrisisGame() {
             <stop offset="100%" stopColor="#ef4444" stopOpacity="0" />
           </radialGradient>
         </defs>
-        {/* A darkened, blood-red catastrophe sky and a solid ground band. */}
         <rect x="0" y="0" width={W} height={H} fill="#1a0d12" opacity="0.55" />
         <rect
           x="0"
@@ -293,7 +113,6 @@ export function CrisisGame() {
           )
         })}
 
-        {/* Impact flashes (fading). */}
         {world.flashes.map((f) => {
           const age = (world.time - f.born) / 520
           return (
@@ -309,14 +128,12 @@ export function CrisisGame() {
           )
         })}
 
-        {/* Falling meteors (rocky head + flame trail). */}
         {world.meteors.map((m) => (
           <g key={`m${m.id}`} transform={`translate(${m.x} ${m.y})`} aria-hidden>
-            <Meteor />
+            <MeteorGlyph />
           </g>
         ))}
 
-        {/* Creatures. Sheltered ones dive into a burrow; hit ones fade out. */}
         {world.creatures.map((c) => {
           const age = world.time - c.t0
           const dir = c.vx < 0 ? -1 : 1
@@ -339,7 +156,7 @@ export function CrisisGame() {
                 <g
                   transform={`translate(${c.x + ux * T * p} ${GROUND_Y + uy * T * p}) scale(${dir} 1) rotate(${72 * p}) scale(${k} ${k})`}
                 >
-                  <Critter kind={c.kind} />
+                  <CritterGlyph kind={c.kind} />
                 </g>
               </g>
             )
@@ -353,7 +170,7 @@ export function CrisisGame() {
                 opacity={k}
                 aria-hidden
               >
-                <Critter kind={c.kind} />
+                <CritterGlyph kind={c.kind} />
               </g>
             )
           }
@@ -363,7 +180,7 @@ export function CrisisGame() {
                 transform={`translate(${c.x} ${GROUND_Y}) scale(${dir} 1)`}
                 className="group-hover:brightness-125"
               >
-                <Critter kind={c.kind} />
+                <CritterGlyph kind={c.kind} />
               </g>
               <circle
                 cx={c.x}
@@ -388,7 +205,6 @@ export function CrisisGame() {
         })}
       </svg>
 
-      {/* Progress toward the goal. */}
       <div className="flex w-full max-w-5xl items-center gap-3">
         <span className="text-sm font-semibold text-fg">
           {t('crisisGame.saved')} {saved} / {CRISIS_GOAL}

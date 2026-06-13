@@ -111,8 +111,6 @@ export function ResourcePanel({ era }: { era: EraDef }) {
                       title={complexityTip(id)}
                       className="inline-flex shrink-0 items-center gap-0.5 text-octarine"
                     >
-                      {/* Idea-constellation Complexity multiplier on this era, shown
-                          before the diamond. */}
                       {complexityBoost > 1 ? (
                         <span className="text-xs font-bold tabular-nums">×{complexityBoost}</span>
                       ) : null}
@@ -120,7 +118,6 @@ export function ResourcePanel({ era }: { era: EraDef }) {
                       <span className="sr-only">{complexityTip(id)}</span>
                     </span>
                   ) : null}
-                  {/* Memory mini-game multiplier on this era's main resource. */}
                   {id === era.clickResource && memoryBoost > 0 ? (
                     <MemoryBadge factor={2 ** memoryBoost} title={t('memory.badge')} />
                   ) : null}

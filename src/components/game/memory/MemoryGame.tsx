@@ -102,7 +102,6 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
     const matches = card.res.id === setId
     const count = inProgress.length + 1
 
-    // Flip the clicked card face-up.
     setCards((prev) => prev.map((c, idx) => (idx === i ? { ...c, flipped: true } : c)))
 
     if (!matches) {
@@ -219,7 +218,6 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
           })}
         </div>
 
-        {/* Start / won / lost panel, centred over the (dimmed) board. */}
         {phase !== 'play' ? (
           <div className="absolute inset-0 flex items-center justify-center p-4">
             <div className="modal-in flex max-w-md flex-col items-center gap-3 rounded-xl border border-octarine/40 bg-surface/95 p-6 text-center shadow-2xl backdrop-blur">
@@ -289,7 +287,6 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                       />
                     </span>
                   ) : null}
-                  {/* Level details (board size, set size, mistakes) of the next attempt. */}
                   <div className="flex flex-col gap-1 text-sm text-muted">
                     <p>
                       <span className="font-semibold text-octarine">

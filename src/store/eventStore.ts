@@ -6,7 +6,6 @@ interface EventStore {
   queue: GameEvent[]
   /** Adds an event unless one with the same id is already queued. */
   enqueue: (event: GameEvent) => void
-  /** Dismisses the current (front) event. */
   dismiss: () => void
 }
 

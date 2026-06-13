@@ -76,7 +76,7 @@ export function CityGrid({ era }: { era: EraDef }) {
     setGrid((prev) => {
       const next = [...prev]
       if (next[i] !== null) {
-        next[i] = null // clear the tile
+        next[i] = null
         return next
       }
       next[i] = selected
@@ -104,7 +104,6 @@ export function CityGrid({ era }: { era: EraDef }) {
     <div className="flex w-full flex-col items-center gap-3">
       <span className="text-base font-semibold text-fg">{verb}</span>
 
-      {/* Building palette. */}
       <div role="radiogroup" aria-label={verb} className="flex flex-wrap justify-center gap-2">
         {BUILDINGS.map((b, i) => (
           <button
@@ -127,7 +126,6 @@ export function CityGrid({ era }: { era: EraDef }) {
         ))}
       </div>
 
-      {/* The city grid. */}
       <div
         role="group"
         aria-label={verb}

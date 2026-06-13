@@ -187,7 +187,6 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
       gainBase()
       setSelected(null)
       if (next.size >= mol.bonds.length) {
-        // Molecule complete: it assembles into RNA, then a new target loads.
         complete()
         setDone((d) => d + 1)
         setDrawn(new Set())
@@ -210,7 +209,6 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
         role="group"
         aria-label={verb}
       >
-        {/* Guide + drawn bonds. */}
         {mol.bonds.map(([a, b]) => {
           const on = drawn.has(bondKey(a, b))
           return (
@@ -230,7 +228,6 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
           )
         })}
 
-        {/* Atoms (clickable, keyboard-accessible). */}
         {mol.atoms.map((atom, i) => (
           <g key={i}>
             <circle

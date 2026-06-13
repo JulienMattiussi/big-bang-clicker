@@ -101,7 +101,6 @@ export function AccretionDisk({ era }: { era: EraDef }) {
     planetsRef.current = planets
   }, [planets])
 
-  // Single rAF loop: orbits the clumps and planets, syncs hit-test positions.
   useEffect(() => {
     let raf = 0
     const start = performance.now()
@@ -182,7 +181,7 @@ export function AccretionDisk({ era }: { era: EraDef }) {
   }
 
   const accrete = (e: MouseEvent) => {
-    gainBase() // every click gathers dust
+    gainBase()
     const keyboard = e.detail === 0
     const p = keyboard ? null : viewBoxPoint(svgRef.current, e.clientX, e.clientY, VBW, VBH)
     const px = p?.x ?? CX
@@ -216,7 +215,7 @@ export function AccretionDisk({ era }: { era: EraDef }) {
       c.progress += 1
       addPuff(at.x, at.y)
       if (c.progress >= PLANET_CLICKS) {
-        complete() // a planet collapses out of the clump (varied colour)
+        complete()
         spawnPlanet(c.colorIndex, pos.current[hit])
         c.progress = 0
         // The clump scatters and re-forms elsewhere, a new colour seed.
@@ -227,7 +226,7 @@ export function AccretionDisk({ era }: { era: EraDef }) {
         c.colorIndex = Math.floor(Math.random() * PLANET_COLORS.length)
       }
     } else {
-      addPuff(px, py) // outside any clump: just dust
+      addPuff(px, py)
     }
   }
 
@@ -273,7 +272,6 @@ export function AccretionDisk({ era }: { era: EraDef }) {
             </filter>
           </defs>
 
-          {/* Faint orbit rings. */}
           {[34, 54, 74].map((r) => (
             <ellipse
               key={r}
@@ -289,7 +287,6 @@ export function AccretionDisk({ era }: { era: EraDef }) {
             />
           ))}
 
-          {/* Sun: a bright luminous glow, no rays. Outer halo breathes gently. */}
           <circle
             cx={CX}
             cy={CY}
@@ -301,7 +298,6 @@ export function AccretionDisk({ era }: { era: EraDef }) {
           <circle cx={CX} cy={CY} r="13" fill="url(#acc-sun)" opacity="0.95" />
           <circle cx={CX} cy={CY} r="6" fill="var(--color-fg)" />
 
-          {/* Orbiting planets (varied colours), moved by rAF. */}
           {planets.map((p) => (
             <g
               key={p.id}
@@ -311,12 +307,10 @@ export function AccretionDisk({ era }: { era: EraDef }) {
               <circle className="pop-in" r="2.8" fill={PLANET_COLORS[p.colorIndex]} />
               {/* Shaded terminator (makes it a sphere, not a flat tint). */}
               <circle r="2.8" fill="url(#acc-shade)" />
-              {/* Specular highlight on the lit side. */}
               <circle r="0.7" cx="-1" cy="-1.1" fill="var(--color-fg)" opacity="0.45" />
             </g>
           ))}
 
-          {/* Drifting, spinning particle clumps. */}
           {CLUMP_INDICES.map((i) => (
             <g key={i} data-clump={i}>
               {/* Cloud (haze + particles) that CONDENSES toward the centre as you
@@ -339,7 +333,6 @@ export function AccretionDisk({ era }: { era: EraDef }) {
             </g>
           ))}
 
-          {/* Dust puffs at each click. */}
           {puffs.map((p) => (
             <circle
               key={p.id}
@@ -351,7 +344,6 @@ export function AccretionDisk({ era }: { era: EraDef }) {
             />
           ))}
 
-          {/* Planet-formation burst. */}
           {burst ? (
             <circle
               key={burst.id}

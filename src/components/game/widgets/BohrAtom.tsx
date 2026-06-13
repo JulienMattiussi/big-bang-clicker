@@ -130,7 +130,6 @@ export function BohrAtom({ era }: { era: EraDef }) {
             strokeDasharray="2 4"
             opacity="0.5"
           />
-          {/* K orbit + one decorative bound electron. */}
           <circle
             cx="50"
             cy="50"
@@ -143,7 +142,6 @@ export function BohrAtom({ era }: { era: EraDef }) {
             <circle cx="78" cy="50" r="2.4" fill="var(--color-secondary)" opacity="0.8" />
           </g>
 
-          {/* Capture zone (brightens when the free electron is inside it). */}
           <circle
             ref={zoneRef}
             cx="50"
@@ -155,10 +153,8 @@ export function BohrAtom({ era }: { era: EraDef }) {
             strokeDasharray="3 3"
             opacity="0.16"
           />
-          {/* Nucleus glow (brightens when capturable). */}
           <circle ref={glowRef} cx="50" cy="50" r="15" fill="var(--color-accent)" opacity="0.16" />
 
-          {/* Nucleus (cluster of nucleons). */}
           <g fill="var(--color-accent)">
             <circle cx="47" cy="49" r="5" />
             <circle cx="53" cy="49" r="5" />
@@ -166,10 +162,8 @@ export function BohrAtom({ era }: { era: EraDef }) {
             <circle cx="50" cy="45" r="4.4" />
           </g>
 
-          {/* The free electron (moved imperatively each frame). */}
           <circle ref={electronRef} cx="84" cy="50" r="3" fill="var(--color-secondary)" />
 
-          {/* Captured electron fading away (re-mounts per capture). */}
           {captured.id > 0 ? (
             <circle
               key={captured.id}
@@ -181,7 +175,6 @@ export function BohrAtom({ era }: { era: EraDef }) {
             />
           ) : null}
 
-          {/* Light burst projecting well beyond the orbit. */}
           {flash > 0 ? (
             <circle
               key={flash}

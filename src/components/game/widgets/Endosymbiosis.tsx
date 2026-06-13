@@ -220,14 +220,12 @@ export function Endosymbiosis({ era }: { era: EraDef }) {
           <circle cx="52" cy="51.5" r="5" fill="var(--color-fg)" opacity="0.25" />
         </g>
 
-        {/* Engulfed organelles living inside the host (same irregular shapes). */}
         {inner.map((d) => (
           <g key={d.id} transform={`translate(${d.x} ${d.y})`}>
             <path className="pop-in" d={SHAPES[d.shape]} fill={d.tint} opacity="0.9" />
           </g>
         ))}
 
-        {/* Organelles mid-engulfment, gliding from the ring into the host. */}
         {travelers.map((tr) => (
           <FlyingOrganelle key={tr.id} traveler={tr} onArrive={() => arrive(tr)} />
         ))}

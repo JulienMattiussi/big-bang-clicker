@@ -7,7 +7,7 @@ const DOTS = Array.from({ length: 10 }, (_, i) => {
   return { cx: 12 + Math.cos(a) * 9.3, cy: 12 + Math.sin(a) * 9.3 }
 })
 
-/** Custom glyph (atmosphere): the Earth ringed by gas particles all around. */
+/** Atmosphere glyph: the Earth ringed by gas particles all around. */
 export function AtmosphereIcon(props: SVGProps<SVGSVGElement>): ReactElement {
   return (
     <svg {...GLYPH_PROPS} {...props}>

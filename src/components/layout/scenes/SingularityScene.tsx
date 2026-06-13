@@ -7,7 +7,6 @@ export function SingularityScene(): ReactElement {
   return (
     <svg className={svgClass} {...svgProps}>
       <Defs />
-      {/* Lines converging on the core (contraction). */}
       <g stroke="var(--color-accent)" strokeOpacity="0.18" strokeWidth="0.4">
         {Array.from({ length: 16 }, (_, i) => {
           const a = (i / 16) * Math.PI * 2

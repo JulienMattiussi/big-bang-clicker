@@ -45,7 +45,6 @@ export function CoolingWidget({ className }: { className?: string }) {
   const { t } = useTranslation()
   const [temperature, setTemperature] = useState(100)
 
-  // Passive re-heating when the player stops cooling.
   useEffect(() => {
     const timer = setInterval(() => {
       setTemperature((temp) => Math.min(100, temp + (WARM_PER_SECOND * TICK_MS) / 1000))
@@ -88,10 +87,8 @@ export function CoolingWidget({ className }: { className?: string }) {
           </linearGradient>
         </defs>
 
-        {/* Cool halo: grows as the orb cools. */}
         <circle cx="50" cy="50" r="42" fill="var(--color-secondary)" opacity={0.2 * (1 - heat)} />
         <circle cx="50" cy="50" r={radius} fill="url(#bbc-cooling)" className="widget-pulse" />
-        {/* White-hot core: fades as it cools. */}
         <circle
           cx="50"
           cy="50"
@@ -105,7 +102,6 @@ export function CoolingWidget({ className }: { className?: string }) {
           ))}
         </g>
 
-        {/* Temperature arcs hugging the orb, one on each side. */}
         <TempArc d="M 50 96 A 46 46 0 0 1 50 4" temperature={temperature} />
         <TempArc d="M 50 96 A 46 46 0 0 0 50 4" temperature={temperature} />
       </svg>

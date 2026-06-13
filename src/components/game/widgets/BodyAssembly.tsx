@@ -1,181 +1,31 @@
-import { useEffect, useRef, useState, type ReactElement } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
-import { OrganismGlyph } from './OrganismGlyph'
-import { Galet } from '@/components/game/Galet'
+import {
+  BELT_MS,
+  COMBO_CAP,
+  CYCLE_MS,
+  EXIT_MS,
+  GALET_UNLOCK_LEVEL,
+  PART_IDS,
+  SPAWN_MS,
+  colorOf,
+  freshQueue,
+  galetEvery,
+  partsOf,
+  pickOrg,
+  planFor,
+  type PartId,
+  type Piece,
+} from './assemblyPlan'
+import { OrganismGlyph } from '@/components/art/OrganismGlyph'
+import { PartGlyph } from '@/components/art/PartGlyph'
+import { Galet } from '@/components/art/Galet'
 import { announceGalet } from '@/hooks/useGalets'
 import { widgetGaletForEra } from '@/lib/galets'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
-
-/** Body parts that ride the conveyor; the SHAPE is the identity, and each part
- *  now has its OWN rainbow hue so they are easy to tell apart at a glance. */
-const PARTS = [
-  { id: 'eye', color: 'var(--part-1)' },
-  { id: 'segment', color: 'var(--part-2)' },
-  { id: 'appendage', color: 'var(--part-3)' },
-  { id: 'spine', color: 'var(--part-4)' },
-  { id: 'leg', color: 'var(--part-5)' },
-  { id: 'shell', color: 'var(--part-6)' },
-  { id: 'fin', color: 'var(--part-7)' },
-  { id: 'frond', color: 'var(--part-8)' },
-] as const
-type PartId = (typeof PARTS)[number]['id']
-const PART_IDS = PARTS.map((p) => p.id)
-const colorOf = (id: PartId) => PARTS.find((p) => p.id === id)!.color
-
-/**
- * Cambrian organisms to assemble (Burgess Shale / Chengjiang fauna), each a
- * realistic combination of shared body parts - so most parts serve several
- * organisms (only the sponge's "frond" is unique).
- */
-const ORGANISMS: { id: string; parts: PartId[] }[] = [
-  { id: 'trilobite', parts: ['segment', 'eye', 'leg'] },
-  { id: 'anomalocaris', parts: ['eye', 'appendage', 'fin'] },
-  { id: 'opabinia', parts: ['eye', 'appendage', 'segment'] },
-  { id: 'hallucigenia', parts: ['spine', 'leg', 'segment'] },
-  { id: 'wiwaxia', parts: ['shell', 'spine'] },
-  { id: 'pikaia', parts: ['fin', 'segment'] },
-  { id: 'haikouichthys', parts: ['eye', 'fin', 'segment'] },
-  { id: 'marrella', parts: ['eye', 'spine', 'leg'] },
-  { id: 'brachiopod', parts: ['shell', 'appendage'] },
-  { id: 'sponge', parts: ['frond', 'spine'] },
-]
-
-/** Conveyor pacing: a new part every SPAWN_MS, crossing in BELT_MS (lower
- *  SPAWN_MS = parts closer together on the belt). */
-const SPAWN_MS = 1000
-const BELT_MS = 11000
-/** Organisms queued ahead of the current one (the production plan), so the next
- *  one can be pre-stocked before its turn. */
-const QUEUE_AHEAD = 2
-/** Each organism lives this long before it dies; EXIT_MS = its leave animation. */
-const CYCLE_MS = 5000
-const EXIT_MS = 550
-/** Combo: +1 per organism completed in time, reset on a miss, capped here. */
-const COMBO_CAP = 100
-/** The era's main converter must reach this level before the pebble can appear. */
-const GALET_UNLOCK_LEVEL = 2
-/** The diversity pebble surfaces on the belt about once every 20-30 parts. */
-const GALET_MIN = 20
-const GALET_MAX = 30
-const galetEvery = () => GALET_MIN + Math.floor(Math.random() * (GALET_MAX - GALET_MIN + 1))
-
-interface Piece {
-  key: number
-  id: PartId
-  /** ms already elapsed on the belt at spawn (>0 only for the start pre-fill). */
-  age: number
-  /** This piece is the diversity pebble riding the belt (clicked to discover it). */
-  galet?: boolean
-}
-interface Slot {
-  id: PartId
-  filled: boolean
-}
-interface Plan {
-  org: string
-  slots: Slot[]
-}
-
-/** The parts a given organism is made of. */
-function partsOf(orgId: string): PartId[] {
-  return ORGANISMS.find((o) => o.id === orgId)?.parts ?? []
-}
-
-/** A random organism id, avoiding the ones already in the queue (no repeats). */
-function pickOrg(exclude: string[]): string {
-  const pool = ORGANISMS.filter((o) => !exclude.includes(o.id))
-  const src = pool.length > 0 ? pool : ORGANISMS
-  return src[Math.floor(Math.random() * src.length)].id
-}
-
-/** A fresh, empty body plan for an organism. */
-function planFor(orgId: string): Plan {
-  return { org: orgId, slots: partsOf(orgId).map((id) => ({ id, filled: false })) }
-}
-
-/** The starting queue: a current plan plus QUEUE_AHEAD distinct upcoming organisms. */
-function freshQueue(): { plan: Plan; upcoming: string[] } {
-  const upcoming: string[] = []
-  const current = pickOrg([])
-  for (let i = 0; i < QUEUE_AHEAD; i++) upcoming.push(pickOrg([current, ...upcoming]))
-  return { plan: planFor(current), upcoming }
-}
-
-/** One body part as a fillable glyph (solid when acquired, dim outline otherwise). */
-function PartGlyph({ id, filled }: { id: PartId; filled: boolean }): ReactElement {
-  const f = filled ? 'currentColor' : 'none'
-  const s = {
-    stroke: 'currentColor',
-    strokeWidth: 2,
-    strokeLinejoin: 'round' as const,
-    strokeLinecap: 'round' as const,
-  }
-  return (
-    <svg viewBox="0 0 24 24" className="h-9 w-9" fill="none" aria-hidden>
-      {id === 'eye' ? (
-        <>
-          <circle cx="12" cy="12" r="8" fill={f} {...s} />
-          <circle
-            cx="12"
-            cy="12"
-            r="3"
-            fill={filled ? 'var(--color-bg)' : 'currentColor'}
-            stroke="none"
-          />
-        </>
-      ) : null}
-      {id === 'segment'
-        ? [0, 1, 2].map((k) => (
-            <rect key={k} x="4" y={6 + k * 5} width="16" height="3.4" rx="1.7" fill={f} {...s} />
-          ))
-        : null}
-      {id === 'appendage' ? <path d="M5 5 Q21 7 17 20 Q13 12 5 11 Z" fill={f} {...s} /> : null}
-      {id === 'spine' ? (
-        <>
-          <polygon points="3,20 6,7 9,20" fill={f} {...s} />
-          <polygon points="9,20 12,4 15,20" fill={f} {...s} />
-          <polygon points="15,20 18,8 21,20" fill={f} {...s} />
-        </>
-      ) : null}
-      {id === 'leg' ? (
-        <>
-          <rect x="3" y="6" width="18" height="4" rx="2" fill={f} {...s} />
-          {[4.5, 9, 13.5, 18].map((x, k) => (
-            <rect key={k} x={x} y="10" width="2.6" height="9" rx="1.3" fill={f} {...s} />
-          ))}
-        </>
-      ) : null}
-      {id === 'shell' ? (
-        <>
-          <path d="M3 19 A9 9 0 0 1 21 19 Z" fill={f} {...s} />
-          <path
-            d="M12 10 V19 M7.5 13 V19 M16.5 13 V19"
-            stroke="currentColor"
-            strokeWidth="1.3"
-            opacity={filled ? 0.45 : 0.85}
-          />
-        </>
-      ) : null}
-      {id === 'fin' ? <path d="M12 3 L21 21 Q12 16 3 21 Z" fill={f} {...s} /> : null}
-      {id === 'frond' ? (
-        <>
-          <path d="M7 21 Q5 8 9 5 L15 5 Q19 8 17 21 Z" fill={f} {...s} />
-          <ellipse
-            cx="12"
-            cy="6"
-            rx="3"
-            ry="1.5"
-            fill={filled ? 'var(--color-bg)' : 'none'}
-            {...s}
-          />
-        </>
-      ) : null}
-    </svg>
-  )
-}
 
 /**
  * Era 9 (Cambrian explosion): the assembly line of life (full-width). Body parts
@@ -450,7 +300,6 @@ export function BodyAssembly({ era }: { era: EraDef }) {
         <span className="text-xs text-muted">{t('assembly.hint')}</span>
       </div>
 
-      {/* Target organism + the specific parts it still wants. */}
       <div className="flex items-center gap-4">
         <span
           key={cycle}
@@ -504,7 +353,6 @@ export function BodyAssembly({ era }: { era: EraDef }) {
         ) : null}
       </div>
 
-      {/* Combo: consecutive organisms completed in time (resets on a miss). */}
       <span className="flex h-5 items-center">
         {combo > 0 ? (
           <span
@@ -516,7 +364,6 @@ export function BodyAssembly({ era }: { era: EraDef }) {
         ) : null}
       </span>
 
-      {/* Lifetime bar: depletes over 5s; the organism dies when it empties. */}
       <div className="h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-border/40">
         {status === null ? (
           <div
@@ -527,9 +374,7 @@ export function BodyAssembly({ era }: { era: EraDef }) {
         ) : null}
       </div>
 
-      {/* The conveyor belt: parts drift right to left; click the ones you need. */}
       <div className="relative h-24 w-full overflow-hidden rounded-xl border border-border bg-bg/40 shadow-inner">
-        {/* Centre guide line (the belt). */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-border/50"

@@ -108,7 +108,6 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
   const genBadges = (id: string) => toBadges(galetsAffectingGenerator(state, defs, id))
   const convBadges = (id: string) => toBadges(galetsAffectingConverter(state, defs, id))
 
-  // Manual craft: apply one recipe by hand, with floating feedback.
   const craft = (id: string) => {
     const def = defs.converters[id]
     if (!canManualConvert(state, defs, id)) return

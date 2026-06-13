@@ -36,7 +36,6 @@ export function AtmosphereBalance({ era }: { era: EraDef }) {
     setPos(next)
   }
 
-  // Drift + stable-atmosphere accumulation.
   useEffect(() => {
     const id = window.setInterval(() => {
       const p = posRef.current
@@ -94,7 +93,6 @@ export function AtmosphereBalance({ era }: { era: EraDef }) {
             className="absolute inset-y-0 border-x border-fg/40"
             style={{ left: `${ZONE_LO}%`, width: `${ZONE_HI - ZONE_LO}%` }}
           />
-          {/* Needle. */}
           <div
             aria-hidden
             className={`absolute inset-y-0 w-1 -translate-x-1/2 rounded-full transition-[left] duration-75 ${

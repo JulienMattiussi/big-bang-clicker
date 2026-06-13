@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Galet } from '@/components/game/Galet'
+import { Galet } from '@/components/art/Galet'
 import { GALET_SLOTS } from '@/data/galets'
 import { useGameStore } from '@/store/gameStore'
 import { useGaletStore } from '@/store/galetStore'
@@ -144,7 +144,6 @@ export function GaletReceptacle() {
         })}
       </div>
 
-      {/* Giant clone shrinking from screen centre into the pebble's socket. */}
       {intro && introGalet ? (
         <div
           aria-hidden
@@ -168,13 +167,11 @@ export function GaletReceptacle() {
         </div>
       ) : null}
 
-      {/* Styled hover/focus card: the pebble enlarged, its name, status, effect. */}
       {card ? (
         <div
           role="tooltip"
           className="shadow-float modal-in absolute top-full left-0 z-30 mt-2 w-80 rounded-lg border border-octarine/40 bg-surface p-3 text-left"
         >
-          {/* The pebble shown large, on its own line spanning the card width. */}
           <div className="relative flex h-28 items-center justify-center">
             <div
               aria-hidden

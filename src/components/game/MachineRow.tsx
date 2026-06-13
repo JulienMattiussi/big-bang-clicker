@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/Button'
 import { IconBadge } from '@/components/ui/IconBadge'
 import { Icon } from '@/components/ui/Icon'
 import { EraIcon } from '@/components/game/EraIcon'
-import { Galet } from '@/components/game/Galet'
+import { Galet } from '@/components/art/Galet'
 import { formatFixed } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
 
@@ -121,7 +121,7 @@ export function MachineRow({
 }: RowProps) {
   const toggleLabel = enabled ? t('machine.pause') : t('machine.resume')
   const running = level >= 1 && enabled !== false
-  const boosted = !!badges?.some((b) => b.active) // an active pebble speeds it up
+  const boosted = !!badges?.some((b) => b.active)
   // Quick "fill" pulse on each upgrade (re-keys the bar to replay), then it loops.
   const [boost, setBoost] = useState(0)
   const handleBuy = () => {

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { Icon } from '@/components/ui/Icon'
-import { Galet } from '@/components/game/Galet'
+import { Galet } from '@/components/art/Galet'
 import { FloaterLayer } from '@/components/ui/FloaterLayer'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
@@ -41,7 +41,6 @@ export function ComplexityBadge() {
 
   return (
     <div className="complexity-glow relative flex items-center gap-2 rounded-full border border-octarine/40 bg-octarine/10 px-4 py-1.5">
-      {/* The diamond, with any Complexity-boosting pebble shown right beneath it. */}
       <div className="flex shrink-0 flex-col items-center gap-0.5">
         <Icon name="gem" className="h-5 w-5 text-octarine" />
         {galets.map((g) => {

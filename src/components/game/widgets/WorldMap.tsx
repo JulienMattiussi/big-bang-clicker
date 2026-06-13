@@ -102,9 +102,7 @@ export function WorldMap({ era }: { era: EraDef }) {
         aria-label={verb}
         key={bloom}
       >
-        {/* Stylised landmass. */}
         <ellipse cx="50" cy="32" rx="46" ry="26" fill="var(--color-secondary)" opacity="0.05" />
-        {/* Borders between regions. */}
         {EDGES.map(([a, b], i) => (
           <line
             key={i}

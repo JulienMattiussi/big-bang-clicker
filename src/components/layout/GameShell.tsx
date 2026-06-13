@@ -112,7 +112,6 @@ export function GameShell() {
       {/* Sliding transition between eras (direction by tab order). */}
       <EraTransition eraId={era.id} index={era.index} className="flex flex-col gap-4">
         {isFullWidthWidget(era.widget) ? (
-          // Wide widget (e.g. periodic table): full-width on top, panels below.
           <>
             <section className="-mt-2 flex justify-center pb-2">{central}</section>
             {/* Resources kept narrow so the wide machines panel fits 3 columns. */}

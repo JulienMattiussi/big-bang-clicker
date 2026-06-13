@@ -470,7 +470,6 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     for (const e of def.rebound) if (e.target) frozen.add(e.target)
   }
 
-  // 1. Generators: direct production.
   for (const id in state.generators) {
     const level = state.generators[id].level
     if (level <= 0) continue
@@ -480,7 +479,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     resources[gen.output] = (resources[gen.output] ?? 0) + generatorPerSec(state, defs, id, level) * dt
   }
 
-  // 2. Converters: combination, bounded by available inputs.
+  // Converters are bounded by the inputs actually available this tick.
   for (const id in state.converters) {
     const cState = state.converters[id]
     if (!cState.enabled || cState.level <= 0) continue

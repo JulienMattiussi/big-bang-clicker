@@ -307,10 +307,9 @@ export function PetriDish({ era }: { era: EraDef }) {
             </radialGradient>
           </defs>
 
-          {/* Culture medium. */}
           <circle cx={CX} cy={CY} r={DISH_R} fill="var(--color-secondary)" opacity="0.05" />
 
-          {/* Swimming cells (position/size/orientation driven by rAF via data-cell). */}
+          {/* Position/size/orientation are driven imperatively by rAF via data-cell. */}
           {cells.map((c) => (
             <g key={c.id} data-cell={c.id}>
               <ellipse
@@ -326,7 +325,6 @@ export function PetriDish({ era }: { era: EraDef }) {
             </g>
           ))}
 
-          {/* Division flash at each cut point. */}
           {splits.map((sp) => (
             <circle
               key={sp.id}

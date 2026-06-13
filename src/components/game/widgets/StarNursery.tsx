@@ -163,22 +163,18 @@ export function StarNursery({ era }: { era: EraDef }) {
             </filter>
           </defs>
 
-          {/* Faint outer haze. */}
           <circle cx="50" cy="50" r="46" fill="var(--color-secondary)" opacity="0.05" />
 
-          {/* Gaseous, formless nebula: blurred overlapping blobs, slowly breathing. */}
           <g filter="url(#bbc-blur)" className="widget-pulse">
             {NEBULA.map((b, i) => (
               <circle key={i} cx={b.x} cy={b.y} r={b.r} fill={b.fill} opacity={b.o} />
             ))}
           </g>
 
-          {/* Gas-cloud puff around the pointer at each click. */}
           {puffs.map((p) => (
             <circle key={p.id} className="gas-puff" cx={p.x} cy={p.y} r="9" fill="url(#bbc-gas)" />
           ))}
 
-          {/* Gas being compressed at the focus (grows toward ignition). */}
           {build.count > 0 ? (
             <circle
               cx={build.x}
@@ -189,7 +185,7 @@ export function StarNursery({ era }: { era: EraDef }) {
             />
           ) : null}
 
-          {/* Ignition flash (re-mounts per star so it replays). */}
+          {/* Re-mounts per star (keyed by id) so the burst animation replays. */}
           {flash ? (
             <circle
               key={flash.id}
@@ -201,7 +197,6 @@ export function StarNursery({ era }: { era: EraDef }) {
             />
           ) : null}
 
-          {/* Stars ignited by the player (ignite then twinkle). */}
           {stars.map((s) => (
             <circle key={s.id} className="star" cx={s.x} cy={s.y} r="0.9" fill="var(--color-fg)" />
           ))}

@@ -8,7 +8,6 @@ export function CosmosScene(): ReactElement {
   return (
     <svg className={svgClass} {...svgProps}>
       <Defs />
-      {/* A faint spiral galaxy. */}
       <g className="bg-breathe" style={{ transformOrigin: 'center' }}>
         <g transform="rotate(20 50 48)">
           <ellipse cx="50" cy="48" rx="38" ry="12" fill="url(#sb-secondary)" opacity="0.4" />
