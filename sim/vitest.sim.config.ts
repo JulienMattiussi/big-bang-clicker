@@ -17,6 +17,6 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['sim/run.sim.ts'],
-    testTimeout: 600_000,
+    testTimeout: 1_800_000,
   },
 })

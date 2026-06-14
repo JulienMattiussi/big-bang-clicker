@@ -188,7 +188,7 @@ export function SimViewer() {
           <LineChart
             series={timeSeries}
             width={1100}
-            height={300}
+            height={460}
             xLog={false}
             yLog
             xTickValues={eraTicks}

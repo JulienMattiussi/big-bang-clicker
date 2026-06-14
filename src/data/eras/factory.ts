@@ -78,23 +78,37 @@ export interface EraBundle {
 }
 
 /**
- * Late-game progression easing. From era LATE_FROM onward (and ONLY from there -
- * the earlier eras are untouched, their balance is good), production is raised and
- * consumption lowered, COMPOUNDING per era past the threshold, to counter the
- * x3.16/era milestone growth once the big side-mechanic boosts (galets <= era 9,
- * crisis rebound <= era 10) no longer apply. Tunable; validated via `make sim`.
+ * Late-game progression easing as per-era "from-now" steps: at era N the step
+ * takes this value and HOLDS until the next entry. An era's total multiplier is
+ * the product of the steps across all eras up to it (1 before the first), so the
+ * pace can be re-oriented at any era - add an entry where you want it to change;
+ * earlier eras stay untouched. Counters the ~x3.16/era milestone growth once the
+ * big side-mechanic boosts fade. Tunable; validated via `make sim`.
  */
-const LATE_FROM = 11
-const LATE_PROD = 1.55 // production x LATE_PROD^(idx - LATE_FROM + 1)
-const LATE_CONSUMPTION = 0.92 // converter inputs x LATE_CONSUMPTION^(idx - LATE_FROM + 1)
+const PROD_STEP_FROM: Record<number, number> = {
+  11: 1.55, // late-game easing begins (eras before 11 are untouched, x1)
+  13: 5, // stronger production from the Nations era onward
+}
+const CONS_STEP_FROM: Record<number, number> = {
+  11: 0.92, // converter inputs ease down from the late game
+}
+/** Cumulative easing multiplier for an era: product of the steps up to it. */
+function cumulativeStep(changePoints: Record<number, number>, eraIdx: number): number {
+  let step = 1
+  let mult = 1
+  for (let e = 0; e <= eraIdx; e++) {
+    if (changePoints[e] !== undefined) step = changePoints[e]
+    mult *= step
+  }
+  return mult
+}
 
 export function buildEra(spec: SimpleEraSpec): EraBundle {
   const { id, base } = spec
   // Era index (e11 -> 11). Late eras get an easing multiplier; earlier ones get 1.
   const eraIdx = Number(id.slice(1)) || 0
-  const steps = Math.max(0, eraIdx - LATE_FROM + 1)
-  const prodMult = LATE_PROD ** steps
-  const consMult = LATE_CONSUMPTION ** steps
+  const prodMult = cumulativeStep(PROD_STEP_FROM, eraIdx)
+  const consMult = cumulativeStep(CONS_STEP_FROM, eraIdx)
 
   // The terse form is just a one-link chain (base*10 + consumes*1 -> combined).
   const links: ChainLink[] =

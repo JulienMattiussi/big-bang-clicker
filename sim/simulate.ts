@@ -255,6 +255,9 @@ export function simulate(
       nextCityThriveT = t + CITY_THRIVE_INTERVAL_S
     }
     const cityMult = currentEra.widget === 'city' ? 1 + cityThriving : 1
+    // World map (era 13): expansion is forced-contiguous (revealed from Europe),
+    // so almost every claim lands the bloc bonus -> x2 on both gain and output.
+    const mapMult = currentEra.widget === 'map' ? 2 : 1
 
     // Manual actions. Two modes:
     let clicks = 0
@@ -274,15 +277,16 @@ export function simulate(
       clicks = Math.floor(clickCarry)
       clickCarry -= clicks
     }
-    if (clicks > 0) state = applyClick(state, currentEra.clickResource, clicks * cityMult)
+    if (clicks > 0) state = applyClick(state, currentEra.clickResource, clicks * cityMult * mapMult)
 
     if (profile.clickMode !== 'bootstrap') {
       completeCarry += profile.completesPerSecond * DT
-      let completes = Math.floor(completeCarry)
+      const completes = Math.floor(completeCarry)
       completeCarry -= completes
       if (completes > 0 && currentEra.converters.length > 0) {
         const cid = currentEra.converters[0]
-        while (completes-- > 0) state = manualProduce(state, defs, cid)
+        let n = completes * mapMult
+        while (n-- > 0) state = manualProduce(state, defs, cid)
       }
     }
 

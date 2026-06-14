@@ -35,7 +35,7 @@ const bundles: EraBundle[] = [
     icon: 'swords',
     widget: 'map',
     base: { id: 'trade', icon: 'coins', tier: 14 },
-    combined: { id: 'empire', icon: 'crown', tier: 16 },
+    combined: { id: 'empire', icon: 'crown', tier: 25 },
     consumes: 'city',
     generatorId: 'market',
     converterId: 'conquest',

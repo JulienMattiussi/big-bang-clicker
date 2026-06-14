@@ -36,7 +36,13 @@ function ticksFor(minV: number, maxV: number, log: boolean): number[] {
     const lo = Math.floor(Math.log10(Math.max(minV, 1)))
     const hi = Math.ceil(Math.log10(Math.max(maxV, 10)))
     const out: number[] = []
-    for (let e = lo; e <= hi; e++) out.push(10 ** e)
+    // 1/2/5 subdivisions per decade, so a wide range still has readable steps.
+    for (let e = lo; e <= hi; e++) {
+      for (const m of [1, 2, 5]) {
+        const v = m * 10 ** e
+        if (v <= 10 ** hi) out.push(v)
+      }
+    }
     return out
   }
   const out: number[] = []
