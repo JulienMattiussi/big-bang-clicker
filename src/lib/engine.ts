@@ -158,6 +158,26 @@ export function galetComplexityMultiplier(state: GameState, defs: GameDefs, eraI
   return galetMachineMultiplier(state, defs, eraId, 'complexityMultiplier')
 }
 
+/** True if `converterId` is the terminal (last) converter of its era. */
+export function isTerminalConverter(defs: GameDefs, converterId: ConverterId): boolean {
+  const conv = defs.converters[converterId]
+  if (!conv) return false
+  const list = defs.eras.find((e) => e.id === conv.eraId)?.converters
+  return !!list && list.length > 0 && list[list.length - 1] === converterId
+}
+
+/** Input-cost multiplier from active pebbles that ease a TERMINAL converter's
+ *  consumption (e.g. the multitude pebble halves it). 1 for any other converter. */
+export function galetConsumptionMultiplier(
+  state: GameState,
+  defs: GameDefs,
+  converterId: ConverterId,
+): number {
+  const conv = defs.converters[converterId]
+  if (!conv || !isTerminalConverter(defs, converterId)) return 1
+  return galetMachineMultiplier(state, defs, conv.eraId, 'terminalConsumption')
+}
+
 // --- Production rates (the SINGLE source the tick AND the UI both read, so the
 // "x/s" shown on a machine can never diverge from what is actually produced). ---
 
@@ -171,7 +191,10 @@ export function generatorPerSec(
   const gen = defs.generators[id]
   if (!gen) return 0
   return (
-    level * gen.baseRate * resourceMultiplier(state, defs, gen.output) * galetGeneratorMultiplier(state, defs, id)
+    level *
+    gen.baseRate *
+    resourceMultiplier(state, defs, gen.output) *
+    galetGeneratorMultiplier(state, defs, id)
   )
 }
 
@@ -205,7 +228,9 @@ export function converterOutputPerSec(
   level: number,
 ): number {
   return (
-    amount * converterCyclesPerSec(defs, id, level) * converterOutputMultiplier(state, defs, id, resource)
+    amount *
+    converterCyclesPerSec(defs, id, level) *
+    converterOutputMultiplier(state, defs, id, resource)
   )
 }
 
@@ -390,7 +415,8 @@ function creditedComplexity(
 export function canManualConvert(state: GameState, defs: GameDefs, id: ConverterId): boolean {
   const conv = defs.converters[id]
   if (!conv) return false
-  return conv.inputs.every((i) => (state.resources[i.resource] ?? 0) >= i.amount)
+  const consume = galetConsumptionMultiplier(state, defs, id)
+  return conv.inputs.every((i) => (state.resources[i.resource] ?? 0) >= i.amount * consume)
 }
 
 /**
@@ -402,8 +428,9 @@ export function manualConvert(state: GameState, defs: GameDefs, id: ConverterId)
   if (!conv || !canManualConvert(state, defs, id)) return state
 
   const resources = { ...state.resources }
+  const consume = galetConsumptionMultiplier(state, defs, id)
   for (const input of conv.inputs) {
-    resources[input.resource] = (resources[input.resource] ?? 0) - input.amount
+    resources[input.resource] = (resources[input.resource] ?? 0) - input.amount * consume
   }
   const latestEra = latestUnlockedIndex(state)
   let gained = 0
@@ -476,7 +503,8 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     const gen = defs.generators[id]
     if (!gen) continue
     if (frozen.has(gen.output)) continue
-    resources[gen.output] = (resources[gen.output] ?? 0) + generatorPerSec(state, defs, id, level) * dt
+    resources[gen.output] =
+      (resources[gen.output] ?? 0) + generatorPerSec(state, defs, id, level) * dt
   }
 
   // Converters are bounded by the inputs actually available this tick.
@@ -488,16 +516,17 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     // A frozen output (crisis) halts the whole recipe: no output, no input drain.
     if (conv.outputs.some((o) => frozen.has(o.resource))) continue
 
+    const consume = galetConsumptionMultiplier(state, defs, id)
     let cycles = cState.level * conv.baseRate * dt
     for (const input of conv.inputs) {
       if (input.amount <= 0) continue
-      const max = (resources[input.resource] ?? 0) / input.amount
+      const max = (resources[input.resource] ?? 0) / (input.amount * consume)
       if (max < cycles) cycles = max
     }
     if (cycles <= 0) continue
 
     for (const input of conv.inputs) {
-      resources[input.resource] = (resources[input.resource] ?? 0) - input.amount * cycles
+      resources[input.resource] = (resources[input.resource] ?? 0) - input.amount * consume * cycles
     }
     for (const output of conv.outputs) {
       // Complexity follows the ACTUAL output (multipliers included), so a memory

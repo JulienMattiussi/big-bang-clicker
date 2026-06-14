@@ -17,7 +17,9 @@ describe('memoryUnlocked', () => {
   it('verrouillé tant que le convertisseur de déblocage n a pas été monté', () => {
     expect(memoryUnlocked(makeState())).toBe(false)
     expect(
-      memoryUnlocked(makeState({ converters: { [MEMORY_UNLOCK_CONVERTER]: { level: 1, enabled: true } } })),
+      memoryUnlocked(
+        makeState({ converters: { [MEMORY_UNLOCK_CONVERTER]: { level: 1, enabled: true } } }),
+      ),
     ).toBe(true)
   })
 })
@@ -30,7 +32,9 @@ describe('memoryLevel / memoryEraMaxed', () => {
   })
 
   it('maxé une fois MEMORY_MAX_LEVEL réussites atteintes', () => {
-    expect(memoryEraMaxed(makeState({ memoryLevels: { e7: MEMORY_MAX_LEVEL - 1 } }), 'e7')).toBe(false)
+    expect(memoryEraMaxed(makeState({ memoryLevels: { e7: MEMORY_MAX_LEVEL - 1 } }), 'e7')).toBe(
+      false,
+    )
     expect(memoryEraMaxed(makeState({ memoryLevels: { e7: MEMORY_MAX_LEVEL } }), 'e7')).toBe(true)
   })
 })

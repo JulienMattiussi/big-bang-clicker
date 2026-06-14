@@ -8,11 +8,16 @@ import {
   converterCyclesPerSec,
   converterOutputMultiplier,
   converterOutputPerSec,
+  galetConsumptionMultiplier,
   generatorPerSec,
   nextCost,
 } from '@/lib/engine'
 import { revealedMachines } from '@/lib/reveal'
-import { galetsAffectingConverter, galetsAffectingGenerator } from '@/lib/galets'
+import {
+  galetsAffectingConverter,
+  galetsAffectingGenerator,
+  galetsAffectingTerminalConverter,
+} from '@/lib/galets'
 import {
   MachineFlows,
   MachineRow,
@@ -106,13 +111,19 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
       }
     })
   const genBadges = (id: string) => toBadges(galetsAffectingGenerator(state, defs, id))
-  const convBadges = (id: string) => toBadges(galetsAffectingConverter(state, defs, id))
+  const convBadges = (id: string) =>
+    toBadges([
+      ...galetsAffectingConverter(state, defs, id),
+      ...galetsAffectingTerminalConverter(state, defs, id),
+    ])
 
   const craft = (id: string) => {
     const def = defs.converters[id]
     if (!canManualConvert(state, defs, id)) return
     manualConvert(id)
-    for (const i of def.inputs) spawn(`res:${i.resource}`, `-${formatNumber(i.amount)}`, 'spend')
+    const consume = galetConsumptionMultiplier(state, defs, id)
+    for (const i of def.inputs)
+      spawn(`res:${i.resource}`, `-${formatNumber(i.amount * consume)}`, 'spend')
     for (const o of def.outputs)
       spawn(
         `res:${o.resource}`,
@@ -166,14 +177,15 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
             const cost = nextCost(def.cost, level)
             const cycles = converterCyclesPerSec(defs, id, level)
             const nextCycles = converterCyclesPerSec(defs, id, level + 1)
-            // Consumption is the plain recipe rate; production carries the output
-            // multipliers (memory / crisis / pebbles), via the engine helper.
+            // Consumption is the recipe rate, eased by any pebble on a terminal
+            // converter; production carries the output multipliers via the helper.
+            const consume = galetConsumptionMultiplier(state, defs, id)
             const consumeFlow = (resource: ResourceId, amount: number): FlowEntry => ({
               icon: defs.resources[resource].icon,
               symbol: defs.resources[resource].symbol,
               name: t(defs.resources[resource].nameKey as TranslationKey),
-              perSec: amount * cycles,
-              nextPerSec: amount * nextCycles,
+              perSec: amount * consume * cycles,
+              nextPerSec: amount * consume * nextCycles,
               era: eraTag(resource),
             })
             const produceFlow = (resource: ResourceId, amount: number): FlowEntry => ({

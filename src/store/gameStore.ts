@@ -76,6 +76,8 @@ interface GameStore {
   /** Idea-constellation 10-sequence cleared: doubles the current era's Complexity.
    *  Returns the new boost count (for a unique announcement). */
   awardComplexityBoost: () => number
+  /** City widget: records newly discovered neighbour pairings (kept across reloads). */
+  discoverCityPairs: (keys: string[]) => void
 }
 
 function loadInitialState(now: number): { state: GameState; tampered: boolean } {
@@ -207,7 +209,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   awardComplexityBoost: () => {
     const era = get().state.currentEraId
     const count = Math.min((get().state.complexityBoosts[era] ?? 0) + 1, MAX_COMPLEXITY_BOOST)
-    set((s) => commit({ ...s.state, complexityBoosts: { ...s.state.complexityBoosts, [era]: count } }))
+    set((s) =>
+      commit({ ...s.state, complexityBoosts: { ...s.state.complexityBoosts, [era]: count } }),
+    )
     return count
   },
+  discoverCityPairs: (keys) =>
+    set((s) => {
+      const fresh = keys.filter((k) => !s.state.cityPairs.includes(k))
+      if (fresh.length === 0) return {}
+      return commit({ ...s.state, cityPairs: [...s.state.cityPairs, ...fresh] })
+    }),
 }))

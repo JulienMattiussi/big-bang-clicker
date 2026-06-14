@@ -29,6 +29,25 @@ const MOTIFS: Record<string, (color: string) => ReactElement> = {
       <circle r="2.4" fill={color} />
     </g>
   ),
+  // A family in a child's hand: two big stick figures and a small one.
+  family: (color) => (
+    <g
+      transform="translate(18 16)"
+      fill="none"
+      stroke={color}
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="-7" cy="-6" r="2.1" />
+      <path d="M-9.1,-6.4 Q-9.7,-4 -9,-2.2 M-4.9,-6.4 Q-4.3,-4 -5,-2.2 M-8.6,-7.7 -8.9,-9 M-7,-8.1 -7,-9.5 M-5.4,-7.7 -5.1,-9" />
+      <path d="M-7,-3.9 V3 M-10,-1 H-4 M-7,3 -9.5,7 M-7,3 -4.5,7" />
+      <circle cx="7" cy="-6" r="2.1" />
+      <path d="M7,-3.9 V3 M4,-1 H10 M7,3 4.5,7 M7,3 9.5,7" />
+      <circle cx="0" cy="-1" r="1.6" />
+      <path d="M0,0.6 V4 M-2.2,1.6 H2.2 M0,4 -1.6,7 M0,4 1.6,7" />
+    </g>
+  ),
   // A cell: membrane with an off-centre nucleus.
   cell: (color) => (
     <g transform="translate(18 16)">

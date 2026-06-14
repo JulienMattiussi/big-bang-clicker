@@ -105,9 +105,15 @@ export interface GaletEffect {
    * maxEraIndex:
    * - generatorMultiplier: primary factories (generators);
    * - converterMultiplier: secondary factories (converters/recipes);
-   * - complexityMultiplier: the Complexity gained from those eras' resources.
+   * - complexityMultiplier: the Complexity gained from those eras' resources;
+   * - terminalConsumption: input cost of each era's TERMINAL converter (value
+   *   acts on consumption, e.g. 0.5 halves it).
    */
-  type: 'generatorMultiplier' | 'converterMultiplier' | 'complexityMultiplier'
+  type:
+    | 'generatorMultiplier'
+    | 'converterMultiplier'
+    | 'complexityMultiplier'
+    | 'terminalConsumption'
   maxEraIndex: number
   value: number
 }
@@ -147,13 +153,14 @@ export interface CrisisDef {
   risk: {
     sourceResource?: ResourceId
     threshold: number
-    telegraph: boolean
     floor?: number
+    /** The crisis cannot trigger until this resource reaches `level`. */
+    gate?: { resource: ResourceId; level: number }
   }
   trigger: 'threshold' | 'player' | 'probabilistic'
   regression: Effect[]
   rebound: Effect[]
-  textKeys: { warnKey: string; triggerKey: string; reboundKey: string }
+  textKeys: { triggerKey: string; reboundKey: string }
 }
 
 export interface EraDef {
@@ -238,4 +245,6 @@ export interface GameState {
   /** Idea-constellation (Simon) bonus: times a full 10-sequence was cleared in an
    *  era. The engine derives a x2 Complexity multiplier per clear for that era. */
   complexityBoosts: Record<EraId, number>
+  /** City widget (era 12): neighbour pairings the player has discovered. */
+  cityPairs: string[]
 }

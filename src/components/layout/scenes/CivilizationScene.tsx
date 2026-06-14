@@ -158,11 +158,19 @@ SYN_SOMAS.forEach((s, i) => {
     const pts: Pt[] = Array.from({ length: 9 }, (_, k) => {
       const t = k / 8
       const u = 1 - t
-      return [u * u * s.x + 2 * u * t * cx + t * t * o.x, u * u * s.y + 2 * u * t * cy + t * t * o.y]
+      return [
+        u * u * s.x + 2 * u * t * cx + t * t * o.x,
+        u * u * s.y + 2 * u * t * cy + t * t * o.y,
+      ]
     })
     const base = 0.22 + depth * 0.3
     const hw = pts.map(() => Math.max(0.08, base * synR(0.7, 1.25)))
-    SYN_FIBRES.push({ d: ribbon(pts, hw), color: 'var(--color-accent)', o: 0.18 + depth * 0.26, depth })
+    SYN_FIBRES.push({
+      d: ribbon(pts, hw),
+      color: 'var(--color-accent)',
+      o: 0.18 + depth * 0.26,
+      depth,
+    })
     for (const t of [synR(0.3, 0.45), synR(0.55, 0.7)]) spark(alongPolyline(pts, t), depth)
   }
 })
@@ -186,13 +194,24 @@ export function CivilizationScene(): ReactElement {
           <path key={`f${i}`} d={f.d} fill={f.color} opacity={f.o} />
         ))}
         {SYN_TERMINALS.map((tn, i) => (
-          <circle key={`t${i}`} cx={tn.x} cy={tn.y} r={tn.r} fill="var(--color-accent)" opacity="0.4" />
+          <circle
+            key={`t${i}`}
+            cx={tn.x}
+            cy={tn.y}
+            r={tn.r}
+            fill="var(--color-accent)"
+            opacity="0.4"
+          />
         ))}
         {SYN_SOMAS.map((s, i) => (
           <g
             key={`m${i}`}
             className="bg-pulse"
-            style={{ transformBox: 'fill-box', transformOrigin: 'center', animationDelay: `-${s.delay}s` }}
+            style={{
+              transformBox: 'fill-box',
+              transformOrigin: 'center',
+              animationDelay: `-${s.delay}s`,
+            }}
           >
             <circle cx={s.x} cy={s.y} r={s.r * 1.7} fill="url(#sb-core)" />
             <path d={s.blob} fill="var(--color-fg)" opacity="0.5" />

@@ -104,6 +104,8 @@ export function isCrisisReady(state: GameState, defs: GameDefs, id: CrisisId): b
   if (!def) return false
   const runtime = state.crises[id]
   if (!runtime || runtime.resolved) return false
+  const gate = def.risk.gate
+  if (gate && (state.resources[gate.resource] ?? 0) < gate.level) return false
   return runtime.risk >= def.risk.threshold
 }
 

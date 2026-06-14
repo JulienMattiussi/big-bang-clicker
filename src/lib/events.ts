@@ -9,6 +9,7 @@ import type { GameDefs, GameState } from './types'
 import { revealedMachines } from './reveal'
 import { memoryUnlocked } from './memory'
 import { backpackUnlocked } from './inventory'
+import { isCrisisReady } from './crises'
 
 export type EventTone = 'transition' | 'regression' | 'tutorial'
 
@@ -82,7 +83,7 @@ export function triggeredEvents(state: GameState, defs: GameDefs): GameEvent[] {
     const def = defs.crises[id]
     const runtime = state.crises[id]
     if (!runtime) continue
-    const ready = !runtime.resolved && runtime.risk >= def.risk.threshold
+    const ready = isCrisisReady(state, defs, id)
     if (ready || runtime.count > 0) {
       events.push({
         id: `crisis:${id}`,

@@ -480,6 +480,42 @@
   transform-origin: 50% 50%;
   transform-box: fill-box;
 }
+@keyframes harmony-pulse {
+  0% {
+    box-shadow: 0 0 0 2px var(--color-accent);
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.09);
+  }
+  100% {
+    box-shadow: 0 0 0 8px transparent;
+    transform: scale(1);
+  }
+}
+.harmony-react {
+  position: relative;
+  z-index: 2;
+  animation: harmony-pulse 0.6s ease-out;
+}
+@keyframes discord-pulse {
+  0% {
+    box-shadow: 0 0 0 2px var(--danger);
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.93);
+  }
+  100% {
+    box-shadow: 0 0 0 8px transparent;
+    transform: scale(1);
+  }
+}
+.discord-react {
+  position: relative;
+  z-index: 2;
+  animation: discord-pulse 0.6s ease-out;
+}
 /* Endosymbiosis: a clicked organelle slides from the ring into the host. */
 .engulf-travel {
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -521,7 +557,9 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .pop-in,
-  .bloom {
+  .bloom,
+  .harmony-react,
+  .discord-react {
     animation: none;
   }
   .widget-shake {

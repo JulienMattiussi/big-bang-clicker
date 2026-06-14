@@ -55,6 +55,7 @@
   --galet-matter: #f5b042; /* amber - primordial matter, painted as an atom */
   --galet-life: #3fbf6f; /* green - life, painted as a cell */
   --galet-diversity: #c061f0; /* violet - solid stand-in for glows; its motif is painted rainbow */
+  --galet-society: #e23c34; /* red - the multitude pebble, painted as a child's family */
   /* Rainbow bands of the diversity pebble's painted motif (concentric arcs, one
      colour per token; referenced by the Galet 'rainbow' motif). */
   --galet-rainbow-1: #ff4d4d;

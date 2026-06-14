@@ -45,6 +45,20 @@ export const galetDefs: GaletDef[] = [
     discoverEraId: 'e9',
     effect: { type: 'complexityMultiplier', maxEraIndex: 9, value: 8 },
   },
+  {
+    id: 'society',
+    nameKey: 'galet.society.name',
+    descKey: 'galet.society.desc',
+    loreKey: 'galet.society.lore',
+    color: 'var(--galet-society)',
+    motif: 'family',
+    shape: 0,
+    // Earned in the Societies city widget by reaching the super-bonus harmony.
+    discovery: 'widget',
+    discoverEraId: 'e12',
+    // Halves the input cost of every era's terminal converter up to the Societies.
+    effect: { type: 'terminalConsumption', maxEraIndex: 12, value: 0.5 },
+  },
 ]
 
 /** Planned size of the collection (a wink at the six infinity stones). */

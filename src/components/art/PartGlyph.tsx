@@ -61,7 +61,14 @@ export function PartGlyph({ id, filled }: { id: string; filled: boolean }): Reac
       {id === 'frond' ? (
         <>
           <path d="M7 21 Q5 8 9 5 L15 5 Q19 8 17 21 Z" fill={f} {...s} />
-          <ellipse cx="12" cy="6" rx="3" ry="1.5" fill={filled ? 'var(--color-bg)' : 'none'} {...s} />
+          <ellipse
+            cx="12"
+            cy="6"
+            rx="3"
+            ry="1.5"
+            fill={filled ? 'var(--color-bg)' : 'none'}
+            {...s}
+          />
         </>
       ) : null}
     </svg>

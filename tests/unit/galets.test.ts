@@ -23,7 +23,14 @@ function galet(id: string, overrides: Partial<GaletDef> = {}): GaletDef {
   }
 }
 
-const gen: GeneratorDef = { id: 'gen1', eraId: 'e2', nameKey: '', output: 'r', baseRate: 1, cost: [] }
+const gen: GeneratorDef = {
+  id: 'gen1',
+  eraId: 'e2',
+  nameKey: '',
+  output: 'r',
+  baseRate: 1,
+  cost: [],
+}
 const conv: ConverterDef = {
   id: 'conv1',
   eraId: 'e2',
@@ -52,7 +59,9 @@ const defs = makeDefs({
 describe('discoverableGalets', () => {
   it('révèle un galet quand le seuil de son ère est atteint, jamais avant', () => {
     expect(discoverableGalets(makeState({ complexity: 99 }), defs)).toHaveLength(0)
-    expect(discoverableGalets(makeState({ complexity: 100 }), defs).map((g) => g.id)).toContain('g1')
+    expect(discoverableGalets(makeState({ complexity: 100 }), defs).map((g) => g.id)).toContain(
+      'g1',
+    )
   })
 
   it('exclut les galets déjà trouvés', () => {

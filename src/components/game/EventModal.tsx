@@ -186,7 +186,9 @@ export function EventModal() {
           <p className="mb-5 leading-relaxed text-muted">{body}</p>
           {event.complexityFactor ? (
             <div className="mb-2 flex items-center justify-center gap-2 text-octarine">
-              <span className="text-4xl font-extrabold tabular-nums">×{event.complexityFactor}</span>
+              <span className="text-4xl font-extrabold tabular-nums">
+                ×{event.complexityFactor}
+              </span>
               <Icon name="gem" className="h-10 w-10" aria-hidden />
             </div>
           ) : null}

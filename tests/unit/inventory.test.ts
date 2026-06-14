@@ -16,7 +16,9 @@ describe('backpackUnlocked', () => {
 
   it('déverrouillé dès que la ressource est détenue ou découverte', () => {
     expect(backpackUnlocked(makeState({ resources: { [BACKPACK_UNLOCK_RESOURCE]: 1 } }))).toBe(true)
-    expect(backpackUnlocked(makeState({ discovered: { [BACKPACK_UNLOCK_RESOURCE]: true } }))).toBe(true)
+    expect(backpackUnlocked(makeState({ discovered: { [BACKPACK_UNLOCK_RESOURCE]: true } }))).toBe(
+      true,
+    )
   })
 })
 

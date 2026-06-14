@@ -64,3 +64,17 @@ export function galetsAffectingConverter(
   const conv = defs.converters[converterId]
   return conv ? galetsAffecting(state, defs, conv.eraId, 'converterMultiplier') : []
 }
+
+/** Found pebbles easing the consumption of a TERMINAL converter (badge shown only
+ *  on the last converter of each era). Empty for any other converter. */
+export function galetsAffectingTerminalConverter(
+  state: GameState,
+  defs: GameDefs,
+  converterId: string,
+): GaletDef[] {
+  const conv = defs.converters[converterId]
+  if (!conv) return []
+  const list = defs.eras.find((e) => e.id === conv.eraId)?.converters
+  if (!list || list[list.length - 1] !== converterId) return []
+  return galetsAffecting(state, defs, conv.eraId, 'terminalConsumption')
+}

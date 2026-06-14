@@ -172,7 +172,9 @@ export function AccretionDisk({ era }: { era: EraDef }) {
     const fadeId = solid.length + 1 > MAX_PLANETS ? solid[0].id : undefined
     setPlanets((ps) => {
       const next = [...ps, planet]
-      return fadeId === undefined ? next : next.map((p) => (p.id === fadeId ? { ...p, fading: true } : p))
+      return fadeId === undefined
+        ? next
+        : next.map((p) => (p.id === fadeId ? { ...p, fading: true } : p))
     })
     if (fadeId !== undefined) {
       window.setTimeout(() => setPlanets((ps) => ps.filter((p) => p.id !== fadeId)), PLANET_FADE_MS)

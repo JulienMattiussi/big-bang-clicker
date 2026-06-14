@@ -21,7 +21,9 @@ describe('canBuyMeta', () => {
   it('vrai seulement si défini, non possédé et abordable', () => {
     expect(canBuyMeta(makeState({ echoes: 10 }), defs, 'm1')).toBe(true)
     expect(canBuyMeta(makeState({ echoes: 9 }), defs, 'm1')).toBe(false)
-    expect(canBuyMeta(makeState({ echoes: 99, metaUpgrades: { m1: true } }), defs, 'm1')).toBe(false)
+    expect(canBuyMeta(makeState({ echoes: 99, metaUpgrades: { m1: true } }), defs, 'm1')).toBe(
+      false,
+    )
     expect(canBuyMeta(makeState({ echoes: 99 }), defs, 'unknown')).toBe(false)
   })
 })

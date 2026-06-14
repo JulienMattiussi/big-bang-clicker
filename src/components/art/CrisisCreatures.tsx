@@ -27,9 +27,18 @@ export function CritterGlyph({ kind }: { kind: 'rat' | 'raptor' }): ReactElement
     // Bipedal theropod: stiff raised tail, body, neck rising to a snouted head,
     // two digitigrade legs.
     return (
-      <g fill="var(--color-fg)" stroke="var(--color-fg)" strokeLinecap="round" strokeLinejoin="round">
+      <g
+        fill="var(--color-fg)"
+        stroke="var(--color-fg)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path d="M-7 -3 Q-3 -4 0 -4.5 Q2 -4.8 3 -4.2 Q4 -6 4.8 -7.6 Q5.2 -8.3 6 -8.1 Q7 -7.9 6.6 -7.1 Q6 -6.7 5.2 -6.7 Q4.6 -5.7 4 -4.9 Q3.2 -3.9 2.4 -3.5 Q1 -3.1 -1 -3.3 Q-4 -3.3 -7 -3 Z" />
-        <path d="M0.6 -3.3 L1.5 -1.4 L0.5 0 M2.2 -3.1 L3 -1.4 L2.2 0" fill="none" strokeWidth="0.85" />
+        <path
+          d="M0.6 -3.3 L1.5 -1.4 L0.5 0 M2.2 -3.1 L3 -1.4 L2.2 0"
+          fill="none"
+          strokeWidth="0.85"
+        />
         <path d="M3.4 -4.1 L4.2 -3.1 L3.7 -2.4" fill="none" strokeWidth="0.55" />
       </g>
     )

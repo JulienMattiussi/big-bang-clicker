@@ -205,45 +205,45 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
           const lit = active === i || feedback !== null
           const fill = feedback === 'fail' ? FAIL_COLOR : NODE_COLORS[i]
           return (
-          <g key={i}>
-            <circle
-              cx={n.x}
-              cy={n.y}
-              r={lit ? 8 : 6}
-              fill={fill}
-              fillOpacity={lit ? 1 : 0.3}
-              stroke={fill}
-              strokeWidth="1.6"
-              style={{ transition: 'r 0.18s ease, fill 0.18s ease, fill-opacity 0.18s ease' }}
-            />
-            {/* Hover/focus affordance: a small dot of the idea's own colour. */}
-            {hovered === i && !lit ? (
-              <circle cx={n.x} cy={n.y} r="2.6" fill={NODE_COLORS[i]} pointerEvents="none" />
-            ) : null}
-            <circle
-              cx={n.x}
-              cy={n.y}
-              r="9"
-              fill="transparent"
-              role="button"
-              tabIndex={phase === 'input' ? 0 : -1}
-              aria-disabled={phase === 'watch'}
-              aria-label={`${t('memory.idea')} ${i + 1}`}
-              onClick={() => clickIdea(i)}
-              onMouseEnter={() => setHovered(i)}
-              onMouseLeave={() => setHovered((h) => (h === i ? null : h))}
-              onFocus={() => setHovered(i)}
-              onBlur={() => setHovered((h) => (h === i ? null : h))}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  clickIdea(i)
-                }
-              }}
-              className="cursor-pointer outline-none focus-visible:stroke-accent"
-              strokeWidth="2"
-            />
-          </g>
+            <g key={i}>
+              <circle
+                cx={n.x}
+                cy={n.y}
+                r={lit ? 8 : 6}
+                fill={fill}
+                fillOpacity={lit ? 1 : 0.3}
+                stroke={fill}
+                strokeWidth="1.6"
+                style={{ transition: 'r 0.18s ease, fill 0.18s ease, fill-opacity 0.18s ease' }}
+              />
+              {/* Hover/focus affordance: a small dot of the idea's own colour. */}
+              {hovered === i && !lit ? (
+                <circle cx={n.x} cy={n.y} r="2.6" fill={NODE_COLORS[i]} pointerEvents="none" />
+              ) : null}
+              <circle
+                cx={n.x}
+                cy={n.y}
+                r="9"
+                fill="transparent"
+                role="button"
+                tabIndex={phase === 'input' ? 0 : -1}
+                aria-disabled={phase === 'watch'}
+                aria-label={`${t('memory.idea')} ${i + 1}`}
+                onClick={() => clickIdea(i)}
+                onMouseEnter={() => setHovered(i)}
+                onMouseLeave={() => setHovered((h) => (h === i ? null : h))}
+                onFocus={() => setHovered(i)}
+                onBlur={() => setHovered((h) => (h === i ? null : h))}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    clickIdea(i)
+                  }
+                }}
+                className="cursor-pointer outline-none focus-visible:stroke-accent"
+                strokeWidth="2"
+              />
+            </g>
           )
         })}
       </svg>

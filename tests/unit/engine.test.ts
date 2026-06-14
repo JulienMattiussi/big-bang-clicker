@@ -374,7 +374,14 @@ describe('multiplicateurs dérivés (mémoire + crise), rétroactifs', () => {
     ...defs,
     eras: [{ id: 'e7', clickResource: 'beast', generators: ['beastGen'] } as unknown as EraDef],
     generators: {
-      beastGen: { id: 'beastGen', eraId: 'e7', nameKey: '', output: 'beast', baseRate: 1, cost: [] },
+      beastGen: {
+        id: 'beastGen',
+        eraId: 'e7',
+        nameKey: '',
+        output: 'beast',
+        baseRate: 1,
+        cost: [],
+      },
     },
     crises: {
       ext: {
