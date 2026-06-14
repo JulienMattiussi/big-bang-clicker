@@ -1,5 +1,13 @@
 import { create } from 'zustand'
-import type { ConverterId, EraId, GameDefs, GameState, GeneratorId, ResourceId } from '@/lib/types'
+import type {
+  ConverterId,
+  EraId,
+  GameDefs,
+  GameEvent,
+  GameState,
+  GeneratorId,
+  ResourceId,
+} from '@/lib/types'
 import {
   applyClick,
   buyConverter,
@@ -63,10 +71,14 @@ interface GameStore {
   prestige: () => void
   /** Buys a prestige meta-upgrade with Echoes. */
   buyMetaUpgrade: (id: string) => void
-  /** Marks a narrative event as shown (so it never fires again). */
-  markEventSeen: (id: string) => void
-  /** Marks an infinity pebble as found (starts active). */
-  discoverGalet: (id: string) => void
+  /** Adds narrative popups to the persisted pending queue in one update (deduped;
+   *  skipped if already pending or dismissed). The popups survive a reload. */
+  enqueueEvents: (events: GameEvent[]) => void
+  /** Convenience: enqueue a single popup. */
+  enqueueEvent: (event: GameEvent) => void
+  /** Dismisses the front popup: marks it seen, applies its deferred effect (a
+   *  pebble grant), and removes it from the queue. */
+  dismissEvent: () => void
   /** Toggles a found pebble's effect on/off. */
   toggleGalet: (id: string) => void
   /** Pays the memory game's Complexity cost to start an attempt; false if too poor. */
@@ -80,15 +92,27 @@ interface GameStore {
   discoverCityPairs: (keys: string[]) => void
 }
 
+/**
+ * One-time backlog suppression for a state that just entered play (a loaded or
+ * imported save). The FIRST time, mark every already-satisfied event as seen so
+ * its whole history is not replayed as fresh popups. After that we trust
+ * seenEvents (set on dismiss) and pendingEvents (the persisted queue), so a popup
+ * the player never closed - or one that came due offline - still shows.
+ */
+function initEvents(state: GameState): GameState {
+  if (state.eventsInitialized) return state
+  const seenEvents = { ...state.seenEvents }
+  for (const event of triggeredEvents(state, defs)) seenEvents[event.id] = true
+  return { ...state, seenEvents, eventsInitialized: true }
+}
+
 function loadInitialState(now: number): { state: GameState; tampered: boolean } {
   const { state: loaded, tampered } = loadFromStorage()
   const base = loaded ? applyOffline(loaded, defs, now) : createInitialState(now, defs.eras[0]?.id)
-  const ready = applyMeta(base, defs)
-  // Pre-mark already-satisfied events as seen so a returning save doesn't replay
-  // its whole past on load; only genuinely new events fire from now on.
-  const seenEvents = { ...ready.seenEvents }
-  for (const event of triggeredEvents(ready, defs)) seenEvents[event.id] = true
-  return { state: { ...ready, seenEvents }, tampered }
+  const meta = applyMeta(base, defs)
+  const ready = initEvents(meta)
+  if (ready !== meta) saveToStorage(ready) // initialised this load: persist the flag
+  return { state: ready, tampered }
 }
 
 /**
@@ -147,7 +171,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   exportSave: () => encodeSave(get().state),
   importSave: (encoded) => {
     try {
-      const next = applyMeta(applyOffline(decodeSave(encoded), defs, Date.now()), defs)
+      // Restore the snapshot as saved: NO offline catch-up (it would credit hours
+      // of production and could cross thresholds the save was below, e.g. a crisis
+      // gate), just reset lastSeen. initEvents suppresses the backlog like a load.
+      const decoded = { ...decodeSave(encoded), lastSeen: Date.now() }
+      const next = initEvents(applyMeta(decoded, defs))
       saveToStorage(next)
       set({ state: next })
       return 'ok'
@@ -175,21 +203,37 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({ state: reborn })
   },
   buyMetaUpgrade: (id) => set((s) => commit(buyMeta(s.state, s.defs, id))),
-  markEventSeen: (id) =>
-    set((s) =>
-      s.state.seenEvents[id]
-        ? {}
-        : { state: { ...s.state, seenEvents: { ...s.state.seenEvents, [id]: true } } },
-    ),
-  discoverGalet: (id) =>
-    set((s) =>
-      s.state.galets[id]?.found
-        ? {}
-        : commit({
-            ...s.state,
-            galets: { ...s.state.galets, [id]: { found: true, active: true } },
-          }),
-    ),
+  // Adds every not-seen, not-already-pending event in ONE set. We compute the
+  // fresh list via get() and call set only when there is something new: a no-op
+  // set would still notify subscribers, and useEvents enqueues from inside a
+  // subscriber, so an empty set would recurse forever.
+  enqueueEvents: (events) => {
+    const s = get()
+    const have = new Set(s.state.pendingEvents.map((e) => e.id))
+    const fresh: GameEvent[] = []
+    for (const e of events) {
+      if (s.state.seenEvents[e.id] || have.has(e.id)) continue
+      have.add(e.id)
+      fresh.push(e)
+    }
+    if (fresh.length === 0) return
+    set(commit({ ...s.state, pendingEvents: [...s.state.pendingEvents, ...fresh] }))
+  },
+  enqueueEvent: (event) => get().enqueueEvents([event]),
+  dismissEvent: () =>
+    set((s) => {
+      const [front, ...rest] = s.state.pendingEvents
+      if (!front) return {}
+      const galets = front.galetId
+        ? { ...s.state.galets, [front.galetId]: { found: true, active: true } }
+        : s.state.galets
+      return commit({
+        ...s.state,
+        galets,
+        pendingEvents: rest,
+        seenEvents: { ...s.state.seenEvents, [front.id]: true },
+      })
+    }),
   toggleGalet: (id) =>
     set((s) => {
       const galet = s.state.galets[id]

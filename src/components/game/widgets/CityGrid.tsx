@@ -11,6 +11,10 @@ import type { EraDef } from '@/lib/types'
 const COLS = 8
 const ROWS = 5
 const CELLS = COLS * ROWS
+/** Most copies of one building type a single city may hold (forces diversity). */
+const PER_TYPE_LIMIT = 10
+/** Cap on the thriving-cities multiplier applied to the widget's effects. */
+const MAX_THRIVE_MULT = 10
 /** Harmony the full city must reach for the thriving-city bonus to fire. */
 const HARMONY_GOAL = 40
 /** Higher harmony of a full city that also awards the painted society pebble. */
@@ -218,6 +222,9 @@ export function CityGrid({ era }: { era: EraDef }) {
   const [harmony, setHarmony] = useState(0)
   const [thriving, setThriving] = useState(0)
   const [bloomCell, setBloomCell] = useState<number | null>(null)
+  const [outcome, setOutcome] = useState<{ success: boolean; score: number; mult: number } | null>(
+    null,
+  )
   const [reactGood, setReactGood] = useState<number[]>([])
   const [reactBad, setReactBad] = useState<number[]>([])
   const bloomTimer = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -235,18 +242,21 @@ export function CityGrid({ era }: { era: EraDef }) {
 
   const discover = (found: Set<string>) => discoverCityPairs([...found])
 
+  const typeCount = (g: (number | null)[], type: number) => g.filter((c) => c === type).length
+
   const place = (i: number) => {
-    if (grid[i] !== null) {
-      const next = [...grid]
-      next[i] = null
-      setGrid(next)
-      setHarmony(scoreGrid(next))
-      return
-    }
+    if (grid[i] !== null) return // a placed building stays put: not clickable
+    if (typeCount(grid, selected) >= PER_TYPE_LIMIT) return // this type is used up
 
     const next = [...grid]
     next[i] = selected
     setGrid(next)
+
+    // If that placement used up the type, jump to one that still has room.
+    if (typeCount(next, selected) >= PER_TYPE_LIMIT) {
+      const free = BUILDINGS.findIndex((_, idx) => typeCount(next, idx) < PER_TYPE_LIMIT)
+      if (free >= 0) setSelected(free)
+    }
 
     const me = BUILDINGS[selected]
     const good: number[] = []
@@ -265,8 +275,10 @@ export function CityGrid({ era }: { era: EraDef }) {
       }
     }
 
+    // Each thriving city already built multiplies every effect of the widget (capped).
+    const mult = Math.min(1 + thriving, MAX_THRIVE_MULT)
     // Base resource scales with good neighbours: x2 for one, x3 for two, etc.
-    gainBase(good.length + 1)
+    gainBase((good.length + 1) * mult)
 
     if (good.length || bad.length) {
       // The placed tile flashes with whichever it triggered; neighbours by kind.
@@ -283,22 +295,26 @@ export function CityGrid({ era }: { era: EraDef }) {
     const score = scoreGrid(next)
     setHarmony(score)
 
-    // A full city pays out if harmonious enough, then the plan starts over.
+    // A full city pays out if harmonious enough; an outcome message shows over
+    // the grid, then the plan starts over.
     if (next.every((c) => c !== null)) {
-      if (score >= HARMONY_GOAL) {
-        complete(1)
+      const success = score >= HARMONY_GOAL
+      if (success) {
+        complete(mult)
         setThriving((c) => c + 1)
         setBloomCell(i)
         clearTimeout(bloomTimer.current)
         bloomTimer.current = setTimeout(() => setBloomCell(null), 520)
+        // Super bonus: a flawless, very harmonious city awards the society pebble.
+        if (score >= SUPER_GOAL && galetDef && !galetFound) announceGalet(galetDef)
       }
-      // Super bonus: a flawless, very harmonious city awards the society pebble.
-      if (score >= SUPER_GOAL && galetDef && !galetFound) announceGalet(galetDef)
+      setOutcome({ success, score, mult })
       clearTimeout(resetTimer.current)
       resetTimer.current = setTimeout(() => {
         setGrid(new Array(CELLS).fill(null))
         setHarmony(0)
-      }, 650)
+        setOutcome(null)
+      }, 1900)
     }
   }
 
@@ -348,33 +364,55 @@ export function CityGrid({ era }: { era: EraDef }) {
         <div
           role="radiogroup"
           aria-label={verb}
-          className="flex flex-wrap justify-center gap-2 md:col-start-1 md:row-start-1"
+          className="flex w-full flex-nowrap justify-center gap-1.5 md:col-start-1 md:row-start-1"
         >
-          {BUILDINGS.map((b, i) => (
-            <button
-              key={b.key}
-              type="button"
-              role="radio"
-              aria-checked={selected === i}
-              onClick={() => setSelected(i)}
-              className={`flex items-center gap-1.5 rounded-md border bg-surface/90 px-2.5 py-1.5 text-sm transition select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-                selected === i
-                  ? 'border-accent text-accent'
-                  : 'border-border text-muted hover:text-fg'
-              }`}
-            >
-              <Mark idx={i} className="h-3.5 w-3.5" />
-              {t(`city.${b.key}` as TranslationKey)}
-            </button>
-          ))}
+          {BUILDINGS.map((b, i) => {
+            const left = PER_TYPE_LIMIT - typeCount(grid, i)
+            return (
+              <button
+                key={b.key}
+                type="button"
+                role="radio"
+                aria-checked={selected === i}
+                disabled={left <= 0}
+                onClick={() => setSelected(i)}
+                className={`flex shrink-0 items-center gap-1 whitespace-nowrap rounded-md border bg-surface/90 px-2 py-1.5 text-sm transition select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-40 ${
+                  selected === i
+                    ? 'border-accent text-accent'
+                    : 'border-border text-muted hover:text-fg'
+                }`}
+              >
+                <Mark idx={i} className="h-3.5 w-3.5" />
+                {t(`city.${b.key}` as TranslationKey)}
+                <span className="tabular-nums text-muted">{left}</span>
+              </button>
+            )
+          })}
         </div>
 
         <div
           role="group"
           aria-label={verb}
-          className="grid w-full gap-1 rounded-lg border border-border bg-surface/80 p-2 md:col-start-1 md:row-start-2"
+          className="relative grid w-full gap-1 rounded-lg border border-border bg-surface/80 p-2 md:col-start-1 md:row-start-2"
           style={{ gridTemplateColumns: `repeat(${COLS}, minmax(0, 1fr))` }}
         >
+          {outcome ? (
+            <div className="modal-in absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-bg/85 p-4 text-center">
+              <div className="flex flex-col gap-1">
+                <span
+                  className={`text-base font-bold ${outcome.success ? 'text-accent' : 'text-red-400'}`}
+                >
+                  {t(outcome.success ? 'city.success.title' : 'city.fail.title')}
+                </span>
+                <span className="text-sm text-muted">
+                  {t(outcome.success ? 'city.success.body' : 'city.fail.body')
+                    .replace('{score}', String(outcome.score))
+                    .replace('{goal}', String(HARMONY_GOAL))
+                    .replace('{mult}', String(outcome.mult))}
+                </span>
+              </div>
+            </div>
+          ) : null}
           {grid.map((type, i) => {
             const b = type === null ? null : BUILDINGS[type]
             return (
@@ -382,6 +420,7 @@ export function CityGrid({ era }: { era: EraDef }) {
                 key={i}
                 type="button"
                 onClick={() => place(i)}
+                disabled={b !== null}
                 aria-label={b ? t(`city.${b.key}` as TranslationKey) : t('city.empty')}
                 className={`group relative flex aspect-square items-center justify-center rounded-sm border transition select-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-accent ${
                   b ? 'border-border' : 'border-border/40 bg-bg/50 hover:bg-secondary/20'
@@ -440,7 +479,12 @@ export function CityGrid({ era }: { era: EraDef }) {
               />
             </div>
             <span className="text-xs text-muted">
-              {t('city.thriving')} : <span className="tabular-nums text-fg">{thriving}</span>
+              {t('city.thriving')} : <span className="tabular-nums text-fg">{thriving}</span>{' '}
+              <span className="tabular-nums text-accent">
+                {`(×${Math.min(1 + thriving, MAX_THRIVE_MULT)}${
+                  1 + thriving >= MAX_THRIVE_MULT ? ` ${t('city.max')}` : ''
+                })`}
+              </span>
             </span>
           </div>
 

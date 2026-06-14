@@ -4,7 +4,7 @@ import { create } from 'zustand'
 export const CRISIS_GOAL = 50
 
 /** Crises that have a survival mini-game (others resolve straight from the banner). */
-export const CRISIS_GAMES = new Set(['extinction'])
+export const CRISIS_GAMES = new Set(['extinction', 'revolt'])
 
 /**
  * Transient (not persisted) state of the crisis mini-game: which crisis is being

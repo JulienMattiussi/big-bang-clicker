@@ -118,6 +118,23 @@ export interface GaletEffect {
   value: number
 }
 
+export type EventTone = 'transition' | 'regression' | 'tutorial'
+
+/** A narrative popup shown in the event modal. Persisted in the pending queue so
+ *  a popup survives a reload until the player explicitly closes it. */
+export interface GameEvent {
+  id: string
+  tone: EventTone
+  titleKey: string
+  bodyKey: string
+  icon?: string
+  /** When set, the modal shows this infinity pebble's drawing (discovery); the
+   *  pebble is only granted when the popup is dismissed. */
+  galetId?: string
+  /** When set, the modal shows a big "xN diamond" (Complexity-doubled reward). */
+  complexityFactor?: number
+}
+
 /** A collectible "pebble of infinity": found at a milestone, toggleable. */
 export interface GaletDef {
   id: string
@@ -247,4 +264,10 @@ export interface GameState {
   complexityBoosts: Record<EraId, number>
   /** City widget (era 12): neighbour pairings the player has discovered. */
   cityPairs: string[]
+  /** Narrative popups shown but not yet dismissed. Persisted so a popup the
+   *  player never closed reappears on reload (and its effect stays deferred). */
+  pendingEvents: GameEvent[]
+  /** Whether the one-time backlog suppression has run (so a returning save does
+   *  not replay its whole event history on the first load). */
+  eventsInitialized: boolean
 }

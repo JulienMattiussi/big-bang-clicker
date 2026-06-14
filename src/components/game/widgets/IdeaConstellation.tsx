@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
 import { useGameStore } from '@/store/gameStore'
-import { useEventStore } from '@/store/eventStore'
 import { MAX_COMPLEXITY_BOOST } from '@/lib/engine'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
@@ -142,7 +141,7 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
               const era0 = gs.state.currentEraId
               if ((gs.state.complexityBoosts[era0] ?? 0) < MAX_COMPLEXITY_BOOST) {
                 const count = gs.awardComplexityBoost()
-                useEventStore.getState().enqueue({
+                gs.enqueueEvent({
                   id: `idea:bonus:${era0}:${count}`,
                   tone: 'transition',
                   titleKey: 'idea.bonus.title',

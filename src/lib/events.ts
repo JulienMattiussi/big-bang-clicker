@@ -5,25 +5,13 @@
  * via GameState.seenEvents. i18n keys are plain strings (resolved in the UI).
  */
 
-import type { GameDefs, GameState } from './types'
+import type { GameDefs, GameEvent, GameState } from './types'
 import { revealedMachines } from './reveal'
 import { memoryUnlocked } from './memory'
 import { backpackUnlocked } from './inventory'
 import { isCrisisReady } from './crises'
 
-export type EventTone = 'transition' | 'regression' | 'tutorial'
-
-export interface GameEvent {
-  id: string
-  tone: EventTone
-  titleKey: string
-  bodyKey: string
-  icon?: string
-  /** When set, the modal shows this infinity pebble's drawing (discovery). */
-  galetId?: string
-  /** When set, the modal shows a big "xN diamond" (Complexity-doubled reward). */
-  complexityFactor?: number
-}
+export type { GameEvent, EventTone } from './types'
 
 /** All events whose condition is currently satisfied (regardless of "seen"). */
 export function triggeredEvents(state: GameState, defs: GameDefs): GameEvent[] {

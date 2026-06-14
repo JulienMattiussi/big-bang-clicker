@@ -6,7 +6,6 @@ import { EraIcon } from '@/components/game/EraIcon'
 import { EventHero, type HeroTone } from '@/components/game/EventHero'
 import { CrisisScene } from '@/components/art/CrisisScene'
 import { Galet } from '@/components/art/Galet'
-import { useEventStore } from '@/store/eventStore'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
 import { useInventoryStore } from '@/store/inventoryStore'
@@ -32,8 +31,8 @@ const TONE_COLOR: Record<EventTone, string> = {
  */
 export function EventModal() {
   const { t } = useTranslation()
-  const event = useEventStore((s) => s.queue[0])
-  const dismiss = useEventStore((s) => s.dismiss)
+  const event = useGameStore((s) => s.state.pendingEvents[0])
+  const dismiss = useGameStore((s) => s.dismissEvent)
   const defs = useGameStore((s) => s.defs)
   const galet = useGameStore((s) =>
     event?.galetId ? s.defs.galets.find((g) => g.id === event.galetId) : undefined,

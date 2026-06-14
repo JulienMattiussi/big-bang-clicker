@@ -2,12 +2,11 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
-import { useEventStore } from '@/store/eventStore'
 import { useTranslation } from '@/i18n/useTranslation'
 
-type Status = 'idle' | 'copied' | 'error' | 'tampered'
+type Status = 'idle' | 'error' | 'tampered'
 
-/** Save management menu: export, import, reset. */
+/** Save management menu: export, import, reset (file-based). */
 export function SaveMenu() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -34,13 +33,23 @@ function SavePanel({ onDone }: { onDone: () => void }) {
   const importSave = useGameStore((s) => s.importSave)
   const reset = useGameStore((s) => s.reset)
   const persist = useGameStore((s) => s.persist)
-  const enqueue = useEventStore((s) => s.enqueue)
+  const enqueueEvent = useGameStore((s) => s.enqueueEvent)
+
+  const [status, setStatus] = useState<Status>('idle')
+  const [confirmReset, setConfirmReset] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  // Flush the live state to storage on open so the download reflects it (the
+  // game keeps ticking); exportSave() then reads the current state at click time.
+  useEffect(() => {
+    persist()
+  }, [persist])
 
   // Confirm a successful import with a modal (the imported state replaced the
   // game), then close the menu. Failures keep their inline message.
   const onImported = (result: 'ok' | 'invalid' | 'tampered') => {
     if (result !== 'ok') return setStatus(result === 'tampered' ? 'tampered' : 'error')
-    enqueue({
+    enqueueEvent({
       id: 'save:imported',
       tone: 'transition',
       titleKey: 'save.imported.title',
@@ -50,35 +59,8 @@ function SavePanel({ onDone }: { onDone: () => void }) {
     onDone()
   }
 
-  // The export must reflect the LIVE game state, not a snapshot frozen when the
-  // panel opened (the game keeps ticking). Seed with the state at open, flush to
-  // storage on open, then recompute on every export action (copy/download/select).
-  const [code, setCode] = useState(() => exportSave())
-  useEffect(() => {
-    persist()
-  }, [persist])
-  const refreshCode = () => {
-    const fresh = exportSave()
-    setCode(fresh)
-    return fresh
-  }
-
-  const [importText, setImportText] = useState('')
-  const [status, setStatus] = useState<Status>('idle')
-  const [confirmReset, setConfirmReset] = useState(false)
-  const fileRef = useRef<HTMLInputElement>(null)
-
-  const fieldClass = 'h-16 w-full resize-none rounded-md border border-border bg-bg p-2 text-xs'
-
-  const copy = () => {
-    void navigator.clipboard?.writeText(refreshCode())
-    setStatus('copied')
-    // Briefly show the confirmation, then close the menu on success.
-    window.setTimeout(onDone, 700)
-  }
-
   const download = () => {
-    const blob = new Blob([refreshCode()], { type: 'text/plain' })
+    const blob = new Blob([exportSave()], { type: 'text/plain' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
     link.href = url
@@ -87,8 +69,6 @@ function SavePanel({ onDone }: { onDone: () => void }) {
     URL.revokeObjectURL(url)
     window.setTimeout(onDone, 400)
   }
-
-  const doImport = () => onImported(importSave(importText.trim()))
 
   const importFromFile = async (file: File) => {
     const text = await file.text()
@@ -117,24 +97,10 @@ function SavePanel({ onDone }: { onDone: () => void }) {
           <span className="block text-xs font-semibold tracking-wide text-muted uppercase">
             {t('save.export')}
           </span>
-          {/* Refresh on focus so a manual select-all also grabs the live state. */}
-          <textarea
-            readOnly
-            aria-label={t('save.export')}
-            value={code}
-            onFocus={refreshCode}
-            className={fieldClass}
-          />
-          <div className="flex gap-2">
-            <Button variant="ghost" className="flex-1 text-center" onClick={copy}>
-              <Icon name="copy" className="mr-1 inline h-4 w-4 align-text-bottom" />
-              {status === 'copied' ? t('save.copied') : t('save.copy')}
-            </Button>
-            <Button variant="ghost" className="flex-1 text-center" onClick={download}>
-              <Icon name="download" className="mr-1 inline h-4 w-4 align-text-bottom" />
-              {t('save.download')}
-            </Button>
-          </div>
+          <Button variant="ghost" className="w-full text-center" onClick={download}>
+            <Icon name="download" className="mr-1 inline h-4 w-4 align-text-bottom" />
+            {t('save.download')}
+          </Button>
         </section>
 
         <section className="flex flex-col gap-2">
@@ -144,7 +110,7 @@ function SavePanel({ onDone }: { onDone: () => void }) {
           <input
             ref={fileRef}
             type="file"
-            accept=".sav,.txt,.json,text/plain,application/json"
+            accept=".sav"
             className="sr-only"
             aria-hidden
             tabIndex={-1}
@@ -157,22 +123,6 @@ function SavePanel({ onDone }: { onDone: () => void }) {
           >
             <Icon name="upload" className="mr-1 inline h-4 w-4 align-text-bottom" />
             {t('save.importFile')}
-          </Button>
-          <textarea
-            value={importText}
-            onChange={(e) => setImportText(e.target.value)}
-            placeholder={t('save.importPlaceholder')}
-            aria-label={t('save.import')}
-            className={fieldClass}
-          />
-          <Button
-            variant="ghost"
-            className="w-full text-center"
-            disabled={!importText.trim()}
-            onClick={doImport}
-          >
-            <Icon name="upload" className="mr-1 inline h-4 w-4 align-text-bottom" />
-            {t('save.import')}
           </Button>
           {status === 'error' ? (
             <p className="text-xs text-red-400">{t('save.importError')}</p>

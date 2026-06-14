@@ -17,14 +17,6 @@ export const PROFILES: ProfileConfig[] = [
     clickMode: 'bootstrap',
   },
   {
-    id: 'idle',
-    label: 'Idle (full auto)',
-    clicksPerSecond: 0,
-    completesPerSecond: 0,
-    decisionIntervalS: 5,
-    strategy: 'cheapest',
-  },
-  {
     id: 'casual',
     label: 'Casual',
     clicksPerSecond: 2,

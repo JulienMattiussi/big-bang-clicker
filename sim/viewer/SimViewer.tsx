@@ -31,7 +31,6 @@ const RUN_KINDS = [...new Map(ALL_RUNS.map((r) => [`${r.profileId}__${r.unlockPo
 
 const PROFILE_COLOR: Record<string, string> = {
   minimal: 'var(--color-era-2)',
-  idle: '#ef4444',
   casual: 'var(--color-secondary)',
   active: 'var(--color-accent)',
   optimal: 'var(--color-octarine)',

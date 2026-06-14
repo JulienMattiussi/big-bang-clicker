@@ -5,7 +5,6 @@ import { useTick } from '@/hooks/useTick'
 import { useEvents } from '@/hooks/useEvents'
 import { useGalets } from '@/hooks/useGalets'
 import { useGameStore } from '@/store/gameStore'
-import { useEventStore } from '@/store/eventStore'
 import { useTranslation } from '@/i18n/useTranslation'
 
 function App() {
@@ -24,7 +23,7 @@ function App() {
   // A stored save was edited outside the game and rejected: wink at the player.
   useEffect(() => {
     if (!tampered) return
-    useEventStore.getState().enqueue({
+    useGameStore.getState().enqueueEvent({
       id: 'save:tampered',
       tone: 'tutorial',
       titleKey: 'save.tampered.title',

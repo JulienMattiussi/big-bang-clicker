@@ -50,5 +50,8 @@ export function prestige(state: GameState, now: number): GameState {
     memoryLevels: {},
     complexityBoosts: {},
     cityPairs: [],
+    pendingEvents: [],
+    // The fresh run keeps a clean slate; no backlog to suppress on a later load.
+    eventsInitialized: true,
   }
 }

@@ -32,11 +32,14 @@ export const crisisDefs: CrisisDef[] = [
     risk: {
       sourceResource: 'population',
       threshold: 1_000_000,
-      gate: { resource: 'city', level: 1_000_000 },
+      gate: { resource: 'city', level: 100_000 },
     },
     trigger: 'threshold',
     regression: [{ type: 'resetResource', target: 'population', value: 0.5 }],
-    rebound: [{ type: 'multiplier', target: 'global', value: 1.5 }],
+    rebound: [
+      { type: 'multiplier', target: 'population', value: 8 },
+      { type: 'multiplier', target: 'city', value: 8 },
+    ],
     textKeys: {
       triggerKey: 'crisis.revolt.trigger',
       reboundKey: 'crisis.revolt.rebound',

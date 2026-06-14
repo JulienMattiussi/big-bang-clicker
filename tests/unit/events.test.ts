@@ -1,29 +1,46 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { useEventStore } from '@/store/eventStore'
+import { useGameStore } from '@/store/gameStore'
 import { triggeredEvents } from '@/lib/events'
 import type { GameEvent } from '@/lib/events'
 import { defs } from '@/data'
 import { makeState } from '../helpers'
 
-const ev = (id: string): GameEvent => ({ id, tone: 'transition', titleKey: '', bodyKey: '' })
+const ev = (id: string, galetId?: string): GameEvent => ({
+  id,
+  tone: 'transition',
+  titleKey: '',
+  bodyKey: '',
+  ...(galetId ? { galetId } : {}),
+})
 
-describe('eventStore', () => {
-  beforeEach(() => useEventStore.setState({ queue: [] }))
+describe('pending events (gameStore)', () => {
+  beforeEach(() => useGameStore.setState({ state: makeState() }))
 
-  it('enqueues and dedupes by id', () => {
-    const { enqueue } = useEventStore.getState()
-    enqueue(ev('a'))
-    enqueue(ev('a'))
-    enqueue(ev('b'))
-    expect(useEventStore.getState().queue.map((e) => e.id)).toEqual(['a', 'b'])
+  it('enqueues, dedupes by id, and skips already-seen events', () => {
+    const { enqueueEvent } = useGameStore.getState()
+    enqueueEvent(ev('a'))
+    enqueueEvent(ev('a'))
+    enqueueEvent(ev('b'))
+    expect(useGameStore.getState().state.pendingEvents.map((e) => e.id)).toEqual(['a', 'b'])
   })
 
-  it('dismiss removes the front event', () => {
-    const { enqueue, dismiss } = useEventStore.getState()
-    enqueue(ev('a'))
-    enqueue(ev('b'))
-    dismiss()
-    expect(useEventStore.getState().queue.map((e) => e.id)).toEqual(['b'])
+  it('dismiss removes the front event and marks it seen (so it never re-fires)', () => {
+    const { enqueueEvent, dismissEvent } = useGameStore.getState()
+    enqueueEvent(ev('a'))
+    enqueueEvent(ev('b'))
+    dismissEvent()
+    expect(useGameStore.getState().state.pendingEvents.map((e) => e.id)).toEqual(['b'])
+    expect(useGameStore.getState().state.seenEvents['a']).toBe(true)
+    enqueueEvent(ev('a'))
+    expect(useGameStore.getState().state.pendingEvents.map((e) => e.id)).toEqual(['b'])
+  })
+
+  it('grants a pebble only when its discovery popup is dismissed', () => {
+    const { enqueueEvent, dismissEvent } = useGameStore.getState()
+    enqueueEvent(ev('galet:matter', 'matter'))
+    expect(useGameStore.getState().state.galets['matter']?.found).toBeFalsy()
+    dismissEvent()
+    expect(useGameStore.getState().state.galets['matter']).toEqual({ found: true, active: true })
   })
 })
 

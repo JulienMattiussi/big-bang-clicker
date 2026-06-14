@@ -41,6 +41,13 @@ const MEMORY_MAX_TRIES = 5
  *  10-sequence about this often, doubling the era's Complexity (capped). */
 const SIMON_INTERVAL_S = 900
 const SIMON_MIN_SKILL = 1 // completesPerSecond >= this (active/optimal): clears a 10-run
+/** City widget (era 12): an active player completes a prosperous city about this
+ *  often; each one raises a thriving multiplier scaling the widget's whole output
+ *  (the gain per gesture AND the free recipe payout), as in CityGrid. Capped so a
+ *  long stay in the era can't blow up the per-tick work into a runaway loop. */
+const CITY_THRIVE_INTERVAL_S = 30
+/** Caps cityThriving so cityMult (1 + thriving) tops out at 10, like the widget. */
+const CITY_THRIVE_MAX = 9
 
 /** Deterministic PRNG (mulberry32) seeded per run, so memory outcomes are
  *  reproducible (the sim never reads true randomness). */
@@ -187,6 +194,9 @@ export function simulate(
   const memoryTries: Record<string, number> = {}
   let nextMemoryT = 0
   let nextSimonT = SIMON_INTERVAL_S
+  // City widget (era 12): thriving cities completed so far, raising the multiplier.
+  let cityThriving = 0
+  let nextCityThriveT = CITY_THRIVE_INTERVAL_S
 
   for (let iter = 0; iter < MAX_ITERS; iter++) {
     state = tick(state, defs, DT)
@@ -205,7 +215,7 @@ export function simulate(
 
     // Widget pebble (e.g. the Cambrian diversity galet, clicked off the belt):
     // only a profile that plays the widgets finds it, and only while in its era
-    // once the main converter is leveled enough. idle/minimal never click it.
+    // once the main converter is leveled enough. minimal never clicks it.
     if (profile.completesPerSecond > 0) {
       const wg = widgetGaletForEra(defs, state.currentEraId)
       const conv = currentEra.converters[0]
@@ -231,6 +241,21 @@ export function simulate(
       nextSimonT = t + SIMON_INTERVAL_S
     }
 
+    // City widget (era 12): each prosperous city raises a thriving multiplier
+    // that scales the gain per gesture (modelled on the clicks below), as the
+    // player keeps building. Only profiles that play the widget benefit; capped
+    // like the widget (CityGrid) so the multiplier tops out.
+    if (
+      profile.completesPerSecond > 0 &&
+      currentEra.widget === 'city' &&
+      t >= nextCityThriveT &&
+      cityThriving < CITY_THRIVE_MAX
+    ) {
+      cityThriving++
+      nextCityThriveT = t + CITY_THRIVE_INTERVAL_S
+    }
+    const cityMult = currentEra.widget === 'city' ? 1 + cityThriving : 1
+
     // Manual actions. Two modes:
     let clicks = 0
     if (profile.clickMode === 'bootstrap') {
@@ -249,7 +274,7 @@ export function simulate(
       clicks = Math.floor(clickCarry)
       clickCarry -= clicks
     }
-    if (clicks > 0) state = applyClick(state, currentEra.clickResource, clicks)
+    if (clicks > 0) state = applyClick(state, currentEra.clickResource, clicks * cityMult)
 
     if (profile.clickMode !== 'bootstrap') {
       completeCarry += profile.completesPerSecond * DT
