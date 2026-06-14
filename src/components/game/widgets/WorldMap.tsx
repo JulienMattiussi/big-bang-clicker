@@ -1,63 +1,78 @@
 import { useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
+import { Icon } from '@/components/ui/Icon'
+import { defs } from '@/data'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
 
 type Status = 'neutral' | 'trade' | 'war'
 // Regions spread over the continents (viewBox 100x60, equirectangular-ish), so the
-// edge network hugs the land. 0-3 N.America, 4-6 S.America, 7-8 Europe, 9-13 Africa,
-// 14-19 Asia, 20 India, 21 Oceania.
+// edge network draws clean territories. 0-4 N.America, 5-8 S.America, 9-10 Europe,
+// 11-16 Africa, 17-23 Asia, 24 India, 25-26 Oceania.
 const REGIONS = [
-  { x: 13, y: 13 },
-  { x: 20, y: 13 },
-  { x: 17, y: 20 },
-  { x: 22, y: 27 },
-  { x: 29, y: 35 },
-  { x: 32, y: 40 },
-  { x: 28, y: 47 },
-  { x: 47, y: 12 },
+  { x: 12, y: 12 },
+  { x: 19, y: 11 },
+  { x: 24, y: 16 },
+  { x: 16, y: 19 },
+  { x: 21, y: 25 },
+  { x: 28, y: 33 },
+  { x: 32, y: 39 },
+  { x: 29, y: 44 },
+  { x: 28, y: 49 },
+  { x: 46, y: 11 },
   { x: 52, y: 14 },
-  { x: 49, y: 22 },
-  { x: 58, y: 24 },
-  { x: 52, y: 30 },
-  { x: 50, y: 38 },
-  { x: 51, y: 45 },
-  { x: 57, y: 16 },
-  { x: 66, y: 11 },
-  { x: 75, y: 10 },
-  { x: 84, y: 14 },
-  { x: 78, y: 20 },
-  { x: 70, y: 18 },
-  { x: 65, y: 27 },
-  { x: 84, y: 42 },
+  { x: 48, y: 22 },
+  { x: 58, y: 23 },
+  { x: 53, y: 28 },
+  { x: 49, y: 34 },
+  { x: 52, y: 40 },
+  { x: 51, y: 46 },
+  { x: 57, y: 17 },
+  { x: 63, y: 10 },
+  { x: 72, y: 8 },
+  { x: 82, y: 11 },
+  { x: 85, y: 16 },
+  { x: 78, y: 19 },
+  { x: 70, y: 19 },
+  { x: 65, y: 28 },
+  { x: 82, y: 41 },
+  { x: 87, y: 44 },
+  { x: 60, y: 42 },
 ]
 const EDGES: [number, number][] = [
   [0, 1],
-  [0, 2],
+  [0, 3],
   [1, 2],
-  [2, 3],
   [3, 4],
+  [2, 4],
   [4, 5],
-  [4, 6],
   [5, 6],
-  [1, 7],
+  [6, 7],
   [7, 8],
-  [7, 9],
+  [6, 9],
   [9, 10],
   [9, 11],
-  [10, 11],
   [11, 12],
+  [11, 13],
   [12, 13],
-  [8, 14],
-  [10, 14],
-  [14, 19],
-  [15, 19],
+  [13, 14],
+  [14, 15],
   [15, 16],
-  [16, 17],
-  [17, 18],
+  [10, 17],
+  [12, 17],
+  [17, 23],
+  [18, 23],
   [18, 19],
   [19, 20],
-  [18, 21],
+  [20, 21],
+  [21, 22],
+  [22, 23],
+  [23, 24],
+  [22, 24],
+  [22, 25],
+  [25, 26],
+  [15, 27],
+  [24, 27],
 ]
 /** Stylised continent silhouettes (filled land), drawn behind the regions. */
 const CONTINENTS = [
@@ -68,34 +83,76 @@ const CONTINENTS = [
   'M52,10 Q60,6 70,7 Q80,6 87,11 Q90,14 85,16 Q88,18 83,19 Q85,22 80,22 Q74,24 69,21 Q64,23 60,20 Q55,19 53,15 Q50,12 52,10 Z', // Asia
   'M63,22 Q67,22 68,26 Q67,31 65,31 Q63,28 62,24 Q62,22 63,22 Z', // India
   'M79,39 Q85,37 90,40 Q92,43 88,46 Q83,48 79,45 Q76,42 79,39 Z', // Oceania
+  'M60,38 Q62,40 61,44 Q60,47 59,44 Q58,39 60,38 Z', // Madagascar
 ]
 
+/** Expansion seeds in Europe; a region's neighbours are revealed only once it is
+ *  claimed, so the map unfolds outward from there. */
+const START = 9 // Europe (west)
 const neighborsOf = (i: number) => EDGES.flatMap(([a, b]) => (a === i ? [b] : b === i ? [a] : []))
-const fillFor = (s: Status) =>
-  s === 'trade'
-    ? 'var(--color-secondary)'
-    : s === 'war'
-      ? 'var(--color-accent)'
-      : 'var(--color-surface)'
+
+/** Trade mark: two coins. Negotiated holds (and the hover preview) wear it. */
+function TradeMark({ cx, cy, color }: { cx: number; cy: number; color: string }) {
+  return (
+    <g fill={color} aria-hidden>
+      <circle cx={cx - 0.7} cy={cy + 0.3} r="1" />
+      <circle cx={cx + 0.7} cy={cy - 0.4} r="1" />
+    </g>
+  )
+}
+
+/** War mark: an upright sword (blade, crossguard, pommel). Conquered holds (and
+ *  the hover preview) wear it. */
+function WarMark({ cx, cy, color }: { cx: number; cy: number; color: string }) {
+  return (
+    <g aria-hidden transform={`rotate(38 ${cx} ${cy})`}>
+      <line
+        x1={cx}
+        y1={cy - 1.6}
+        x2={cx}
+        y2={cy + 1.1}
+        stroke={color}
+        strokeWidth="0.6"
+        strokeLinecap="round"
+      />
+      <line
+        x1={cx - 0.9}
+        y1={cy + 0.4}
+        x2={cx + 0.9}
+        y2={cy + 0.4}
+        stroke={color}
+        strokeWidth="0.6"
+        strokeLinecap="round"
+      />
+      <circle cx={cx} cy={cy + 1.4} r="0.45" fill={color} />
+    </g>
+  )
+}
 
 /**
- * Era 13 (Nations): a stylised world map of the real continents. Choose a stance,
- * then bring regions into your state. Negotiate forms a peaceful trade hold
- * (+trade), Conquer annexes for an empire (+empire). Claiming next to a region you
- * already hold forms a bloc and pays a bonus. Unify the whole map and it resets.
- * Territory control with a diplomacy-vs-war choice. Full-width.
+ * Era 13 (Nations): a stylised world map. Expansion starts in Europe; a region's
+ * neighbours are revealed only once it is claimed, so the map unfolds outward.
+ * Choose a stance: Negotiate forms a peaceful trade hold (+trade), Conquer annexes
+ * for an empire (+empire). Unify the whole map and it resets. Full-width.
  */
 export function WorldMap({ era }: { era: EraDef }) {
   const { t } = useTranslation()
   const { verb, gainBase, complete } = useEraMechanic(era)
 
   const [status, setStatus] = useState<Status[]>(() => REGIONS.map(() => 'neutral'))
+  const [revealed, setRevealed] = useState<Set<number>>(() => new Set([START]))
   const [mode, setMode] = useState<'negotiate' | 'conquer'>('negotiate')
   const [bloom, setBloom] = useState(0)
   const timer = useRef<number | undefined>(undefined)
 
+  // Effect icons echoed on the stance buttons: Negotiate yields the base resource
+  // (trade), Conquer yields the recipe output (empires).
+  const tradeIcon = defs.resources[era.clickResource]?.icon
+  const empireRes = defs.converters[era.converters[0]]?.outputs[0]?.resource
+  const empireIcon = empireRes ? defs.resources[empireRes]?.icon : undefined
+
   const claim = (i: number) => {
-    if (status[i] !== 'neutral') return
+    if (!revealed.has(i) || status[i] !== 'neutral') return
     const bloc = neighborsOf(i).some((n) => status[n] !== 'neutral')
     const next = [...status]
     if (mode === 'negotiate') {
@@ -106,11 +163,20 @@ export function WorldMap({ era }: { era: EraDef }) {
       complete()
       if (bloc) complete()
     }
+    // Claiming a region reveals its neighbours (they become reachable).
+    setRevealed((prev) => {
+      const s = new Set(prev)
+      for (const n of neighborsOf(i)) s.add(n)
+      return s
+    })
     if (next.every((s) => s !== 'neutral')) {
       complete() // the whole map united: a new world opens
       setBloom((b) => b + 1)
       window.clearTimeout(timer.current)
-      timer.current = window.setTimeout(() => setStatus(REGIONS.map(() => 'neutral')), 850)
+      timer.current = window.setTimeout(() => {
+        setStatus(REGIONS.map(() => 'neutral'))
+        setRevealed(new Set([START]))
+      }, 850)
     }
     setStatus(next)
   }
@@ -120,22 +186,36 @@ export function WorldMap({ era }: { era: EraDef }) {
       <span className="text-base font-semibold text-fg">{verb}</span>
 
       <div role="radiogroup" aria-label={t('map.mode')} className="flex gap-2">
-        {(['negotiate', 'conquer'] as const).map((m) => (
-          <button
-            key={m}
-            type="button"
-            role="radio"
-            aria-checked={mode === m}
-            onClick={() => setMode(m)}
-            className={`rounded-md border px-3 py-1.5 text-sm transition select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-              mode === m
-                ? 'border-accent bg-accent/15 text-fg'
-                : 'border-border text-muted hover:text-fg'
-            }`}
-          >
-            {t(m === 'negotiate' ? 'map.negotiate' : 'map.conquer')}
-          </button>
-        ))}
+        {(['negotiate', 'conquer'] as const).map((m) => {
+          const effectIcon = m === 'negotiate' ? tradeIcon : empireIcon
+          return (
+            <button
+              key={m}
+              type="button"
+              role="radio"
+              aria-checked={mode === m}
+              onClick={() => setMode(m)}
+              className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                mode === m
+                  ? 'border-accent bg-accent/15 text-fg'
+                  : 'border-border text-muted hover:text-fg'
+              }`}
+            >
+              <svg viewBox="0 0 6 6" className="h-4 w-4" aria-hidden>
+                {m === 'negotiate' ? (
+                  <TradeMark cx={3} cy={3} color="var(--stone-light)" />
+                ) : (
+                  <WarMark cx={3} cy={3} color="var(--color-accent)" />
+                )}
+              </svg>
+              {t(m === 'negotiate' ? 'map.negotiate' : 'map.conquer')}
+              <span aria-hidden className="text-muted">
+                +
+              </span>
+              {effectIcon ? <Icon name={effectIcon} className="h-4 w-4" /> : null}
+            </button>
+          )
+        })}
       </div>
 
       <svg
@@ -151,49 +231,64 @@ export function WorldMap({ era }: { era: EraDef }) {
             <path key={i} d={d} />
           ))}
         </g>
-        {EDGES.map(([a, b], i) => (
+        {EDGES.filter(([a, b]) => revealed.has(a) && revealed.has(b)).map(([a, b]) => (
           <line
-            key={i}
+            key={`${a}-${b}`}
             x1={REGIONS[a].x}
             y1={REGIONS[a].y}
             x2={REGIONS[b].x}
             y2={REGIONS[b].y}
             stroke="var(--color-border)"
-            strokeWidth="0.8"
-            strokeDasharray="2 2"
+            strokeWidth="0.7"
+            strokeDasharray="1 1.2"
           />
         ))}
-        {REGIONS.map((r, i) => (
-          <g key={i} className={bloom && status[i] !== 'neutral' ? 'bloom' : undefined}>
-            <circle
-              cx={r.x}
-              cy={r.y}
-              r="2.5"
-              fill={fillFor(status[i])}
-              stroke="var(--color-fg)"
-              strokeWidth="0.6"
-              opacity="0.95"
-            />
-            <circle
-              cx={r.x}
-              cy={r.y}
-              r="4"
-              fill="transparent"
-              role="button"
-              tabIndex={0}
-              aria-label={`${t('map.region')} ${i + 1}`}
-              onClick={() => claim(i)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault()
-                  claim(i)
-                }
-              }}
-              className="cursor-pointer outline-none focus-visible:stroke-accent"
-              strokeWidth="1.2"
-            />
-          </g>
-        ))}
+        {REGIONS.map((r, i) =>
+          revealed.has(i) ? (
+            <g key={i} className={`group ${bloom && status[i] !== 'neutral' ? 'bloom' : ''}`}>
+              <circle
+                cx={r.x}
+                cy={r.y}
+                r="2"
+                fill="var(--color-surface)"
+                stroke="var(--color-fg)"
+                strokeWidth="0.5"
+                opacity="0.95"
+              />
+              {status[i] === 'trade' ? (
+                <TradeMark cx={r.x} cy={r.y} color="var(--stone-light)" />
+              ) : status[i] === 'war' ? (
+                <WarMark cx={r.x} cy={r.y} color="var(--color-accent)" />
+              ) : (
+                <g className="opacity-0 transition group-hover:opacity-90">
+                  {mode === 'negotiate' ? (
+                    <TradeMark cx={r.x} cy={r.y} color="var(--color-muted)" />
+                  ) : (
+                    <WarMark cx={r.x} cy={r.y} color="var(--color-muted)" />
+                  )}
+                </g>
+              )}
+              <circle
+                cx={r.x}
+                cy={r.y}
+                r="3.4"
+                fill="transparent"
+                role="button"
+                tabIndex={0}
+                aria-label={`${t('map.region')} ${i + 1}`}
+                onClick={() => claim(i)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    claim(i)
+                  }
+                }}
+                className="cursor-pointer stroke-transparent outline-none transition hover:stroke-accent focus-visible:stroke-accent"
+                strokeWidth="1.2"
+              />
+            </g>
+          ) : null,
+        )}
       </svg>
       <span className="text-xs text-muted">{t('map.hint')}</span>
     </div>

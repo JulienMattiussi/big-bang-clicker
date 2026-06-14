@@ -134,7 +134,7 @@ export const en: Translations = {
   'city.success.body': 'Harmony {score} (goal {goal}): reward ×{mult}.',
   'city.fail.title': 'The city scatters',
   'city.fail.body': 'Not enough harmony: {score} / {goal}. No reward.',
-  'map.hint': 'Choose your stance, then bring territories into your state',
+  'map.hint': 'Unite the world, by arms or by diplomacy',
   'map.mode': 'Stance',
   'map.negotiate': 'Negotiate',
   'map.conquer': 'Conquer',

@@ -134,7 +134,7 @@ export const fr = {
   'city.success.body': 'Harmonie {score} (seuil {goal}) : récompense ×{mult}.',
   'city.fail.title': 'Cité dispersée',
   'city.fail.body': 'Harmonie insuffisante : {score} / {goal}. Aucune récompense.',
-  'map.hint': 'Choisis ta posture, puis rallie des territoires à ton État',
+  'map.hint': 'Unifie le monde, par les armes ou par la diplomatie',
   'map.mode': 'Posture',
   'map.negotiate': 'Négocier',
   'map.conquer': 'Conquérir',
