@@ -114,8 +114,14 @@ export function GameShell() {
         {isFullWidthWidget(era.widget) ? (
           <>
             <section className="-mt-2 flex justify-center pb-2">{central}</section>
-            {/* Resources kept narrow so the wide machines panel fits 3 columns. */}
-            <section className="grid gap-4 md:grid-cols-[1fr_3fr]">
+            {/* Resources stay narrow next to the wide machines panel. The
+                civilization eras (Societies -> Industry) widen the resource column
+                a bit, where many eras' resources cohabit and it gets cramped. */}
+            <section
+              className={`grid gap-4 ${
+                era.uiTier === 'civilization' ? 'md:grid-cols-[1fr_2fr]' : 'md:grid-cols-[1fr_3fr]'
+              }`}
+            >
               <ResourcePanel era={era} />
               <PurchasePanel era={era} wide />
             </section>

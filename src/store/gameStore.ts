@@ -33,6 +33,7 @@ import {
   TAMPER_ERROR,
 } from '@/lib/save'
 import { defs } from '@/data'
+import { INVENTIONS } from '@/data/inventions'
 
 interface GameStore {
   state: GameState
@@ -90,6 +91,12 @@ interface GameStore {
   awardComplexityBoost: () => number
   /** City widget: records newly discovered neighbour pairings (kept across reloads). */
   discoverCityPairs: (keys: string[]) => void
+  /** Inventions widget: reveals the next invention (persisted across reloads). */
+  discoverInvention: () => void
+  /** Inventions widget: restarts the discovery from the first invention (after a crisis). */
+  resetInventions: () => void
+  /** Inventions widget: makes a player-triggered crisis ready (once; never re-fires). */
+  triggerCrisis: (id: string) => void
 }
 
 /**
@@ -263,5 +270,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const fresh = keys.filter((k) => !s.state.cityPairs.includes(k))
       if (fresh.length === 0) return {}
       return commit({ ...s.state, cityPairs: [...s.state.cityPairs, ...fresh] })
+    }),
+  discoverInvention: () =>
+    set((s) =>
+      commit({ ...s.state, inventions: Math.min(s.state.inventions + 1, INVENTIONS.length) }),
+    ),
+  resetInventions: () => set((s) => commit({ ...s.state, inventions: 0 })),
+  triggerCrisis: (id) =>
+    set((s) => {
+      const def = s.defs.crises[id]
+      if (!def) return {}
+      const runtime = s.state.crises[id]
+      // Already resolved or already active: never re-fire (the looped USB/etc.
+      // inventions reach the same crisis again, but it must trigger only once).
+      if (runtime?.resolved || (runtime?.risk ?? 0) >= def.risk.threshold) return {}
+      return commit({
+        ...s.state,
+        crises: {
+          ...s.state.crises,
+          [id]: { risk: def.risk.threshold, resolved: false, count: runtime?.count ?? 0 },
+        },
+      })
     }),
 }))

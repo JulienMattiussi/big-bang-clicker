@@ -12,6 +12,7 @@ import { TreeOfLife } from './TreeOfLife'
 import { IdeaConstellation } from './IdeaConstellation'
 import { CityGrid } from './CityGrid'
 import { WorldMap } from './WorldMap'
+import { InventionsWidget } from './InventionsWidget'
 import type { EraDef } from '@/lib/types'
 
 /**
@@ -34,6 +35,7 @@ export const INTERACTIVE_WIDGETS: Record<string, (props: { era: EraDef }) => Rea
   memory: IdeaConstellation,
   city: CityGrid,
   map: WorldMap,
+  inventions: InventionsWidget,
 }
 
 /**
@@ -41,7 +43,15 @@ export const INTERACTIVE_WIDGETS: Record<string, (props: { era: EraDef }) => Rea
  * Compact ones stay centered in the 3-column layout, like the non-interactive
  * eras.
  */
-const FULLWIDTH_WIDGETS = new Set(['periodic', 'accretion', 'assembly', 'tree', 'city', 'map'])
+const FULLWIDTH_WIDGETS = new Set([
+  'periodic',
+  'accretion',
+  'assembly',
+  'tree',
+  'city',
+  'map',
+  'inventions',
+])
 
 export function isFullWidthWidget(widget: string): boolean {
   return FULLWIDTH_WIDGETS.has(widget)

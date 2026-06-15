@@ -11,6 +11,7 @@ import { useMemoryStore } from '@/store/memoryStore'
 import { useInventoryStore } from '@/store/inventoryStore'
 import { useGaletStore } from '@/store/galetStore'
 import { useCrisisStore, CRISIS_GAMES } from '@/store/crisisStore'
+import { describeCrisisEffect, type CrisisEffectLine } from './crisisEffectText'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EventTone } from '@/lib/events'
@@ -34,6 +35,7 @@ export function EventModal() {
   const event = useGameStore((s) => s.state.pendingEvents[0])
   const dismiss = useGameStore((s) => s.dismissEvent)
   const defs = useGameStore((s) => s.defs)
+  const resources = useGameStore((s) => s.state.resources)
   const galet = useGameStore((s) =>
     event?.galetId ? s.defs.galets.find((g) => g.id === event.galetId) : undefined,
   )
@@ -49,6 +51,16 @@ export function EventModal() {
   // A crisis with a survival mini-game: closing the modal drops into the widget.
   const crisisGame = crisisId !== null && CRISIS_GAMES.has(crisisId)
   const isCrisisWon = event.id.startsWith('crisis-won:')
+
+  // Explicit, data-driven effect lines: the regression on the trigger modal, the
+  // rebound on the "overcome" modal (derived from the crisis data).
+  const effectCrisisId = crisisId ?? (isCrisisWon ? event.id.slice('crisis-won:'.length) : null)
+  const effectDef = effectCrisisId ? defs.crises[effectCrisisId] : undefined
+  const effectLines = effectDef
+    ? (isCrisisWon ? effectDef.rebound : effectDef.regression)
+        .map((e) => describeCrisisEffect(e, t, defs, resources))
+        .filter((line): line is CrisisEffectLine => line !== null)
+    : []
 
   const handleDismiss = () => {
     if (isMemory) useMemoryStore.getState().flash()
@@ -91,7 +103,7 @@ export function EventModal() {
     hero = {
       tone: 'accent',
       eyebrow: t('crisis.overcome.eyebrow'),
-      glyph: <Icon name="flora" className="relative h-16 w-16 text-accent" />,
+      glyph: <Icon name="sunrise" className="relative h-16 w-16 text-accent" />,
     }
   } else if (crisisId) {
     hero = {
@@ -193,6 +205,53 @@ export function EventModal() {
           ) : null}
         </>
       )}
+
+      {effectLines.length > 0 ? (
+        <div
+          className={`mt-4 rounded-lg border px-3 py-2 text-left ${
+            isCrisisWon ? 'border-accent/40 bg-accent/10' : 'border-red-500/40 bg-red-500/10'
+          }`}
+        >
+          <span
+            className={`text-xs font-semibold tracking-wide uppercase ${
+              isCrisisWon ? 'text-accent' : 'text-red-400'
+            }`}
+          >
+            {t(isCrisisWon ? 'crisis.effect.boost' : 'crisis.effect.damage')}
+          </span>
+          <ul className="mt-1.5 flex flex-col gap-1 text-sm">
+            {effectLines.map((line, i) => {
+              const res = line.resource
+              const otherEra =
+                res && res.eraId !== effectDef?.eraId
+                  ? defs.eras.find((e) => e.id === res.eraId)
+                  : undefined
+              return (
+                <li key={i} className="flex items-center gap-1.5">
+                  {res ? (
+                    res.symbol ? (
+                      <span aria-hidden className="w-4 text-center text-xs leading-none font-bold">
+                        {res.symbol}
+                      </span>
+                    ) : (
+                      <Icon name={res.icon} className="h-4 w-4 shrink-0" />
+                    )
+                  ) : null}
+                  {otherEra ? <EraIcon icon={otherEra.icon} className="h-4 w-4 shrink-0" /> : null}
+                  <span className="flex-1 truncate text-fg">{line.label}</span>
+                  <span
+                    className={`shrink-0 font-semibold tabular-nums ${
+                      isCrisisWon ? 'text-accent' : 'text-red-400'
+                    }`}
+                  >
+                    {line.detail}
+                  </span>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      ) : null}
 
       <div className={`mt-5 flex ${centered ? 'justify-center' : 'justify-end'}`}>
         <Button autoFocus onClick={handleDismiss}>

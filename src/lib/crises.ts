@@ -83,6 +83,9 @@ export function updateRisk(state: GameState, defs: GameDefs, dt: number): GameSt
   const crises = { ...state.crises }
   for (const id in defs.crises) {
     const def = defs.crises[id]
+    // Player-triggered crises (reaching an invention) never build risk on their
+    // own; they only become ready when explicitly triggered.
+    if (def.trigger === 'player') continue
     const runtime = crises[id] ?? { risk: 0, resolved: false, count: 0 }
     if (runtime.resolved) continue
     const source = def.risk.sourceResource

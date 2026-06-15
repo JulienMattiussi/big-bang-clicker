@@ -140,6 +140,140 @@ export const fr = {
   'map.conquer': 'Conquérir',
   'map.region': 'Région',
 
+  'invent.title': 'Inventions',
+  'invent.gauge': 'Prochaine invention',
+  'invent.empty': 'Vos inventions apparaîtront ici, au fil des clics.',
+  'invent.restart':
+    "L'humanité a régressé après la crise. Mais le génie humain ne s'arrête jamais : tout va repartir de plus belle.",
+  'invent.count': 'Inventions : {n}',
+  'invent.navigate': 'Parcourir les inventions',
+  'invent.latest': 'Nouvelle invention',
+  'invent.variant.usb.tag': 'USB',
+  'invent.variant.usb.note': '(mais en USB)',
+  'invent.variant.bluetooth.tag': 'Bluetooth',
+  'invent.variant.bluetooth.note': '(mais en Bluetooth)',
+  'invent.variant.laser.tag': 'Laser',
+  'invent.variant.laser.note': '(mais au laser)',
+  'invent.variant.ionic.tag': 'Ionique',
+  'invent.variant.ionic.note': '(mais en ionique)',
+  'invent.variant.quantum.tag': 'Quantique',
+  'invent.variant.quantum.note': '(mais en quantique)',
+  'invention.steamEngine.title': 'Machine à vapeur',
+  'invention.steamEngine.desc':
+    'La vapeur sous pression devient force motrice et entraîne les premières usines.',
+  'invention.spinningJenny.title': 'Métier à filer',
+  'invention.spinningJenny.desc':
+    "Une seule roue file des dizaines de fils à la fois : le textile s'industrialise.",
+  'invention.battery.title': 'Pile électrique',
+  'invention.battery.desc':
+    'Volta empile cuivre et zinc et obtient le premier courant continu durable.',
+  'invention.locomotive.title': 'Locomotive à vapeur',
+  'invention.locomotive.desc':
+    'Sur des rails, la vapeur transporte hommes et marchandises plus vite que jamais.',
+  'invention.photography.title': 'Photographie',
+  'invention.photography.desc':
+    'La lumière fixe enfin son image sur une plaque : le réel se conserve.',
+  'invention.telegraph.title': 'Télégraphe',
+  'invention.telegraph.desc':
+    'Des impulsions électriques portent les messages à travers les continents en un instant.',
+  'invention.anaesthesia.title': 'Anesthésie',
+  'invention.anaesthesia.desc':
+    'On opère désormais sans douleur : la chirurgie moderne devient possible.',
+  'invention.dynamite.title': 'Dynamite',
+  'invention.dynamite.desc': 'Nobel dompte la nitroglycérine ; on perce montagnes et canaux.',
+  'invention.combustionEngine.title': 'Moteur à explosion',
+  'invention.combustionEngine.desc':
+    'Un mélange enflammé pousse le piston : une énergie compacte et mobile.',
+  'invention.telephone.title': 'Téléphone',
+  'invention.telephone.desc':
+    "La voix voyage le long d'un fil : on se parle d'une ville à l'autre.",
+  'invention.lightBulb.title': 'Ampoule électrique',
+  'invention.lightBulb.desc':
+    'Un filament incandescent repousse la nuit dans les foyers et les rues.',
+  'invention.automobile.title': 'Automobile',
+  'invention.automobile.desc':
+    "Le moteur à explosion s'installe sur quatre roues : la route s'ouvre à tous.",
+  'invention.cinema.title': 'Cinématographe',
+  'invention.cinema.desc':
+    "Vingt-quatre images par seconde donnent l'illusion du mouvement projeté.",
+  'invention.xray.title': 'Rayons X',
+  'invention.xray.desc': "Un rayonnement invisible révèle l'intérieur du corps sans l'ouvrir.",
+  'invention.radio.title': 'Radio',
+  'invention.radio.desc': 'Les ondes hertziennes transmettent le son sans aucun fil.',
+  'invention.airplane.title': 'Avion',
+  'invention.airplane.desc': "Plus lourd que l'air, l'homme s'arrache enfin du sol et vole.",
+  'invention.plastic.title': 'Plastique',
+  'invention.plastic.desc': "La première matière entièrement synthétique : moulable à l'infini.",
+  'invention.penicillin.title': 'Pénicilline',
+  'invention.penicillin.desc':
+    "Une moisissure tue les bactéries : l'ère des antibiotiques commence.",
+  'invention.transistor.title': 'Transistor',
+  'invention.transistor.desc':
+    "Un minuscule interrupteur de silicium remplace les tubes : l'électronique miniaturisée.",
+  'invention.internet.title': 'Internet',
+  'invention.internet.desc':
+    "Des ordinateurs distants se relient en réseau et échangent l'information du monde.",
+  'invention.microprocessor.title': 'Microprocesseur',
+  'invention.microprocessor.desc':
+    'Tout un ordinateur central gravé sur une seule puce de silicium.',
+  'invention.email.title': 'Courrier électronique',
+  'invention.email.desc': "Le premier message envoyé d'une machine à une autre via le réseau.",
+  'invention.videoGame.title': 'Jeu vidéo',
+  'invention.videoGame.desc':
+    "L'écran devient terrain de jeu : le divertissement interactif est né.",
+  'invention.personalComputer.title': 'Ordinateur personnel',
+  'invention.personalComputer.desc': 'La puissance de calcul entre dans chaque foyer.',
+  'invention.mri.title': 'IRM',
+  'invention.mri.desc': 'Des aimants révèlent les tissus mous du corps en coupe, sans rayons.',
+  'invention.gps.title': 'GPS',
+  'invention.gps.desc': "Une constellation de satellites donne sa position exacte à qui l'écoute.",
+  'invention.compactDisc.title': 'Disque compact',
+  'invention.compactDisc.desc': 'La musique se numérise et se lit au laser, sans contact ni usure.',
+  'invention.cellPhone.title': 'Téléphone portable',
+  'invention.cellPhone.desc': 'Le téléphone quitte le mur et tient dans la main.',
+  'invention.dnaProfiling.title': 'Empreinte génétique',
+  'invention.dnaProfiling.desc': 'Chaque individu se reconnaît à la signature unique de son ADN.',
+  'invention.liIonBattery.title': 'Batterie lithium-ion',
+  'invention.liIonBattery.desc':
+    "Une réserve d'énergie légère et rechargeable qui suit l'homme partout.",
+  'invention.worldWideWeb.title': 'Web',
+  'invention.worldWideWeb.desc':
+    "Des pages reliées par des liens : l'information du réseau devient navigable.",
+  'invention.wifi.title': 'Wi-Fi',
+  'invention.wifi.desc': 'Le réseau se libère des câbles : on se connecte par les ondes.',
+  'invention.socialNetwork.title': 'Réseau social',
+  'invention.socialNetwork.desc': 'Le monde entier se relie, se suit et se commente en ligne.',
+  'invention.videoSharing.title': 'Partage de vidéos',
+  'invention.videoSharing.desc':
+    "N'importe qui peut publier une vidéo que le monde entier regarde.",
+  'invention.smartphone.title': 'Smartphone',
+  'invention.smartphone.desc': 'Un ordinateur tactile dans la poche, relié au monde en permanence.',
+  'invention.tablet.title': 'Tablette',
+  'invention.tablet.desc': 'Un grand écran tactile sans clavier, à emporter partout.',
+  'invention.crispr.title': 'CRISPR',
+  'invention.crispr.desc': "Des ciseaux moléculaires réécrivent l'ADN lettre par lettre.",
+  'invention.reusableRocket.title': 'Fusée réutilisable',
+  'invention.reusableRocket.desc':
+    "Le lanceur revient se poser intact pour repartir : l'espace devient abordable.",
+  'invention.mrnaVaccine.title': 'Vaccin à ARN messager',
+  'invention.mrnaVaccine.desc':
+    'On apprend aux cellules à fabriquer elles-mêmes leur bouclier immunitaire.',
+  'invention.aiAssistant.title': 'IA générative',
+  'invention.aiAssistant.desc': 'Une machine converse, écrit et crée à partir de quelques mots.',
+  'invention.crash.title': 'Krach de 1929',
+  'invention.crash.desc': "Les marchés s'effondrent en un jour : la grande dépression commence.",
+  'invention.atomicBomb.title': 'Bombe atomique',
+  'invention.atomicBomb.desc':
+    "Fissionner l'atome libère une puissance qui peut raser une ville d'un éclair.",
+  'invention.y2k.title': "Bug de l'an 2000",
+  'invention.y2k.desc':
+    'On craint que tous les ordinateurs lâchent à minuit. Spoiler : presque rien.',
+  'invention.machineRebellion.title': 'Rébellion des machines',
+  'invention.machineRebellion.desc': "À force d'apprendre, les machines décident de ne plus obéir.",
+  'invention.climate.title': 'Crise climatique',
+  'invention.climate.desc':
+    "À force de tout brûler, l'atmosphère se réchauffe et le climat se dérègle.",
+
   'event.continue': 'Continuer',
   'era.unlocked.eyebrow': "Une nouvelle ère s'ouvre",
 
@@ -203,12 +337,26 @@ export const fr = {
   'crisis.overcome.eyebrow': 'Renaissance',
   'crisis.overcome.title': 'Crise surmontée',
   'crisis.effect.struck': 'Perte de {pct}% de la {res} existante.',
-  'crisis.effect.recovered': 'Crise résolue : la vie foisonne, production multipliée par {mult}.',
+  'crisis.effect.recovered': 'Crise résolue : {name}, production multipliée par {mult}.',
+  'crisis.extinction.name': 'Extinction de masse',
+  'crisis.revolt.name': 'Révolte de Starpacus',
+  'crisis.crash.name': 'Krach de 1929',
+  'crisis.atomic.name': 'Guerre nucléaire',
+  'crisis.climate.name': 'Crise climatique',
+  'crisis.y2k.name': "Bug de l'an 2000",
+  'crisis.machineRebellion.name': 'Rébellion des machines',
+  'crisis.effect.damage': 'Conséquence',
+  'crisis.effect.boost': 'Rebond',
+  'crisis.effect.loss': '-{amount} ({pct}%)',
+  'crisis.effect.lossPct': '-{pct}%',
+  'crisis.effect.gain': '×{mult}',
   'crisisGame.hint':
     'Mets les créatures à l’abri des météores : clique sur l’une d’elles pour la faire plonger dans un terrier.',
   'crisisGame.aria': 'Zone de survie : sauve les créatures des chutes de météores.',
   'crisisGame.saved': 'Créatures sauvées',
   'crisisGame.creature': 'Mettre cette créature à l’abri',
+  'crisisGame.survive.label': 'Survivre',
+  'crisisGame.survive.hint': "Accroche-toi : clique sans relâche pour t'en sortir.",
   'revoltGame.hint':
     'Affranchis les révoltés et mène-les au Parlement. Gare aux rouges : trois bousculades et le citoyen retombe dans la révolte.',
   'revoltGame.aria': 'Place publique : affranchis les révoltés et remplis le Parlement.',
@@ -218,8 +366,22 @@ export const fr = {
   'crisis.extinction.rebound': 'Une branche mineure prospère : la vie repart, plus diverse.',
   'crisis.revolt.trigger': 'Révolte de Starpacus : la société éclate.',
   'crisis.revolt.rebound': 'Les affranchis deviennent citoyens : une société plus juste.',
-  'crisis.atomic.trigger': 'Une bombe atomique éclate : effondrement.',
+  'crisis.atomic.trigger':
+    'La guerre nucléaire éclate. Tant de génie, pour en arriver là... Pauvres fous.',
   'crisis.atomic.rebound': 'Les survivants refondent une société plus résiliente.',
+  'crisis.machineRebellion.trigger':
+    'Les machines se soulèvent : la technologie échappe à son créateur.',
+  'crisis.machineRebellion.rebound':
+    "Les machines sont matées : l'humanité reprend le contrôle et tout repart de plus belle.",
+  'crisis.crash.trigger': "Krach boursier : l'économie s'effondre.",
+  'crisis.crash.rebound': 'Sur les ruines, une économie repart, mieux régulée.',
+  'crisis.climate.trigger':
+    "Le climat s'emballe : canicules, mégafeux, montée des océans. Des réfugiés climatiques fuient par milliers des terres devenues invivables.",
+  'crisis.climate.rebound':
+    'Sursaut écologique mondial : des technologies durables réparent le climat et tout repart.',
+  'crisis.y2k.trigger':
+    "Bug de l'an 2000 : à minuit, tous les ordinateurs du monde vont s'effondrer. Avions, banques, centrales... la civilisation retient son souffle.",
+  'crisis.y2k.rebound': "On l'a échappé belle : le bug n'aura presque rien cassé, tout repart.",
 
   'prestige.title': 'Renaissance',
   'prestige.desc': 'Tout recommence, augmenté par les Échos.',

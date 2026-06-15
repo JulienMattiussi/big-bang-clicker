@@ -88,6 +88,7 @@ export interface EraBundle {
 const PROD_STEP_FROM: Record<number, number> = {
   11: 1.55, // late-game easing begins (eras before 11 are untouched, x1)
   13: 5, // stronger production from the Nations era onward
+  14: 2, // Industry: ease back down so it does not race ahead after its crises
 }
 const CONS_STEP_FROM: Record<number, number> = {
   11: 0.92, // converter inputs ease down from the late game

@@ -495,6 +495,9 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
     if (def.risk.sourceResource) frozen.add(def.risk.sourceResource)
     for (const e of def.regression) if (e.target) frozen.add(e.target)
     for (const e of def.rebound) if (e.target) frozen.add(e.target)
+    // The whole era stalls during its crisis (you cannot click around it).
+    const era = defs.eras.find((e) => e.id === def.eraId)
+    if (era?.resources) for (const r of era.resources) frozen.add(r)
   }
 
   for (const id in state.generators) {

@@ -45,16 +45,119 @@ export const crisisDefs: CrisisDef[] = [
       reboundKey: 'crisis.revolt.rebound',
     },
   },
+  // Reached, not over-exploited: these e14 crises fire when the player discovers
+  // the matching invention in the widget (player trigger), so they never build
+  // risk on their own. threshold 1 = ready as soon as triggerCrisis sets the risk.
   {
     id: 'atomic',
     eraId: 'e14',
-    risk: { sourceResource: 'technology', threshold: 5_000_000 },
-    trigger: 'threshold',
-    regression: [{ type: 'resetResource', target: 'technology', value: 0.3 }],
-    rebound: [{ type: 'multiplier', target: 'technology', value: 2 }],
+    risk: { threshold: 1 },
+    trigger: 'player',
+    regression: [
+      { type: 'resetResource', target: 'research', value: 0.2 },
+      { type: 'resetResource', target: 'technology', value: 0.2 },
+      { type: 'resetResource', target: 'population', value: 0.2 },
+      { type: 'resetResource', target: 'city', value: 0.2 },
+      { type: 'resetResource', target: 'trade', value: 0.2 },
+      { type: 'resetResource', target: 'empire', value: 0.2 },
+    ],
+    rebound: [
+      { type: 'multiplier', target: 'research', value: 2 },
+      { type: 'multiplier', target: 'technology', value: 2 },
+      { type: 'multiplier', target: 'population', value: 2 },
+      { type: 'multiplier', target: 'city', value: 2 },
+      { type: 'multiplier', target: 'trade', value: 2 },
+      { type: 'multiplier', target: 'empire', value: 2 },
+    ],
     textKeys: {
       triggerKey: 'crisis.atomic.trigger',
       reboundKey: 'crisis.atomic.rebound',
+    },
+  },
+  {
+    id: 'crash',
+    eraId: 'e14',
+    risk: { threshold: 1 },
+    trigger: 'player',
+    regression: [
+      { type: 'resetResource', target: 'research', value: 0.5 },
+      { type: 'resetResource', target: 'technology', value: 0.5 },
+    ],
+    rebound: [
+      { type: 'multiplier', target: 'research', value: 2 },
+      { type: 'multiplier', target: 'technology', value: 2 },
+    ],
+    textKeys: {
+      triggerKey: 'crisis.crash.trigger',
+      reboundKey: 'crisis.crash.rebound',
+    },
+  },
+  {
+    id: 'climate',
+    eraId: 'e14',
+    risk: { threshold: 1 },
+    trigger: 'player',
+    // Same toll as the machine rebellion / nuclear war: a civilisation-wide blow.
+    regression: [
+      { type: 'resetResource', target: 'research', value: 0.2 },
+      { type: 'resetResource', target: 'technology', value: 0.2 },
+      { type: 'resetResource', target: 'population', value: 0.2 },
+      { type: 'resetResource', target: 'city', value: 0.2 },
+      { type: 'resetResource', target: 'trade', value: 0.2 },
+      { type: 'resetResource', target: 'empire', value: 0.2 },
+    ],
+    rebound: [
+      { type: 'multiplier', target: 'research', value: 2 },
+      { type: 'multiplier', target: 'technology', value: 2 },
+      { type: 'multiplier', target: 'population', value: 2 },
+      { type: 'multiplier', target: 'city', value: 2 },
+      { type: 'multiplier', target: 'trade', value: 2 },
+      { type: 'multiplier', target: 'empire', value: 2 },
+    ],
+    textKeys: {
+      triggerKey: 'crisis.climate.trigger',
+      reboundKey: 'crisis.climate.rebound',
+    },
+  },
+  // The bug that wasn't: global panic, a single unit of Technology lost, then a
+  // healthy rebound (the derisory damage is the joke).
+  {
+    id: 'y2k',
+    eraId: 'e14',
+    risk: { threshold: 1 },
+    trigger: 'player',
+    regression: [{ type: 'grantResource', target: 'technology', value: -1 }],
+    rebound: [{ type: 'multiplier', target: 'technology', value: 2 }],
+    textKeys: {
+      triggerKey: 'crisis.y2k.trigger',
+      reboundKey: 'crisis.y2k.rebound',
+    },
+  },
+  {
+    id: 'machineRebellion',
+    eraId: 'e14',
+    risk: { threshold: 1 },
+    trigger: 'player',
+    // Same toll as the nuclear war: the machines turning is just as devastating.
+    regression: [
+      { type: 'resetResource', target: 'research', value: 0.2 },
+      { type: 'resetResource', target: 'technology', value: 0.2 },
+      { type: 'resetResource', target: 'population', value: 0.2 },
+      { type: 'resetResource', target: 'city', value: 0.2 },
+      { type: 'resetResource', target: 'trade', value: 0.2 },
+      { type: 'resetResource', target: 'empire', value: 0.2 },
+    ],
+    rebound: [
+      { type: 'multiplier', target: 'research', value: 2 },
+      { type: 'multiplier', target: 'technology', value: 2 },
+      { type: 'multiplier', target: 'population', value: 2 },
+      { type: 'multiplier', target: 'city', value: 2 },
+      { type: 'multiplier', target: 'trade', value: 2 },
+      { type: 'multiplier', target: 'empire', value: 2 },
+    ],
+    textKeys: {
+      triggerKey: 'crisis.machineRebellion.trigger',
+      reboundKey: 'crisis.machineRebellion.rebound',
     },
   },
 ]

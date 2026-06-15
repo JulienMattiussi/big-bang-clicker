@@ -264,6 +264,8 @@ export interface GameState {
   complexityBoosts: Record<EraId, number>
   /** City widget (era 12): neighbour pairings the player has discovered. */
   cityPairs: string[]
+  /** Inventions widget (era 14): how many inventions have been revealed (in order). */
+  inventions: number
   /** Narrative popups shown but not yet dismissed. Persisted so a popup the
    *  player never closed reappears on reload (and its effect stays deferred). */
   pendingEvents: GameEvent[]

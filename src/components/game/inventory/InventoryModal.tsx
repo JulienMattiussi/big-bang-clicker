@@ -36,7 +36,7 @@ export function InventoryModal({ onClose }: { onClose: () => void }) {
       onClose={onClose}
       closeOnBackdrop
       labelledBy="inventory-title"
-      className="modal-in flex h-full max-h-[92vh] w-full max-w-3xl flex-col rounded-lg border border-border bg-surface text-fg shadow-xl"
+      className="modal-in flex h-full max-h-[92vh] w-full max-w-5xl flex-col rounded-lg border border-border bg-surface text-fg shadow-xl"
     >
       <div className="flex items-center gap-3 border-b border-border px-5 py-4">
         <Icon name="backpack" className="h-6 w-6 shrink-0 text-accent" aria-hidden />
@@ -60,7 +60,7 @@ export function InventoryModal({ onClose }: { onClose: () => void }) {
       {/* Masonry: era blocks flow into several columns and stack within each
             to fill the space (a column is NOT one era). Full available height. */}
       <div className="overflow-y-auto p-5">
-        <div className="columns-1 gap-3 sm:columns-2 lg:columns-3">
+        <div className="columns-1 gap-3 sm:columns-2 lg:columns-3 xl:columns-4">
           {groups.map(({ era, resources }) => (
             <section
               key={era.id}

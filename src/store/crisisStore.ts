@@ -3,8 +3,17 @@ import { create } from 'zustand'
 /** Number of creatures the player must shelter to overcome a crisis. */
 export const CRISIS_GOAL = 50
 
-/** Crises that have a survival mini-game (others resolve straight from the banner). */
-export const CRISIS_GAMES = new Set(['extinction', 'revolt'])
+/** Crises confronted through a survival mini-game (others resolve from the banner).
+ *  The era-14 crises all share the simple SurviveGame (mash to fill the bar). */
+export const CRISIS_GAMES = new Set([
+  'extinction',
+  'revolt',
+  'crash',
+  'atomic',
+  'climate',
+  'y2k',
+  'machineRebellion',
+])
 
 /**
  * Transient (not persisted) state of the crisis mini-game: which crisis is being

@@ -40,6 +40,7 @@ export function createInitialState(now: number, firstEraId: EraId = ''): GameSta
     memoryLevels: {},
     complexityBoosts: {},
     cityPairs: [],
+    inventions: 0,
     pendingEvents: [],
     eventsInitialized: false,
   }
