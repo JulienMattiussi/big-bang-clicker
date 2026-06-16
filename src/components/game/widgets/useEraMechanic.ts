@@ -1,7 +1,8 @@
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
 import { useTranslation } from '@/i18n/useTranslation'
-import { clickYield } from '@/lib/engine'
+import { clickYield, converterOutputMultiplier } from '@/lib/engine'
+import { widgetGaletMultiplier } from '@/lib/galets'
 import { formatNumber } from '@/lib/format'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef, ResourceId } from '@/lib/types'
@@ -33,10 +34,17 @@ export function useEraMechanic(era: EraDef) {
     return def ? t(def.nameKey as TranslationKey) : resource
   }
 
+  // The space-time pebble (when active) DOUBLES every widget reward; it never
+  // touches the automated factories (which read engine multipliers, not this one).
+  const widgetMult = () => {
+    const { state, defs } = useGameStore.getState()
+    return widgetGaletMultiplier(state, defs, era.index)
+  }
+
   const gainBase = (n = 1) => {
     if (n <= 0) return
     const { state, defs } = useGameStore.getState()
-    const amount = n * clickYield(state, defs, era)
+    const amount = n * clickYield(state, defs, era) * widgetMult()
     click(era.clickResource, amount)
     spawn(`res:${era.clickResource}`, `+${formatNumber(amount)}`, 'resource')
   }
@@ -46,10 +54,33 @@ export function useEraMechanic(era: EraDef) {
     if (!recipeId || times <= 0) return
     const conv = useGameStore.getState().defs.converters[recipeId]
     if (!conv) return
-    for (let k = 0; k < times; k++) manualProduce(recipeId)
+    const runs = times * widgetMult()
+    for (let k = 0; k < runs; k++) manualProduce(recipeId)
     for (const o of conv.outputs)
-      spawn(`res:${o.resource}`, `+${formatNumber(o.amount * times)}`, 'resource')
+      spawn(`res:${o.resource}`, `+${formatNumber(o.amount * runs)}`, 'resource')
   }
 
-  return { verb, name, gainBase, complete, baseResource: era.clickResource }
+  const combinedResource = recipeId
+    ? useGameStore.getState().defs.converters[recipeId]?.outputs[0]?.resource
+    : undefined
+
+  /** Grants the era's combined resource for a FIXED base `n` (e.g. +1), scaled by
+   *  this era's FACTORY progression - the recipe's converter LEVEL plus its output
+   *  multipliers (memory/crisis/global/meta + converter galets) - and the widget
+   *  galet. It drops the recipe's flat late-game easing, so the manual reward stays
+   *  small but grows as the era's factory is leveled up. */
+  const gainCombinedScaled = (n = 1) => {
+    if (!recipeId || !combinedResource || n <= 0) return
+    const { state, defs } = useGameStore.getState()
+    const level = state.converters[recipeId]?.level ?? 0
+    const mult =
+      (level + 1) *
+      converterOutputMultiplier(state, defs, recipeId, combinedResource) *
+      widgetMult()
+    const amount = n * mult
+    click(combinedResource, amount)
+    spawn(`res:${combinedResource}`, `+${formatNumber(amount)}`, 'resource')
+  }
+
+  return { verb, name, gainBase, gainCombinedScaled, complete, baseResource: era.clickResource }
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
+import { WidgetGalet } from './WidgetGalet'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
 
@@ -272,7 +273,10 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
         ))}
       </svg>
       <span className="text-base font-semibold text-fg">{verb}</span>
-      <span className="text-xs text-muted">{t('molecule.hint')}</span>
+      <span className="flex flex-col items-center gap-1.5 text-xs text-muted">
+        {t('molecule.hint')}
+        <WidgetGalet />
+      </span>
     </div>
   )
 }

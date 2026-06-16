@@ -1,5 +1,6 @@
 import { useState, type ReactElement } from 'react'
 import { useEraMechanic } from './useEraMechanic'
+import { WidgetGalet } from './WidgetGalet'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { Icon } from '@/components/ui/Icon'
@@ -19,7 +20,7 @@ const clicksFor = (variant: number) => 10 + variant * 2
  */
 export function InventionsWidget({ era }: { era: EraDef }): ReactElement {
   const { t } = useTranslation()
-  const { verb, gainBase, complete } = useEraMechanic(era)
+  const { verb, gainBase, gainCombinedScaled } = useEraMechanic(era)
 
   const discovered = useGameStore((s) => s.state.inventions)
   const crises = useGameStore((s) => s.state.crises)
@@ -67,22 +68,25 @@ export function InventionsWidget({ era }: { era: EraDef }): ReactElement {
       return
     }
     setGauge(0)
-    complete()
     const next = timeline[discovered]
-    if (!next) return // whole current timeline seen: keep producing, nothing new
+    if (!next) return // whole current timeline seen: nothing new
     // Reaching an unresolved crisis fires it (it is not an invention card, and not
     // counted): on resolution the discovery restarts from the first invention.
     if (next.crisis) {
       triggerCrisis(next.crisis)
       return
     }
+    gainCombinedScaled(1) // +1 Technology per invention, scaled by the era's factory level
     discoverInvention()
     setViewIndex(discovered) // jump the card to the freshly revealed invention
   }
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
-      <span className="text-base font-semibold text-fg">{verb}</span>
+      <span className="inline-flex items-center gap-2 text-base font-semibold text-fg">
+        {verb}
+        <WidgetGalet />
+      </span>
 
       <div className="grid w-full max-w-4xl overflow-hidden rounded-lg border border-border bg-surface/80 md:h-104 md:grid-cols-2 md:items-stretch">
         <div className="flex flex-col items-center justify-center gap-6 border-b border-border p-6 md:border-r md:border-b-0">

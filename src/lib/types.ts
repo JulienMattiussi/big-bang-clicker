@@ -108,12 +108,15 @@ export interface GaletEffect {
    * - complexityMultiplier: the Complexity gained from those eras' resources;
    * - terminalConsumption: input cost of each era's TERMINAL converter (value
    *   acts on consumption, e.g. 0.5 halves it).
+   * - widgetMultiplier: multiplies the manual reward of each era's WIDGET gesture
+   *   (handled in useEraMechanic), with NO effect on automated factory output.
    */
   type:
     | 'generatorMultiplier'
     | 'converterMultiplier'
     | 'complexityMultiplier'
     | 'terminalConsumption'
+    | 'widgetMultiplier'
   maxEraIndex: number
   value: number
 }

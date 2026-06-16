@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import { viewBoxPoint } from './svgCoords'
 import { useEraMechanic } from './useEraMechanic'
+import { WidgetGalet } from './WidgetGalet'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
 
@@ -368,7 +369,10 @@ export function PetriDish({ era }: { era: EraDef }) {
       >
         {t('petri.divide')}
       </button>
-      <span className="text-center text-xs whitespace-pre-line text-muted">{t('petri.hint')}</span>
+      <span className="flex flex-col items-center gap-1.5 text-center text-xs whitespace-pre-line text-muted">
+        {t('petri.hint')}
+        <WidgetGalet />
+      </span>
     </div>
   )
 }

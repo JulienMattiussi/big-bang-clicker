@@ -25,6 +25,18 @@ export function widgetGaletForEra(defs: GameDefs, eraId: string): GaletDef | und
   return defs.galets.find((g) => g.discovery === 'widget' && g.discoverEraId === eraId)
 }
 
+/** Product of active 'widgetMultiplier' pebbles reaching `eraIdx`. Applied to the
+ *  manual widget gestures (useEraMechanic), never to automated factory output. */
+export function widgetGaletMultiplier(state: GameState, defs: GameDefs, eraIdx: number): number {
+  let m = 1
+  for (const g of defs.galets ?? []) {
+    if (g.effect.type !== 'widgetMultiplier') continue
+    const owned = state.galets?.[g.id]
+    if (owned?.found && owned.active && eraIdx <= g.effect.maxEraIndex) m *= g.effect.value
+  }
+  return m
+}
+
 /** Found pebbles that boost the Complexity gain (for the effect badge on the meter). */
 export function galetsAffectingComplexity(state: GameState, defs: GameDefs): GaletDef[] {
   return defs.galets.filter(

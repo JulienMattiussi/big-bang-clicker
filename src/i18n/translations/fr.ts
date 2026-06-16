@@ -43,6 +43,11 @@ export const fr = {
     "Divise par 2 la consommation de l'usine terminale de chaque ère jusqu'aux Sociétés",
   'galet.society.lore':
     "En creusant les fondations du nouveau théâtre, des ouvriers ont mis au jour un galet peint à gros traits d'enfant : une famille, les premiers d'une multitude qui apprendra à vivre côte à côte.",
+  'galet.widget.tip': "Quadruple l'effet des clics (×{mult})",
+  'galet.spacetime.name': "Galet peint de l'espace-temps",
+  'galet.spacetime.desc': 'Quadruple tous les effets des widgets de chaque ère',
+  'galet.spacetime.lore':
+    "Sur la première planète foulée, à demi enfoui dans la poussière, un galet bleu. Tu le ramasses, et l'espace d'un instant, le temps lui-même semble hésiter.",
   'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',
@@ -59,7 +64,7 @@ export const fr = {
   'machine.produce': 'Produire',
   'widget.temperature': 'Température',
   'bohr.hint': "Capture l'électron quand il s'approche du noyau",
-  'nursery.hint': 'Chaque clic effondre du gaz ; martèle un point pour allumer une étoile',
+  'nursery.hint': 'Chaque clic effondre du gaz\nmartèle un point pour allumer une étoile',
 
   // Widgets interactifs (ères 4-13) : indications et libellés accessibles.
   'accretion.hint':
@@ -139,6 +144,19 @@ export const fr = {
   'map.negotiate': 'Négocier',
   'map.conquer': 'Conquérir',
   'map.region': 'Région',
+
+  'rocket.hint': 'Mène chaque vaisseau de la rampe à une planète lointaine, phase par phase.',
+  'rocket.phase.launch': 'Décollage',
+  'rocket.phase.ascent': 'Ascension',
+  'rocket.phase.cruise': 'Croisière',
+  'rocket.phase.landing': 'Atterrissage',
+  'rocket.thrust': 'Poussée',
+  'rocket.left': 'Incliner à gauche',
+  'rocket.right': 'Incliner à droite',
+  'rocket.fire': 'Viser l’étoile',
+  'rocket.waiting': 'En attente',
+  'rocket.land': 'Posé !',
+  'rocket.crash': 'Écrasé',
 
   'invent.title': 'Inventions',
   'invent.gauge': 'Prochaine invention',
@@ -453,8 +471,6 @@ export const fr = {
   'res.colony': 'Colonies',
   'res.ship': 'Vaisseaux',
   'res.federation': 'Fédérations',
-  'res.bridge': 'Ponts',
-  'res.cluster': 'Amas',
   'res.district': 'Districts',
   'res.universeCity': 'Ville-univers',
   'res.tension': 'Tension',
@@ -476,7 +492,6 @@ export const fr = {
   'gen.laboratory': 'Laboratoire',
   'gen.refinery': 'Raffinerie',
   'gen.shipyard': 'Chantier spatial',
-  'gen.engineering': 'Ingénierie',
   'gen.urbanism': 'Urbanisme cosmique',
   'gen.instability': 'Instabilité',
 
@@ -497,7 +512,6 @@ export const fr = {
   'conv.invention': 'Invention',
   'conv.launch': 'Lancement',
   'conv.colonization': 'Colonisation',
-  'conv.link': 'Liaison intergalactique',
   'conv.unification': 'Unification',
 
   'era.e0.name': 'Big Bang',
@@ -580,26 +594,21 @@ export const fr = {
   'era.e15.stock': 'Vaisseaux',
   'era.e15.machines': 'Industrie spatiale',
   'era.e15.verb': 'Lancer',
-  'era.e16.name': 'Sociétés galactiques',
-  'era.e16.tagline': "Une galaxie entière ne demande qu'à vivre.",
-  'era.e16.stock': 'Colonies',
-  'era.e16.machines': 'Méga-structures',
-  'era.e16.verb': 'Coloniser',
-  'era.e17.name': 'Intergalactique',
-  'era.e17.tagline': "Entre les galaxies, le grand vide t'attend.",
-  'era.e17.stock': 'Réseau',
-  'era.e17.machines': 'Ponts cosmiques',
-  'era.e17.verb': 'Relier',
-  'era.e18.name': 'La grande unification',
-  'era.e18.tagline': "L'univers entier, réuni en une seule ville.",
-  'era.e18.stock': 'Univers',
-  'era.e18.machines': 'Districts',
-  'era.e18.verb': 'Unifier',
-  'era.e19.name': 'Explosion',
-  'era.e19.tagline': 'Tout finit... et tout recommence, en mieux.',
-  'era.e19.stock': 'Instabilité',
-  'era.e19.machines': 'Singularité',
-  'era.e19.verb': 'Tendre vers la rupture',
+  'era.e16.name': 'Voyage intergalactique',
+  'era.e16.tagline': "Le grand vide entre les galaxies n'attend que d'être franchi.",
+  'era.e16.stock': 'Expansion',
+  'era.e16.machines': 'Flottes',
+  'era.e16.verb': 'Explorer',
+  'era.e17.name': 'La grande unification',
+  'era.e17.tagline': "L'univers entier, réuni en une seule ville.",
+  'era.e17.stock': 'Univers',
+  'era.e17.machines': 'Districts',
+  'era.e17.verb': 'Unifier',
+  'era.e18.name': 'Explosion',
+  'era.e18.tagline': 'Tout finit... et tout recommence, en mieux.',
+  'era.e18.stock': 'Instabilité',
+  'era.e18.machines': 'Singularité',
+  'era.e18.verb': 'Tendre vers la rupture',
 
   // Textes de transition (modale d'évènement) affichés en entrant dans l'ère.
   'era.e1.transition':
@@ -633,11 +642,9 @@ export const fr = {
   'era.e15.transition':
     'Des fusées quittent le berceau. Car la Terre est un berceau, pas une demeure : il est temps de déménager vers les étoiles.',
   'era.e16.transition':
-    "D'étoile en étoile, l'humanité essaime. Les colonies fleurissent : une galaxie entière ne demande qu'à vivre.",
+    "D'étoile en étoile, puis de galaxie en galaxie, les vaisseaux franchissent le grand vide. Les mondes lointains se fédèrent : l'univers devient un quartier.",
   'era.e17.transition':
-    "Reste l'immense vide entre les galaxies. On le franchit par des ponts cosmiques : l'univers devient un quartier.",
-  'era.e18.transition':
     "Tout converge enfin : l'univers entier, réuni en une seule ville-univers à son apogée. Que pourrait-il bien arriver ?",
-  'era.e19.transition':
+  'era.e18.transition':
     "Quelque part, un dirigeant de quartier galactique a oublié d'éteindre le gaz après son petit-déjeuner. L'univers entier s'embrase. Tout est à refaire... en mieux.",
 } as const

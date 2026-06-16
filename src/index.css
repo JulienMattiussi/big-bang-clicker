@@ -672,8 +672,32 @@
     transform: rotate(0deg);
   }
 }
+/* A ship drifting across the whole viewport (space scenes), on an HTML wrapper.
+   Endpoints are CSS variables so each ship gets its own direction and slope. */
+@keyframes bg-cross {
+  0% {
+    transform: translate(var(--bx-from), var(--by-from));
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: 0.85;
+  }
+  100% {
+    transform: translate(var(--bx-to), var(--by-to));
+    opacity: 0;
+  }
+}
 .bg-scene {
   animation: bg-fade-in 0.9s ease-out;
+}
+.bg-cross {
+  --bx-from: -15vw;
+  --bx-to: 115vw;
+  --by-from: 0px;
+  --by-to: 0px;
+  animation: bg-cross linear infinite;
+  will-change: transform;
 }
 .bg-breathe {
   animation: bg-breathe 9s ease-in-out infinite;
@@ -713,6 +737,9 @@
   .bg-fern,
   .bg-pulse {
     animation: none;
+  }
+  .bg-cross {
+    display: none;
   }
 }
 

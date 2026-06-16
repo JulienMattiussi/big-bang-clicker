@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { viewBoxPoint } from './svgCoords'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
+import { WidgetGalet } from './WidgetGalet'
 import { useTranslation } from '@/i18n/useTranslation'
 import { clickYield } from '@/lib/engine'
 import { formatNumber } from '@/lib/format'
@@ -203,7 +204,10 @@ export function StarNursery({ era }: { era: EraDef }) {
         </svg>
       </button>
       <span className="text-base font-semibold text-fg">{t(era.verbKey as TranslationKey)}</span>
-      <span className="text-xs text-muted">{t('nursery.hint')}</span>
+      <span className="flex flex-col items-center gap-1.5 whitespace-pre-line text-center text-xs text-muted">
+        {t('nursery.hint')}
+        <WidgetGalet />
+      </span>
     </div>
   )
 }

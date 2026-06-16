@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
+import { WidgetGalet } from './WidgetGalet'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
 
@@ -272,8 +273,9 @@ export function TreeOfLife({ era }: { era: EraDef }) {
           })}
         </g>
       </svg>
-      <span className="text-xs text-muted">
+      <span className="inline-flex items-center justify-center gap-1.5 text-xs text-muted">
         {phase === 'choose' ? t('tree.choose') : t('tree.hint')}
+        <WidgetGalet />
       </span>
     </div>
   )

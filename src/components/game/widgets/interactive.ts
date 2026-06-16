@@ -13,6 +13,7 @@ import { IdeaConstellation } from './IdeaConstellation'
 import { CityGrid } from './CityGrid'
 import { WorldMap } from './WorldMap'
 import { InventionsWidget } from './InventionsWidget'
+import { RocketLaunch } from './RocketLaunch'
 import type { EraDef } from '@/lib/types'
 
 /**
@@ -36,6 +37,7 @@ export const INTERACTIVE_WIDGETS: Record<string, (props: { era: EraDef }) => Rea
   city: CityGrid,
   map: WorldMap,
   inventions: InventionsWidget,
+  rocket: RocketLaunch,
 }
 
 /**
@@ -51,6 +53,7 @@ const FULLWIDTH_WIDGETS = new Set([
   'city',
   'map',
   'inventions',
+  'rocket',
 ])
 
 export function isFullWidthWidget(widget: string): boolean {

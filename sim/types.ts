@@ -26,6 +26,14 @@ export interface ProfileConfig {
    */
   clickMode?: 'rate' | 'bootstrap'
   /**
+   * Buy at least one level of EVERY revealed machine (each generator AND each
+   * converter) before leveling up the cheapest. A hands-off player who only
+   * automates still seeds the whole conversion chain - notably the deep feeders
+   * (e.g. iron at era 3, the sole input of the era-4 accretion recipe) that a
+   * pure 'cheapest' strategy would starve. Without it such a chain never runs.
+   */
+  seedMachines?: boolean
+  /**
    * Memory mini-game success rate PER LEVEL (index 0 = level 1, ... up to
    * MEMORY_MAX_LEVEL). Omit (or empty) for profiles that never play memory. Once
    * unlocked, the profile stakes 10% Complexity per attempt and, on success,

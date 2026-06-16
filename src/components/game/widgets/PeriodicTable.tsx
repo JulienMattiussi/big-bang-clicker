@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react'
+import { WidgetGalet } from './WidgetGalet'
 import { canManualConvert, clickYield, galetConverterMultiplier } from '@/lib/engine'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
@@ -108,11 +109,12 @@ export function PeriodicTable({ era }: { era: EraDef }) {
       {/* The verb sits in the table's empty top-middle (saves vertical space). */}
       <div
         style={{ gridColumn: '3 / 13', gridRow: '1 / 3' }}
-        className="flex items-center justify-center"
+        className="flex items-center justify-center gap-2"
       >
         <span aria-hidden className="text-lg font-semibold text-fg">
           {t(era.verbKey as TranslationKey)}
         </span>
+        <WidgetGalet />
       </div>
       {LAYOUT.map(({ col, row }) => {
         const cell: CSSProperties = { gridColumnStart: col, gridRowStart: row }

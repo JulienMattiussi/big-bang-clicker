@@ -8,7 +8,7 @@ import {
   civilizationResources,
 } from './eras/civilization'
 import { spaceConverters, spaceEras, spaceGenerators, spaceResources } from './eras/space'
-import { era19, era19Generators, era19Resources } from './eras/transcendence'
+import { era18, era18Generators, era18Resources } from './eras/transcendence'
 import { crisisDefs } from './crises'
 import { metaUpgradeDefs } from './metaUpgrades'
 import { galetDefs } from './galets'
@@ -30,14 +30,14 @@ const resources: ResourceDef[] = [
   ...lifeResources,
   ...civilizationResources,
   ...spaceResources,
-  ...era19Resources,
+  ...era18Resources,
 ]
 const generators: GeneratorDef[] = [
   ...cosmosGenerators,
   ...lifeGenerators,
   ...civilizationGenerators,
   ...spaceGenerators,
-  ...era19Generators,
+  ...era18Generators,
 ]
 const converters: ConverterDef[] = [
   ...cosmosConverters,
@@ -47,7 +47,7 @@ const converters: ConverterDef[] = [
 ]
 
 export const defs: GameDefs = {
-  eras: [...cosmosEras, ...lifeEras, ...civilizationEras, ...spaceEras, era19],
+  eras: [...cosmosEras, ...lifeEras, ...civilizationEras, ...spaceEras, era18],
   resources: byId(resources),
   generators: byId(generators),
   converters: byId(converters),

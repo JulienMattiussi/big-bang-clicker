@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react'
 import { useEraMechanic } from './useEraMechanic'
+import { WidgetGalet } from './WidgetGalet'
 import { useGameStore } from '@/store/gameStore'
 import { announceGalet } from '@/hooks/useGalets'
 import { widgetGaletForEra } from '@/lib/galets'
@@ -214,7 +215,10 @@ export function CityGrid({ era }: { era: EraDef }) {
   const discoverCityPairs = useGameStore((s) => s.discoverCityPairs)
   const discovered = new Set(useGameStore((s) => s.state.cityPairs))
 
-  const galetDef = widgetGaletForEra(useGameStore((s) => s.defs), era.id)
+  const galetDef = widgetGaletForEra(
+    useGameStore((s) => s.defs),
+    era.id,
+  )
   const galetFound = useGameStore((s) => (galetDef ? !!s.state.galets[galetDef.id]?.found : false))
 
   const [grid, setGrid] = useState<(number | null)[]>(() => new Array(CELLS).fill(null))
@@ -447,8 +451,9 @@ export function CityGrid({ era }: { era: EraDef }) {
           })}
         </div>
 
-        <span className="flex items-center justify-center whitespace-pre-line text-center text-xs text-muted md:col-start-2 md:row-start-1">
+        <span className="flex items-center justify-center gap-1.5 whitespace-pre-line text-center text-xs text-muted md:col-start-2 md:row-start-1">
           {t('city.hint')}
+          <WidgetGalet />
         </span>
 
         <aside

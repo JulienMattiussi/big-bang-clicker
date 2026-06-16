@@ -48,7 +48,7 @@ Choix validés : voir la section "Décisions" plus bas et
 > tableau périodique, `components/game/widgets/PeriodicTable.tsx` + `interactive.ts`)
 > demande aussi un composant. Voir [GAME-DESIGN](./docs/GAME-DESIGN.md) section 7.
 
-État actuel : jouable de bout en bout (moteur, 20 ères, prestige, crises,
+État actuel : jouable de bout en bout (moteur, 19 ères, prestige, crises,
 widgets interactifs sur-mesure pour la plupart des ères, galets de l'infini,
 fond de scène par palier, modales d'évènements). Arborescence :
 
@@ -264,7 +264,7 @@ pas seulement à constater.
 - **Stack** : React 19 + Vite + Zustand + Tailwind (standard maison).
 - **Économie** : réseau de ressources qui se combinent + méta-ressource
   (Complexité) + prestige final (Échos). Voir [GAME-DESIGN.md](./docs/GAME-DESIGN.md).
-- **Découpage** : **20 ères** validées (dérivées de la chronologie réelle), avec
+- **Découpage** : **19 ères** (dérivées de la chronologie réelle), avec
   cohabitation et chaînage inter-ères. Voir [PHASES.md](./docs/PHASES.md).
 - **Automatisation** : usines/générateurs façon clicker standard (GAME-DESIGN 5).
 - **Crises (régressions)** : effondrement partiel puis rebond amélioré, échos

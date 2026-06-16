@@ -1,4 +1,4 @@
-# Big Bang Clicker - Les 20 ères
+# Big Bang Clicker - Les 19 ères
 
 > Découpage validé, dérivé de la chronologie scientifique
 > ([SCIENCE.md](./SCIENCE.md)). Pour chaque ère : verbe, réseau de ressources
@@ -15,7 +15,7 @@
 > Interface : coquille stable + widgets iconiques + paliers de transformation
 > (voir [UI-UX.md](./UI-UX.md)).
 >
-> Statut : structure figée (20 ères) ; chiffres et contenu fin à affiner. La
+> Statut : structure figée (19 ères) ; chiffres et contenu fin à affiner. La
 > partie biologique/anthropologique reste **à re-sourcer** (voir SCIENCE.md).
 
 ## Légende
@@ -36,8 +36,8 @@
 | COSMOS | 0 à 4 | base |
 | VIVANT | 5 à 10 | **transformation majeure** (apparition de la vie, ère 5/6) |
 | CIVILISATION | 11 à 14 | **transformation majeure** (apparition des sociétés, ère 12) |
-| SPATIAL | 15 à 18 | marquée |
-| TRANSCENDANCE | 19 | spectaculaire (prestige) |
+| SPATIAL | 15 à 17 | marquée |
+| TRANSCENDANCE | 18 | spectaculaire (prestige) |
 
 ---
 
@@ -335,44 +335,34 @@
   [GAME-DESIGN.md](./GAME-DESIGN.md) section 6.
 - **Passage** : présence multiplanétaire stable.
 
-### Ère 16 - Sociétés galactiques `spéculatif`
+### Ère 16 - Voyage intergalactique `spéculatif`
 
-- **Accroche** : « Une galaxie entière ne demande qu'à vivre. »
-- **Narratif** : la civilisation se répand dans **sa galaxie** : colonisation
-  interstellaire, fédérations d'étoiles, méga-structures captant l'énergie des
-  étoiles (sphères de Dyson).
-- **Verbe** : coloniser / fédérer (à l'échelle de la galaxie).
+- **Accroche** : « Le grand vide entre les galaxies n'attend que d'être franchi. »
+- **Narratif** : la civilisation se répand de galaxie en galaxie. D'abord sa
+  galaxie (colonisation interstellaire, fédérations d'étoiles), puis le grand
+  vide intergalactique que les vaisseaux franchissent pour fédérer des mondes
+  toujours plus lointains : l'univers devient un quartier.
+- **Verbe** : explorer / fédérer (à l'échelle inter-galactique).
 - **Ressources & chaînes** :
-  - `vaisseaux interstellaires -> systèmes colonisés -> fédération galactique`
-  - `étoiles -> sphères de Dyson -> énergie stellaire`
-- **Widget** : **carte galactique** (la Voie lactée, systèmes à coloniser) +
-  **sphère de Dyson**.
-- **Production** : vaisseaux générationnels, mondes-anneaux, sphères de Dyson.
-- **Passage** : galaxie largement colonisée -> franchir le vide intergalactique.
+  - Base : Vaisseaux ; consomme les Colonies (ère 15).
+  - `vaisseaux + colonies -> fédération` (mondes reliés à travers le vide)
+- **Widget** : **carte galactique -> toile cosmique** (systèmes à coloniser,
+  puis filaments reliant les galaxies). Réutilise la Voie lactée de l'ère 2.
+- **Production** : chantiers spatiaux, flottes générationnelles, fédération.
+- **Passage** : assez de fédérations pour entamer l'unification de l'univers.
+- **Note structure** : cette ère **fusionne** les anciennes « Sociétés
+  galactiques » et « Sociétés intergalactiques » en un seul voyage (le découpage
+  doublonnait ; le geste et la chaîne de ressources sont identiques).
 
-### Ère 17 - Sociétés intergalactiques `spéculatif`
-
-- **Accroche** : « Entre les galaxies, le grand vide t'attend. »
-- **Narratif** : franchir les abysses entre galaxies. Relier plusieurs galaxies,
-  exploiter des amas, tendre des ponts à travers la **toile cosmique**.
-- **Verbe** : relier les galaxies / s'étendre dans l'amas.
-- **Ressources & chaînes** :
-  - `fédération galactique -> ponts intergalactiques -> amas reliés`
-  - `galaxies -> super-amas -> réseau de la toile cosmique`
-- **Widget** : **carte de l'amas / toile cosmique** (filaments reliant les
-  galaxies, noeuds à activer). Zoom au-dessus de la carte galactique de l'ère 16.
-- **Production** : ponts intergalactiques, vaisseaux à très longue portée,
-  exploitation d'amas.
-- **Passage** : assez de galaxies reliées pour englober l'univers entier.
-
-### Ère 18 - Ville-univers `spéculatif`
+### Ère 17 - La grande unification (ville-univers) `spéculatif`
 
 - **Accroche** : « L'univers entier, réuni en une seule ville. »
 - **Narratif** : toute la matière et l'énergie de l'univers convergent en une
   unique ville-univers (civilisation de Type III+).
 - **Verbe** : unifier / englober.
 - **Ressources & chaînes** :
-  - `districts galactiques -> ville-univers`
+  - Base : Districts ; consomme les Fédérations (ère 16).
+  - `districts + fédérations -> ville-univers`
   - jauge de **complétude de l'univers** qui sature.
 - **Widget** : **ville-univers / horloge cosmique** (la complétude se remplit,
   l'instabilité monte).
@@ -383,7 +373,7 @@
 
 ## Tier TRANSCENDANCE
 
-### Ère 19 - Explosion : nouveau Big Bang `spéculatif`
+### Ère 18 - Explosion : nouveau Big Bang `spéculatif`
 
 - **Accroche** : « Tout finit... et tout recommence, en mieux. »
 - **Narratif** : la ville-univers est saturée de complexité, au bord de
@@ -394,7 +384,7 @@
 - **Ton** : bascule **comique/absurde** assumée pour la toute fin. Les enjeux
   cosmiques sont anéantis par une bêtise domestique : c'est le contraste qui
   fait le sel de la chute. (Formulation exacte du gag **à affiner**.)
-- **Note de design** : l'instabilité (jauge de complétude de l'ère 18) fournit
+- **Note de design** : l'instabilité (jauge de complétude de l'ère 17) fournit
   la poudre ; l'incident trivial fournit l'étincelle. Possibilité d'un petit
   évènement scripté/illustré au moment du déclenchement.
 - **Verbe** : transcender (déclencher le prestige).

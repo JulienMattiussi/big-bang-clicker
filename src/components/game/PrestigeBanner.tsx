@@ -19,7 +19,7 @@ export function PrestigeBanner() {
   const prestige = useGameStore((s) => s.prestige)
   const buyMetaUpgrade = useGameStore((s) => s.buyMetaUpgrade)
 
-  if (!state.unlockedEras.includes('e19')) return null
+  if (!state.unlockedEras.includes('e18')) return null
 
   const gain = echoesGain(state)
 

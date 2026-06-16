@@ -8,6 +8,7 @@ import {
   buyGenerator,
   canAfford,
   canUnlockNextEra,
+  converterOutputMultiplier,
   manualProduce,
   MAX_COMPLEXITY_BOOST,
   nextCost,
@@ -18,8 +19,8 @@ import {
 import { readyCrises, resolveCrisis, updateRisk } from '@/lib/crises'
 import { memoryUnlocked, memoryLevel, memoryEraMaxed, memoryStart, memoryWin } from '@/lib/memory'
 import { revealedMachines, revealedResources } from '@/lib/reveal'
-import { decliningResources } from '@/lib/graph'
-import { discoverableGalets, widgetGaletForEra } from '@/lib/galets'
+import { decliningResources, netFlows } from '@/lib/graph'
+import { discoverableGalets, widgetGaletForEra, widgetGaletMultiplier } from '@/lib/galets'
 import type { EraDef, GameState } from '@/lib/types'
 import type { Completeness, MilestoneStat, ProfileConfig, RunResult, UnlockPolicy } from './types'
 
@@ -48,6 +49,9 @@ const SIMON_MIN_SKILL = 1 // completesPerSecond >= this (active/optimal): clears
 const CITY_THRIVE_INTERVAL_S = 30
 /** Caps cityThriving so cityMult (1 + thriving) tops out at 10, like the widget. */
 const CITY_THRIVE_MAX = 9
+/** Player-triggered crises (Industry, e14): spacing between forced triggers, so an
+ *  active player reaches and overcomes them one after another across the era. */
+const CRISIS_TRIGGER_INTERVAL_S = 150
 
 /** Deterministic PRNG (mulberry32) seeded per run, so memory outcomes are
  *  reproducible (the sim never reads true randomness). */
@@ -73,6 +77,30 @@ function nameOf(era: EraDef): string {
   return (fr as Record<string, string>)[era.nameKey] ?? era.id
 }
 
+/** Mirrors the widgets' gainCombinedScaled: a fixed base `n` of the era's combined
+ *  resource, scaled by the converter LEVEL, its output multipliers (memory/crisis/
+ *  global/meta + converter galets) and the widget pebble - dropping the recipe's
+ *  flat late-game easing. This is the manual reward the e14/e15/e16/e17 widgets now
+ *  grant (a small batch that grows with the factory), not the free full recipe. */
+function combinedGain(state: GameState, era: EraDef, n: number): GameState {
+  const cid = era.converters[0]
+  if (!cid || n <= 0) return state
+  const combined = defs.converters[cid]?.outputs[0]?.resource
+  if (!combined) return state
+  const level = state.converters[cid]?.level ?? 0
+  const mult =
+    (level + 1) *
+    converterOutputMultiplier(state, defs, cid, combined) *
+    widgetGaletMultiplier(state, defs, era.index)
+  return applyClick(state, combined, n * mult)
+}
+
+/** Eras whose widget reward is a factory-scaled +1 of the combined resource
+ *  (Industry inventions + every space era) instead of the free full recipe. */
+function usesScaledCombined(era: EraDef): boolean {
+  return era.widget === 'inventions' || era.uiTier === 'space'
+}
+
 function measureCompleteness(state: GameState, era: EraDef): Completeness {
   const gActive = era.generators.filter((id) => (state.generators[id]?.level ?? 0) >= 1)
   const cActive = era.converters.filter((id) => (state.converters[id]?.level ?? 0) >= 1)
@@ -92,9 +120,28 @@ function measureCompleteness(state: GameState, era: EraDef): Completeness {
   }
 }
 
-/** Buys the single best affordable revealed machine, or returns null. */
-function purchaseOnce(state: GameState, strategy: ProfileConfig['strategy']): GameState | null {
+/** Surplus factor required on the base resource before switching on a converter
+ *  that consumes it: production must exceed the new converter's draw by 50%, so
+ *  the base keeps accumulating (to afford the next, deeper link) instead of being
+ *  pinned at zero. Below this, the converter is held back and the base generator
+ *  is grown first. */
+const BASE_SURPLUS_FACTOR = 1.5
+
+/** Buys the single best affordable revealed machine, or returns null. When
+ *  `seedMachines` is set, an un-built machine (level 0) takes priority over
+ *  leveling up an existing one - cheapest first - so every feeder in a chain gets
+ *  switched on. A converter that draws on its era's BASE resource is held back
+ *  until the base flow (real net, via `flows`) has the surplus to sustain it;
+ *  meanwhile the base generator is grown (or the turn saved) so the chain can
+ *  climb to its deepest element instead of starving on the first link. */
+function purchaseOnce(
+  state: GameState,
+  strategy: ProfileConfig['strategy'],
+  seedMachines = false,
+  flows: Record<string, number> | null = null,
+): GameState | null {
   let best: { id: string; isConv: boolean; costSum: number; tier: number } | null = null
+  let bestSeed: { id: string; isConv: boolean; costSum: number } | null = null
   for (const eraId of state.unlockedEras) {
     const era = ERA_BY_ID[eraId]
     if (!era) continue
@@ -111,7 +158,20 @@ function purchaseOnce(state: GameState, strategy: ProfileConfig['strategy']): Ga
       const tier = isConv
         ? Math.max(...conv.outputs.map((o) => defs.resources[o.resource]?.tier ?? 0))
         : (defs.resources[gen.output]?.tier ?? 0)
+      // Hold back (in seed mode) a level-0 converter that draws on its era's base
+      // until the base flow can sustain it: it then counts for NEITHER pick, and
+      // its generator is grown first - no starvation deadlock on the first link.
+      if (seedMachines && level === 0 && conv && flows) {
+        const baseInput = conv.inputs.find((inp) => inp.resource === era.clickResource)
+        if (baseInput) {
+          const draw = baseInput.amount * (conv.baseRate ?? 0.5)
+          if ((flows[era.clickResource] ?? 0) < draw * BASE_SURPLUS_FACTOR) continue
+        }
+      }
       const cand = { id, isConv, costSum, tier }
+      if (seedMachines && level === 0 && (!bestSeed || costSum < bestSeed.costSum)) {
+        bestSeed = { id, isConv, costSum }
+      }
       if (!best) {
         best = cand
       } else if (strategy === 'tierFirst') {
@@ -126,6 +186,37 @@ function purchaseOnce(state: GameState, strategy: ProfileConfig['strategy']): Ga
       }
     }
   }
+  // Priority 1: switch on a not-yet-built machine that IS affordable.
+  if (bestSeed) {
+    return bestSeed.isConv
+      ? buyConverter(state, defs, bestSeed.id)
+      : buyGenerator(state, defs, bestSeed.id)
+  }
+  // Priority 2 (seedMachines): the earliest era whose cascade is still incomplete
+  // gets its BASE generator grown, so feedstock builds up to climb toward the
+  // deepest element (e.g. enough stellar pressure for fusion to reach iron) rather
+  // than the chain stalling on its first link. Only the earliest pending chain is
+  // chased (a `break`), and only if its generator is affordable; otherwise we fall
+  // through to the normal pick (which, with starved base-consumers held back, just
+  // grows that same generator or saves when nothing else is affordable).
+  if (seedMachines) {
+    for (const eraId of state.unlockedEras) {
+      const era = ERA_BY_ID[eraId]
+      if (!era) continue
+      const revealed = revealedMachines(state, defs, era)
+      const pending = era.converters.some(
+        (id) => revealed.has(id) && (state.converters[id]?.level ?? 0) === 0,
+      )
+      if (!pending) continue
+      const genId = era.generators[0]
+      if (genId) {
+        const gen = defs.generators[genId]
+        const cost = nextCost(gen.cost, state.generators[genId]?.level ?? 0)
+        if (canAfford(state.resources, cost)) return buyGenerator(state, defs, genId)
+      }
+      break
+    }
+  }
   if (!best) return null
   return best.isConv ? buyConverter(state, defs, best.id) : buyGenerator(state, defs, best.id)
 }
@@ -133,10 +224,14 @@ function purchaseOnce(state: GameState, strategy: ProfileConfig['strategy']): Ga
 function doPurchases(
   state: GameState,
   strategy: ProfileConfig['strategy'],
+  seedMachines = false,
 ): { state: GameState; count: number } {
   let count = 0
   for (let i = 0; i < MAX_BUYS_PER_DECISION; i++) {
-    const next = purchaseOnce(state, strategy)
+    // Real net flows drive the base-surplus gate; only needed (and only paid for)
+    // when seeding, and refreshed each buy since growing the generator shifts them.
+    const flows = seedMachines ? netFlows(state, defs) : null
+    const next = purchaseOnce(state, strategy, seedMachines, flows)
     if (!next) break
     state = next
     count++
@@ -197,6 +292,7 @@ export function simulate(
   // City widget (era 12): thriving cities completed so far, raising the multiplier.
   let cityThriving = 0
   let nextCityThriveT = CITY_THRIVE_INTERVAL_S
+  let nextCrisisT = CRISIS_TRIGGER_INTERVAL_S
 
   for (let iter = 0; iter < MAX_ITERS; iter++) {
     state = tick(state, defs, DT)
@@ -277,7 +373,16 @@ export function simulate(
       clicks = Math.floor(clickCarry)
       clickCarry -= clicks
     }
-    if (clicks > 0) state = applyClick(state, currentEra.clickResource, clicks * cityMult * mapMult)
+    // The widget pebble (when found) doubles every manual reward (clicks + combined).
+    const widgetMult = widgetGaletMultiplier(state, defs, currentEra.index)
+    const scaled = usesScaledCombined(currentEra)
+    // Generic space eras (e16/e17): no bespoke widget, so the combined resource
+    // rides on each CLICK (gainBase + gainCombinedScaled), as in ClickArea.
+    const spaceGeneric = scaled && currentEra.widget === 'generic'
+    if (clicks > 0) {
+      state = applyClick(state, currentEra.clickResource, clicks * cityMult * mapMult * widgetMult)
+      if (spaceGeneric) state = combinedGain(state, currentEra, clicks)
+    }
 
     if (profile.clickMode !== 'bootstrap') {
       completeCarry += profile.completesPerSecond * DT
@@ -285,8 +390,51 @@ export function simulate(
       completeCarry -= completes
       if (completes > 0 && currentEra.converters.length > 0) {
         const cid = currentEra.converters[0]
-        let n = completes * mapMult
-        while (n-- > 0) state = manualProduce(state, defs, cid)
+        if (scaled && !spaceGeneric) {
+          // Industry inventions / rocket landings: each skilled gesture grants a
+          // factory-scaled +1 of the combined resource (no free full recipe).
+          state = combinedGain(state, currentEra, completes)
+        } else if (!spaceGeneric) {
+          // Other widgets: the gesture produces the full recipe for free.
+          let n = completes * mapMult
+          while (n-- > 0) state = manualProduce(state, defs, cid)
+        }
+      }
+    }
+
+    // Player-triggered crises (Industry, e14): an active player reaches them via the
+    // inventions widget and overcomes them. Force the era's unresolved ones one at a
+    // time (waiting for each to resolve) so their post-crisis rebound multipliers
+    // shape the late economy, instead of never firing in a headless run.
+    if (profile.completesPerSecond > 0 && t >= nextCrisisT) {
+      const eraPlayerCrises = Object.keys(defs.crises).filter(
+        (id) => defs.crises[id].eraId === currentEra.id && defs.crises[id].trigger === 'player',
+      )
+      const anyPending = eraPlayerCrises.some(
+        (id) =>
+          !state.crises[id]?.resolved &&
+          (state.crises[id]?.risk ?? 0) >= defs.crises[id].risk.threshold,
+      )
+      const nextC = anyPending
+        ? undefined
+        : eraPlayerCrises.find(
+            (id) =>
+              !state.crises[id]?.resolved &&
+              (state.crises[id]?.risk ?? 0) < defs.crises[id].risk.threshold,
+          )
+      if (nextC) {
+        state = {
+          ...state,
+          crises: {
+            ...state.crises,
+            [nextC]: {
+              risk: defs.crises[nextC].risk.threshold,
+              resolved: false,
+              count: state.crises[nextC]?.count ?? 0,
+            },
+          },
+        }
+        nextCrisisT = t + CRISIS_TRIGGER_INTERVAL_S
       }
     }
 
@@ -300,7 +448,7 @@ export function simulate(
     // Purchases + back-trip detection on the decision cadence.
     let bought = 0
     if (iter % decisionEvery === 0) {
-      const res = doPurchases(state, profile.strategy)
+      const res = doPurchases(state, profile.strategy, profile.seedMachines)
       state = res.state
       bought = res.count
       const starved = feederDeficit(state, currentEra)

@@ -34,11 +34,11 @@ function sceneFor(index: number): Scene {
   if (index <= 9) return 'sea' // e7-e9: oxygen, eukaryotes, cambrian seas
   if (index === 10) return 'land' // e10: conquest of land (terrestrial)
   if (index <= 14) return 'civilization' // e11-e14: minds, cities, nations, tech (neuron field)
-  if (index <= 18) return 'cosmos' // e15-e18: space, galaxies, universe-city
-  return 'singularity' // e19: collapse / rebirth
+  if (index <= 17) return 'cosmos' // e15-e17: space, galaxies, universe-city
+  return 'singularity' // e18: collapse / rebirth
 }
 
-const SCENES: Record<Scene, () => ReactElement> = {
+const SCENES: Record<Scene, (props: { eraIndex: number }) => ReactElement> = {
   plasma: PlasmaScene,
   stars: StarsScene,
   cells: CellsScene,
@@ -59,7 +59,7 @@ export function SceneBackground({ eraIndex }: { eraIndex: number }): ReactElemen
     >
       {/* Keyed so switching era groups fades the new scene in. */}
       <div key={scene} className="bg-scene absolute inset-0">
-        <Scene />
+        <Scene eraIndex={eraIndex} />
       </div>
     </div>
   )

@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
 import { Icon } from '@/components/ui/Icon'
 import { defs } from '@/data'
+import { WidgetGalet } from './WidgetGalet'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
 
@@ -225,7 +226,15 @@ export function WorldMap({ era }: { era: EraDef }) {
         aria-label={verb}
         key={bloom}
       >
-        <rect x="0" y="0" width="100" height="60" rx="3" fill="var(--color-secondary)" opacity="0.12" />
+        <rect
+          x="0"
+          y="0"
+          width="100"
+          height="60"
+          rx="3"
+          fill="var(--color-secondary)"
+          opacity="0.12"
+        />
         <g fill="var(--part-4)" opacity="0.7" aria-hidden>
           {CONTINENTS.map((d, i) => (
             <path key={i} d={d} />
@@ -290,7 +299,10 @@ export function WorldMap({ era }: { era: EraDef }) {
           ) : null,
         )}
       </svg>
-      <span className="text-xs text-muted">{t('map.hint')}</span>
+      <span className="inline-flex items-center justify-center gap-1.5 text-xs text-muted">
+        {t('map.hint')}
+        <WidgetGalet />
+      </span>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
+import { WidgetGalet } from './WidgetGalet'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
 
@@ -113,7 +114,10 @@ export function AtmosphereBalance({ era }: { era: EraDef }) {
       >
         {verb}
       </button>
-      <span className="text-center text-xs text-muted">{t('balance.hint')}</span>
+      <span className="flex flex-col items-center gap-1.5 text-center text-xs text-muted">
+        {t('balance.hint')}
+        <WidgetGalet />
+      </span>
     </div>
   )
 }

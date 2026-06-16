@@ -62,6 +62,28 @@ const MOTIFS: Record<string, (color: string) => ReactElement> = {
       <circle cx="2.5" cy="1" r="2.8" fill={color} />
     </g>
   ),
+  // Spacetime: a row of hourglasses, each smaller than the last.
+  hourglasses: (color) => (
+    <g
+      transform="translate(18 16)"
+      fill="none"
+      stroke={color}
+      strokeWidth="1.1"
+      strokeLinejoin="round"
+    >
+      {[0, 1, 2, 3].map((i) => {
+        const w = 4.6 - i * 0.9
+        const h = 9.5 - i * 1.8
+        const cx = -13 + i * 8.5
+        return (
+          <path
+            key={i}
+            d={`M${cx - w} ${-h} L${cx + w} ${-h} L${cx} 0 L${cx + w} ${h} L${cx - w} ${h} L${cx} 0 Z`}
+          />
+        )
+      })}
+    </g>
+  ),
   // A painted rainbow: concentric arcs, red (outer) to purple (inner). Self-coloured
   // from the rainbow tokens (the `color` argument is ignored), like a child's rock.
   rainbow: () => {
@@ -186,8 +208,11 @@ export function Galet({
         <path d={d} fill={`url(#${shadeId})`} />
       </g>
       <path d={d} fill="none" stroke="var(--stone-dark)" strokeWidth="0.6" />
-      {/* Painted motif (the pebble's colour), worn and scraped. */}
-      {paint ? <g filter={`url(#${wornId})`}>{paint}</g> : null}
+      {paint ? (
+        <g clipPath={`url(#${clipId})`}>
+          <g filter={`url(#${wornId})`}>{paint}</g>
+        </g>
+      ) : null}
     </svg>
   )
 }

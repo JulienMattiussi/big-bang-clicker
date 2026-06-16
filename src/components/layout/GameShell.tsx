@@ -38,6 +38,9 @@ export function GameShell() {
     readyCrises(s.state, s.defs).some((id) => s.defs.crises[id].eraId === s.state.currentEraId),
   )
   const fighting = useCrisisStore((s) => s.fighting)
+  // Replacing the whole state (import/reset/prestige) must remount the widget, or
+  // its transient local state (e.g. ships in flight) lingers from the old save.
+  const epoch = useGameStore((s) => s.epoch)
 
   const era = defs.eras.find((e) => e.id === currentEraId) ?? defs.eras[0]
   const fightingHere = fighting != null && defs.crises[fighting]?.eraId === era.id
@@ -48,7 +51,7 @@ export function GameShell() {
       <CrisisBanner />
     )
   ) : (
-    <ClickArea era={era} />
+    <ClickArea key={`${era.id}-${epoch}`} era={era} />
   )
 
   return (

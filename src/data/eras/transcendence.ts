@@ -1,19 +1,19 @@
 import type { EraDef, GeneratorDef, ResourceDef } from '@/lib/types'
 
 /**
- * TRANSCENDENCE tier (era 19) - Explosion. Final era: accumulate tension until
+ * TRANSCENDENCE tier (era 18) - Explosion. Final era: accumulate tension until
  * you can transcend (prestige / new Big Bang). No converter; the prestige action
  * happens via PrestigeBanner.
  */
 
-export const era19Resources: ResourceDef[] = [
-  { id: 'tension', eraId: 'e19', nameKey: 'res.tension', icon: 'zap', tier: 20, isBase: true },
+export const era18Resources: ResourceDef[] = [
+  { id: 'tension', eraId: 'e18', nameKey: 'res.tension', icon: 'zap', tier: 20, isBase: true },
 ]
 
-export const era19Generators: GeneratorDef[] = [
+export const era18Generators: GeneratorDef[] = [
   {
     id: 'instability',
-    eraId: 'e19',
+    eraId: 'e18',
     nameKey: 'gen.instability',
     output: 'tension',
     baseRate: 1,
@@ -21,19 +21,19 @@ export const era19Generators: GeneratorDef[] = [
   },
 ]
 
-export const era19: EraDef = {
-  id: 'e19',
-  index: 19,
-  nameKey: 'era.e19.name',
-  taglineKey: 'era.e19.tagline',
-  stockKey: 'era.e19.stock',
-  machinesKey: 'era.e19.machines',
-  verbKey: 'era.e19.verb',
+export const era18: EraDef = {
+  id: 'e18',
+  index: 18,
+  nameKey: 'era.e18.name',
+  taglineKey: 'era.e18.tagline',
+  stockKey: 'era.e18.stock',
+  machinesKey: 'era.e18.machines',
+  verbKey: 'era.e18.verb',
   clickResource: 'tension',
   icon: 'burst',
   uiTier: 'transcendence',
   widget: 'cooling',
-  unlock: { complexity: 80_000_000_000 },
+  unlock: { complexity: 25_000_000_000 },
   resources: ['tension'],
   generators: ['instability'],
   converters: [],

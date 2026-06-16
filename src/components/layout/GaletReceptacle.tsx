@@ -192,22 +192,24 @@ export function GaletReceptacle() {
             </div>
           </div>
           <div className="mt-2 flex items-baseline justify-between gap-2">
-            <span className="font-semibold text-fg">{t(card.nameKey as TranslationKey)}</span>
+            <span className="text-base font-semibold text-fg">
+              {t(card.nameKey as TranslationKey)}
+            </span>
             <span
-              className={`shrink-0 text-[10px] font-semibold tracking-wide uppercase ${
+              className={`shrink-0 text-xs font-semibold tracking-wide uppercase ${
                 cardActive ? 'text-accent' : 'text-muted'
               }`}
             >
               {cardActive ? t('galet.active') : t('galet.inactive')}
             </span>
           </div>
-          <p className="mt-2 text-xs leading-snug text-muted/80 italic">
+          <p className="mt-2 text-sm leading-snug text-muted/80 italic">
             {t(card.loreKey as TranslationKey)}
           </p>
-          <p className="mt-1.5 text-sm leading-snug text-fg/90">
+          <p className="mt-2 text-base leading-snug text-fg/90">
             {t(card.descKey as TranslationKey)}
           </p>
-          <p className="mt-1.5 text-[11px] text-muted/70">{t('galet.toggle')}</p>
+          <p className="mt-2 text-xs text-muted/70">{t('galet.toggle')}</p>
         </div>
       ) : null}
     </div>

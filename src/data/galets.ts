@@ -59,6 +59,20 @@ export const galetDefs: GaletDef[] = [
     // Halves the input cost of every era's terminal converter up to the Societies.
     effect: { type: 'terminalConsumption', maxEraIndex: 12, value: 0.5 },
   },
+  {
+    id: 'spacetime',
+    nameKey: 'galet.spacetime.name',
+    descKey: 'galet.spacetime.desc',
+    loreKey: 'galet.spacetime.lore',
+    color: 'var(--galet-spacetime)',
+    motif: 'hourglasses',
+    shape: 1,
+    // Found on the FIRST landing in the Space-conquest rocket widget.
+    discovery: 'widget',
+    discoverEraId: 'e15',
+    // Quadruples every era's WIDGET reward (useEraMechanic), never the factories.
+    effect: { type: 'widgetMultiplier', maxEraIndex: 18, value: 4 },
+  },
 ]
 
 /** Planned size of the collection (a wink at the six infinity stones). */

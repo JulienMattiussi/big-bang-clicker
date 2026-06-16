@@ -38,6 +38,9 @@ import { INVENTIONS } from '@/data/inventions'
 interface GameStore {
   state: GameState
   defs: GameDefs
+  /** Bumped whenever the whole state is replaced (import, reset, prestige) so views
+   *  with transient local state (interactive widgets) remount instead of lingering. */
+  epoch: number
   /** True when a stored save was rejected at startup for failing its integrity check. */
   tampered: boolean
   /** Clears the startup tamper flag (once the rejection notice has been shown). */
@@ -140,6 +143,7 @@ const initial = loadInitialState(Date.now())
 export const useGameStore = create<GameStore>((set, get) => ({
   state: initial.state,
   defs,
+  epoch: 0,
   tampered: initial.tampered,
   clearTampered: () => set({ tampered: false }),
   tick: (dt) => set((s) => ({ state: updateRisk(tick(s.state, s.defs, dt), s.defs, dt) })),
@@ -184,7 +188,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const decoded = { ...decodeSave(encoded), lastSeen: Date.now() }
       const next = initEvents(applyMeta(decoded, defs))
       saveToStorage(next)
-      set({ state: next })
+      set((s) => ({ state: next, epoch: s.epoch + 1 }))
       return 'ok'
     } catch (e) {
       return e instanceof Error && e.message === TAMPER_ERROR ? 'tampered' : 'invalid'
@@ -193,7 +197,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   reset: () => {
     const fresh = createInitialState(Date.now(), defs.eras[0]?.id)
     saveToStorage(fresh)
-    set({ state: fresh })
+    set((s) => ({ state: fresh, epoch: s.epoch + 1 }))
   },
   prestige: () => {
     const next = runPrestige(get().state, Date.now())
@@ -207,7 +211,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       defs,
     )
     saveToStorage(reborn)
-    set({ state: reborn })
+    set((s) => ({ state: reborn, epoch: s.epoch + 1 }))
   },
   buyMetaUpgrade: (id) => set((s) => commit(buyMeta(s.state, s.defs, id))),
   // Adds every not-seen, not-already-pending event in ONE set. We compute the

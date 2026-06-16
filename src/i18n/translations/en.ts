@@ -44,6 +44,11 @@ export const en: Translations = {
   'galet.society.desc': "Halves the input cost of each era's terminal factory up to the Societies",
   'galet.society.lore':
     "While digging the foundations of the new theatre, workers unearthed a pebble painted in a child's bold strokes: a family, the first of a multitude that will learn to live side by side.",
+  'galet.widget.tip': 'Quadruples click effects (×{mult})',
+  'galet.spacetime.name': 'Painted pebble of spacetime',
+  'galet.spacetime.desc': "Quadruples all of every era's widget effects",
+  'galet.spacetime.lore':
+    'On the first planet you set foot on, half-buried in the dust, a blue pebble. You pick it up, and for an instant, time itself seems to hesitate.',
   'app.unlock': 'Reach the milestone',
   'lang.label': 'Language',
   'nav.eras': 'Eras',
@@ -60,7 +65,7 @@ export const en: Translations = {
   'machine.produce': 'Produce',
   'widget.temperature': 'Temperature',
   'bohr.hint': 'Capture the electron as it nears the nucleus',
-  'nursery.hint': 'Each click collapses gas; hammer a spot to ignite a star',
+  'nursery.hint': 'Each click collapses gas\nhammer a spot to ignite a star',
 
   // Interactive widgets (eras 4-13): hints and accessible labels.
   'accretion.hint':
@@ -138,6 +143,19 @@ export const en: Translations = {
   'map.negotiate': 'Negotiate',
   'map.conquer': 'Conquer',
   'map.region': 'Region',
+
+  'rocket.hint': 'Take each ship from the pad to a distant planet, phase by phase.',
+  'rocket.phase.launch': 'Liftoff',
+  'rocket.phase.ascent': 'Ascent',
+  'rocket.phase.cruise': 'Cruise',
+  'rocket.phase.landing': 'Landing',
+  'rocket.thrust': 'Thrust',
+  'rocket.left': 'Tilt left',
+  'rocket.right': 'Tilt right',
+  'rocket.fire': 'Aim at the star',
+  'rocket.waiting': 'Waiting',
+  'rocket.land': 'Landed!',
+  'rocket.crash': 'Crashed',
 
   'invent.title': 'Inventions',
   'invent.gauge': 'Next invention',
@@ -442,8 +460,6 @@ export const en: Translations = {
   'res.colony': 'Colonies',
   'res.ship': 'Ships',
   'res.federation': 'Federations',
-  'res.bridge': 'Bridges',
-  'res.cluster': 'Clusters',
   'res.district': 'Districts',
   'res.universeCity': 'Universe-city',
   'res.tension': 'Tension',
@@ -465,7 +481,6 @@ export const en: Translations = {
   'gen.laboratory': 'Laboratory',
   'gen.refinery': 'Refinery',
   'gen.shipyard': 'Space shipyard',
-  'gen.engineering': 'Engineering',
   'gen.urbanism': 'Cosmic urbanism',
   'gen.instability': 'Instability',
 
@@ -486,7 +501,6 @@ export const en: Translations = {
   'conv.invention': 'Invention',
   'conv.launch': 'Launch',
   'conv.colonization': 'Colonization',
-  'conv.link': 'Intergalactic link',
   'conv.unification': 'Unification',
 
   'era.e0.name': 'Big Bang',
@@ -569,26 +583,21 @@ export const en: Translations = {
   'era.e15.stock': 'Ships',
   'era.e15.machines': 'Space industry',
   'era.e15.verb': 'Launch',
-  'era.e16.name': 'Galactic societies',
-  'era.e16.tagline': 'A whole galaxy waiting to live.',
-  'era.e16.stock': 'Colonies',
-  'era.e16.machines': 'Megastructures',
-  'era.e16.verb': 'Colonize',
-  'era.e17.name': 'Intergalactic',
-  'era.e17.tagline': 'Between galaxies, the great void awaits.',
-  'era.e17.stock': 'Network',
-  'era.e17.machines': 'Cosmic bridges',
-  'era.e17.verb': 'Connect',
-  'era.e18.name': 'The Great Unification',
-  'era.e18.tagline': 'The whole universe, gathered into one city.',
-  'era.e18.stock': 'Universe',
-  'era.e18.machines': 'Districts',
-  'era.e18.verb': 'Unify',
-  'era.e19.name': 'Explosion',
-  'era.e19.tagline': 'Everything ends... and begins again, better.',
-  'era.e19.stock': 'Instability',
-  'era.e19.machines': 'Singularity',
-  'era.e19.verb': 'Push to the brink',
+  'era.e16.name': 'Intergalactic voyage',
+  'era.e16.tagline': 'The great void between galaxies is just waiting to be crossed.',
+  'era.e16.stock': 'Expansion',
+  'era.e16.machines': 'Fleets',
+  'era.e16.verb': 'Explore',
+  'era.e17.name': 'The Great Unification',
+  'era.e17.tagline': 'The whole universe, gathered into one city.',
+  'era.e17.stock': 'Universe',
+  'era.e17.machines': 'Districts',
+  'era.e17.verb': 'Unify',
+  'era.e18.name': 'Explosion',
+  'era.e18.tagline': 'Everything ends... and begins again, better.',
+  'era.e18.stock': 'Instability',
+  'era.e18.machines': 'Singularity',
+  'era.e18.verb': 'Push to the brink',
 
   // Transition texts (event modal) shown when entering the era.
   'era.e1.transition':
@@ -622,11 +631,9 @@ export const en: Translations = {
   'era.e15.transition':
     'Rockets leave the cradle. For Earth is a cradle, not a home: time to move out to the stars.',
   'era.e16.transition':
-    'Star by star, humanity spreads. Colonies bloom: a whole galaxy is just waiting to live.',
+    'Star by star, then galaxy by galaxy, ships cross the great void. Distant worlds federate: the universe becomes a neighbourhood.',
   'era.e17.transition':
-    'Only the vast void between galaxies remains. We bridge it with cosmic links: the universe becomes a neighbourhood.',
-  'era.e18.transition':
     'At last everything converges: the entire universe gathered into a single universe-city at its peak. What could possibly go wrong?',
-  'era.e19.transition':
+  'era.e18.transition':
     'Somewhere, a galactic-district leader forgot to turn off the gas after breakfast. The whole universe goes up in flames. Time to start over... better.',
 }

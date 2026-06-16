@@ -9,8 +9,9 @@ import { tick } from './engine'
 import { sign } from './integrity'
 
 /** v2 introduced the signed save envelope; v3 stopped baking memory/crisis
- *  multipliers into `multipliers` (now derived from levels/counts). */
-export const SAVE_VERSION = 3
+ *  multipliers into `multipliers` (now derived from levels/counts); v4 merged the
+ *  Intergalactic era into the Intergalactic Voyage and shifted later era ids. */
+export const SAVE_VERSION = 4
 export const SAVE_KEY = 'big-bang-clicker:save'
 /** Cap on the offline-idle credit (anti clock-cheat). */
 export const DEFAULT_OFFLINE_CAP_SECONDS = 60 * 60 * 8
@@ -60,6 +61,21 @@ const migrations: Record<number, Migration> = {
   // values so they are not double-counted; meta is recomputed by applyMeta on
   // load, memory/crisis are derived live (so the current data values apply).
   2: (state) => ({ ...state, multipliers: {}, version: 3 }),
+  // v3 -> v4: the standalone "Intergalactic" era (bridges/clusters) was merged into
+  // the Intergalactic Voyage (e16). Later eras shift down one slot: old e18
+  // Unification -> e17, old e19 Explosion -> e18. Remap the saved era ids (a save
+  // stranded mid-merge falls back to e16). Resource/generator/converter ids are
+  // unchanged, so their stocks carry over untouched.
+  3: (state) => {
+    const remap = (id: string): EraId =>
+      id === 'e17' ? 'e16' : id === 'e18' ? 'e17' : id === 'e19' ? 'e18' : (id as EraId)
+    return {
+      ...state,
+      unlockedEras: [...new Set(state.unlockedEras.map(remap))],
+      currentEraId: remap(state.currentEraId),
+      version: 4,
+    }
+  },
 }
 
 export function migrate(state: GameState): GameState {

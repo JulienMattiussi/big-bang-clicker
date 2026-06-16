@@ -9,12 +9,15 @@ export const PROFILES: ProfileConfig[] = [
   {
     id: 'minimal',
     label: 'Minimal (bootstrap)',
-    // Clicks only to launch each era's first machine, then lets it run.
+    // Clicks only to launch each era's first machine, then lets it run - but
+    // still seeds one level of every machine so the feeder chains actually flow
+    // (e.g. iron at era 3, required by the era-4 accretion recipe).
     clicksPerSecond: 8,
     completesPerSecond: 0,
     decisionIntervalS: 1,
     strategy: 'cheapest',
     clickMode: 'bootstrap',
+    seedMachines: true,
   },
   {
     id: 'casual',

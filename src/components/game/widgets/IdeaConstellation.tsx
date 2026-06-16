@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
+import { WidgetGalet } from './WidgetGalet'
 import { useGameStore } from '@/store/gameStore'
 import { MAX_COMPLEXITY_BOOST } from '@/lib/engine'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -246,7 +247,10 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
           )
         })}
       </svg>
-      <span className="text-base font-semibold text-fg">{verb}</span>
+      <span className="flex flex-col items-center gap-1.5 text-base font-semibold text-fg">
+        {verb}
+        <WidgetGalet />
+      </span>
       <div className="flex items-center gap-1.5" role="presentation">
         {Array.from({ length: seqLen }, (_, k) => (
           <span

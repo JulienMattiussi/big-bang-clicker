@@ -65,6 +65,9 @@ export interface SimpleEraSpec {
   /** Units of `combined` produced per recipe (default 1); raises output without
    *  touching consumption. */
   converterOutput?: number
+  /** Extra recipe inputs beyond base*10 + consumes*1 (e.g. a far-era resource the
+   *  recipe also draws on, like stars for colonies). */
+  extraInputs?: { resource: string; amount: number }[]
 
   // --- General multi-recipe form (takes precedence over the terse fields). ---
   chain?: ChainLink[]
@@ -126,6 +129,7 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
           inputs: [
             { resource: base.id, amount: 10 },
             { resource: spec.consumes, amount: 1 },
+            ...(spec.extraInputs ?? []),
           ],
         },
       ]
