@@ -3,6 +3,8 @@ import { useCrisisStore } from '@/store/crisisStore'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { CrisisScene } from '@/components/art/CrisisScene'
+import { crisisGaletForEra } from '@/lib/galets'
+import { announceGalet } from '@/hooks/useGalets'
 import type { TranslationKey } from '@/i18n/types'
 
 // The bar resists: it drains on its own, so surviving means clicking faster than
@@ -55,6 +57,10 @@ export function SurviveGame() {
         titleKey: 'crisis.overcome.title',
         bodyKey: def.textKeys.reboundKey,
       })
+      // Some crises hand out a pebble for overcoming them (e.g. the Force pebble
+      // from the era-16 encounter); its discovery popup follows the rebound one.
+      const galet = crisisGaletForEra(defs, def.eraId)
+      if (galet && !useGameStore.getState().state.galets[galet.id]?.found) announceGalet(galet)
     }
     stop()
   }

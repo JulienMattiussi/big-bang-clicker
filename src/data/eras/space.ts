@@ -14,7 +14,9 @@ const bundles: EraBundle[] = [
     // Colonising also burns a star (the destination), beyond fuel + technology.
     extraInputs: [{ resource: 'star', amount: 1 }],
     generatorId: 'refinery',
+    generatorRate: 1.5,
     converterId: 'launch',
+    converterOutput: 1.5,
     unlockComplexity: 800_000_000,
   }),
   buildEra({
@@ -22,12 +24,15 @@ const bundles: EraBundle[] = [
     index: 16,
     uiTier: 'space',
     icon: 'radar',
+    widget: 'massrelay',
     base: { id: 'ship', icon: 'ship', tier: 17 },
     combined: { id: 'federation', icon: 'satellite', tier: 19 },
     consumes: 'colony',
+    // Federating distant worlds also draws on the galaxies being reached (era 2).
+    extraInputs: [{ resource: 'galaxy', amount: 1 }],
     generatorId: 'shipyard',
     converterId: 'colonization',
-    unlockComplexity: 2_500_000_000,
+    unlockComplexity: 2_000_000_000,
   }),
   buildEra({
     id: 'e17',
@@ -40,7 +45,7 @@ const bundles: EraBundle[] = [
     consumes: 'federation',
     generatorId: 'urbanism',
     converterId: 'unification',
-    unlockComplexity: 8_000_000_000,
+    unlockComplexity: 6_400_000_000,
   }),
 ]
 

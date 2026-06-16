@@ -1,7 +1,23 @@
 import { Icon } from '@/components/ui/Icon'
 import { useTranslation } from '@/i18n/useTranslation'
-import type { ResourceDef } from '@/lib/types'
+import { JOKER_LABEL, type Card } from './memoryDeck'
 import type { TranslationKey } from '@/i18n/types'
+
+/** A stylised glowing-blade emblem (original); colour and crossguard tell the two
+ *  Force factions apart. */
+function JokerGlyph({ kind }: { kind: 'sith' | 'jedi' }) {
+  const color = kind === 'sith' ? 'var(--color-octarine)' : 'var(--color-secondary)'
+  return (
+    <svg viewBox="0 0 24 24" className="h-9 w-9" aria-hidden>
+      <line x1="12" y1="3" x2="12" y2="15" stroke={color} strokeWidth="5" strokeLinecap="round" opacity="0.25" />
+      <line x1="12" y1="3" x2="12" y2="15" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
+      {kind === 'sith' ? (
+        <path d="M8.5 14.6 L10 15.3 M15.5 14.6 L14 15.3" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+      ) : null}
+      <rect x="10.7" y="15" width="2.6" height="6" rx="1" fill={color} />
+    </svg>
+  )
+}
 
 /** A roughly realistic playing-card back: diamond lattice, frame, centre pip. */
 export function CardBack() {
@@ -34,9 +50,20 @@ export function CardBack() {
   )
 }
 
-/** The card's face: chemical symbol if any, otherwise the resource icon. */
-export function CardFace({ res }: { res: ResourceDef }) {
+/** The card's face: a joker's emblem, else the chemical symbol or resource icon. */
+export function CardFace({ card }: { card: Card }) {
   const { t } = useTranslation()
+  if (card.joker) {
+    return (
+      <span className="flex flex-col items-center gap-0.5 text-octarine">
+        <JokerGlyph kind={card.joker} />
+        <span className="max-w-full truncate px-0.5 text-[10px] text-muted">
+          {t(JOKER_LABEL[card.joker])}
+        </span>
+      </span>
+    )
+  }
+  const res = card.res
   return (
     <span className="flex flex-col items-center gap-0.5 text-secondary">
       {res.symbol ? (

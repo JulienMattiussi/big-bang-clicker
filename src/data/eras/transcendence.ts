@@ -33,7 +33,7 @@ export const era18: EraDef = {
   icon: 'burst',
   uiTier: 'transcendence',
   widget: 'cooling',
-  unlock: { complexity: 25_000_000_000 },
+  unlock: { complexity: 20_000_000_000 },
   resources: ['tension'],
   generators: ['instability'],
   converters: [],

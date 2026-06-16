@@ -465,7 +465,7 @@ export function simulate(
       const key = `${currentEra.id}:${level}`
       const rate = rates[level - 1] ?? 0
       if (rate > 0 && (memoryTries[key] ?? 0) < MEMORY_MAX_TRIES) {
-        const staked = memoryStart(state)
+        const staked = memoryStart(state, defs)
         if (staked) {
           state = staked
           memoryTries[key] = (memoryTries[key] ?? 0) + 1

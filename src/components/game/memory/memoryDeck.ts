@@ -1,11 +1,20 @@
 import type { ResourceDef } from '@/lib/types'
+import type { TranslationKey } from '@/i18n/types'
 
-/** A single board card: a resource shown face-up when flipped or matched. */
+/** i18n label for a joker card's faction. */
+export const JOKER_LABEL: Record<'sith' | 'jedi', TranslationKey> = {
+  sith: 'memory.joker.sith',
+  jedi: 'memory.joker.jedi',
+}
+
+/** A single board card: a resource shown face-up when flipped or matched. A joker
+ *  card (Force pebble) is dealt pre-solved with a sith/jedi emblem instead. */
 export interface Card {
   key: number
   res: ResourceDef
   flipped: boolean
   matched: boolean
+  joker?: 'sith' | 'jedi'
 }
 
 export function shuffle<T>(arr: T[]): T[] {
@@ -36,4 +45,20 @@ export function dealCards(pool: ResourceDef[], symbols: number, group: number): 
     })),
   )
   return shuffle(cards)
+}
+
+/** With the Force pebble active: turn two symbol groups into pre-solved joker sets
+ *  (one sith, one jedi), revealed and matched from the deal, so the player has two
+ *  fewer sets to memorise. Keeps at least one real set to play. */
+export function applyJokers(cards: Card[]): Card[] {
+  const ids = [...new Set(cards.map((c) => c.res.id))]
+  if (ids.length < 3) return cards
+  const [sith, jedi] = ids
+  return cards.map((c) =>
+    c.res.id === sith
+      ? { ...c, joker: 'sith' as const, flipped: true, matched: true }
+      : c.res.id === jedi
+        ? { ...c, joker: 'jedi' as const, flipped: true, matched: true }
+        : c,
+  )
 }

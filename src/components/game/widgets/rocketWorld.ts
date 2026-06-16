@@ -54,7 +54,10 @@ export const STEP_MS = 50
 export const THRUST_PER_CLICK = 8
 const LIFT_SPEED = 150 // liftoff travel per second once the rocket is fuelled
 const ARRIVE_SPEED = 260 // slide-in travel per second for a fresh rocket
-export const ASCENT_TILT = 24 // degrees the rocket leans on a jolt
+const LEAN_MIN = 6 // initial lean, kept non-zero so the side is readable at once
+const LEAN_MAX = 52
+const CRASH_TILT = 78
+export const URGENT_LEAD = 1 // seconds before tip-over: the correct steer button blinks
 const REACT_TIME = 1.7 // seconds to correct a jolt before it tips over
 const ASCENT_CLIMB = 130 // climb-away travel per second once steadied
 const RETICLE_SPEED = 46 // cruise sweep (units/s)
@@ -213,16 +216,18 @@ export function step(world: World, dt: number): World {
       ascent.wait -= dt
       if (ascent.wait <= 0) {
         ascent.tilt = Math.random() < 0.5 ? -1 : 1
-        ascent.angle = ascent.tilt * ASCENT_TILT
+        ascent.angle = ascent.tilt * LEAN_MIN
         ascent.react = REACT_TIME
       }
       slots[1] = ascent
     } else {
-      // Leaning: correct it before the timer runs out.
+      // Leaning: the lean accelerates (k squared) until corrected or it tips over.
       ascent.react -= dt
+      const k = 1 - Math.max(0, ascent.react) / REACT_TIME
+      ascent.angle = ascent.tilt * (LEAN_MIN + (LEAN_MAX - LEAN_MIN) * k * k)
       if (ascent.react <= 0) {
         ascent.result = 'crash'
-        ascent.angle = ascent.tilt * 70
+        ascent.angle = ascent.tilt * CRASH_TILT
         ascent.flash = FLASH
       }
       slots[1] = ascent
@@ -297,7 +302,7 @@ export function nudge(world: World, dir: number): World {
     }
   } else {
     // Wrong side: it tips over and explodes.
-    slots[1] = { ...ascent, result: 'crash', angle: ascent.tilt * 70, flash: FLASH }
+    slots[1] = { ...ascent, result: 'crash', angle: ascent.tilt * CRASH_TILT, flash: FLASH }
   }
   return { ...world, slots }
 }

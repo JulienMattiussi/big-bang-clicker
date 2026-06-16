@@ -160,4 +160,26 @@ export const crisisDefs: CrisisDef[] = [
       reboundKey: 'crisis.machineRebellion.rebound',
     },
   },
+  // Era 16: a chance encounter on a far galaxy with hooded, torch-wielding types
+  // who turn out surprisingly tough. Triggered by the relay widget (reaching the
+  // encounter galaxy) so it fires early and once; overcoming it grants the Force
+  // pebble. Hits the era's own resources, then a healthy rebound.
+  {
+    id: 'encounter',
+    eraId: 'e16',
+    risk: { threshold: 1 },
+    trigger: 'player',
+    regression: [
+      { type: 'resetResource', target: 'ship', value: 0.3 },
+      { type: 'resetResource', target: 'federation', value: 0.3 },
+    ],
+    rebound: [
+      { type: 'multiplier', target: 'ship', value: 2 },
+      { type: 'multiplier', target: 'federation', value: 2 },
+    ],
+    textKeys: {
+      triggerKey: 'crisis.encounter.trigger',
+      reboundKey: 'crisis.encounter.rebound',
+    },
+  },
 ]

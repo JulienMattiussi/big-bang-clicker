@@ -1,4 +1,5 @@
 import {
+  ArrowDownRight,
   Atom,
   Axe,
   Backpack,
@@ -158,6 +159,7 @@ const ICONS: Record<string, Glyph> = {
   download: Download,
   upload: Upload,
   'rotate-ccw': RotateCcw,
+  'arrow-down-right': ArrowDownRight,
   copy: Copy,
 }
 

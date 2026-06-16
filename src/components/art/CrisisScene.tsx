@@ -23,6 +23,57 @@ export function CrisisScene({
   id: string
   className?: string
 }): ReactElement {
+  if (id === 'encounter') {
+    // A far galaxy: hooded figures brandishing glowing torches (a wink at certain
+    // robed, blade-wielding orders).
+    const figures = [
+      { cx: 70, dir: -1 },
+      { cx: 120, dir: 1 },
+      { cx: 168, dir: -1 },
+    ]
+    return (
+      <svg viewBox="0 0 240 140" className={className} fill="none" aria-hidden>
+        {STARS.map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r="1" fill="var(--color-fg)" opacity="0.35" />
+        ))}
+        {/* distant galaxy + ground */}
+        <ellipse cx="180" cy="34" rx="40" ry="11" fill="var(--color-accent)" opacity="0.12" />
+        <ellipse cx="180" cy="34" rx="16" ry="5" fill="var(--color-accent)" opacity="0.18" />
+        <path d="M0 124 Q120 112 240 124 L240 140 L0 140 Z" fill="var(--color-fg)" fillOpacity="0.14" />
+        {figures.map(({ cx, dir }) => (
+          <g key={cx}>
+            {/* torch beam (halo + core) */}
+            <line
+              x1={cx + dir * 8}
+              y1={104}
+              x2={cx + dir * 19}
+              y2={62}
+              stroke="var(--color-accent)"
+              strokeWidth="7"
+              strokeLinecap="round"
+              opacity="0.18"
+            />
+            <line
+              x1={cx + dir * 8}
+              y1={104}
+              x2={cx + dir * 19}
+              y2={62}
+              stroke="var(--color-accent)"
+              strokeWidth="2.6"
+              strokeLinecap="round"
+            />
+            {/* hooded robe */}
+            <path
+              d={`M${cx} 74 C ${cx - 12} 78 ${cx - 13} 106 ${cx - 12} 124 L ${cx + 12} 124 C ${cx + 13} 106 ${cx + 12} 78 ${cx} 74 Z`}
+              fill="var(--color-fg)"
+              fillOpacity="0.55"
+            />
+            <ellipse cx={cx} cy={89} rx="4" ry="5.4" fill="var(--color-bg)" />
+          </g>
+        ))}
+      </svg>
+    )
+  }
   if (id !== 'extinction') {
     return <Icon name="skull" className={`${className} text-red-400`} />
   }

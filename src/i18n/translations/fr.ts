@@ -48,6 +48,11 @@ export const fr = {
   'galet.spacetime.desc': 'Quadruple tous les effets des widgets de chaque ère',
   'galet.spacetime.lore':
     "Sur la première planète foulée, à demi enfoui dans la poussière, un galet bleu. Tu le ramasses, et l'espace d'un instant, le temps lui-même semble hésiter.",
+  'galet.force.name': 'Galet peint de la Force',
+  'galet.force.desc':
+    'Le jeu de mémoire ne coûte plus que 1 % de Complexité, et des cartes joker facilitent la partie',
+  'galet.force.lore':
+    "Arraché aux mystérieux encapuchons, ce galet aux reflets octarine murmure à l'esprit. Avec lui, mémoriser devient un jeu d'enfant.",
   'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',
@@ -157,6 +162,11 @@ export const fr = {
   'rocket.waiting': 'En attente',
   'rocket.land': 'Posé !',
   'rocket.crash': 'Écrasé',
+  'massrelay.fire': 'Catapulter',
+  'massrelay.charge': 'Charge du relais',
+  'massrelay.aligned': 'Aligne le faisceau sur une galaxie !',
+  'massrelay.hint.charge': 'Clique pour charger le relais à effet de masse.',
+  'massrelay.hint.fire': 'Catapulte un vaisseau quand le faisceau croise une galaxie.',
 
   'invent.title': 'Inventions',
   'invent.gauge': 'Prochaine invention',
@@ -324,6 +334,8 @@ export const fr = {
   'memory.close': 'Fermer',
   'memory.tooPoor': 'Pas assez de Complexité',
   'memory.cardBack': 'Symbole caché',
+  'memory.joker.sith': 'Sith',
+  'memory.joker.jedi': 'Jedi',
   'memory.win.title': 'La mémoire est gravée',
   'memory.win.production': 'La production de',
   'memory.win.doubled': 'est doublée.',
@@ -334,11 +346,13 @@ export const fr = {
   'memory.event.body':
     "Tu viens de découvrir un nouveau moyen d'agir sur l'existence et de progresser. Les 42 symboles t'offriront la réponse aux grands problèmes de la vie, de l'Univers et du reste : retrouve-les deux à deux pour en graver la mémoire, et la production de la ressource maîtresse de l'ère en sera doublée.",
 
-  'inventory.button': 'Inventaire',
-  'inventory.title': 'Inventaire des ressources',
+  'inventory.button': 'Guide des Ressources Galactiques',
+  'inventory.title': 'Guide des Ressources Galactiques',
   'inventory.hint': 'Clique sur une ressource pour aller à sa production.',
   'inventory.goto': 'Aller à sa production',
   'inventory.close': 'Fermer',
+  'guide.flip': 'Tourner la page',
+  'guide.dontPanic': 'PAS DE PANIQUE',
   'inventory.event.eyebrow': "Un cadeau de l'univers",
   'inventory.event.title': "Un sac pour t'organiser",
   'inventory.event.body':
@@ -363,6 +377,7 @@ export const fr = {
   'crisis.climate.name': 'Crise climatique',
   'crisis.y2k.name': "Bug de l'an 2000",
   'crisis.machineRebellion.name': 'Rébellion des machines',
+  'crisis.encounter.name': 'Embuscade encapuchonnée',
   'crisis.effect.damage': 'Conséquence',
   'crisis.effect.boost': 'Rebond',
   'crisis.effect.loss': '-{amount} ({pct}%)',
@@ -400,6 +415,10 @@ export const fr = {
   'crisis.y2k.trigger':
     "Bug de l'an 2000 : à minuit, tous les ordinateurs du monde vont s'effondrer. Avions, banques, centrales... la civilisation retient son souffle.",
   'crisis.y2k.rebound': "On l'a échappé belle : le bug n'aura presque rien cassé, tout repart.",
+  'crisis.encounter.trigger':
+    "Sur une galaxie lointaine, des silhouettes encapuchonnées surgissent, brandissant d'étranges lampes torches. L'air de rien... mais redoutablement coriaces. Survis à l'assaut !",
+  'crisis.encounter.rebound':
+    "Les encapuchons sont repoussés. Reconnaissant ta force, l'un d'eux s'incline et t'offre en tribut un mystérieux galet peint. La voie intergalactique est libre, et ta flotte repart de plus belle.",
 
   'prestige.title': 'Renaissance',
   'prestige.desc': 'Tout recommence, augmenté par les Échos.',
@@ -642,9 +661,9 @@ export const fr = {
   'era.e15.transition':
     'Des fusées quittent le berceau. Car la Terre est un berceau, pas une demeure : il est temps de déménager vers les étoiles.',
   'era.e16.transition':
-    "D'étoile en étoile, puis de galaxie en galaxie, les vaisseaux franchissent le grand vide. Les mondes lointains se fédèrent : l'univers devient un quartier.",
+    "Le capitaine Shepherd met la main sur de gigantesques machines abandonnées aux confins de l'espace : des relais à effet de masse, capables de catapulter un vaisseau d'une galaxie à l'autre. Le grand vide n'est plus un obstacle, et les mondes lointains commencent à se fédérer.",
   'era.e17.transition':
-    "Tout converge enfin : l'univers entier, réuni en une seule ville-univers à son apogée. Que pourrait-il bien arriver ?",
+    "Tout converge : l'univers entier se rassemble en une seule ville-univers à son apogée. C'est alors qu'un savant fou, Harry Sheldon, prétend avoir inventé une science prédictive infaillible. Son verdict : l'univers s'éteindra très bientôt, à cause d'une obscure histoire de plaque de cuisson. Personne ne le prend au sérieux.",
   'era.e18.transition':
     "Quelque part, un dirigeant de quartier galactique a oublié d'éteindre le gaz après son petit-déjeuner. L'univers entier s'embrase. Tout est à refaire... en mieux.",
 } as const

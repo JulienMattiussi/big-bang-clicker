@@ -110,6 +110,8 @@ export interface GaletEffect {
    *   acts on consumption, e.g. 0.5 halves it).
    * - widgetMultiplier: multiplies the manual reward of each era's WIDGET gesture
    *   (handled in useEraMechanic), with NO effect on automated factory output.
+   * - memoryBoost: mind-bending - the memory mini-game costs `value` of the
+   *   Complexity (e.g. 0.01 = 1% instead of 10%) and is eased with joker cards.
    */
   type:
     | 'generatorMultiplier'
@@ -117,6 +119,7 @@ export interface GaletEffect {
     | 'complexityMultiplier'
     | 'terminalConsumption'
     | 'widgetMultiplier'
+    | 'memoryBoost'
   maxEraIndex: number
   value: number
 }
@@ -157,9 +160,10 @@ export interface GaletDef {
    *   reachable (before crossing it);
    * - 'widget': by clicking it inside the era's interactive widget (it is not
    *   handed out by the milestone path; the widget drives its discovery).
+   * - 'crisis': granted when the era's crisis is overcome (not milestone-based).
    */
-  discovery?: 'milestone' | 'widget'
-  /** Era tying the pebble to a milestone ('milestone') or a widget ('widget'). */
+  discovery?: 'milestone' | 'widget' | 'crisis'
+  /** Era tying the pebble to a milestone, a widget, or a crisis to overcome. */
   discoverEraId: EraId
   effect: GaletEffect
 }

@@ -1,4 +1,5 @@
 import type { GameDefs, GameState } from './types'
+import { memoryGalet } from './galets'
 
 /**
  * "Memory" mini-game: spend Complexity to play a concentration game with
@@ -66,15 +67,18 @@ export function memoryEraMaxed(state: GameState, eraId: string): boolean {
   return memoryCompletions(state, eraId) >= MEMORY_MAX_LEVEL
 }
 
-/** Complexity cost of one attempt: 10% of the current Complexity. */
-export function memoryCost(state: GameState): number {
-  return Math.max(1, Math.round(state.complexity * 0.1))
+/** Complexity cost of one attempt: 10% of the current Complexity, dropped to the
+ *  Force pebble's fraction (1%) while that mind-control pebble is active. */
+export function memoryCost(state: GameState, defs: GameDefs): number {
+  const galet = memoryGalet(state, defs)
+  const fraction = galet ? galet.effect.value : 0.1
+  return Math.max(1, Math.round(state.complexity * fraction))
 }
 
-/** Pays the attempt's stake (10% Complexity). Returns the new state, or `null`
- *  if the player can't afford it. Pure: the store and the sim both reuse this. */
-export function memoryStart(state: GameState): GameState | null {
-  const cost = memoryCost(state)
+/** Pays the attempt's stake. Returns the new state, or `null` if the player can't
+ *  afford it. Pure: the store and the sim both reuse this. */
+export function memoryStart(state: GameState, defs: GameDefs): GameState | null {
+  const cost = memoryCost(state, defs)
   if (state.complexity < cost) return null
   return { ...state, complexity: state.complexity - cost }
 }

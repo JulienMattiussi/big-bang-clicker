@@ -49,6 +49,11 @@ export const en: Translations = {
   'galet.spacetime.desc': "Quadruples all of every era's widget effects",
   'galet.spacetime.lore':
     'On the first planet you set foot on, half-buried in the dust, a blue pebble. You pick it up, and for an instant, time itself seems to hesitate.',
+  'galet.force.name': 'Painted pebble of the Force',
+  'galet.force.desc':
+    'The memory mini-game costs only 1% of Complexity, and joker cards make it easier',
+  'galet.force.lore':
+    'Wrested from the hooded strangers, this octarine-sheened pebble whispers to the mind. With it, remembering becomes child’s play.',
   'app.unlock': 'Reach the milestone',
   'lang.label': 'Language',
   'nav.eras': 'Eras',
@@ -156,6 +161,11 @@ export const en: Translations = {
   'rocket.waiting': 'Waiting',
   'rocket.land': 'Landed!',
   'rocket.crash': 'Crashed',
+  'massrelay.fire': 'Catapult',
+  'massrelay.charge': 'Relay charge',
+  'massrelay.aligned': 'Align the beam with a galaxy!',
+  'massrelay.hint.charge': 'Click to charge the mass-effect relay.',
+  'massrelay.hint.fire': 'Catapult a ship when the beam crosses a galaxy.',
 
   'invent.title': 'Inventions',
   'invent.gauge': 'Next invention',
@@ -313,6 +323,8 @@ export const en: Translations = {
   'memory.close': 'Close',
   'memory.tooPoor': 'Not enough Complexity',
   'memory.cardBack': 'Hidden symbol',
+  'memory.joker.sith': 'Sith',
+  'memory.joker.jedi': 'Jedi',
   'memory.win.title': 'The memory is etched',
   'memory.win.production': 'Production of',
   'memory.win.doubled': 'is doubled.',
@@ -323,11 +335,13 @@ export const en: Translations = {
   'memory.event.body':
     "You have just discovered a new way to act upon existence and to progress. The 42 symbols will grant you the answer to the great questions of Life, the Universe, and Everything: match them two by two to commit them to memory, and the era's foremost resource will see its production doubled.",
 
-  'inventory.button': 'Inventory',
-  'inventory.title': 'Resource inventory',
+  'inventory.button': 'Galactic Resource Guide',
+  'inventory.title': 'Galactic Resource Guide',
   'inventory.hint': 'Click a resource to jump to its production.',
   'inventory.goto': 'Go to its production',
   'inventory.close': 'Close',
+  'guide.flip': 'Turn the page',
+  'guide.dontPanic': "DON'T PANIC",
   'inventory.event.eyebrow': 'A gift from the universe',
   'inventory.event.title': 'A bag to keep you organised',
   'inventory.event.body':
@@ -352,6 +366,7 @@ export const en: Translations = {
   'crisis.climate.name': 'Climate crisis',
   'crisis.y2k.name': 'Y2K bug',
   'crisis.machineRebellion.name': 'Machine rebellion',
+  'crisis.encounter.name': 'Hooded ambush',
   'crisis.effect.damage': 'Consequence',
   'crisis.effect.boost': 'Rebound',
   'crisis.effect.loss': '-{amount} ({pct}%)',
@@ -389,6 +404,10 @@ export const en: Translations = {
     'Y2K bug: at midnight, every computer on Earth will collapse. Planes, banks, power grids... civilisation holds its breath.',
   'crisis.y2k.rebound':
     'That was close: the bug barely scratched anything, and everything resumes.',
+  'crisis.encounter.trigger':
+    'On a far galaxy, hooded figures spring up, brandishing odd torches. Harmless-looking... yet remarkably tough. Survive the onslaught!',
+  'crisis.encounter.rebound':
+    'The hooded ones are driven off. Acknowledging your strength, one of them bows and offers you a mysterious painted pebble in tribute. The intergalactic road is clear, and your fleet sets off stronger than ever.',
 
   'prestige.title': 'Rebirth',
   'prestige.desc': 'Everything restarts, boosted by Echoes.',
@@ -631,9 +650,9 @@ export const en: Translations = {
   'era.e15.transition':
     'Rockets leave the cradle. For Earth is a cradle, not a home: time to move out to the stars.',
   'era.e16.transition':
-    'Star by star, then galaxy by galaxy, ships cross the great void. Distant worlds federate: the universe becomes a neighbourhood.',
+    'Captain Shepherd stumbles upon colossal machines abandoned at the edge of space: mass-effect relays that catapult a ship from one galaxy to the next. The great void is no longer a barrier, and distant worlds begin to federate.',
   'era.e17.transition':
-    'At last everything converges: the entire universe gathered into a single universe-city at its peak. What could possibly go wrong?',
+    'Everything converges: the entire universe gathers into a single universe-city at its peak. That is when a mad scientist, Harry Sheldon, claims to have invented an infallible predictive science. His verdict: the universe will end very soon, over some obscure business about a kitchen stove. Nobody takes him seriously.',
   'era.e18.transition':
     'Somewhere, a galactic-district leader forgot to turn off the gas after breakfast. The whole universe goes up in flames. Time to start over... better.',
 }

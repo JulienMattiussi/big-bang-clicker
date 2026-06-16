@@ -14,6 +14,7 @@ import { CityGrid } from './CityGrid'
 import { WorldMap } from './WorldMap'
 import { InventionsWidget } from './InventionsWidget'
 import { RocketLaunch } from './RocketLaunch'
+import { MassRelay } from './MassRelay'
 import type { EraDef } from '@/lib/types'
 
 /**
@@ -38,6 +39,7 @@ export const INTERACTIVE_WIDGETS: Record<string, (props: { era: EraDef }) => Rea
   map: WorldMap,
   inventions: InventionsWidget,
   rocket: RocketLaunch,
+  massrelay: MassRelay,
 }
 
 /**
@@ -54,6 +56,7 @@ const FULLWIDTH_WIDGETS = new Set([
   'map',
   'inventions',
   'rocket',
+  'massrelay',
 ])
 
 export function isFullWidthWidget(widget: string): boolean {

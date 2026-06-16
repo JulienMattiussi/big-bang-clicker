@@ -41,20 +41,20 @@ describe('memoryLevel / memoryEraMaxed', () => {
 
 describe('memoryCost', () => {
   it('coûte 10% de la Complexité, au minimum 1', () => {
-    expect(memoryCost(makeState({ complexity: 1000 }))).toBe(100)
-    expect(memoryCost(makeState({ complexity: 0 }))).toBe(1)
+    expect(memoryCost(makeState({ complexity: 1000 }), defs)).toBe(100)
+    expect(memoryCost(makeState({ complexity: 0 }), defs)).toBe(1)
   })
 })
 
 describe('memoryStart', () => {
   it('débite la mise et renvoie le nouvel état si abordable', () => {
-    const next = memoryStart(makeState({ complexity: 1000 }))
+    const next = memoryStart(makeState({ complexity: 1000 }), defs)
     expect(next?.complexity).toBe(900)
   })
 
   it('renvoie null quand la Complexité est insuffisante', () => {
     // coût minimal 1, mais complexité 0 < 1
-    expect(memoryStart(makeState({ complexity: 0 }))).toBeNull()
+    expect(memoryStart(makeState({ complexity: 0 }), defs)).toBeNull()
   })
 })
 

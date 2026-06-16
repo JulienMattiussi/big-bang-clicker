@@ -11,7 +11,7 @@ import type { GaletDef, GameDefs, GameState } from './types'
  *  their discovery, not the milestone threshold. */
 export function discoverableGalets(state: GameState, defs: GameDefs): GaletDef[] {
   return defs.galets.filter((galet) => {
-    if (galet.discovery === 'widget') return false
+    if (galet.discovery === 'widget' || galet.discovery === 'crisis') return false
     if (state.galets?.[galet.id]?.found) return false
     const era = defs.eras.find((e) => e.id === galet.discoverEraId)
     const threshold = era?.unlock.complexity
@@ -23,6 +23,21 @@ export function discoverableGalets(state: GameState, defs: GameDefs): GaletDef[]
  *  interactive widget uses it to know whether to surface the pebble for a click. */
 export function widgetGaletForEra(defs: GameDefs, eraId: string): GaletDef | undefined {
   return defs.galets.find((g) => g.discovery === 'widget' && g.discoverEraId === eraId)
+}
+
+/** The crisis-granted pebble tied to `eraId` (found or not): handed out when that
+ *  era's crisis is overcome. */
+export function crisisGaletForEra(defs: GameDefs, eraId: string): GaletDef | undefined {
+  return defs.galets.find((g) => g.discovery === 'crisis' && g.discoverEraId === eraId)
+}
+
+/** The found+active 'memoryBoost' pebble (mind control), if any: it cheapens the
+ *  memory mini-game and eases it with joker cards. */
+export function memoryGalet(state: GameState, defs: GameDefs): GaletDef | undefined {
+  return defs.galets.find((g) => {
+    const owned = state.galets?.[g.id]
+    return g.effect.type === 'memoryBoost' && owned?.found && owned.active
+  })
 }
 
 /** Product of active 'widgetMultiplier' pebbles reaching `eraIdx`. Applied to the

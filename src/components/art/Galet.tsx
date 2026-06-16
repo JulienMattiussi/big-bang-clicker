@@ -14,6 +14,9 @@ const PEBBLE_SHAPES = [
   'M4,16 C4,9 9,3.5 18,3.5 C27,3.5 33,9 33,17 C33,24 27,28.5 17,28.5 C8,28.5 4,23 4,16 Z',
   'M3,18 C3,11 8.5,3 19,3 C29,3 34,10.5 33,18.5 C32,25.5 25.5,29 16,29 C7,29 3,24.5 3,18 Z',
   'M5,13.5 C4,8 10,3.5 19,4 C28.5,4.5 34,10 32,18.5 C30.5,25.5 24.5,29 15,28 C7,27 6,20.5 5,13.5 Z',
+  // Flattened, asymmetric disc with a soft notch on the front edge: a pebble that
+  // just hints at a saucer-shaped freighter, without copying any real silhouette.
+  'M4,16 C4,10 9,5.5 18,5.5 C25,5.5 30,8.5 32,12 C31,13.6 30.5,14.8 30.5,16 C30.5,17.2 31,18.4 32,20 C30,23.5 25,26.5 18,26.5 C9,26.5 4,22 4,16 Z',
 ]
 
 /** Painted motifs, drawn in the pebble's colour over the grey stone. */
@@ -107,6 +110,22 @@ const MOTIFS: Record<string, (color: string) => ReactElement> = {
       </g>
     )
   },
+  // A stylised ascending starbird inside an arc - a rebel emblem (original design).
+  rebel: (color) => (
+    <g
+      transform="translate(18 16)"
+      fill="none"
+      stroke={color}
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M-10 3 A 11 11 0 0 1 10 3" opacity="0.6" />
+      <path d="M-9 5 C -5 -2 -2 -7 0 -9 C 2 -7 5 -2 9 5" />
+      <path d="M0 -8 V 6" />
+      <circle r="1.3" cy="-9" fill={color} stroke="none" />
+    </g>
+  ),
 }
 
 export function Galet({

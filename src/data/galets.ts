@@ -73,6 +73,20 @@ export const galetDefs: GaletDef[] = [
     // Quadruples every era's WIDGET reward (useEraMechanic), never the factories.
     effect: { type: 'widgetMultiplier', maxEraIndex: 18, value: 4 },
   },
+  {
+    id: 'force',
+    nameKey: 'galet.force.name',
+    descKey: 'galet.force.desc',
+    loreKey: 'galet.force.lore',
+    color: 'var(--octarine)',
+    motif: 'rebel',
+    shape: 3, // the saucer-ish freighter silhouette
+    // Granted by overcoming the era-16 encounter crisis (the hooded fighters).
+    discovery: 'crisis',
+    discoverEraId: 'e16',
+    // Mind control: the memory mini-game costs only 1% (eased with joker cards).
+    effect: { type: 'memoryBoost', maxEraIndex: 18, value: 0.01 },
+  },
 ]
 
 /** Planned size of the collection (a wink at the six infinity stones). */

@@ -26,10 +26,10 @@
 | Référence / source | Idée en jeu | Ère(s) | Type |
 |---|---|---|---|
 | Star Wars | Invention d'un **couteau à huître laser** (lame d'énergie pour ouvrir les huîtres), vite **abandonné car peu fiable** (instable, dangereux pour l'utilisateur) | 14 (Technologies) | Invention absurde / abandonnée |
-| Asimov, Fondation | Un savant invente la **psychohistoire** (prédire l'avenir des sociétés), **abandonnée car peu fiable** | 13 (Relations) ou 14 (Technologies) | Invention abandonnée / clin d'oeil |
+| Asimov, Fondation | **Intégré (e17, transition)** : **Harry Sheldon** prétend avoir inventé une science prédictive infaillible et annonce la fin de l'univers pour très bientôt (par une obscure histoire de plaque de cuisson, cf. ère 18) ; personne ne le prend au sérieux | 17 (La grande unification) | Évènement narratif / clin d'oeil |
 | (Histoire des religions) | **Naissance et disparition de religions** au fil de la société ; la société la plus évoluée devient **athée** | 12 (Sociétés) | Arc narratif / évènements |
 | Mass Effect | Le **Commandant Shepard** meurt en luttant contre une civilisation hostile, les **Cultivateurs** | 16 (galactique) / 17 (intergalactique) | Évènement narratif / clin d'oeil |
-| Mass Effect | Technologie **effet de masse** débloquant les **voyages intergalactiques** | 17 (Intergalactique) | Techno nommée / clin d'oeil |
+| Mass Effect | **Intégré (e16)** : le **capitaine Shepherd** découvre de gigantesques **relais à effet de masse** pour voyager de galaxie en galaxie (modale de transition + widget de l'ère : charger le relais, catapulter un vaisseau) | 16 (Voyage intergalactique) | Techno + widget / clin d'oeil |
 | Dune | L'**épice**, ressource clé de la conquête galactique, produite par les **vers de vase** de la planète **Salakis** | 16 (Galactique) | Ressource nommée / clin d'oeil |
 | H2G2 | **"Pas de panique"** affiché au déclenchement d'une crise (régression) : un clin d'oeil qui **rassure** le joueur au pire moment | Transverse (crises, section 6) | **Humour utile (UX)** |
 | H2G2 | Le nombre **42** comme "réponse" cachée : jalon/easter egg secret (ex : à 42 d'une ressource ou de Complexité, un message énigmatique) | Transverse | Easter egg / nombre culte |

@@ -5,7 +5,8 @@ import { Icon } from '@/components/ui/Icon'
 import { EraIcon } from '@/components/game/EraIcon'
 import { EraSymbolCluster } from '@/components/game/memory/Answer42'
 import { CardBack, CardFace } from '@/components/game/memory/MemoryCards'
-import { dealCards, shuffle, type Card } from '@/components/game/memory/memoryDeck'
+import { applyJokers, dealCards, shuffle, JOKER_LABEL, type Card } from '@/components/game/memory/memoryDeck'
+import { memoryGalet } from '@/lib/galets'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import { formatFixed } from '@/lib/format'
@@ -35,7 +36,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
   const currentEraId = useGameStore((s) => s.state.currentEraId)
   const startMemoryGame = useGameStore((s) => s.startMemoryGame)
   const winMemoryGame = useGameStore((s) => s.winMemoryGame)
-  const cost = useGameStore((s) => memoryCost(s.state))
+  const cost = useGameStore((s) => memoryCost(s.state, s.defs))
   // The level the NEXT attempt plays, and whether this era is fully boosted.
   const upcomingLevel = useGameStore((s) => memoryLevel(s.state, s.state.currentEraId))
   const maxed = useGameStore((s) => memoryEraMaxed(s.state, s.state.currentEraId))
@@ -60,7 +61,10 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
       shuffle(extra)
       pool.push(...extra)
     }
-    return dealCards(pool, cfg.symbols, cfg.group)
+    const deck = dealCards(pool, cfg.symbols, cfg.group)
+    // The Force pebble pre-solves two sets as sith/jedi jokers.
+    const forceActive = !!memoryGalet(useGameStore.getState().state, defs)
+    return forceActive ? applyJokers(deck) : deck
   }
 
   const [phase, setPhase] = useState<Phase>('start')
@@ -203,7 +207,13 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                 data-tier={up ? tier : undefined}
                 onClick={() => flip(i)}
                 disabled={phase !== 'play' || up || busy}
-                aria-label={up ? t(c.res.nameKey as TranslationKey) : t('memory.cardBack')}
+                aria-label={
+                  up
+                    ? c.joker
+                      ? t(JOKER_LABEL[c.joker])
+                      : t(c.res.nameKey as TranslationKey)
+                    : t('memory.cardBack')
+                }
                 className={`flex aspect-5/7 items-center justify-center overflow-hidden rounded-md border transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
                   c.matched
                     ? 'border-accent/70 bg-accent/15 opacity-80'
@@ -212,7 +222,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                       : 'border-octarine/40 bg-bg hover:brightness-125'
                 }`}
               >
-                {up ? <CardFace res={c.res} /> : <CardBack />}
+                {up ? <CardFace card={c} /> : <CardBack />}
               </button>
             )
           })}

@@ -255,7 +255,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       })
     }),
   startMemoryGame: () => {
-    const next = memoryStart(get().state)
+    const next = memoryStart(get().state, get().defs)
     if (!next) return false
     set(commit(next))
     return true

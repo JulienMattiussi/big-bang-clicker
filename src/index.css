@@ -937,3 +937,22 @@ body {
     Roboto,
     sans-serif;
 }
+
+/* Steer button urgency blink (rocket ascent, just before a tip-over). */
+@keyframes urgent-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+.animate-urgent {
+  animation: urgent-blink 0.45s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-urgent {
+    animation: none;
+  }
+}

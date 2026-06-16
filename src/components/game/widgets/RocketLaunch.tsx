@@ -15,6 +15,7 @@ import {
   nudge,
   STAR_HIT,
   STEP_MS,
+  URGENT_LEAD,
   steer,
   step,
   type Phase,
@@ -168,6 +169,11 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
 
   const [launch, ascent, cruise, landing] = world.slots
 
+  // The side to right a lean is opposite it (-ascent.tilt); blink it near tip-over.
+  // -1 = left, +1 = right, 0 = none.
+  const urgentDir =
+    ascent && !ascent.result && ascent.tilt !== 0 && ascent.react <= URGENT_LEAD ? -ascent.tilt : 0
+
   const tapLaunch = () => {
     if (!launch || launch.thrust >= 100) return
     setWorld(addThrust)
@@ -256,12 +262,14 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
             <SteerButton
               side="left"
               disabled={!ascent || !!ascent.result || ascent.corrected >= ascent.needed}
+              urgent={urgentDir === -1}
               onClick={act((w) => nudge(w, -1))}
               label={t('rocket.left')}
             />
             <SteerButton
               side="right"
               disabled={!ascent || !!ascent.result || ascent.corrected >= ascent.needed}
+              urgent={urgentDir === 1}
               onClick={act((w) => nudge(w, 1))}
               label={t('rocket.right')}
             />
@@ -301,11 +309,7 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
                       strokeWidth="1.6"
                     />
                   </g>
-                  <g
-                    transform={`translate(${landing.x} ${14 + landing.descent * 1.18}) scale(0.7)`}
-                  >
-                    <Rocket flame={landing.result ? 0 : 0.4} color={livery(landing.color)} />
-                  </g>
+                  <LandingShip ship={landing} />
                   <Outcome ship={landing} t={t} />
                 </>
               ) : (
@@ -347,11 +351,13 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
 function SteerButton({
   side,
   disabled,
+  urgent = false,
   onClick,
   label,
 }: {
   side: 'left' | 'right'
   disabled: boolean
+  urgent?: boolean
   onClick: () => void
   label: string
 }): ReactElement {
@@ -361,9 +367,9 @@ function SteerButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
-      className={`absolute top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-accent/50 bg-surface/85 text-lg text-accent shadow-sm backdrop-blur-sm transition select-none active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-25 ${
-        side === 'left' ? 'left-2' : 'right-2'
-      }`}
+      className={`absolute top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border bg-surface/85 text-lg text-accent shadow-sm backdrop-blur-sm transition select-none active:scale-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:opacity-25 ${
+        urgent ? 'animate-urgent border-accent ring-2 ring-accent' : 'border-accent/50'
+      } ${side === 'left' ? 'left-2' : 'right-2'}`}
     >
       {side === 'left' ? '◄' : '►'}
     </button>
@@ -410,25 +416,36 @@ function Gauge({ value, max, label }: { value: number; max: number; label: strin
   )
 }
 
-/** Horizontal tilt meter: green zone in the middle, a marker at the current angle. */
-/** A burst of light + debris where a rocket explodes; `p` is 0..1 progress. */
+/** Rocket blowing up; `p` is 0..1 progress (0 = the instant it pops). */
 function Explosion({ x, y, p }: { x: number; y: number; p: number }): ReactElement {
-  const r = 5 + p * 22
+  const fade = 1 - p
+  const ease = Math.pow(p, 0.55)
+  const coreR = (5 + ease * 9) * (1 - p * 0.5)
+  const ringR = 5 + ease * 30
+  const SHARDS = 14
   return (
-    <g transform={`translate(${x} ${y})`} opacity={1 - p}>
-      <circle r={r} fill="var(--color-accent)" opacity={0.5 * (1 - p)} />
-      {[0, 60, 120, 180, 240, 300].map((deg) => {
-        const a = (deg * Math.PI) / 180
+    <g transform={`translate(${x} ${y})`} opacity={fade}>
+      <circle
+        r={ringR}
+        fill="none"
+        stroke="var(--color-accent)"
+        strokeWidth={3.5 * fade}
+        opacity={0.55 * fade}
+      />
+      <circle r={coreR * 1.7} fill="var(--color-accent)" opacity={0.4 * fade} />
+      <circle r={coreR} fill="var(--color-fg)" opacity={0.85 * fade} />
+      {Array.from({ length: SHARDS }, (_, i) => {
+        const a = i * 2.39996 // golden angle: an even, non-repeating spread
+        const d = ease * (13 + (i % 4) * 6)
+        const sr = fade * (1.2 + (i % 3) * 0.7)
         return (
-          <line
-            key={deg}
-            x1={Math.cos(a) * r * 0.4}
-            y1={Math.sin(a) * r * 0.4}
-            x2={Math.cos(a) * r}
-            y2={Math.sin(a) * r}
-            stroke="var(--color-accent)"
-            strokeWidth="1.6"
-            strokeLinecap="round"
+          <circle
+            key={i}
+            cx={Math.cos(a) * d}
+            cy={Math.sin(a) * d}
+            r={sr}
+            fill="var(--color-accent)"
+            opacity={fade}
           />
         )
       })}
@@ -468,7 +485,7 @@ function AscentScene({ ship }: { ship: Ship }): ReactElement {
         <>
           <g
             transform={`translate(50 ${y}) rotate(${climbing ? 0 : ship.angle})`}
-            style={{ transition: 'transform 260ms ease-out' }}
+            style={{ transition: 'transform 90ms linear' }}
           >
             <Rocket flame={climbing ? 1 : 0.7} color={livery(ship.color)} />
           </g>
@@ -554,5 +571,25 @@ function CruiseScene({ ship }: { ship: Ship }): ReactElement {
         />
       ) : null}
     </>
+  )
+}
+
+/** The descending ship. On a crash it topples onto the pad (first half of the
+ *  outcome flash) and then explodes (second half); a clean landing just rests. */
+function LandingShip({ ship }: { ship: Ship }): ReactElement {
+  const y = 14 + ship.descent * 1.18
+  const crash = ship.result === 'crash'
+  const cp = crash ? 1 - Math.max(0, ship.flash) / FLASH : 0
+  const topple = Math.min(1, cp / 0.5)
+  const boom = Math.max(0, (cp - 0.5) / 0.5)
+  if (crash && boom > 0) return <Explosion x={ship.x} y={y} p={boom} />
+  const lean = crash ? (ship.vx >= 0 ? 1 : -1) * topple * 82 : 0
+  return (
+    <g
+      transform={`translate(${ship.x} ${y}) rotate(${lean}) scale(0.7)`}
+      style={{ transition: 'transform 80ms linear' }}
+    >
+      <Rocket flame={ship.result ? 0 : 0.4} color={livery(ship.color)} />
+    </g>
   )
 }
