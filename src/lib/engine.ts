@@ -45,7 +45,7 @@ export function nextCost(cost: CostCurve[], level: number): Record<ResourceId, n
   for (const curve of cost) {
     total[curve.resource] = (total[curve.resource] ?? 0) + costAtLevel(curve, level)
   }
-  for (const id in total) total[id] = roundCost(total[id])
+  for (const id in total) total[id] = roundCost(total[id]!)
   return total
 }
 
@@ -54,7 +54,7 @@ export function canAfford(
   cost: Record<ResourceId, number>,
 ): boolean {
   for (const id in cost) {
-    if ((resources[id] ?? 0) < cost[id]) return false
+    if ((resources[id] ?? 0) < cost[id]!) return false
   }
   return true
 }
@@ -65,7 +65,7 @@ function spend(
 ): Record<ResourceId, number> {
   const next = { ...resources }
   for (const id in cost) {
-    next[id] = (next[id] ?? 0) - cost[id]
+    next[id] = (next[id] ?? 0) - cost[id]!
   }
   return next
 }
@@ -91,7 +91,7 @@ function crisisReboundMultiplier(state: GameState, defs: GameDefs, target: strin
   for (const id in defs.crises) {
     const count = state.crises?.[id]?.count ?? 0
     if (count <= 0) continue
-    for (const e of defs.crises[id].rebound) {
+    for (const e of defs.crises[id]!.rebound) {
       if (e.type === 'multiplier' && e.target === target) m *= (e.value ?? 1) ** count
     }
   }
@@ -134,7 +134,7 @@ function galetMachineMultiplier(
 }
 
 /** Multiplier from active pebbles on a generator's (primary factory) output. */
-export function galetGeneratorMultiplier(
+function galetGeneratorMultiplier(
   state: GameState,
   defs: GameDefs,
   generatorId: GeneratorId,
@@ -154,12 +154,12 @@ export function galetConverterMultiplier(
 }
 
 /** Multiplier from active pebbles on the Complexity gained from an era's resources. */
-export function galetComplexityMultiplier(state: GameState, defs: GameDefs, eraId: EraId): number {
+function galetComplexityMultiplier(state: GameState, defs: GameDefs, eraId: EraId): number {
   return galetMachineMultiplier(state, defs, eraId, 'complexityMultiplier')
 }
 
 /** True if `converterId` is the terminal (last) converter of its era. */
-export function isTerminalConverter(defs: GameDefs, converterId: ConverterId): boolean {
+function isTerminalConverter(defs: GameDefs, converterId: ConverterId): boolean {
   const conv = defs.converters[converterId]
   if (!conv) return false
   const list = defs.eras.find((e) => e.id === conv.eraId)?.converters
@@ -259,7 +259,7 @@ function discoveredWith(
 ): Record<string, boolean> {
   let next = prev
   for (const id in resources) {
-    if (resources[id] > 0 && !next[id]) {
+    if (resources[id]! > 0 && !next[id]) {
       if (next === prev) next = { ...prev }
       next[id] = true
     }
@@ -361,7 +361,7 @@ function latestUnlockedIndex(state: GameState): number {
 
 /** Each cleared 10-sequence of an era's idea constellation (Simon) doubles that
  *  era's Complexity. DERIVED from the persisted clear count, so it re-applies. */
-export const COMPLEXITY_BOOST = 2
+const COMPLEXITY_BOOST = 2
 /** Max clears of a 10-sequence rewarded per era; the Complexity bonus caps at 2^this. */
 export const MAX_COMPLEXITY_BOOST = 5
 
@@ -491,7 +491,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
   const frozen = new Set<string>()
   for (const id in defs.crises) {
     if (!isCrisisReady(state, defs, id)) continue
-    const def = defs.crises[id]
+    const def = defs.crises[id]!
     if (def.risk.sourceResource) frozen.add(def.risk.sourceResource)
     for (const e of def.regression) if (e.target) frozen.add(e.target)
     for (const e of def.rebound) if (e.target) frozen.add(e.target)
@@ -501,7 +501,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
   }
 
   for (const id in state.generators) {
-    const level = state.generators[id].level
+    const level = state.generators[id]!.level
     if (level <= 0) continue
     const gen = defs.generators[id]
     if (!gen) continue
@@ -512,7 +512,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
 
   // Converters are bounded by the inputs actually available this tick.
   for (const id in state.converters) {
-    const cState = state.converters[id]
+    const cState = state.converters[id]!
     if (!cState.enabled || cState.level <= 0) continue
     const conv = defs.converters[id]
     if (!conv) continue

@@ -40,7 +40,7 @@ export function useMilestone(): Milestone | null {
     current,
     target,
     ready: current >= target,
-    icon: byComplexity ? 'gem' : resourceId ? defs.resources[resourceId].icon : 'gem',
+    icon: byComplexity ? 'gem' : resourceId ? defs.resources[resourceId]!.icon : 'gem',
     kind: byComplexity ? 'complexity' : 'resource',
     barColor: byComplexity ? 'bg-octarine' : 'bg-accent',
     pct: Math.min(100, (current / target) * 100),

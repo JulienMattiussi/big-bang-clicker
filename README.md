@@ -22,19 +22,21 @@ puissante.
 ## Statut
 
 Conception **terminée** (voir `docs/`). **Jouable de bout en bout** : moteur
-data-driven, les 20 ères, prestige (Échos) + méta-upgrades + galets de l'infini
+data-driven, les 19 ères, prestige (Échos) + méta-upgrades + galets de l'infini
 (collectibles conservés au prestige), crises (dont une **crise jouable** : un
 mini-jeu de survie plein écran), recettes manuelles + automatisables, fond de
 scène évolutif, modales d'évènements narratifs, et des widgets
-interactifs aux mécaniques distinctes pour les ères 0 à 13 (jauge, atome de Bohr,
-pépinière d'étoiles, tableau périodique, disque d'accrétion, modèle moléculaire,
-boîte de Petri, balance atmosphérique, endosymbiose, atelier du vivant, arbre du
-vivant, constellation mnésique, plan de cité, carte du monde). Conception des
-widgets dans [docs/WIDGETS.md](./docs/WIDGETS.md). Stack Vite + React + TS +
-Tailwind + Zustand, lint/tests/Makefile, `make check` passe. Un harnais de
-simulation d'équilibrage (`make sim`, avec visualiseur) aide à régler la
-progression. En cours : finition (widgets des ères 14+, onboarding, équilibrage,
-déploiement). Voir [docs/ROADMAP.md](./docs/ROADMAP.md).
+interactifs aux mécaniques distinctes pour chaque ère (jauge de température,
+atome de Bohr, pépinière d'étoiles, tableau périodique, disque d'accrétion,
+modèle moléculaire, boîte de Petri, balance atmosphérique, endosymbiose, chaîne
+de montage du vivant, arbre du vivant, constellation mnésique, plan de cité,
+carte du monde, arbre des inventions, lancement de fusée, relais à effet de
+masse, roue de l'unification). Conception des widgets dans
+[docs/WIDGETS.md](./docs/WIDGETS.md). Stack Vite + React + TS + Tailwind +
+Zustand, lint/tests/Makefile, `make check` passe. Un harnais de simulation
+d'équilibrage (`make sim`, avec visualiseur) aide à régler la progression. En
+cours : finition (onboarding, équilibrage, déploiement). Voir
+[docs/ROADMAP.md](./docs/ROADMAP.md).
 
 ## Documentation
 
@@ -56,7 +58,8 @@ Via le `Makefile` (standard maison) :
 ```sh
 make install   # installe les dépendances
 make start     # lance le serveur de développement (http://localhost:1138)
-make check     # build + lint + typecheck + tests unitaires
+make check     # build + lint + typecheck + knip + tests unitaires
+make knip      # détecte fichiers, exports et dépendances inutilisés
 make fix       # format + lint
 ```
 

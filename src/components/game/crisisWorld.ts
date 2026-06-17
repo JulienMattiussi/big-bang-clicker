@@ -15,7 +15,7 @@ const FALL_MS = 1500
 export const IMPACT_R = 19
 const TARGET_ALIVE = 9
 
-export type Kind = 'rat' | 'raptor'
+type Kind = 'rat' | 'raptor'
 interface Creature {
   id: number
   x: number

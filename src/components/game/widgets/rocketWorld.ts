@@ -7,10 +7,9 @@
  */
 
 export type Phase = 'launch' | 'ascent' | 'cruise' | 'landing'
-export const PHASES: Phase[] = ['launch', 'ascent', 'cruise', 'landing']
 
 /** Number of distinct rocket colours (mapped to palette tokens in the component). */
-export const ROCKET_COLORS = 5
+const ROCKET_COLORS = 5
 
 export interface Ship {
   id: number

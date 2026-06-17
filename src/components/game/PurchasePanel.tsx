@@ -40,7 +40,7 @@ function describeCost(cost: Record<ResourceId, number>, defs: GameDefs, t: Trans
   return Object.entries(cost)
     .map(
       ([id, amount]) =>
-        `${formatNumber(amount)} ${t(defs.resources[id].nameKey as TranslationKey)}`,
+        `${formatNumber(amount)} ${t(defs.resources[id]!.nameKey as TranslationKey)}`,
     )
     .join(', ')
 }
@@ -51,7 +51,7 @@ function describeRecipe(conv: ConverterDef, defs: GameDefs, t: Translate): strin
     list
       .map(
         (io) =>
-          `${formatNumber(io.amount)} ${t(defs.resources[io.resource].nameKey as TranslationKey)}`,
+          `${formatNumber(io.amount)} ${t(defs.resources[io.resource]!.nameKey as TranslationKey)}`,
       )
       .join(', ')
   return `${t('machine.consumes')} ${side(conv.inputs)} → ${t('machine.produces')} ${side(conv.outputs)}`
@@ -88,7 +88,7 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
   // Era a resource belongs to, only when it differs from the current one
   // (so the player knows which tab to open to find it).
   const eraTag = (resource: ResourceId): FlowEntry['era'] => {
-    const eraId = defs.resources[resource].eraId
+    const eraId = defs.resources[resource]!.eraId
     if (eraId === era.id) return undefined
     const owner = defs.eras.find((e) => e.id === eraId)
     return owner ? { icon: owner.icon, name: t(owner.nameKey as TranslationKey) } : undefined
@@ -123,7 +123,7 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
     ])
 
   const craft = (id: string) => {
-    const def = defs.converters[id]
+    const def = defs.converters[id]!
     if (!canManualConvert(state, defs, id)) return
     manualConvert(id)
     const consume = galetConsumptionMultiplier(state, defs, id)
@@ -143,14 +143,14 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
         {era.generators
           .filter((id) => revealed.has(id))
           .map((id) => {
-            const def = defs.generators[id]
+            const def = defs.generators[id]!
             const level = state.generators[id]?.level ?? 0
             const cost = nextCost(def.cost, level)
             const produce: FlowEntry[] = [
               {
-                icon: defs.resources[def.output].icon,
-                symbol: defs.resources[def.output].symbol,
-                name: t(defs.resources[def.output].nameKey as TranslationKey),
+                icon: defs.resources[def.output]!.icon,
+                symbol: defs.resources[def.output]!.symbol,
+                name: t(defs.resources[def.output]!.nameKey as TranslationKey),
                 perSec: generatorPerSec(state, defs, id, level),
                 nextPerSec: generatorPerSec(state, defs, id, level + 1),
               },
@@ -161,7 +161,7 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
                 t={t}
                 name={t(def.nameKey as TranslationKey)}
                 badges={genBadges(id)}
-                outputIcon={defs.resources[def.output].icon}
+                outputIcon={defs.resources[def.output]!.icon}
                 level={level}
                 costLabel={describeCost(cost, defs, t)}
                 affordable={canAfford(state.resources, cost)}
@@ -176,7 +176,7 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
         {era.converters
           .filter((id) => revealed.has(id))
           .map((id) => {
-            const def = defs.converters[id]
+            const def = defs.converters[id]!
             const converterState = state.converters[id]
             const level = converterState?.level ?? 0
             const cost = nextCost(def.cost, level)
@@ -186,17 +186,17 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
             // converter; production carries the output multipliers via the helper.
             const consume = galetConsumptionMultiplier(state, defs, id)
             const consumeFlow = (resource: ResourceId, amount: number): FlowEntry => ({
-              icon: defs.resources[resource].icon,
-              symbol: defs.resources[resource].symbol,
-              name: t(defs.resources[resource].nameKey as TranslationKey),
+              icon: defs.resources[resource]!.icon,
+              symbol: defs.resources[resource]!.symbol,
+              name: t(defs.resources[resource]!.nameKey as TranslationKey),
               perSec: amount * consume * cycles,
               nextPerSec: amount * consume * nextCycles,
               era: eraTag(resource),
             })
             const produceFlow = (resource: ResourceId, amount: number): FlowEntry => ({
-              icon: defs.resources[resource].icon,
-              symbol: defs.resources[resource].symbol,
-              name: t(defs.resources[resource].nameKey as TranslationKey),
+              icon: defs.resources[resource]!.icon,
+              symbol: defs.resources[resource]!.symbol,
+              name: t(defs.resources[resource]!.nameKey as TranslationKey),
               perSec: converterOutputPerSec(state, defs, id, resource, amount, level),
               nextPerSec: converterOutputPerSec(state, defs, id, resource, amount, level + 1),
               era: eraTag(resource),
@@ -207,7 +207,7 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
                 t={t}
                 name={t(def.nameKey as TranslationKey)}
                 badges={convBadges(id)}
-                outputIcon={defs.resources[def.outputs[0].resource].icon}
+                outputIcon={defs.resources[def.outputs[0]!.resource]!.icon}
                 level={level}
                 costLabel={describeCost(cost, defs, t)}
                 affordable={canAfford(state.resources, cost)}

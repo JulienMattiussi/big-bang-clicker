@@ -2,7 +2,7 @@
 
 > Traduction technique des décisions de conception. Principe central :
 > **data-driven** (le moteur est générique ; ères, ressources, recettes,
-> usines, upgrades et crises sont des données). Voir
+> usines et crises sont des données). Voir
 > [GAME-DESIGN.md](./GAME-DESIGN.md), [PHASES.md](./PHASES.md),
 > [UI-UX.md](./UI-UX.md), [AGENTS.md](../AGENTS.md).
 >
@@ -67,15 +67,18 @@ src/
 │   ├── useEvents.ts      # détecte et enfile les évènements narratifs
 │   ├── useGalets.ts      # découverte des galets au franchissement de palier (announceGalet, partagé avec la découverte par widget)
 │   ├── useEraMechanic.ts # geste de clic d'une ère (gain de base + complétion gratuite)
-│   └── useMilestone.ts   # données du palier suivant (jauge NextGoal + bouton MilestoneButton)
+│   ├── useMilestone.ts   # données du palier suivant (jauge NextGoal + bouton MilestoneButton)
+│   ├── useArrivalReward.ts # crédite un gain à chaque nouvel élément arrivé (delta d'un total cumulé)
+│   ├── useSimLoop.ts     # mini-boucle générique (setInterval) pilotant un « monde » de widget/mini-jeu
+│   └── usePageHidden.ts  # signal de page masquée / en arrière-plan (pagehide / visibilitychange)
 ├── components/
-│   ├── ui/               # primitives (Button, Panel, Modal (scrim/dialog/Escape partagés), Icon, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── ui/               # primitives (Button, Panel, Modal (scrim/dialog/Escape partagés), Icon, IconBadge, AlertBadge, FloaterLayer...) ; introRect.ts (rect/transform partagé des animations d'arrivée : inventaire, mémoire, galet)
 │   ├── art/              # graphisme exclusivement : glyphs/ (icônes custom du registre Icon) + illustrations (Galet, Sauropod, OrganismGlyph, PartGlyph, CrisisCreatures, CrisisScene)
-│   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, galets ; modales (EventModal + EventHero, layout « hero » partagé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge)
+│   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, galets ; modales (EventModal + EventHero, layout « hero » partagé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge) ; eraTitle.ts (titre « Ère N : Nom »)
 │   │   ├── memory/       # mini-jeu de mémoire : MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42 (+EraSymbolCluster), police Neogen
 │   │   ├── inventory/    # sac à dos : InventoryButton/InventoryModal
-│   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
-│   └── layout/           # coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier), GaletReceptacle
+│   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish...) routés par interactive.ts ; helpers svgCoords.ts, StarField.tsx (champ d'étoiles SVG partagé)
+│   └── layout/           # coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier), GaletReceptacle ; eraLayout.ts (disposition de page par ère, voir EraLayoutName)
 └── App.tsx               # navigation par état (pas de router)
 ```
 
@@ -90,6 +93,12 @@ type ResourceId = string
 type EraId = string
 
 type UiTier = 'cosmos' | 'life' | 'civilization' | 'space' | 'transcendence'
+
+// Disposition de page d'une ère (catalogue : components/layout/eraLayout.ts).
+// compact = widget centré sur 3 colonnes ; wide* = widget pleine largeur en
+// tête puis ligne ressources | machines (roomy : colonne ressources élargie ;
+// split : panneau machines en deux cartes asymétriques).
+type EraLayoutName = 'compact' | 'wide' | 'wide-roomy' | 'wide-split'
 
 interface ResourceDef {
   id: ResourceId
@@ -132,18 +141,8 @@ interface ConverterDef {
 interface Effect {
   type: 'multiplier' | 'unlock' | 'transformResource' | 'grantResource'
         | 'resetResource' | 'resetGenerator' | 'flatBonus'
-  target?: string        // id de ressource / usine / upgrade visé
+  target?: string        // id de ressource / usine visé
   value?: number
-}
-
-interface UpgradeDef {
-  id: string
-  eraId: EraId
-  cost: { resource: ResourceId; amount: number }[]
-  requires?: string[]
-  effects: Effect[]
-  nameKey: string
-  descKey: string
 }
 
 interface CrisisDef {
@@ -159,15 +158,15 @@ interface CrisisDef {
 
 interface EraDef {
   id: EraId
-  index: number          // 0..19
+  index: number          // 0..18 (19 ères)
   nameKey: string
   uiTier: UiTier
   widget: string         // id du widget iconique (voir UI-UX.md)
+  layout: EraLayoutName  // disposition de page : 'compact' | 'wide' | 'wide-roomy' | 'wide-split'
   unlock: { resource?: ResourceId; amount?: number; complexity?: number }
   resources: ResourceId[]
   generators: string[]
   converters: string[]
-  upgrades: string[]
   crises: string[]
 }
 ```
@@ -184,7 +183,6 @@ interface GameState {
   resources: Record<ResourceId, number>
   generators: Record<string, { level: number }>
   converters: Record<string, { level: number; enabled: boolean }>
-  upgrades: Record<string, boolean>
   crises: Record<string, { risk: number; resolved: boolean; count: number }>  // count : nb de résolutions (le moteur dérive le rebond ^count)
   multipliers: Record<string, number>  // surtout 'meta' (recalculé) ; mémoire/crises N'Y écrivent plus (dérivés, cf. 8.2)
   complexity: number           // méta-ressource (plafonnée au prochain palier)
@@ -296,7 +294,7 @@ Implémente la mécanique de [GAME-DESIGN.md](./GAME-DESIGN.md) section 6 :
 
 - Disponible à l'ère 19. Calcule les Échos à partir de `totalComplexityEver`
   (formule indicative dans [GAME-DESIGN.md](./GAME-DESIGN.md) section 3.3).
-- **Reset** : réinitialise `resources`, `generators`, `converters`, `upgrades`,
+- **Reset** : réinitialise `resources`, `generators`, `converters`,
   `crises`, `unlockedEras`, `currentEraId`, `complexity` ; **conserve** `echoes`
   (incrémentés), `metaUpgrades`, et les compteurs de méta-progression.
 - Les `metaUpgrades` modifient les paramètres de la prochaine partie
@@ -362,12 +360,15 @@ section 9.
   via une **autosauvegarde** périodique (`useTick`, ~10 s) ET **à la fermeture /
   mise en arrière-plan** de la page (`pagehide` / `visibilitychange`), pour ne
   rien perdre entre deux autosauvegardes.
-- **Versioning + migrations** : `GameState.version` (actuellement **3**) ; un
+- **Versioning + migrations** : `GameState.version` (actuellement **5**) ; un
   tableau de migrations `vN -> vN+1` s'applique à la lecture. Pour un **ajout de
   champ**, on n'ajoute pas forcément de migration : `withDefaults` complète les
   champs manquants à partir de l'état initial (ex : `discovered` ajouté ainsi).
-  Une vraie évolution incompatible ajoute une migration : ex. **v2 -> v3** purge
-  les multiplicateurs gravés (mémoire/crises désormais dérivés, cf. 8.2).
+  Une vraie évolution incompatible ajoute une migration : **v2 -> v3** purge les
+  multiplicateurs gravés (mémoire/crises désormais dérivés, cf. 8.2) ; **v3 -> v4**
+  fusionne l'ère « Intergalactique » dans le Voyage intergalactique et décale les
+  ids d'ères suivantes ; **v4 -> v5** retire le champ mort `upgrades` (ancien
+  système d'upgrades par ère, supprimé).
 - **Idle hors-ligne** : à la reprise, `elapsed = now - lastSeen`, **plafonné**
   (anti-triche d'horloge). On crédite la production accumulée (tick en gros pas
   ou approximation fermée). Plafond réglable dans `settingsStore`.
@@ -411,11 +412,14 @@ section 9.
   l'**état** via des sélecteurs Zustand fins.
 - Certains widgets sont **interactifs et portent la mécanique de l'ère**,
   enregistrés dans `interactive.ts` (`INTERACTIVE_WIDGETS`) : `BohrAtom` (ère 1),
-  `StarNursery` (ère 2), `PeriodicTable` (ère 3). `ClickArea` les route ; les
-  larges (`isFullWidthWidget`, ex. le tableau périodique) passent en pleine
-  largeur au-dessus des panneaux, les compacts (Bohr, galaxie) restent centrés
-  dans les 3 colonnes. C'est l'**exception assumée** au "100% data-driven" :
-  une telle ère demande aussi un composant. Voir GAME-DESIGN 7.
+  `StarNursery` (ère 2), `PeriodicTable` (ère 3), etc. `ClickArea` les route. La
+  **disposition de la page** ne dépend plus du widget mais du champ
+  `EraDef.layout` (`EraLayoutName`), interprété par `eraLayout.ts` (helpers
+  `isWideLayout` / `wideRowClass` / `isSplitMachines`, appliqués dans `GameShell`
+  et `PurchasePanel`) : `compact` garde le widget centré dans les 3 colonnes, les
+  `wide*` le passent en pleine largeur au-dessus de la ligne ressources |
+  machines. C'est l'**exception assumée** au "100% data-driven" : une telle ère
+  demande aussi un composant. Voir GAME-DESIGN 7.
 - **Évènements narratifs** : modales (`EventModal` + `eventStore` + `useEvents`
   + `lib/events.ts`) au changement d'ère, aux crises et au tuto (anti-rejeu via
   `GameState.seenEvents`).

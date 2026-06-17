@@ -7,7 +7,7 @@
 import type { CrisisId, Effect, GameDefs, GameState } from './types'
 
 /** Risk build-up rate (per unit of source resource and per second). */
-export const RISK_RATE = 1
+const RISK_RATE = 1
 
 /** Applies a single effect (from a crisis or upgrade) to the state, purely. */
 export function applyEffect(state: GameState, effect: Effect): GameState {
@@ -72,7 +72,7 @@ export function applyEffect(state: GameState, effect: Effect): GameState {
   }
 }
 
-export function applyEffects(state: GameState, effects: Effect[]): GameState {
+function applyEffects(state: GameState, effects: Effect[]): GameState {
   return effects.reduce((acc, effect) => applyEffect(acc, effect), state)
 }
 
@@ -82,7 +82,7 @@ export function updateRisk(state: GameState, defs: GameDefs, dt: number): GameSt
   let changed = false
   const crises = { ...state.crises }
   for (const id in defs.crises) {
-    const def = defs.crises[id]
+    const def = defs.crises[id]!
     // Player-triggered crises (reaching an invention) never build risk on their
     // own; they only become ready when explicitly triggered.
     if (def.trigger === 'player') continue

@@ -57,7 +57,7 @@ export function ResourcePanel({ era }: { era: EraDef }) {
   // discover -> hint at it without spoiling what it is.
   const hasHiddenKey = era.resources.some((id) => !revealed.has(id) && producesComplexity(id))
   const complexityTip = (id: string) => {
-    const def = defs.resources[id]
+    const def = defs.resources[id]!
     const gap = latestIndex - eraIndex(def.eraId)
     // Value from the engine's single source, so the tooltip never drifts from
     // what is actually credited.
@@ -73,7 +73,7 @@ export function ResourcePanel({ era }: { era: EraDef }) {
         {era.resources
           .filter((id) => revealed.has(id))
           .map((id) => {
-            const def = defs.resources[id]
+            const def = defs.resources[id]!
             const amount = state.resources[id] ?? 0
             const flow = flows[id] ?? 0
             const sign = flow >= 0 ? '+' : ''

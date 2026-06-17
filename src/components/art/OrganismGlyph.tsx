@@ -113,7 +113,7 @@ function shape(id: string): ReactElement | null {
             [18, 13],
             [15, 16],
             [19, 17],
-          ].map(([x, y]) => bgDot(x, y, 0.9))}
+          ].map(([x, y]) => bgDot(x!, y!, 0.9))}
         </>
       )
     default:

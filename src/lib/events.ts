@@ -68,7 +68,7 @@ export function triggeredEvents(state: GameState, defs: GameDefs): GameEvent[] {
 
   // Crises: announced when the risk reaches its threshold or once it has occurred.
   for (const id in defs.crises) {
-    const def = defs.crises[id]
+    const def = defs.crises[id]!
     const runtime = state.crises[id]
     if (!runtime) continue
     const ready = isCrisisReady(state, defs, id)

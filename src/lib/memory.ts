@@ -14,7 +14,7 @@ import { memoryGalet } from './galets'
 
 /** The mechanic unlocks the first time this converter reaches this level. */
 export const MEMORY_UNLOCK_CONVERTER = 'oxidation'
-export const MEMORY_UNLOCK_LEVEL = 1
+const MEMORY_UNLOCK_LEVEL = 1
 
 /** Times an era's main resource can be boosted (x2 -> x4 -> x8). */
 export const MEMORY_MAX_LEVEL = 3

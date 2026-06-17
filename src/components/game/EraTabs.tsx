@@ -65,7 +65,7 @@ export function EraTabs() {
       // The active tab always keeps its label, even if it overflows.
       if (activeIdx >= 0) {
         show[activeIdx] = true
-        budget -= metrics[activeIdx].cost
+        budget -= metrics[activeIdx]!.cost
       }
       // Expand outward from the active tab; stop at the first label that no
       // longer fits so the labelled tabs stay contiguous around the active one.
@@ -73,9 +73,9 @@ export function EraTabs() {
         .filter((i) => i !== activeIdx)
         .sort((a, b) => Math.abs(a - activeIdx) - Math.abs(b - activeIdx))
       for (const i of rest) {
-        if (budget - metrics[i].cost < 0) break
+        if (budget - metrics[i]!.cost < 0) break
         show[i] = true
-        budget -= metrics[i].cost
+        budget -= metrics[i]!.cost
       }
 
       const next = new Set(visible.filter((_, i) => show[i]).map((e) => e.id))

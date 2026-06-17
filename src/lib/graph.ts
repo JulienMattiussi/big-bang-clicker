@@ -31,7 +31,7 @@ export function decliningResources(state: GameState, defs: GameDefs): Set<Resour
   const real = netFlows(state, defs)
   const declining = new Set<ResourceId>()
   for (const id in real) {
-    if (real[id] < -0.05) declining.add(id)
+    if (real[id]! < -0.05) declining.add(id)
   }
   return declining
 }
@@ -74,14 +74,14 @@ export function stalledResources(state: GameState, defs: GameDefs): Set<Resource
 export function resourceDependencies(defs: GameDefs): Record<ResourceId, ResourceId[]> {
   const deps: Record<ResourceId, Set<ResourceId>> = {}
   for (const id in defs.converters) {
-    const conv = defs.converters[id]
+    const conv = defs.converters[id]!
     for (const output of conv.outputs) {
       const set = (deps[output.resource] ??= new Set<ResourceId>())
       for (const input of conv.inputs) set.add(input.resource)
     }
   }
   const result: Record<ResourceId, ResourceId[]> = {}
-  for (const resource in deps) result[resource] = [...deps[resource]]
+  for (const resource in deps) result[resource] = [...deps[resource]!]
   return result
 }
 
@@ -94,7 +94,7 @@ export function topologicalOrder(defs: GameDefs): { order: ResourceId[]; hasCycl
   const all = new Set<ResourceId>(Object.keys(defs.resources))
   for (const resource in deps) {
     all.add(resource)
-    for (const dep of deps[resource]) all.add(dep)
+    for (const dep of deps[resource]!) all.add(dep)
   }
 
   const order: ResourceId[] = []

@@ -186,7 +186,7 @@ export function IdeaConstellation({ era }: { era: EraDef }) {
         aria-label={verb}
       >
         {NODES.map((n, i) => {
-          const m = NODES[(i + 1) % NODES.length]
+          const m = NODES[(i + 1) % NODES.length]!
           return (
             <line
               key={`l${i}`}

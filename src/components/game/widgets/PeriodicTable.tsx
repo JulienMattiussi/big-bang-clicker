@@ -50,7 +50,7 @@ export function PeriodicTable({ era }: { era: EraDef }) {
   const spawn = useFeedbackStore((s) => s.spawn)
 
   const has = (resource: ResourceId) => (state.resources[resource] ?? 0) > 0
-  const name = (resource: ResourceId) => t(defs.resources[resource].nameKey as TranslationKey)
+  const name = (resource: ResourceId) => t(defs.resources[resource]!.nameKey as TranslationKey)
 
   const elementAt = (col: number, row: number) =>
     ELEMENTS.find((el) => el.col === col && el.row === row)
@@ -61,7 +61,7 @@ export function PeriodicTable({ era }: { era: EraDef }) {
   const revealed = (el: ElementSpec) => {
     if (!el.converter) return true
     if (state.discovered[el.resource]) return true
-    const main = defs.converters[el.converter].inputs[0].resource
+    const main = defs.converters[el.converter]!.inputs[0]!.resource
     return has(main)
   }
 
@@ -72,7 +72,7 @@ export function PeriodicTable({ era }: { era: EraDef }) {
   }
 
   const onFuse = (converterId: ConverterId) => {
-    const conv = defs.converters[converterId]
+    const conv = defs.converters[converterId]!
     if (!canManualConvert(state, defs, converterId)) return
     // Fuse a batch proportional to this forge's level (level + 1), bounded by the
     // inputs actually available (re-checked against the live state each cycle).
@@ -91,7 +91,7 @@ export function PeriodicTable({ era }: { era: EraDef }) {
   }
 
   const recipe = (converterId: ConverterId) => {
-    const conv = defs.converters[converterId]
+    const conv = defs.converters[converterId]!
     const side = (list: { resource: ResourceId; amount: number }[]) =>
       list.map((io) => `${formatNumber(io.amount)} ${name(io.resource)}`).join(' + ')
     return `${side(conv.inputs)} → ${side(conv.outputs)}`

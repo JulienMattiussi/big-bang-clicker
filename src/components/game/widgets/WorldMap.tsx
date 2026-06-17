@@ -149,7 +149,8 @@ export function WorldMap({ era }: { era: EraDef }) {
   // Effect icons echoed on the stance buttons: Negotiate yields the base resource
   // (trade), Conquer yields the recipe output (empires).
   const tradeIcon = defs.resources[era.clickResource]?.icon
-  const empireRes = defs.converters[era.converters[0]]?.outputs[0]?.resource
+  const converterId = era.converters[0]
+  const empireRes = converterId ? defs.converters[converterId]?.outputs[0]?.resource : undefined
   const empireIcon = empireRes ? defs.resources[empireRes]?.icon : undefined
 
   const claim = (i: number) => {
@@ -243,10 +244,10 @@ export function WorldMap({ era }: { era: EraDef }) {
         {EDGES.filter(([a, b]) => revealed.has(a) && revealed.has(b)).map(([a, b]) => (
           <line
             key={`${a}-${b}`}
-            x1={REGIONS[a].x}
-            y1={REGIONS[a].y}
-            x2={REGIONS[b].x}
-            y2={REGIONS[b].y}
+            x1={REGIONS[a]!.x}
+            y1={REGIONS[a]!.y}
+            x2={REGIONS[b]!.x}
+            y2={REGIONS[b]!.y}
             stroke="var(--color-border)"
             strokeWidth="0.7"
             strokeDasharray="1 1.2"

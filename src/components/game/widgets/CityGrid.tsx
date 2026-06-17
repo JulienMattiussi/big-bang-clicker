@@ -122,12 +122,12 @@ const scoreGrid = (g: (number | null)[]) => {
   let s = 0
   for (let i = 0; i < CELLS; i++) {
     const t = g[i]
-    if (t === null) continue
-    const me = BUILDINGS[t]
+    if (t === null || t === undefined) continue
+    const me = BUILDINGS[t]!
     const c = i % COLS
     const r = Math.floor(i / COLS)
-    if (c < COLS - 1 && g[i + 1] !== null) s += pairScore(me, BUILDINGS[g[i + 1] as number])
-    if (r < ROWS - 1 && g[i + COLS] !== null) s += pairScore(me, BUILDINGS[g[i + COLS] as number])
+    if (c < COLS - 1 && g[i + 1] != null) s += pairScore(me, BUILDINGS[g[i + 1] as number]!)
+    if (r < ROWS - 1 && g[i + COLS] != null) s += pairScore(me, BUILDINGS[g[i + COLS] as number]!)
   }
   return s
 }
@@ -160,7 +160,7 @@ const PAIRS: Pair[] = (() => {
 })()
 
 function Mark({ idx, className }: { idx: number; className?: string }): ReactElement {
-  const b = BUILDINGS[idx]
+  const b = BUILDINGS[idx]!
   return (
     <svg
       viewBox="0 0 16 16"
@@ -262,14 +262,14 @@ export function CityGrid({ era }: { era: EraDef }) {
       if (free >= 0) setSelected(free)
     }
 
-    const me = BUILDINGS[selected]
+    const me = BUILDINGS[selected]!
     const good: number[] = []
     const bad: number[] = []
     const found = new Set<string>()
     for (const n of neighbors(i)) {
       const t2 = next[n]
-      if (t2 === null) continue
-      const nKey = BUILDINGS[t2].key
+      if (t2 === null || t2 === undefined) continue
+      const nKey = BUILDINGS[t2]!.key
       if (me.pairs.includes(nKey)) {
         good.push(n)
         found.add(pairKey(selected, t2))
@@ -326,7 +326,7 @@ export function CityGrid({ era }: { era: EraDef }) {
     const known = discovered.has(pairKey(a, b))
     const outcome = kind === 'good' ? t('city.harmony') : t('city.discord')
     const label = known
-      ? `${t(`city.${BUILDINGS[a].key}` as TranslationKey)} + ${t(`city.${BUILDINGS[b].key}` as TranslationKey)} = ${outcome}`
+      ? `${t(`city.${BUILDINGS[a]!.key}` as TranslationKey)} + ${t(`city.${BUILDINGS[b]!.key}` as TranslationKey)} = ${outcome}`
       : t('city.locked')
     return (
       <li
@@ -418,7 +418,7 @@ export function CityGrid({ era }: { era: EraDef }) {
             </div>
           ) : null}
           {grid.map((type, i) => {
-            const b = type === null ? null : BUILDINGS[type]
+            const b = type === null ? null : BUILDINGS[type]!
             return (
               <button
                 key={i}
@@ -443,7 +443,7 @@ export function CityGrid({ era }: { era: EraDef }) {
                     className="h-3/5 w-3/5 text-muted opacity-0 transition-opacity group-hover:opacity-50"
                     aria-hidden
                   >
-                    {BUILDINGS[selected].glyph({ className: 'fill-current' })}
+                    {BUILDINGS[selected]!.glyph({ className: 'fill-current' })}
                   </svg>
                 )}
               </button>

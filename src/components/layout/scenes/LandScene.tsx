@@ -43,8 +43,8 @@ function lycophyte(x: number, baseY: number, s: number, key: number, seed: numbe
     },
   ]
   const forks = [
-    { p: fl, tips: [tips[0], tips[1]] },
-    { p: fr, tips: [tips[2], tips[3]] },
+    { p: fl, tips: [tips[0]!, tips[1]!] },
+    { p: fr, tips: [tips[2]!, tips[3]!] },
   ]
   return (
     // Opacity on the GROUP (composited once) so overlapping strokes don't stack

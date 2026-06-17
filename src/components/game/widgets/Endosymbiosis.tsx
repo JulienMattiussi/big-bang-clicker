@@ -34,7 +34,7 @@ function blobPath(radii: number[], rot = 0, cx = 0, cy = 0): string {
   const n = radii.length
   const pt = (i: number) => {
     const a = (i / n) * Math.PI * 2 + rot
-    return { x: cx + Math.cos(a) * radii[i % n], y: cy + Math.sin(a) * radii[i % n] }
+    return { x: cx + Math.cos(a) * radii[i % n]!, y: cy + Math.sin(a) * radii[i % n]! }
   }
   const mid = (i: number) => {
     const p = pt(i)
@@ -82,7 +82,7 @@ function ringPos(i: number, n: number): Point {
 function makeRing(startId: number): Organelle[] {
   return Array.from({ length: RING_SIZE }, (_, i) => ({
     id: startId + i,
-    tint: TINTS[i % TINTS.length],
+    tint: TINTS[i % TINTS.length]!,
     shape: i % SHAPES.length,
   }))
 }

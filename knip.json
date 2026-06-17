@@ -1,0 +1,7 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": ["sim/viewer/main.tsx"],
+  "project": ["src/**/*.{ts,tsx}", "sim/**/*.{ts,tsx}", "tests/**/*.{ts,tsx}"],
+  "vitest": { "config": ["vitest.config.ts", "sim/vitest.sim.config.ts"] },
+  "ignoreDependencies": ["tailwindcss"]
+}

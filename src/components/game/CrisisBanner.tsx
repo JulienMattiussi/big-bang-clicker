@@ -18,14 +18,14 @@ export function CrisisBanner() {
   // Only the crisis(es) belonging to the era currently shown (a crisis stays
   // localised to its era).
   const ready = readyCrises(state, defs).filter(
-    (id) => defs.crises[id].eraId === state.currentEraId,
+    (id) => defs.crises[id]!.eraId === state.currentEraId,
   )
   if (ready.length === 0) return null
 
   return (
     <div className="flex w-full flex-col items-center gap-3">
       {ready.map((id) => {
-        const def = defs.crises[id]
+        const def = defs.crises[id]!
         return (
           <div
             key={id}

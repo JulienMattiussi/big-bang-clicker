@@ -5,7 +5,7 @@
  */
 
 export type UnlockPolicy = 'asap' | 'ready'
-export type BuyStrategy = 'cheapest' | 'tierFirst'
+type BuyStrategy = 'cheapest' | 'tierFirst'
 
 /** A simulated player archetype. */
 export interface ProfileConfig {
@@ -72,7 +72,7 @@ export interface MilestoneStat {
 }
 
 /** One sampled point of the progression curve. */
-export interface SeriesPoint {
+interface SeriesPoint {
   t: number
   complexity: number
   eraIndex: number

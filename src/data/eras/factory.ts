@@ -19,7 +19,7 @@ import type {
  */
 
 /** A resource introduced by an era: its base, or a chain link's product. */
-export interface EraResourceSpec {
+interface EraResourceSpec {
   id: string
   icon: string
   tier: number
@@ -28,7 +28,7 @@ export interface EraResourceSpec {
 }
 
 /** One converter step: consume `inputs`, produce `produces` (one unit). */
-export interface ChainLink {
+interface ChainLink {
   produces: EraResourceSpec
   converterId: string
   inputs: ResourceAmount[]
@@ -104,7 +104,8 @@ function cumulativeStep(changePoints: Record<number, number>, eraIdx: number): n
   let step = 1
   let mult = 1
   for (let e = 0; e <= eraIdx; e++) {
-    if (changePoints[e] !== undefined) step = changePoints[e]
+    const point = changePoints[e]
+    if (point !== undefined) step = point
     mult *= step
   }
   return mult

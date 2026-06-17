@@ -25,7 +25,7 @@ export function ResourceCrisisBadge({ resourceId }: { resourceId: string }) {
   const defs = useGameStore((s) => s.defs)
 
   const hits = (cid: string) => {
-    const c = defs.crises[cid]
+    const c = defs.crises[cid]!
     return (
       c.risk.sourceResource === resourceId ||
       c.regression.some((e) => e.target === resourceId) ||
@@ -45,7 +45,7 @@ export function ResourceCrisisBadge({ resourceId }: { resourceId: string }) {
   const resName = t(defs.resources[resourceId]?.nameKey as TranslationKey)
 
   const lineFor = (cid: string) => {
-    const def = defs.crises[cid]
+    const def = defs.crises[cid]!
     if (!isActive(cid)) {
       const boost = def.rebound.find(
         (e) => e.target === resourceId && e.type === 'multiplier',

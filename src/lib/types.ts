@@ -69,7 +69,7 @@ export interface ConverterDef {
   cost: CostCurve[]
 }
 
-export type EffectType =
+type EffectType =
   | 'multiplier'
   | 'unlock'
   | 'transformResource'
@@ -223,16 +223,16 @@ export interface GameDefs {
   galets: GaletDef[]
 }
 
-export interface GeneratorState {
+interface GeneratorState {
   level: number
 }
 
-export interface ConverterState {
+interface ConverterState {
   level: number
   enabled: boolean
 }
 
-export interface CrisisRuntime {
+interface CrisisRuntime {
   risk: number
   resolved: boolean
   count: number

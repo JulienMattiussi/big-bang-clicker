@@ -74,12 +74,12 @@ export function BohrAtom({ era }: { era: EraDef }) {
   const capture = () => {
     const { state, defs } = useGameStore.getState()
     const recipe = era.converters[0]
-    const conv = defs.converters[recipe]
+    const conv = recipe ? defs.converters[recipe] : undefined
     const nucleon = conv?.inputs.find((i) => i.resource !== era.clickResource)
     const haveNucleon = !nucleon || (state.resources[nucleon.resource] ?? 0) >= nucleon.amount
 
     const yield_ = clickYield(state, defs, era)
-    if (closeRef.current && conv && haveNucleon) {
+    if (closeRef.current && recipe && conv && haveNucleon) {
       // Capture electrons (scales with the generator level): one binds into
       // hydrogen, the rest stay with you -> net `yield_` electrons.
       click(era.clickResource, yield_ + 1)

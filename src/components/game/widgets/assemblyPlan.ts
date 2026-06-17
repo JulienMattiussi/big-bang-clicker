@@ -82,7 +82,7 @@ export function partsOf(orgId: string): PartId[] {
 export function pickOrg(exclude: string[]): string {
   const pool = ORGANISMS.filter((o) => !exclude.includes(o.id))
   const src = pool.length > 0 ? pool : ORGANISMS
-  return src[Math.floor(Math.random() * src.length)].id
+  return src[Math.floor(Math.random() * src.length)]!.id
 }
 
 export function planFor(orgId: string): Plan {

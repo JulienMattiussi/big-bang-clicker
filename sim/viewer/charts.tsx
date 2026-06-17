@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from 'react'
 
 /** A lightweight SVG line chart (linear or log axes). No chart dependency. */
-export interface LinePoint {
+interface LinePoint {
   x: number
   y: number
 }

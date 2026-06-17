@@ -17,7 +17,9 @@ function alongPolyline(pts: Pt[], t: number): Pt {
   const f = Math.max(0, Math.min(0.999, t)) * segs
   const i = Math.floor(f)
   const u = f - i
-  return [pts[i][0] + (pts[i + 1][0] - pts[i][0]) * u, pts[i][1] + (pts[i + 1][1] - pts[i][1]) * u]
+  const a = pts[i]!
+  const b = pts[i + 1]!
+  return [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u]
 }
 
 /** A FILLED ribbon around a centreline: each point carries its own half-width, so
@@ -27,8 +29,8 @@ function ribbon(pts: Pt[], halfWidths: number[]): string {
   const n = pts.length
   if (n < 2) return ''
   const normal = (i: number): Pt => {
-    const a = pts[Math.max(0, i - 1)]
-    const b = pts[Math.min(n - 1, i + 1)]
+    const a = pts[Math.max(0, i - 1)]!
+    const b = pts[Math.min(n - 1, i + 1)]!
     const nx = -(b[1] - a[1])
     const ny = b[0] - a[0]
     const len = Math.hypot(nx, ny) || 1
@@ -38,13 +40,14 @@ function ribbon(pts: Pt[], halfWidths: number[]): string {
   const R: Pt[] = []
   for (let i = 0; i < n; i++) {
     const [nx, ny] = normal(i)
-    const h = halfWidths[i]
-    L.push([pts[i][0] + nx * h, pts[i][1] + ny * h])
-    R.push([pts[i][0] - nx * h, pts[i][1] - ny * h])
+    const h = halfWidths[i]!
+    const p = pts[i]!
+    L.push([p[0] + nx * h, p[1] + ny * h])
+    R.push([p[0] - nx * h, p[1] - ny * h])
   }
-  let d = `M ${L[0][0].toFixed(1)} ${L[0][1].toFixed(1)}`
-  for (let i = 1; i < n; i++) d += ` L ${L[i][0].toFixed(1)} ${L[i][1].toFixed(1)}`
-  for (let i = n - 1; i >= 0; i--) d += ` L ${R[i][0].toFixed(1)} ${R[i][1].toFixed(1)}`
+  let d = `M ${L[0]![0].toFixed(1)} ${L[0]![1].toFixed(1)}`
+  for (let i = 1; i < n; i++) d += ` L ${L[i]![0].toFixed(1)} ${L[i]![1].toFixed(1)}`
+  for (let i = n - 1; i >= 0; i--) d += ` L ${R[i]![0].toFixed(1)} ${R[i]![1].toFixed(1)}`
   return d + ' Z'
 }
 
@@ -57,11 +60,12 @@ function blobPath(cx: number, cy: number, r: number): string {
     return [cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]
   })
   const mid = (a: Pt, b: Pt): Pt => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]
-  const m0 = mid(P[n - 1], P[0])
+  const m0 = mid(P[n - 1]!, P[0]!)
   let d = `M ${m0[0].toFixed(1)} ${m0[1].toFixed(1)}`
   for (let i = 0; i < n; i++) {
-    const m = mid(P[i], P[(i + 1) % n])
-    d += ` Q ${P[i][0].toFixed(1)} ${P[i][1].toFixed(1)} ${m[0].toFixed(1)} ${m[1].toFixed(1)}`
+    const pi = P[i]!
+    const m = mid(pi, P[(i + 1) % n]!)
+    d += ` Q ${pi[0].toFixed(1)} ${pi[1].toFixed(1)} ${m[0].toFixed(1)} ${m[1].toFixed(1)}`
   }
   return d + ' Z'
 }
@@ -150,7 +154,7 @@ SYN_SOMAS.forEach((s, i) => {
     const key = i < j ? `${i}-${j}` : `${j}-${i}`
     if (axonSeen.has(key)) continue
     axonSeen.add(key)
-    const o = SYN_SOMAS[j]
+    const o = SYN_SOMAS[j]!
     const cx = (s.x + o.x) / 2 + synR(-14, 14)
     const cy = (s.y + o.y) / 2 + synR(-14, 14)
     const depth = Math.max(s.depth, o.depth)

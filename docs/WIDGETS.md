@@ -1,12 +1,17 @@
 # Big Bang Clicker - Catalogue de conception des widgets-mécaniques
 
-> **Statut : implémentés.** Les widgets des ères 4 à 13 décrits ici sont codés et
+> **Statut : implémentés.** Les widgets des ères 5 à 14 (`e4`-`e13`) décrits ici sont codés et
 > branchés (`src/components/game/widgets/`, registre `interactive.ts`), plus un
-> widget de **crise** plein écran (survie à l'extinction, ère 10). Ce document
-> reste la référence de conception.
+> widget de **crise** plein écran (survie à l'extinction, ère 11 (`e10`)). Depuis, les
+> ères 15 à 18 (`e14`-`e17`) ont aussi reçu leur widget interactif (arbre des inventions,
+> lancement de fusée, relais à effet de masse, roue de l'unification), si bien
+> que **chaque ère** dispose désormais de son geste propre. Ce document reste la
+> référence de conception des widgets des ères 5 à 14 (`e4`-`e13`) ci-dessous.
 >
-> Conception des widgets des **ères 4 à 13** (les ères 0-3 étaient déjà
-> implémentées). Respecte le
+> Numérotation comme en jeu (1-based) : « Ère N » a pour id technique `e(N-1)`.
+>
+> Conception des widgets des **ères 5 à 14 (`e4`-`e13`)** (les ères 1-4
+> (`e0`-`e3`) étaient déjà implémentées). Respecte le
 > [playbook widgets](./UI-UX.md) et les règles d'[AGENTS](../AGENTS.md) :
 > mécanique concrète, jolie + réactive, anti-frustration (jamais d'échec sec),
 > manuel + automatisable, accessibilité (clavier, aria), science respectée,
@@ -18,31 +23,31 @@ Le **type d'interaction évolue** avec le récit, pour casser la monotonie : on
 passe de la **dextérité/artisanat** (jauge, timing, semis, fusion) à des
 **systèmes vivants** (équilibre, croissance, assemblage), puis à de la
 **stratégie cognitive et sociale** (arbre, mémoire, urbanisme, carte). La
-**gestion de ressources** elle-même évolue à partir de l'ère 7 (équilibres à
+**gestion de ressources** elle-même évolue à partir de l'ère 8 (`e7`) (équilibres à
 tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
 
 | Ère | Thème | Widget | Archétype d'interaction (nouveau) |
 |----:|-------|--------|-----------------------------------|
-| 0 | Big Bang | jauge de température | *(fait)* jauge |
-| 1 | Recombinaison | atome de Bohr | *(fait)* capture d'un mobile (timing) |
-| 2 | Premières étoiles | pépinière | *(fait)* semis + combo de clics |
-| 3 | Forges stellaires | tableau périodique | *(fait)* grille de fusion |
-| **4** | Système solaire | disque d'accrétion | **fusion physique** (collisions, croissance) |
-| **5** | Briques de la vie | molécules boule-tige | **tracer des liaisons** (graphe à dessiner) |
-| **6** | Premières vies | boîte de Petri | **automate / culture** (diviser, élaguer) |
-| **7** | Grande Oxydation | balance atmosphérique | **équilibre à tenir** (corde raide) |
-| **8** | Eucaryotes | endosymbiose | **cliquer-engloutir** (combiner A dans B) |
-| **9** | Cambrien | chaîne de montage (plein écran) | **tapis roulant** (attraper les bonnes pièces) |
-| **10** | Conquête des terres | arbre du vivant | **arbre qui ramifie** (croissance + extinctions) |
-| **11** | Intelligence | constellation d'idées | **mémoire / séquence** (Simon) |
-| **12** | Sociétés | plan de la cité | **placement sur grille** (adjacences) |
-| **13** | Nations | carte du monde | **contrôle de territoire** (diplomatie vs guerre) |
+| 1 (`e0`) | Big Bang | jauge de température | *(fait)* jauge |
+| 2 (`e1`) | Recombinaison | atome de Bohr | *(fait)* capture d'un mobile (timing) |
+| 3 (`e2`) | Premières étoiles | pépinière | *(fait)* semis + combo de clics |
+| 4 (`e3`) | Forges stellaires | tableau périodique | *(fait)* grille de fusion |
+| **5** (`e4`) | Système solaire | disque d'accrétion | **fusion physique** (collisions, croissance) |
+| **6** (`e5`) | Briques de la vie | molécules boule-tige | **tracer des liaisons** (graphe à dessiner) |
+| **7** (`e6`) | Premières vies | boîte de Petri | **automate / culture** (diviser, élaguer) |
+| **8** (`e7`) | Grande Oxydation | balance atmosphérique | **équilibre à tenir** (corde raide) |
+| **9** (`e8`) | Eucaryotes | endosymbiose | **cliquer-engloutir** (combiner A dans B) |
+| **10** (`e9`) | Cambrien | chaîne de montage (pleine largeur) | **tapis roulant** (attraper les bonnes pièces) |
+| **11** (`e10`) | Conquête des terres | arbre du vivant | **arbre qui ramifie** (croissance + extinctions) |
+| **12** (`e11`) | Intelligence | constellation d'idées | **mémoire / séquence** (Simon) |
+| **13** (`e12`) | Sociétés | plan de la cité | **placement sur grille** (adjacences) |
+| **14** (`e13`) | Nations | carte du monde | **contrôle de territoire** (diplomatie vs guerre) |
 
 ---
 
-## Ère 4 - Système solaire : disque d'accrétion
+## Ère 5 (`e4`) - Système solaire : disque d'accrétion
 
-- **Ressources / recette** : `dust` (+ `heavyElement` de l'ère 3) -> `planet`
+- **Ressources / recette** : `dust` (+ `heavyElement` de l'ère 4 (`e3`)) -> `planet`
   (recette `accretion`). Verbe : Accréter.
 - **Mécanique - fusion physique.** Un disque protoplanétaire tourne ; des
   **planétésimaux** y dérivent. On les **pousse au clic/drag** vers le centre ;
@@ -65,7 +70,7 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
       . O      .  o           contact -> fusion -> plus gros -> Planète
 ```
 
-## Ère 5 - Briques de la vie : molécules boule-tige
+## Ère 6 (`e5`) - Briques de la vie : molécules boule-tige
 
 - **Ressources / recette** : `molecule` -> `rna` (recette `synthesis`). Verbe :
   Synthétiser.
@@ -84,7 +89,7 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
   bouton "lier" qui relie la prochaine paire valide. Récurrence : revient pour
   des molécules plus grosses (protéines, ADN).
 
-## Ère 6 - Premières vies : boîte de Petri
+## Ère 7 (`e6`) - Premières vies : boîte de Petri
 
 - **Ressources / recette** : `cell` -> `microbe` (recette `division`). Verbe :
   Répliquer.
@@ -104,7 +109,7 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
   passive). Anti-frustration = la surpopulation ralentit, ne détruit pas tout
   (rebond). a11y = boutons "Diviser" / "Élaguer". Récurrence : multicellularité.
 
-## Ère 7 - Grande Oxydation : balance atmosphérique
+## Ère 8 (`e7`) - Grande Oxydation : balance atmosphérique
 
 - **Ressources / recette** : `oxygen` -> `atmosphere` (recette `oxidation`).
   Verbe : Oxygéner.
@@ -129,7 +134,7 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
         derive <-                       clic "Oxygener" -> pousse a droite
 ```
 
-## Ère 8 - Eucaryotes : endosymbiose
+## Ère 9 (`e8`) - Eucaryotes : endosymbiose
 
 - **Ressources / recette** : `organelle` -> `eukaryote` (recette
   `endosymbiosis`). Verbe : Fusionner.
@@ -141,7 +146,7 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
   englouti assez, l'hôte **mûrit en eucaryote** (gratuit) et un nouvel anneau
   réapparaît en fondu. Combiner **deux choses distinctes** délibérément.
 - **Progression / nouveauté** : geste de **combinaison délibérée** (A dans B),
-  différent de la collision passive (ère 4) et du tracé (ère 5).
+  différent de la collision passive (ère 5 (`e4`)) et du tracé (ère 6 (`e5`)).
 - **Gestion de ressources** : chaque organite englouti compte vers la maturation
   de l'hôte -> produit un eucaryote.
 - **Implémentation** : manuel = clic sur une organite -> trajet vers l'hôte ; auto =
@@ -149,7 +154,7 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
   visible) étiqueté "Engloutir", activable au clavier. Récurrence : symbioses plus
   complexes.
 
-## Ère 9 - Cambrien : la chaîne de montage du vivant (plein écran)
+## Ère 10 (`e9`) - Cambrien : la chaîne de montage du vivant (pleine largeur)
 
 - **Ressources / recette** : `tissue` -> `organism` (recette `differentiation`).
   Verbe : Assembler.
@@ -195,10 +200,10 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
   une cible mobile) ; en mouvement réduit, le tapis est figé (pièces présentées
   statiquement). Récurrence : chaînes de production aux ères industrielles.
 
-## Ère 10 - Conquête des terres : arbre du vivant
+## Ère 11 (`e10`) - Conquête des terres : arbre du vivant
 
 - **Ressources / recette** : `flora`/`fauna` (recette `evolution`). Verbe :
-  Faire évoluer. **Crise** : extinction de masse (ère 10).
+  Faire évoluer. **Crise** : extinction de masse (ère 11 (`e10`)).
 - **Mécanique - arbre qui ramifie.** Un **arbre phylogénétique** qui pousse :
   à chaque nœud, on **choisit une branche** (mutation/lignée) à faire évoluer
   (clic). Chaque branche vivante **produit** de la biodiversité. Lors d'une
@@ -222,7 +227,7 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
             o--- (branche C)  X  eteinte (extinction) -> une mineure rebondit
 ```
 
-### Crise (ère 10) - survie à l'extinction (plein écran)
+### Crise (ère 11 (`e10`)) - survie à l'extinction (plein écran)
 
 Une crise peut se résoudre par son **propre mini-jeu**, pas seulement un bouton.
 À l'extinction de masse, la modale d'annonce porte **« Affronter »** : la fermer
@@ -232,7 +237,7 @@ largeur tandis que de petites **créatures** (rats, raptors) errent au sol. On l
 ne les fauche ; **50 sauvetages** surmontent la crise. Voir [GAME-DESIGN](./GAME-DESIGN.md)
 section 6.4 (`CrisisGame`, `CrisisBanner`, `CrisisScene`, `crisisStore`).
 
-## Ère 11 - Intelligence : constellation d'idées (mémoire)
+## Ère 12 (`e11`) - Intelligence : constellation d'idées (mémoire)
 
 - **Ressources / recette** : `tool` -> `knowledge` (recette `learning`). Verbe :
   Apprendre.
@@ -255,10 +260,10 @@ section 6.4 (`CrisisGame`, `CrisisBanner`, `CrisisScene`, `crisisStore`).
   (transmission passive). a11y = nœuds = boutons numérotés, séquence + issue
   annoncées (aria-live). Récurrence : sciences, paradigmes.
 
-## Ère 12 - Sociétés : plan de la cité
+## Ère 13 (`e12`) - Sociétés : plan de la cité
 
 - **Ressources / recette** : `population` -> `city` (recette `construction`).
-  Verbe : Bâtir. **Crise** : esclavage/révolte (Starpacus, ère 12).
+  Verbe : Bâtir. **Crise** : esclavage/révolte (Starpacus, ère 13 (`e12`)).
 - **Mécanique - placement sur grille (adjacences).** Une grille de terrain ; on
   **pose des bâtiments** (habitations, fermes, ateliers, marchés) en choisissant
   l'emplacement. Les **adjacences** donnent des bonus (ferme à côté d'habitation,
@@ -281,7 +286,7 @@ section 6.4 (`CrisisGame`, `CrisisBanner`, `CrisisScene`, `crisisStore`).
    [   ][Hab][   ]      poser pour maximiser les voisinages
 ```
 
-## Ère 13 - Nations : carte du monde
+## Ère 14 (`e13`) - Nations : carte du monde
 
 - **Ressources / recette** : `trade` -> `empire` (recette `conquest`). Verbe :
   Négocier / Conquérir.
@@ -290,7 +295,7 @@ section 6.4 (`CrisisGame`, `CrisisBanner`, `CrisisScene`, `crisisStore`).
   (lent, sûr, pacifique -> `trade`) ou **conquérir** (rapide, risqué, monte la
   tension -> `empire`). Contrôler des régions **produit** de l'influence ; les
   régions adjacentes contrôlées forment des **blocs** (bonus). La voie guerrière
-  alimente la **course à l'armement** (lien vers la crise atomique de l'ère 14).
+  alimente la **course à l'armement** (lien vers la crise atomique de l'ère 15 (`e14`)).
 - **Progression / nouveauté** : première **stratégie de carte avec choix
   moral/tactique** (diplomatie vs guerre), apogée de la montée en complexité
   stratégique. Deux styles de jeu.

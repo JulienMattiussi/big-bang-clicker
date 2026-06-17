@@ -8,7 +8,7 @@ export const CHARGE_PER_CLICK = 20
 export const ALIGN_TOL = 24 // degrees: catapult window around the target galaxy
 const SPIN_SPEED = 95 // alignment beam sweep, deg/s
 const LAUNCH_TIME = 0.7 // seconds for the ship to streak to the galaxy
-export const FLASH = 0.7
+const FLASH = 0.7
 const MISS_PENALTY = 30 // charge bled by a mistimed catapult
 
 export interface RelayWorld {

@@ -168,7 +168,7 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
   const [selected, setSelected] = useState<number | null>(null)
   const [done, setDone] = useState(0)
 
-  const mol = MOLECULES[index]
+  const mol = MOLECULES[index]!
   const isBond = (a: number, b: number) =>
     mol.bonds.some(([i, j]) => bondKey(i, j) === bondKey(a, b))
 
@@ -215,10 +215,10 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
           return (
             <line
               key={bondKey(a, b)}
-              x1={mol.atoms[a].x}
-              y1={mol.atoms[a].y}
-              x2={mol.atoms[b].x}
-              y2={mol.atoms[b].y}
+              x1={mol.atoms[a]!.x}
+              y1={mol.atoms[a]!.y}
+              x2={mol.atoms[b]!.x}
+              y2={mol.atoms[b]!.y}
               stroke={on ? 'var(--color-accent)' : 'var(--color-muted)'}
               strokeWidth={on ? 3 : 2}
               strokeOpacity={on ? 1 : 0.7}

@@ -33,6 +33,7 @@ anglais proposé.
 | Playwright | Tests e2e |
 | Prettier | Formatage |
 | ESLint (typescript-eslint) | Linting |
+| Knip | Détection des fichiers / exports / dépendances inutilisés |
 
 Choix validés : voir la section "Décisions" plus bas et
 [GAME-DESIGN.md](./docs/GAME-DESIGN.md).
@@ -42,8 +43,8 @@ Choix validés : voir la section "Décisions" plus bas et
 ## Architecture (cible)
 
 > Principe directeur : **data-driven**. Le moteur de jeu est générique ; les
-> ères, ressources, générateurs et upgrades sont décrits en **données**, pas
-> en code. Ajouter une ère générique coûte surtout du contenu. **Exception
+> ères, ressources, générateurs et convertisseurs sont décrits en **données**,
+> pas en code. Ajouter une ère générique coûte surtout du contenu. **Exception
 > assumée** : une ère dotée d'un widget interactif portant sa mécanique (ex : le
 > tableau périodique, `components/game/widgets/PeriodicTable.tsx` + `interactive.ts`)
 > demande aussi un composant. Voir [GAME-DESIGN](./docs/GAME-DESIGN.md) section 7.
@@ -55,7 +56,7 @@ fond de scène par palier, modales d'évènements). Arborescence :
 ```
 src/
 ├── lib/                  # Logique pure, zéro React (entièrement testée)
-│   ├── types.ts          # Types du domaine (Era, Resource, Generator, Converter, Crisis, GameState...)
+│   ├── types.ts          # Types du domaine (Era + layout, Resource, Generator, Converter, Crisis, MetaUpgrade, GameState...)
 │   ├── engine.ts         # Tick, coûts (arrondis), achats, conversion manuelle, multiplicateurs de galets, clickYield, palier ; gèle la production des ressources touchées par une crise active et bloque le palier tant qu'elle n'est pas résolue
 │   ├── graph.ts          # Flux nets réels + alertes (ressources en déclin / production à zéro), dépendances, tri
 │   ├── reveal.ts         # Dévoilement progressif (machines / ressources)
@@ -63,7 +64,7 @@ src/
 │   ├── crises.ts         # Crises : risque, déclenchement, régression/rebond
 │   ├── prestige.ts       # Échos + reset New Game+
 │   ├── meta.ts           # Méta-upgrades de prestige
-│   ├── save.ts           # État initial, sérialisation versionnée + migrations, idle, export/import ; enveloppe SIGNÉE (intégrité) : rejet de toute save non signée ou modifiée
+│   ├── save.ts           # État initial, sérialisation versionnée (SAVE_VERSION = 5) + migrations, idle, export/import ; enveloppe SIGNÉE (intégrité) : rejet de toute save non signée ou modifiée
 │   ├── integrity.ts      # Empreinte légère (cyrb53 + sel) anti-triche de save : ralentisseur, pas inviolable (jeu front-end open source)
 │   ├── format.ts         # Notation abrégée des grands nombres
 │   ├── galets.ts         # Galets de l'infini : découverte (palier OU widget), galets affectant générateur/convertisseur/Complexité
@@ -77,13 +78,13 @@ src/
 │   └── index.ts          # defs : GameDefs (agrégation typée)
 ├── store/                # Stores Zustand : gameStore (persisté ; sauve aussitôt les actions de progression discrètes) ; feedbackStore, clickPulse, eventStore, memoryStore, inventoryStore, galetStore, crisisStore (transitoires)
 ├── i18n/                 # i18n custom (FR source de vérité, EN typé complet) ; locale persistée en localStorage
-├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales), useGalets (découverte), useEraMechanic (clic d'ère), useMilestone (jauge/bouton de palier)
+├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales), useGalets (découverte), useMilestone (jauge/bouton de palier), useArrivalReward (récompense d'arrivée d'ère), useSimLoop (boucle d'animation locale d'un widget), usePageHidden (pause hors onglet)
 ├── components/           # Par domaine ; un composant par fichier
-│   ├── ui/               # Primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...)
+│   ├── ui/               # Primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...) ; helper introRect.ts (animation de vol vers un emplacement)
 │   ├── art/              # GRAPHISME exclusivement : glyphs/ (icônes custom du registre Icon), illustrations (Galet, Sauropod, OrganismGlyph, PartGlyph, CrisisCreatures, CrisisScene)
-│   ├── game/             # Ressources, machines, paliers, badges, galets ; modales d'évènements (EventModal + EventHero, layout « hero » partagé typé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge) ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal)
-│   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish...) routés par interactive.ts ; helper svgCoords.ts
-│   └── layout/           # Coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier + shared.ts/Defs.tsx), GaletReceptacle ; LanguageSwitch, SaveMenu
+│   ├── game/             # Ressources, machines, paliers, badges, galets ; modales d'évènements (EventModal + EventHero, layout « hero » partagé typé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge) ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal) ; helper eraTitle.ts (titre « Ère N : ... »)
+│   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish...) routés par interactive.ts ; clic d'ère via useEraMechanic ; helpers svgCoords.ts, StarField.tsx
+│   └── layout/           # Coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier + shared.ts/Defs.tsx), GaletReceptacle ; eraLayout.ts (disposition de page par ère, EraLayoutName) ; LanguageSwitch, SaveMenu
 └── App.tsx               # Navigation par état (pas de router)
 tests/
 ├── helpers.ts            # Helpers partagés (makeState) - éviter la duplication
@@ -116,8 +117,8 @@ sim/                      # Harnais de simulation d'équilibrage (exclu de make 
   `theme.css`.
 - **Pas de CSS local répété** : un motif de classes répété devient un composant
   réutilisable (`components/ui/`), pas du copier-coller.
-- **TypeScript strict** : `noUnusedLocals`, `noUnusedParameters` activés. Ne
-  pas les désactiver.
+- **TypeScript strict** : `noUnusedLocals`, `noUnusedParameters`,
+  `noUncheckedIndexedAccess` activés. Ne pas les désactiver.
 - **Moteur générique** : la logique de jeu ne connaît pas les ères en dur. Une
   ère est une donnée. Pas de `if (era === 'bigbang')` dans le moteur.
 - **Réseau de ressources** : les ressources se combinent via des
@@ -192,7 +193,7 @@ sim/                      # Harnais de simulation d'équilibrage (exclu de make 
   GAME-DESIGN section 5.
 
 ### Qualité (avant de considérer une tâche terminée)
-- `make check` doit passer (build + lint + typecheck + tests unitaires).
+- `make check` doit passer (build + lint + typecheck + knip + tests unitaires).
 
 ### Checkup complet du projet
 
@@ -200,9 +201,10 @@ Un « checkup » (revue de santé globale, au-delà d'une tâche ponctuelle) cou
 les dimensions suivantes. À dérouler dans l'ordre ; chaque point est à corriger,
 pas seulement à constater.
 
-1. **Porte qualité** : `make check` vert (build + lint + typecheck + tests). Le
-   harnais de simulation (`sim/`) en est exclu ; le relancer (`make sim`) si
-   l'équilibrage a bougé.
+1. **Porte qualité** : `make check` vert (build + lint + typecheck + knip +
+   tests). `make knip` signale fichiers, exports et dépendances inutilisés (à
+   nettoyer, pas seulement constater). Le harnais de simulation (`sim/`) en est
+   exclu ; le relancer (`make sim`) si l'équilibrage a bougé.
 2. **Typographie** : aucun tiret long (`—`/`–`) dans le code, les chaînes, les
    commentaires, la doc (l'exemple de la règle dans cet AGENTS est la seule
    occurrence tolérée). Recherche : `grep -rnP "[\x{2014}\x{2013}]"`.
@@ -249,11 +251,12 @@ pas seulement à constater.
 | `make start` | Lance le serveur de dev (http://localhost:1138) |
 | `make build` | Build de production |
 | `make lint` | ESLint |
+| `make knip` | Détecte fichiers / exports / dépendances inutilisés |
 | `make format` | Formate avec Prettier |
 | `make typecheck` | Vérifie les types |
 | `make test` | Tests unitaires (e2e : `make test-e2e`) |
 | `make fix` | Format + lint |
-| `make check` | build + lint + typecheck + tests unitaires |
+| `make check` | build + lint + typecheck + knip + tests unitaires |
 | `make sim` | Lance les simulations d'équilibrage (génère `sim/results/*.json`) |
 | `make sim-view` | Affiche l'URL du visualiseur graphique (nécessite `make start`) |
 

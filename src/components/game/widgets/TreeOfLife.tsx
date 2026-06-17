@@ -37,7 +37,7 @@ function buildTree(): TreeNode[] {
   const queue = [0]
   while (queue.length > 0) {
     const i = queue.shift() as number
-    const d = nodes[i].depth
+    const d = nodes[i]!.depth
     if (d >= MAX_LEVEL) continue
     const remaining = MAX_LEVEL - d
     const n = Math.random() < 1 / 3 ? 3 : 2
@@ -81,13 +81,13 @@ function layout(nodes: TreeNode[]): { x: number; y: number }[] {
       ch.forEach(setX)
       // Median (not mean): a 3-way split's middle child sits exactly under the
       // node, so the trunk stays a continuous vertical with the incoming branch.
-      const xs = ch.map((c) => x[c]).sort((a, b) => a - b)
+      const xs = ch.map((c) => x[c]!).sort((a, b) => a - b)
       const m = xs.length
-      x[i] = m % 2 === 1 ? xs[(m - 1) / 2] : (xs[m / 2 - 1] + xs[m / 2]) / 2
+      x[i] = m % 2 === 1 ? xs[(m - 1) / 2]! : (xs[m / 2 - 1]! + xs[m / 2]!) / 2
     }
   }
   setX(0)
-  return nodes.map((n, i) => ({ x: x[i], y: TOP_Y + n.depth * ROW_H }))
+  return nodes.map((n, i) => ({ x: x[i]!, y: TOP_Y + n.depth * ROW_H }))
 }
 
 /**
@@ -122,7 +122,7 @@ export function TreeOfLife({ era }: { era: EraDef }) {
   const pos = layout(nodes)
 
   const expandable = (i: number) =>
-    revealed[i] && nodes[i].depth < MAX_LEVEL && !kids(nodes, i).some((c) => revealed[c])
+    revealed[i] && nodes[i]!.depth < MAX_LEVEL && !kids(nodes, i).some((c) => revealed[c])
 
   const newTree = (tree?: TreeNode[]) => {
     const fresh = tree ?? generateTree()
@@ -153,11 +153,11 @@ export function TreeOfLife({ era }: { era: EraDef }) {
   // root will sit, slide the whole tree so the chosen leaf lands precisely there
   // (no jump), then swap to the next tree - that leaf becomes its root.
   const chooseLeaf = (i: number) => {
-    if (phase !== 'choose' || nodes[i].depth < MAX_LEVEL) return
+    if (phase !== 'choose' || nodes[i]!.depth < MAX_LEVEL) return
     const next = generateTree()
-    const nextRoot = layout(next)[0]
+    const nextRoot = layout(next)[0]!
     setChosen(i)
-    setSlide({ dx: nextRoot.x - pos[i].x, dy: nextRoot.y - pos[i].y })
+    setSlide({ dx: nextRoot.x - pos[i]!.x, dy: nextRoot.y - pos[i]!.y })
     setPhase('slide')
     slideTimer.current = setTimeout(() => newTree(next), 650)
   }
@@ -181,10 +181,10 @@ export function TreeOfLife({ era }: { era: EraDef }) {
           {/* Stub above the root: the lineage rises from the parent tree (the
               previous one it sprouted from), fading off the top. */}
           <line
-            x1={pos[0].x}
+            x1={pos[0]!.x}
             y1={2}
-            x2={pos[0].x}
-            y2={pos[0].y}
+            x2={pos[0]!.x}
+            y2={pos[0]!.y}
             stroke="var(--color-muted)"
             strokeWidth="1.4"
             strokeDasharray="2 3"
@@ -201,7 +201,7 @@ export function TreeOfLife({ era }: { era: EraDef }) {
                 key={`e${i}`}
                 className="branch-grow"
                 pathLength={1}
-                d={`M ${pos[n.parent].x} ${pos[n.parent].y} H ${pos[i].x} V ${pos[i].y}`}
+                d={`M ${pos[n.parent]!.x} ${pos[n.parent]!.y} H ${pos[i]!.x} V ${pos[i]!.y}`}
                 fill="none"
                 stroke="var(--color-muted)"
                 strokeWidth="1.4"
@@ -228,8 +228,8 @@ export function TreeOfLife({ era }: { era: EraDef }) {
                 className={`branch-tip ${choosable ? 'widget-pulse' : ''} ${clickable ? 'group' : ''}`}
               >
                 <circle
-                  cx={pos[i].x}
-                  cy={pos[i].y}
+                  cx={pos[i]!.x}
+                  cy={pos[i]!.y}
                   r={choosable || isChosen ? 3.6 : tip || terminal ? 3 : 2}
                   fill={
                     tip || isChosen
@@ -244,13 +244,13 @@ export function TreeOfLife({ era }: { era: EraDef }) {
                   className={`group-hover:brightness-125 ${choosable ? 'tree-signal' : ''}`}
                   style={{
                     transition: 'fill 0.6s ease, filter 0.15s ease',
-                    ...(choosable ? { animationDelay: `${(pos[i].x / 200) * 0.6}s` } : {}),
+                    ...(choosable ? { animationDelay: `${(pos[i]!.x / 200) * 0.6}s` } : {}),
                   }}
                 />
                 {clickable ? (
                   <circle
-                    cx={pos[i].x}
-                    cy={pos[i].y}
+                    cx={pos[i]!.x}
+                    cy={pos[i]!.y}
                     r="5"
                     fill="transparent"
                     role="button"

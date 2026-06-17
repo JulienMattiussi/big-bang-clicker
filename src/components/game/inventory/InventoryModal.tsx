@@ -89,7 +89,7 @@ export function InventoryModal({ onClose }: { onClose: () => void }) {
                   </header>
                   <ul className="flex flex-col gap-1 p-2">
                     {resources.map((id) => {
-                      const def = defs.resources[id]
+                      const def = defs.resources[id]!
                       const amount = state.resources[id] ?? 0
                       const isDeclining = declining.has(id)
                       const isStalled = stalled.has(id)

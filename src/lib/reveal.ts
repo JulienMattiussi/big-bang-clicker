@@ -27,8 +27,8 @@ export function revealedMachines(state: GameState, defs: GameDefs, era: EraDef):
   const sequence = [...era.generators, ...era.converters]
   const revealed = new Set<string>()
   for (let i = 0; i < sequence.length; i++) {
-    const id = sequence[i]
-    const prevLeveled = i === 0 || machineLevel(state, sequence[i - 1]) >= 1
+    const id = sequence[i]!
+    const prevLeveled = i === 0 || machineLevel(state, sequence[i - 1]!) >= 1
     const outputKnown = machineOutputs(defs, id).some((r) => isKnown(state, r))
     if (prevLeveled || outputKnown) revealed.add(id)
   }
@@ -45,11 +45,11 @@ export function revealedResources(state: GameState, defs: GameDefs, era: EraDef)
   // resource just because its machine is visible, only once it's automated.
   const outputs = new Set<string>()
   for (const id of era.generators) {
-    if ((state.generators[id]?.level ?? 0) >= 1) outputs.add(defs.generators[id].output)
+    if ((state.generators[id]?.level ?? 0) >= 1) outputs.add(defs.generators[id]!.output)
   }
   for (const id of era.converters) {
     if ((state.converters[id]?.level ?? 0) >= 1) {
-      for (const output of defs.converters[id].outputs) outputs.add(output.resource)
+      for (const output of defs.converters[id]!.outputs) outputs.add(output.resource)
     }
   }
 

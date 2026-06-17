@@ -44,7 +44,7 @@ export function CellsScene(): ReactElement {
       const t = (now - start) / 1000
       const svg = svgRef.current
       for (let i = 0; i < CELLS.length; i++) {
-        const c = CELLS[i]
+        const c = CELLS[i]!
         const x = c.x + c.ax * Math.sin(t * c.fx + c.phx)
         const y = c.y + c.ay * Math.cos(t * c.fy + c.phy)
         svg

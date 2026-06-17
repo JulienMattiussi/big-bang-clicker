@@ -12,9 +12,9 @@ import { sign } from './integrity'
  *  multipliers into `multipliers` (now derived from levels/counts); v4 merged the
  *  Intergalactic era into the Intergalactic Voyage and shifted later era ids. */
 export const SAVE_VERSION = 5
-export const SAVE_KEY = 'big-bang-clicker:save'
+const SAVE_KEY = 'big-bang-clicker:save'
 /** Cap on the offline-idle credit (anti clock-cheat). */
-export const DEFAULT_OFFLINE_CAP_SECONDS = 60 * 60 * 8
+const DEFAULT_OFFLINE_CAP_SECONDS = 60 * 60 * 8
 /** Thrown when a save fails its integrity check (edited outside the game). */
 export const TAMPER_ERROR = 'save-tampered'
 

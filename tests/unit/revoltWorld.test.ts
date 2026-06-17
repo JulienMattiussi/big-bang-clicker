@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import {
   SPLIT_X,
   enfranchise,
-  freshCrowd,
   seatSlot,
   stepCrowd,
   type CrowdWorld,

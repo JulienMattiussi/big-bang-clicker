@@ -48,7 +48,10 @@ export function BodyAssembly({ era }: { era: EraDef }) {
   const defs = useGameStore((s) => s.defs)
   const galetDef = widgetGaletForEra(defs, era.id)
   const galetFound = useGameStore((s) => (galetDef ? !!s.state.galets[galetDef.id]?.found : false))
-  const converterLevel = useGameStore((s) => s.state.converters[era.converters[0]]?.level ?? 0)
+  const converterId = era.converters[0]
+  const converterLevel = useGameStore((s) =>
+    converterId ? (s.state.converters[converterId]?.level ?? 0) : 0,
+  )
   const galetEligible = !!galetDef && !galetFound && converterLevel >= GALET_UNLOCK_LEVEL
 
   const nextId = useRef(0)
@@ -107,12 +110,12 @@ export function BodyAssembly({ era }: { era: EraDef }) {
       )
       timers.add(tm)
     }
-    const pick = (ids: readonly PartId[]) => ids[Math.floor(Math.random() * ids.length)]
+    const pick = (ids: readonly PartId[]) => ids[Math.floor(Math.random() * ids.length)]!
     // The diversity pebble as a special belt item (clicked to discover it).
     const emitGalet = () => {
       galetOnBeltRef.current = true
       const key = nextId.current++
-      setBelt((b) => [...b, { key, id: PART_IDS[0], age: 0, galet: true }])
+      setBelt((b) => [...b, { key, id: PART_IDS[0]!, age: 0, galet: true }])
       const tm = setTimeout(() => {
         setBelt((b) => b.filter((p) => p.key !== key))
         galetOnBeltRef.current = false
@@ -148,9 +151,9 @@ export function BodyAssembly({ era }: { era: EraDef }) {
     const ages: number[] = []
     for (let age = SPAWN_MS; age < BELT_MS; age += SPAWN_MS) ages.push(age)
     const curOrg = planRef.current.org
-    const needed = [...new Set([...partsOf(curOrg), ...partsOf(upcomingRef.current[0])])]
+    const needed = [...new Set([...partsOf(curOrg), ...partsOf(upcomingRef.current[0]!)])]
     const curParts = partsOf(curOrg)
-    ages.forEach((age, i) => emit(i < needed.length ? needed[i] : pick(curParts), age))
+    ages.forEach((age, i) => emit(i < needed.length ? needed[i]! : pick(curParts), age))
     emit(chooseId(), 0)
     // Every tick spawns a part; every ~20-30 parts SEEN, if eligible and not
     // already out, the diversity pebble surfaces (it keeps coming back until
@@ -206,8 +209,8 @@ export function BodyAssembly({ era }: { era: EraDef }) {
     if (status === null) return
     const tm = setTimeout(() => {
       const [next, ...rest] = upcomingRef.current
-      const tail = pickOrg([next, ...rest])
-      setQueue({ plan: planFor(next), upcoming: [...rest, tail] })
+      const tail = pickOrg([next!, ...rest])
+      setQueue({ plan: planFor(next!), upcoming: [...rest, tail] })
       setStatus(null)
       setCycle((c) => c + 1)
     }, EXIT_MS)

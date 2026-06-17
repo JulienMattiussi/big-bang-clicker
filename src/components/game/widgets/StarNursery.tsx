@@ -106,8 +106,8 @@ export function StarNursery({ era }: { era: EraDef }) {
       // Enough compression: a star ignites at the focus (free, no stock spent).
       const { defs } = useGameStore.getState()
       const recipe = era.converters[0]
-      const conv = defs.converters[recipe]
-      if (conv) {
+      const conv = recipe ? defs.converters[recipe] : undefined
+      if (recipe && conv) {
         manualProduce(recipe)
         for (const o of conv.outputs)
           spawn(`res:${o.resource}`, `+${formatNumber(o.amount)}`, 'resource')

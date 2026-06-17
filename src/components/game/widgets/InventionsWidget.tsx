@@ -44,7 +44,7 @@ export function InventionsWidget({ era }: { era: EraDef }): ReactElement {
   const charging = timeline[Math.min(discovered, timeline.length - 1)]
   const need = clicksFor(charging?.variant ?? 0)
   const shownIndex = discovered > 0 ? Math.min(viewIndex, discovered - 1) : -1
-  const shown = shownIndex >= 0 ? timeline[shownIndex] : null
+  const shown = shownIndex >= 0 ? (timeline[shownIndex] ?? null) : null
   const isLatest = shownIndex === discovered - 1
 
   // Variant 0 is the original; later loops append a buzzword tag/note and recolour.

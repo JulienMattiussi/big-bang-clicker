@@ -5,8 +5,8 @@
 
 import type { GameState } from './types'
 
-export const ECHO_K = 1
-export const ECHO_BASE = 1000
+const ECHO_K = 1
+const ECHO_BASE = 1000
 
 /** "Earned" Echoes over the whole run (monotonic with total Complexity). */
 export function lifetimeEchoes(state: GameState): number {

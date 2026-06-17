@@ -12,7 +12,7 @@ Objectif : un dossier de doc complet et validé avant d'écrire le moteur.
       crises, humour).
 - [x] `docs/GAME-DESIGN.md` - boucle, économie réseau, automatisation, crises,
       prestige, ton/humour, équilibrage.
-- [x] `docs/PHASES.md` - les 20 ères détaillées (découpage validé).
+- [x] `docs/PHASES.md` - les 19 ères détaillées (découpage validé).
 - [x] `docs/SCIENCE.md` - recherche sourcée (cosmologie vérifiée ; partie
       bio/anthropo marquée **à re-sourcer**).
 - [x] `docs/UI-UX.md` - coquille stable, paliers, design system, widgets
@@ -61,11 +61,11 @@ Objectif : un moteur qui sait jouer **une** ère, piloté par des données.
 ## Phase D - Tranche verticale (vertical slice)
 
 Objectif : **2 ères jouables et reliées**, pour valider le fun et la
-cohabitation avant de produire les 20.
+cohabitation avant de produire les 19.
 
-- [x] Ère 0 (Refroidir) + Ère 1 (Recombinaison) jouables (data-driven).
+- [x] Ère 1 (`e0`, Refroidir) + Ère 2 (`e1`, Recombinaison) jouables (data-driven).
 - [x] Passage d'ère + cohabitation (la recombinaison consomme les nucléons de
-      l'ère 0, qui doit continuer de tourner).
+      l'ère 1 (`e0`), qui doit continuer de tourner).
 - [x] Méta-ressource Complexité fonctionnelle.
 - [x] Coquille UI du tier COSMOS (GameShell, panneaux ressources/production,
       clic, onglets d'ères) + thème par palier via data-tier.
@@ -81,21 +81,24 @@ Objectif : ajouter les ères par lots cohérents (par tier UI), en réutilisant
 le moteur. Pour chaque ère : données, contenu narratif, mini-système éventuel,
 traductions FR/EN, tests.
 
-- [x] Tier COSMOS : ères 2 (premières étoiles & galaxies), 3 (forges
+- [x] Tier COSMOS : ères 3 (`e2`, premières étoiles & galaxies), 4 (`e3`, forges
       stellaires), avec chaînage inter-ères (étoiles <- hydrogène, forges <-
       étoiles).
 - [x] Widgets iconiques centraux (scène cliquable) : jauge de refroidissement,
       atome de Bohr, galaxie spirale, tableau périodique (SVG animés).
-- [x] **Toutes les ères 4 à 19** créées (data-driven via fabrique `buildEra`),
+- [x] **Toutes les ères 5 à 19** créées (data-driven via fabrique `buildEra`),
       bilingues FR/EN, avec chaînage inter-ères et déblocage par Complexité.
       Thèmes par tier (cosmos/vivant/civilisation/spatial/transcendance) appliqués.
-- [x] **Prestige** (ère 19) : bandeau "Renaissance", conversion en Échos, reset.
-- [x] **Crises (régressions)** : extinction (ère 10), révolte de Starpacus
-      (ère 12), arme atomique (ère 14) ; bandeau de crise + résolution.
-- [x] Widget générique de repli + widgets dédiés : accrétion (ère 4), cellule
-      (ère 6), cité (ère 12), fusée (ère 15), en plus des 4 du tier COSMOS.
-- [ ] Widgets dédiés pour les ères restantes (vivant/civilisation/spatial).
-- [ ] Mini-systèmes spécifiques (arbre phylogénétique, carte Risk...).
+- [x] **Prestige** (ère 19 (`e18`), finale "Explosion") : bandeau "Renaissance",
+      conversion en Échos, reset.
+- [x] **Crises (régressions)** : extinction (e10), révolte de Starpacus
+      (e12), crises de l'ère industrielle dont l'arme atomique (e14), première
+      rencontre (e16) ; bandeau de crise + résolution.
+- [x] Widget générique de repli + widgets dédiés à **chaque** ère (jauge,
+      atome de Bohr, pépinière, tableau périodique, accrétion, molécules, Petri,
+      balance, endosymbiose, assemblage, arbre, mémoire, cité, carte, inventions,
+      fusée, relais à effet de masse, unification).
+- [x] Mini-systèmes spécifiques (arbre phylogénétique, carte Risk...).
 - [x] **Code 100% anglais** (ids, commentaires, clés i18n) ; seules les valeurs
       de traduction sont localisées.
 

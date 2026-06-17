@@ -25,25 +25,25 @@
 
 | Référence / source | Idée en jeu | Ère(s) | Type |
 |---|---|---|---|
-| Star Wars | Invention d'un **couteau à huître laser** (lame d'énergie pour ouvrir les huîtres), vite **abandonné car peu fiable** (instable, dangereux pour l'utilisateur) | 14 (Technologies) | Invention absurde / abandonnée |
-| Asimov, Fondation | **Intégré (e17, transition)** : **Harry Sheldon** prétend avoir inventé une science prédictive infaillible et annonce la fin de l'univers pour très bientôt (par une obscure histoire de plaque de cuisson, cf. ère 18) ; personne ne le prend au sérieux | 17 (La grande unification) | Évènement narratif / clin d'oeil |
-| (Histoire des religions) | **Naissance et disparition de religions** au fil de la société ; la société la plus évoluée devient **athée** | 12 (Sociétés) | Arc narratif / évènements |
-| Mass Effect | Le **Commandant Shepard** meurt en luttant contre une civilisation hostile, les **Cultivateurs** | 16 (galactique) / 17 (intergalactique) | Évènement narratif / clin d'oeil |
-| Mass Effect | **Intégré (e16)** : le **capitaine Shepherd** découvre de gigantesques **relais à effet de masse** pour voyager de galaxie en galaxie (modale de transition + widget de l'ère : charger le relais, catapulter un vaisseau) | 16 (Voyage intergalactique) | Techno + widget / clin d'oeil |
-| Dune | **À venir (e17)** : une **crise des trafiquants d'épice** (l'épice convoitée, les vers de vase, la planète **Salakis**) | 17 (La grande unification) | Crise / clin d'oeil |
+| Star Wars | Invention d'un **couteau à huître laser** (lame d'énergie pour ouvrir les huîtres), vite **abandonné car peu fiable** (instable, dangereux pour l'utilisateur) | 15 (`e14`) (Technologies) | Invention absurde / abandonnée |
+| Asimov, Fondation | **Intégré (e17, transition)** : **Harry Sheldon** prétend avoir inventé une science prédictive infaillible et annonce la fin de l'univers pour très bientôt (par une obscure histoire de plaque de cuisson, cf. ère 19 (`e18`)) ; personne ne le prend au sérieux | 18 (`e17`) (La grande unification) | Évènement narratif / clin d'oeil |
+| (Histoire des religions) | **Naissance et disparition de religions** au fil de la société ; la société la plus évoluée devient **athée** | 13 (`e12`) (Sociétés) | Arc narratif / évènements |
+| Mass Effect | Le **Commandant Shepard** meurt en luttant contre une civilisation hostile, les **Cultivateurs** | 17 (`e16`) (galactique) / 18 (`e17`) (intergalactique) | Évènement narratif / clin d'oeil |
+| Mass Effect | **Intégré (e16)** : le **capitaine Shepherd** découvre de gigantesques **relais à effet de masse** pour voyager de galaxie en galaxie (modale de transition + widget de l'ère : charger le relais, catapulter un vaisseau) | 17 (`e16`) (Voyage intergalactique) | Techno + widget / clin d'oeil |
+| Dune | **À venir (e17)** : une **crise des trafiquants d'épice** (l'épice convoitée, les vers de vase, la planète **Salakis**) | 18 (`e17`) (La grande unification) | Crise / clin d'oeil |
 | H2G2 | **"Pas de panique"** affiché au déclenchement d'une crise (régression) : un clin d'oeil qui **rassure** le joueur au pire moment | Transverse (crises, section 6) | **Humour utile (UX)** |
 | H2G2 | Le nombre **42** comme "réponse" cachée : jalon/easter egg secret (ex : à 42 d'une ressource ou de Complexité, un message énigmatique) | Transverse | Easter egg / nombre culte |
-| H2G2 | La Terre est en réalité un **super-ordinateur** construit pour calculer la Grande Question (et un dirigeant l'éteindra, cf. ère 19) | 4-5 (Terre) | Clin d'oeil narratif |
-| H2G2 | **Drive à improbabilité infinie** : propulsion absurde alternative à l'effet de masse | 15-17 (Spatial) | Techno absurde / clin d'oeil |
+| H2G2 | La Terre est en réalité un **super-ordinateur** construit pour calculer la Grande Question (et un dirigeant l'éteindra, cf. ère 19 (`e18`)) | 5-6 (`e4`-`e5`) (Terre) | Clin d'oeil narratif |
+| H2G2 | **Drive à improbabilité infinie** : propulsion absurde alternative à l'effet de masse | 16-18 (`e15`-`e17`) (Spatial) | Techno absurde / clin d'oeil |
 | Disque-monde (Pratchett) | L'**octarine**, la huitième couleur (couleur de la magie), employée **discrètement** pour les éléments rares/secrets/magiques. Variable `--octarine` dans le thème | Transverse (design) | Easter egg discret / couleur |
 | Pierres de l'infini (Marvel) | Six **galets peints de l'infini** (Espace, Temps, Réalité, Pouvoir, Esprit, Âme), rares, à collectionner à travers les ères et les prestiges ; les réunir tous débloque un effet majeur. Nom volontairement mondain (de simples galets peints qui gouvernent l'univers) | Transverse (méta-progression) | Collection rare / clin d'oeil |
-| Jurassic Park | « **La vie trouve toujours un chemin** » comme accroche / titre de l'ère de l'évolution | 10 (Évolution) | Phrase d'interface / clin d'oeil |
-| Spartacus | La révolte des esclaves est menée par un certain **Starpacus** | 12 (Sociétés) | Évènement nommé / clin d'oeil |
-| The Matrix | Une IA toute-puissante, le **Matrixator**, se soulève : crise (régression) | 14 (Technologies) | Crise nommée / clin d'oeil |
-| Lavoisier | « Rien ne se perd, rien ne se crée, tout se transforme » en accroche de l'ère des forges stellaires (forme popularisée) | 3 (Forges) | Citation / accroche |
+| Jurassic Park | « **La vie trouve toujours un chemin** » comme accroche / titre de l'ère de l'évolution | 11 (`e10`) (Évolution) | Phrase d'interface / clin d'oeil |
+| Spartacus | La révolte des esclaves est menée par un certain **Starpacus** | 13 (`e12`) (Sociétés) | Évènement nommé / clin d'oeil |
+| The Matrix | Une IA toute-puissante, le **Matrixator**, se soulève : crise (régression) | 15 (`e14`) (Technologies) | Crise nommée / clin d'oeil |
+| Lavoisier | « Rien ne se perd, rien ne se crée, tout se transforme » en accroche de l'ère des forges stellaires (forme popularisée) | 4 (`e3`) (Forges) | Citation / accroche |
 
 > **Statut :** les lignes marquées « Intégré » sont en jeu. **Dune** (crise des
-> trafiquants d'épice, ère 17) est la prochaine retenue. Les autres entrées non
+> trafiquants d'épice, ère 18 (`e17`)) est la prochaine retenue. Les autres entrées non
 > marquées (couteau à huître laser, religions/athéisme, mort de Shepherd face aux
 > Cultivateurs, Terre super-ordinateur, drive à improbabilité, renommage en
 > « Matrixator ») ne sont **pas retenues** : l'univers du jeu est jugé déjà
@@ -56,34 +56,34 @@
   comme un upgrade "raté" qui donne un petit bonus de saveur (ou un mini-malus
   comique) puis disparait, sans casser l'équilibrage. Lien possible avec les
   crises légères (section 6).
-- **Religions** (ère 12) : un sous-système discret ou une chaine d'évènements
+- **Religions** (ère 13 (`e12`)) : un sous-système discret ou une chaine d'évènements
   (apparition -> influence -> déclin), aboutissant à une société laïque comme
   jalon de "maturité" narrative voulu par le porteur du projet.
 - **"Pas de panique" (H2G2)** : à afficher sur l'écran de **crise/régression**
   (section 6). C'est le cas rare d'un clin d'oeil qui sert aussi l'UX : il
   dédramatise le revers et rappelle au joueur que le rebond est prévu. Réglable
   via le tag d'évènement (peut n'apparaitre qu'une fois sur N crises).
-- **Terre-ordinateur + 42 (H2G2)** : la Terre (ères 4-5) peut être présentée
+- **Terre-ordinateur + 42 (H2G2)** : la Terre (ères 5-6 (`e4`-`e5`)) peut être présentée
   comme un super-calculateur cherchant la Grande Question, et le nombre **42**
-  semé en easter egg. Belle résonance avec la fin (ère 19) : tout l'univers
+  semé en easter egg. Belle résonance avec la fin (ère 19 (`e18`)) : tout l'univers
   comme un calcul, interrompu par une bêtise domestique.
-- **Épice / Salakis** (ère 16) : au-delà du clin d'oeil, l'épice peut être une
+- **Épice / Salakis** (ère 17 (`e16`)) : au-delà du clin d'oeil, l'épice peut être une
   **ressource du réseau** (rare, produite par une chaîne dédiée via les vers de
   vase) requise pour débloquer ou accélérer l'expansion galactique. Voir le
   modèle de ressources dans [GAME-DESIGN.md](./GAME-DESIGN.md) section 3.1.
 - **Galets peints de l'infini** : chacun peut correspondre à un domaine
   fondamental du jeu, ancré dans une ère :
-  - Espace -> conquête spatiale / intergalactique (ères 15-17)
+  - Espace -> conquête spatiale / intergalactique (ères 16-18 (`e15`-`e17`))
   - Temps -> vitesse de jeu / rendement idle
   - Réalité -> transmutation de ressources (le réseau, section 3.1)
   - Pouvoir -> multiplicateur de production global
-  - Esprit -> intelligence / recherche (ères 11, 14)
-  - Âme -> vie / biomasse (ères 6-10)
+  - Esprit -> intelligence / recherche (ères 12, 15 (`e11`, `e14`))
+  - Âme -> vie / biomasse (ères 7-11 (`e6`-`e10`))
   Idée méta : on les **gagne au fil des prestiges** (lien avec les Échos), ils
   brillent en **octarine**, et les réunir tous débloque un effet puissant (un
   "claquement de doigts" optionnel, qui pourrait même être une crise-récompense
   assumée, cf. section 6). Collection longue durée qui récompense la rejouabilité.
-  - **Galet de la diversité (implémenté, ère 9)** : au-delà des six pierres, un
+  - **Galet de la diversité (implémenté, ère 10 (`e9`))** : au-delà des six pierres, un
     galet peint **arc-en-ciel** trouvé en cliquant dessus sur le tapis du widget
     cambrien (l'explosion de la diversité = l'explosion de la Complexité, qu'il
     octuple). Son foyer reste le réceptacle ; son effet se matérialise sous le
@@ -97,7 +97,7 @@
   prestige). Tag couleur `--octarine` déjà posé dans `src/theme.css`. Un
   tooltip peut souffler qu'elle n'est "visible que par les sorciers et les
   chats".
-- **Cultivateurs / effet de masse** (ères 16-17) : intégrer aux widgets
+- **Cultivateurs / effet de masse** (ères 17-18 (`e16`-`e17`)) : intégrer aux widgets
   spatiaux (carte galactique, toile cosmique) ; la lutte contre les Cultivateurs
   peut être un évènement marquant (voire une crise) de l'ère intergalactique.
 
@@ -116,7 +116,7 @@ Citations dont la version officielle est connue :
 | Lavoisier | « Rien ne se perd, rien ne se crée, tout se transforme » | "Nothing is lost, nothing is created, everything is transformed" |
 | H2G2 (Don't Panic) | « Pas de panique » | "Don't Panic" |
 | Asimov (fin) | « Que la lumière soit » | "Let there be light" |
-| Tsiolkovski (ère 15) | « La Terre est un berceau, pas une demeure » | "Earth is the cradle of humanity, but one cannot live in the cradle forever" |
+| Tsiolkovski (ère 16 (`e15`)) | « La Terre est un berceau, pas une demeure » | "Earth is the cradle of humanity, but one cannot live in the cradle forever" |
 
 Jeux de mots à **réinventer** en anglais (ne pas traduire mot à mot) :
 

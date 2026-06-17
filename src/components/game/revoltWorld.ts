@@ -24,7 +24,7 @@ const WALK_SPEED = 44
 const CONTACT_R2 = 7 * 7
 const HIT_CD_MS = 360
 const MAX_HITS = 3
-export const BLINK_MS = 240
+const BLINK_MS = 240
 
 // Tiered seating (gradins), front row at the bottom. Drawn by RevoltGame.
 const SEAT_COLS = 10

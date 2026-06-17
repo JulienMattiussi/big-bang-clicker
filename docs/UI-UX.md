@@ -108,19 +108,31 @@ qui change selon l'ère active.
 ┌───────────────────────────────────────────────────────────┐
 │  Barre haute : titre de l'ère active · Complexité · Échos  │
 ├───────────┬───────────────────────────────────┬───────────┤
-│ Ressources│                                   │ Upgrades /│
-│ + flux    │      SCÈNE (widget iconique)      │ achats    │
-│ nets      │      de l'ère active              │ de l'ère  │
+│ Ressources│                                   │  Achats   │
+│ + flux    │      SCÈNE (widget iconique)      │ de l'ère  │
+│ nets      │      de l'ère active              │           │
 │ (par ère) │                                   │           │
 ├───────────┴───────────────────────────────────┴───────────┤
 │  Navigation entre ères débloquées (onglets / frise)        │
 └───────────────────────────────────────────────────────────┘
 ```
 
+Le **titre de l'ère** est préfixé de son numéro (1-based) : « Ère N : <nom> »,
+dans l'en-tête comme dans les infobulles d'onglets.
+
+La disposition des trois zones dépend d'un paramètre `layout` propre à chaque ère
+(`compact` | `wide` | `wide-roomy` | `wide-split`, voir
+`components/layout/eraLayout.ts`). En **compact**, le widget est centré dans une
+rangée à trois colonnes (ressources | scène | achats), comme ci-dessus. Dans les
+variantes **wide**, le widget passe pleine largeur en haut, et une rangée
+ressources | machines s'affiche en dessous (la colonne ressources s'élargit en
+`wide-roomy`, le panneau machines adopte un découpage asymétrique en
+`wide-split`).
+
 - **Panneau ressources** : liste des ressources avec **production nette**
   (+entrées / -consommation), pour rendre lisible le réseau de combinaison.
 - **Scène centrale** : le widget iconique de l'ère.
-- **Panneau achats** : générateurs, convertisseurs, upgrades de l'ère.
+- **Panneau achats** : générateurs et convertisseurs de l'ère.
 - **Navigation** : la frise n'affiche **que les ères débloquées**
   (cohabitation) ; l'ère active reçoit le focus (léger bonus, voir
   [GAME-DESIGN.md](./GAME-DESIGN.md)). **Aucune ère future n'est montrée ni

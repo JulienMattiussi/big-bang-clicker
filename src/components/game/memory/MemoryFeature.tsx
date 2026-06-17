@@ -23,7 +23,7 @@ export function MemoryFeature() {
       (s.defs.eras.find((e) => e.id === s.state.currentEraId) ?? s.defs.eras[0])?.icon ?? 'flame',
   )
   // The next attempt's level shapes the emblem: deck size (21/42) and set size.
-  const cfg = useGameStore((s) => MEMORY_LEVELS[memoryLevel(s.state, s.state.currentEraId)])
+  const cfg = useGameStore((s) => MEMORY_LEVELS[memoryLevel(s.state, s.state.currentEraId)]!)
   const digits: [string, string] = cfg.cards === 21 ? ['2', '1'] : ['4', '2']
   const highlight = useMemoryStore((s) => s.highlight)
   const clearHighlight = useMemoryStore((s) => s.clearHighlight)

@@ -43,9 +43,9 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
   const maxed = useGameStore((s) => memoryEraMaxed(s.state, s.state.currentEraId))
   // The Force pebble (octarine), when active, drives this game's discount + jokers.
   const force = useGameStore((s) => memoryGalet(s.state, s.defs))
-  const upcomingCfg = MEMORY_LEVELS[upcomingLevel]
+  const upcomingCfg = MEMORY_LEVELS[upcomingLevel]!
 
-  const era = defs.eras.find((e) => e.id === currentEraId) ?? defs.eras[0]
+  const era = defs.eras.find((e) => e.id === currentEraId) ?? defs.eras[0]!
   const mainRes = era ? defs.resources[era.clickResource] : undefined
   const mainName = mainRes ? t(mainRes.nameKey as TranslationKey) : ''
   const eraName = era ? t(era.nameKey as TranslationKey) : ''
@@ -56,7 +56,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
     const discovered = useGameStore.getState().state.discovered
     const pool = Object.keys(discovered)
       .filter((id) => discovered[id])
-      .map((id) => defs.resources[id])
+      .map((id) => defs.resources[id]!)
       .filter(Boolean)
     shuffle(pool)
     if (pool.length < cfg.symbols) {
@@ -89,7 +89,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
     if (!startMemoryGame()) return
     // Capture the level afresh (it may have just advanced after a previous win).
     const lvl = memoryLevel(useGameStore.getState().state, era?.id ?? '')
-    const config = MEMORY_LEVELS[lvl]
+    const config = MEMORY_LEVELS[lvl]!
     setCfg(config)
     setCards(makeDeck(config))
     setMistakes(0)
@@ -105,7 +105,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
     // The set in progress = cards already face-up but not yet validated. Derived
     // from the cards themselves (not a separate state) so it can never desync.
     const inProgress = cards.filter((c) => c.flipped && !c.matched)
-    const setId = inProgress.length > 0 ? inProgress[0].res.id : card.res.id
+    const setId = inProgress.length > 0 ? inProgress[0]!.res.id : card.res.id
     const matches = card.res.id === setId
     const count = inProgress.length + 1
 

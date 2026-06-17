@@ -18,6 +18,9 @@ preview: build ## Preview production build locally
 lint: ## Run ESLint
 	npm run lint
 
+knip: ## Find unused files, exports and dependencies
+	npm run knip
+
 format: ## Format code with Prettier
 	npm run format
 
@@ -54,7 +57,7 @@ sim-view: ## Show the simulation viewer URL (needs `make start` running)
 
 fix: format lint ## Format and lint all code
 
-check: build lint typecheck test-unit ## Run all checks (build, lint, typecheck, unit tests)
+check: build lint typecheck knip test-unit ## Run all checks (build, lint, typecheck, knip, unit tests)
 	@echo "All checks passed!"
 
 clean: ## Remove build artifacts and dependencies

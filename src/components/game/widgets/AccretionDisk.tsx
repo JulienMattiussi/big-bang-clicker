@@ -110,7 +110,7 @@ export function AccretionDisk({ era }: { era: EraDef }) {
       const tt = (now - start) / 1000
       const cs = clumps.current
       for (let i = 0; i < cs.length; i++) {
-        const c = cs[i]
+        const c = cs[i]!
         if (c.progress > 0 && now - c.lastTouch > SUSTAIN_MS) c.progress = 0
         const theta = c.phase + tt * c.speed
         const x = CX + c.rx * Math.cos(theta)
@@ -170,7 +170,7 @@ export function AccretionDisk({ era }: { era: EraDef }) {
     // Over the cap, the oldest solid planet fades out (then is removed) rather
     // than vanishing abruptly.
     const solid = planetsRef.current.filter((p) => !p.fading)
-    const fadeId = solid.length + 1 > MAX_PLANETS ? solid[0].id : undefined
+    const fadeId = solid.length + 1 > MAX_PLANETS ? solid[0]!.id : undefined
     setPlanets((ps) => {
       const next = [...ps, planet]
       return fadeId === undefined
@@ -180,7 +180,7 @@ export function AccretionDisk({ era }: { era: EraDef }) {
     if (fadeId !== undefined) {
       window.setTimeout(() => setPlanets((ps) => ps.filter((p) => p.id !== fadeId)), PLANET_FADE_MS)
     }
-    setBurst({ id: nextId.current++, x: at.x, y: at.y, color: PLANET_COLORS[colorIndex] })
+    setBurst({ id: nextId.current++, x: at.x, y: at.y, color: PLANET_COLORS[colorIndex]! })
   }
 
   const accrete = (e: MouseEvent) => {
@@ -195,15 +195,15 @@ export function AccretionDisk({ era }: { era: EraDef }) {
     if (keyboard) {
       let bp = -1
       for (let i = 0; i < cs.length; i++) {
-        if (cs[i].progress > bp) {
-          bp = cs[i].progress
+        if (cs[i]!.progress > bp) {
+          bp = cs[i]!.progress
           hit = i
         }
       }
     } else {
       let bestD = HIT_R
       for (let i = 0; i < cs.length; i++) {
-        const d = Math.hypot(px - pos.current[i].x, py - pos.current[i].y)
+        const d = Math.hypot(px - pos.current[i]!.x, py - pos.current[i]!.y)
         if (d < bestD) {
           bestD = d
           hit = i
@@ -212,14 +212,14 @@ export function AccretionDisk({ era }: { era: EraDef }) {
     }
 
     if (hit >= 0) {
-      const c = cs[hit]
-      const at = keyboard ? pos.current[hit] : { x: px, y: py }
+      const c = cs[hit]!
+      const at = keyboard ? pos.current[hit]! : { x: px, y: py }
       c.lastTouch = performance.now()
       c.progress += 1
       addPuff(at.x, at.y)
       if (c.progress >= PLANET_CLICKS) {
         complete()
-        spawnPlanet(c.colorIndex, pos.current[hit])
+        spawnPlanet(c.colorIndex, pos.current[hit]!)
         c.progress = 0
         // The clump scatters and re-forms elsewhere, a new colour seed.
         c.phase = Math.random() * Math.PI * 2
@@ -307,7 +307,7 @@ export function AccretionDisk({ era }: { era: EraDef }) {
               data-planet={p.id}
               style={{ opacity: p.fading ? 0 : 1, transition: `opacity ${PLANET_FADE_MS}ms ease` }}
             >
-              <circle className="pop-in" r="2.8" fill={PLANET_COLORS[p.colorIndex]} />
+              <circle className="pop-in" r="2.8" fill={PLANET_COLORS[p.colorIndex]!} />
               {/* Shaded terminator (makes it a sphere, not a flat tint). */}
               <circle r="2.8" fill="url(#acc-shade)" />
               <circle r="0.7" cx="-1" cy="-1.1" fill="var(--color-fg)" opacity="0.45" />
