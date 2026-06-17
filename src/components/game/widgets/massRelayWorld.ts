@@ -42,6 +42,10 @@ export function angularGap(a: number, b: number): number {
 }
 
 export function step(w: RelayWorld, dt: number): RelayWorld {
+  // Idle: no ship in flight, no miss-flash fading, core not yet full to spin the
+  // beam. Nothing advances, so return the SAME reference - setState then bails out
+  // and skips the re-render (the widget steps 20x/s, even when untouched).
+  if (w.launch < 0 && w.result !== 'miss' && w.charge < 100) return w
   const n = { ...w }
   if (n.launch >= 0) {
     n.launch += dt / LAUNCH_TIME

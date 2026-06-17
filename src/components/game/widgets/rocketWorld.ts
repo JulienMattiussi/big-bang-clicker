@@ -120,6 +120,14 @@ export function freshWorld(): World {
 /** Advances every in-flight ship by dt. `landedTotal` grows by each ship that just
  *  landed safely this step, so the caller can reward the delta. */
 export function step(world: World, dt: number): World {
+  // Idle: nothing in flight and the pad rocket has fully slid in but is not yet
+  // thrusting - step would only re-clone an unchanged world. Return the SAME
+  // reference so setState skips the re-render (the widget steps continuously,
+  // even while the player is just waiting on the pad).
+  if (!world.slots[1] && !world.slots[2] && !world.slots[3]) {
+    const pad = world.slots[0]
+    if (pad && pad.arrive >= 100 && pad.thrust < 100) return world
+  }
   const slots = [...world.slots]
   let nextId = world.nextId
   let lastColor = world.lastColor

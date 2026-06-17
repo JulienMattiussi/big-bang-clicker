@@ -166,6 +166,8 @@ export const en: Translations = {
   'massrelay.aligned': 'Align the beam with a galaxy!',
   'massrelay.hint.charge': 'Click to charge the mass-effect relay.',
   'massrelay.hint.fire': 'Catapult a ship when the beam crosses a galaxy.',
+  'unification.hint':
+    'Click the core to unify. Each spoke is an era converging: lit while it still feeds the universe-city.',
 
   'invent.title': 'Inventions',
   'invent.gauge': 'Next invention',

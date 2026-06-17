@@ -35,7 +35,7 @@ function Ship({ size }: { size: number }): ReactElement {
  * later era (the fleet grows as humanity spreads).
  */
 export function CosmosScene({ eraIndex }: { eraIndex: number }): ReactElement {
-  const count = Math.max(1, 2 * (eraIndex - 14)) // e15:2, e16:4, e17:6
+  const count = ({ 15: 2, 16: 8, 17: 16 } as Record<number, number>)[eraIndex] ?? 2
   const rng = mulberry32(900 + eraIndex)
   const VH_PER_VW = 0.5625 // 16:9, to turn the path angle into a visual heading
   const ships = Array.from({ length: count }, () => {

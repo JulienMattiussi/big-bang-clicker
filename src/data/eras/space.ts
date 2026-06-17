@@ -40,6 +40,7 @@ const bundles: EraBundle[] = [
     uiTier: 'space',
     // Era icon (grand unification) kept distinct from its resources.
     icon: 'unification',
+    widget: 'unification',
     base: { id: 'district', icon: 'district', tier: 19 },
     combined: { id: 'universeCity', icon: 'universe-city', tier: 21 },
     consumes: 'federation',

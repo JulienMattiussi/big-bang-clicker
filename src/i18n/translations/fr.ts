@@ -167,6 +167,8 @@ export const fr = {
   'massrelay.aligned': 'Aligne le faisceau sur une galaxie !',
   'massrelay.hint.charge': 'Clique pour charger le relais à effet de masse.',
   'massrelay.hint.fire': 'Catapulte un vaisseau quand le faisceau croise une galaxie.',
+  'unification.hint':
+    'Clique le cœur pour unifier. Chaque rayon est une ère qui converge : allumé tant qu’elle alimente la ville-univers.',
 
   'invent.title': 'Inventions',
   'invent.gauge': 'Prochaine invention',

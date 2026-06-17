@@ -30,7 +30,7 @@
 | (Histoire des religions) | **Naissance et disparition de religions** au fil de la société ; la société la plus évoluée devient **athée** | 12 (Sociétés) | Arc narratif / évènements |
 | Mass Effect | Le **Commandant Shepard** meurt en luttant contre une civilisation hostile, les **Cultivateurs** | 16 (galactique) / 17 (intergalactique) | Évènement narratif / clin d'oeil |
 | Mass Effect | **Intégré (e16)** : le **capitaine Shepherd** découvre de gigantesques **relais à effet de masse** pour voyager de galaxie en galaxie (modale de transition + widget de l'ère : charger le relais, catapulter un vaisseau) | 16 (Voyage intergalactique) | Techno + widget / clin d'oeil |
-| Dune | L'**épice**, ressource clé de la conquête galactique, produite par les **vers de vase** de la planète **Salakis** | 16 (Galactique) | Ressource nommée / clin d'oeil |
+| Dune | **À venir (e17)** : une **crise des trafiquants d'épice** (l'épice convoitée, les vers de vase, la planète **Salakis**) | 17 (La grande unification) | Crise / clin d'oeil |
 | H2G2 | **"Pas de panique"** affiché au déclenchement d'une crise (régression) : un clin d'oeil qui **rassure** le joueur au pire moment | Transverse (crises, section 6) | **Humour utile (UX)** |
 | H2G2 | Le nombre **42** comme "réponse" cachée : jalon/easter egg secret (ex : à 42 d'une ressource ou de Complexité, un message énigmatique) | Transverse | Easter egg / nombre culte |
 | H2G2 | La Terre est en réalité un **super-ordinateur** construit pour calculer la Grande Question (et un dirigeant l'éteindra, cf. ère 19) | 4-5 (Terre) | Clin d'oeil narratif |
@@ -41,6 +41,13 @@
 | Spartacus | La révolte des esclaves est menée par un certain **Starpacus** | 12 (Sociétés) | Évènement nommé / clin d'oeil |
 | The Matrix | Une IA toute-puissante, le **Matrixator**, se soulève : crise (régression) | 14 (Technologies) | Crise nommée / clin d'oeil |
 | Lavoisier | « Rien ne se perd, rien ne se crée, tout se transforme » en accroche de l'ère des forges stellaires (forme popularisée) | 3 (Forges) | Citation / accroche |
+
+> **Statut :** les lignes marquées « Intégré » sont en jeu. **Dune** (crise des
+> trafiquants d'épice, ère 17) est la prochaine retenue. Les autres entrées non
+> marquées (couteau à huître laser, religions/athéisme, mort de Shepherd face aux
+> Cultivateurs, Terre super-ordinateur, drive à improbabilité, renommage en
+> « Matrixator ») ne sont **pas retenues** : l'univers du jeu est jugé déjà
+> suffisamment garni en clins d'oeil.
 
 ## Idées de mise en scène
 

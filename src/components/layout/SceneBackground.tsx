@@ -7,6 +7,7 @@ import { LandScene } from './scenes/LandScene'
 import { CivilizationScene } from './scenes/CivilizationScene'
 import { CosmosScene } from './scenes/CosmosScene'
 import { SingularityScene } from './scenes/SingularityScene'
+import { usePageHidden } from '@/hooks/usePageHidden'
 
 /**
  * Ambient scene background, rendered behind the whole UI. It changes by ERA GROUP
@@ -52,10 +53,14 @@ const SCENES: Record<Scene, (props: { eraIndex: number }) => ReactElement> = {
 export function SceneBackground({ eraIndex }: { eraIndex: number }): ReactElement {
   const scene = sceneFor(eraIndex)
   const Scene = SCENES[scene]
+  // Freeze the ambient animations while the tab is hidden (nothing to composite).
+  const hidden = usePageHidden()
   return (
     <div
       aria-hidden
-      className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-bg transition-colors duration-700"
+      className={`pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-bg transition-colors duration-700 ${
+        hidden ? 'scene-paused' : ''
+      }`}
     >
       {/* Keyed so switching era groups fades the new scene in. */}
       <div key={scene} className="bg-scene absolute inset-0">

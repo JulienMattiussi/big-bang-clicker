@@ -3,16 +3,12 @@ import { useEraMechanic } from './useEraMechanic'
 import { WidgetGalet } from './WidgetGalet'
 import { useTranslation } from '@/i18n/useTranslation'
 import { addCharge, ALIGN_TOL, angularGap, fire, freshRelay, step, type RelayWorld } from './massRelayWorld'
-import { useGameStore } from '@/store/gameStore'
 import type { EraDef } from '@/lib/types'
 
 const STEP_MS = 50
 const CX = 50
 const CY = 50
 const GAL_R = 38 // galaxy orbit radius around the relay
-// After this many federations the next target is the encounter crisis (the hooded
-// fighters). Kept low so it fires early, before the first factory level is afforded.
-const ENCOUNTER_AT = 1
 
 const STARS = [
   [12, 18],
@@ -58,8 +54,6 @@ function Galaxy({ x, y, near }: { x: number; y: number; near: boolean }): ReactE
 export function MassRelay({ era }: { era: EraDef }): ReactElement {
   const { t } = useTranslation()
   const { verb, gainBase, gainCombinedScaled } = useEraMechanic(era)
-  const triggerCrisis = useGameStore((s) => s.triggerCrisis)
-  const encounterDone = useGameStore((s) => !!s.state.crises['encounter']?.resolved)
   const [world, setWorld] = useState<RelayWorld>(freshRelay)
 
   useEffect(() => {
@@ -77,24 +71,11 @@ export function MassRelay({ era }: { era: EraDef }): ReactElement {
   }, [world.arrived, gainCombinedScaled])
 
   const charged = world.charge >= 100
-  // Until the encounter crisis is overcome, the target after ENCOUNTER_AT galaxies
-  // is the encounter itself: catapulting into it triggers the crisis instead of
-  // federating.
-  const isEncounter = !encounterDone && world.arrived >= ENCOUNTER_AT
   const tap = () => {
     if (world.launch >= 0) return
     if (!charged) {
       setWorld(addCharge)
       gainBase(1)
-      return
-    }
-    if (isEncounter) {
-      if (angularGap(world.spin, world.target) <= ALIGN_TOL) {
-        triggerCrisis('encounter')
-        setWorld((w) => ({ ...w, charge: 0 }))
-      } else {
-        setWorld(fire) // mistimed: bleed charge
-      }
       return
     }
     setWorld(fire)
@@ -122,21 +103,7 @@ export function MassRelay({ era }: { era: EraDef }): ReactElement {
         >
           <svg viewBox="0 0 100 100" className="h-80 w-full" role="img" aria-hidden>
             <StarField />
-            {isEncounter ? (
-              <g transform={`translate(${g.x} ${g.y})`}>
-                <circle
-                  r={near ? 9 : 7}
-                  fill="none"
-                  stroke="var(--color-accent)"
-                  strokeWidth="1.4"
-                  opacity={near ? 1 : 0.6}
-                />
-                <path d="M-3.5 4 C -4 0 -3.6 -3 -2 -4 C -0.4 -3 0 0 -0.5 4 Z" fill="var(--color-fg)" opacity="0.85" />
-                <path d="M3.5 4 C 4 0 3.6 -3 2 -4 C 0.4 -3 0 0 0.5 4 Z" fill="var(--color-fg)" opacity="0.85" />
-              </g>
-            ) : (
-              <Galaxy x={g.x} y={g.y} near={near} />
-            )}
+            <Galaxy x={g.x} y={g.y} near={near} />
 
             {charged && world.launch < 0 ? (
               <line

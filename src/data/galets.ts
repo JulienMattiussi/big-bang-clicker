@@ -80,7 +80,7 @@ export const galetDefs: GaletDef[] = [
     loreKey: 'galet.force.lore',
     color: 'var(--octarine)',
     motif: 'rebel',
-    shape: 3, // the saucer-ish freighter silhouette
+    shape: 3, // the open-mouthed creature silhouette
     // Granted by overcoming the era-16 encounter crisis (the hooded fighters).
     discovery: 'crisis',
     discoverEraId: 'e16',

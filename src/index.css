@@ -21,6 +21,14 @@
   }
 }
 
+/* Pause every ambient scene animation while the tab is hidden: nothing is on
+   screen, so there is no reason to keep compositing them for hours. Scoped to the
+   decorative background subtree (set by SceneBackground). */
+.scene-paused,
+.scene-paused * {
+  animation-play-state: paused !important;
+}
+
 /* Floating click feedback (the "+1" that rises and fades). */
 @keyframes float-up {
   from {

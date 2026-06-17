@@ -161,14 +161,19 @@ export const crisisDefs: CrisisDef[] = [
     },
   },
   // Era 16: a chance encounter on a far galaxy with hooded, torch-wielding types
-  // who turn out surprisingly tough. Triggered by the relay widget (reaching the
-  // encounter galaxy) so it fires early and once; overcoming it grants the Force
-  // pebble. Hits the era's own resources, then a healthy rebound.
+  // who turn out surprisingly tough. Fires automatically once Federations pass a
+  // palier (gate), so it lands well into the era rather than at its start, and is
+  // guaranteed. Overcoming it grants the Force pebble. Hits the era's own
+  // resources, then a healthy rebound.
   {
     id: 'encounter',
     eraId: 'e16',
-    risk: { threshold: 1 },
-    trigger: 'player',
+    risk: {
+      sourceResource: 'federation',
+      threshold: 1,
+      gate: { resource: 'federation', level: 500_000 },
+    },
+    trigger: 'threshold',
     regression: [
       { type: 'resetResource', target: 'ship', value: 0.3 },
       { type: 'resetResource', target: 'federation', value: 0.3 },

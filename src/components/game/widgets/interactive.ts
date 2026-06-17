@@ -15,6 +15,7 @@ import { WorldMap } from './WorldMap'
 import { InventionsWidget } from './InventionsWidget'
 import { RocketLaunch } from './RocketLaunch'
 import { MassRelay } from './MassRelay'
+import { UnificationWheel } from './UnificationWheel'
 import type { EraDef } from '@/lib/types'
 
 /**
@@ -40,6 +41,7 @@ export const INTERACTIVE_WIDGETS: Record<string, (props: { era: EraDef }) => Rea
   inventions: InventionsWidget,
   rocket: RocketLaunch,
   massrelay: MassRelay,
+  unification: UnificationWheel,
 }
 
 /**
@@ -57,6 +59,7 @@ const FULLWIDTH_WIDGETS = new Set([
   'inventions',
   'rocket',
   'massrelay',
+  'unification',
 ])
 
 export function isFullWidthWidget(widget: string): boolean {
