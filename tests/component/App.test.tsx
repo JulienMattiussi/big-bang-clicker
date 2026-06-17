@@ -9,7 +9,7 @@ describe('App', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     useI18nStore.setState({ locale: 'fr' })
-    useGameStore.setState({ state: createInitialState(0, 'e0') })
+    useGameStore.setState({ state: createInitialState(0, 'e1') })
   })
   afterEach(() => {
     vi.useRealTimers()

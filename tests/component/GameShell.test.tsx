@@ -9,7 +9,7 @@ import { createInitialState } from '@/lib/save'
 describe('GameShell', () => {
   beforeEach(() => {
     useI18nStore.setState({ locale: 'fr' })
-    useGameStore.setState({ state: createInitialState(0, 'e0') })
+    useGameStore.setState({ state: createInitialState(0, 'e1') })
   })
 
   it('le clic sur le verbe produit la ressource de clic', async () => {

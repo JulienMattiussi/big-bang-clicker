@@ -11,7 +11,7 @@ const defs: GameDefs = {
   crises: {
     revolte: {
       id: 'revolte',
-      eraId: 'e12',
+      eraId: 'e13',
       risk: { sourceResource: 'esclaves', threshold: 10, telegraph: true },
       trigger: 'threshold',
       regression: [{ type: 'resetResource', target: 'production', value: 0 }],
@@ -76,7 +76,7 @@ describe('risque et résolution', () => {
       crises: {
         ext: {
           id: 'ext',
-          eraId: 'e10',
+          eraId: 'e11',
           risk: { sourceResource: 'fauna', threshold: 100, telegraph: true, floor: 2000 },
           trigger: 'threshold',
           regression: [],

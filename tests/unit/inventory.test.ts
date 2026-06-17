@@ -4,8 +4,8 @@ import { makeState, makeEra, makeDefs } from '../helpers'
 
 const defs = makeDefs({
   eras: [
-    makeEra({ id: 'e6', clickResource: 'microbe', resources: ['microbe', 'enzyme'] }),
-    makeEra({ id: 'e7', clickResource: 'beast', resources: ['beast'] }),
+    makeEra({ id: 'e7', clickResource: 'microbe', resources: ['microbe', 'enzyme'] }),
+    makeEra({ id: 'e8', clickResource: 'beast', resources: ['beast'] }),
   ],
 })
 
@@ -24,26 +24,26 @@ describe('backpackUnlocked', () => {
 
 describe('knownResourcesByEra', () => {
   it('ne liste que les ères débloquées, dans l ordre', () => {
-    const groups = knownResourcesByEra(makeState({ unlockedEras: ['e6'] }), defs)
-    expect(groups.map((g) => g.era.id)).toEqual(['e6'])
+    const groups = knownResourcesByEra(makeState({ unlockedEras: ['e7'] }), defs)
+    expect(groups.map((g) => g.era.id)).toEqual(['e7'])
   })
 
   it('ne garde que les ressources révélées (clickResource collante, le reste si découvert)', () => {
     // Seule la ressource de clic est révélée d office ; enzyme reste cachée.
-    const base = knownResourcesByEra(makeState({ unlockedEras: ['e6'] }), defs)
+    const base = knownResourcesByEra(makeState({ unlockedEras: ['e7'] }), defs)
     expect(base[0].resources).toEqual(['microbe'])
 
     // enzyme découverte -> elle apparaît.
     const withEnzyme = knownResourcesByEra(
-      makeState({ unlockedEras: ['e6'], discovered: { enzyme: true } }),
+      makeState({ unlockedEras: ['e7'], discovered: { enzyme: true } }),
       defs,
     )
     expect(withEnzyme[0].resources).toEqual(['microbe', 'enzyme'])
   })
 
   it('inclut chaque ère débloquée via sa ressource de clic', () => {
-    const groups = knownResourcesByEra(makeState({ unlockedEras: ['e6', 'e7'] }), defs)
-    expect(groups.map((g) => g.era.id)).toEqual(['e6', 'e7'])
+    const groups = knownResourcesByEra(makeState({ unlockedEras: ['e7', 'e8'] }), defs)
+    expect(groups.map((g) => g.era.id)).toEqual(['e7', 'e8'])
     expect(groups[1].resources).toEqual(['beast'])
   })
 })

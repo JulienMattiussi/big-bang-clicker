@@ -71,7 +71,7 @@ src/
 │   ├── memory.ts         # Mini-jeu de mémoire (ère 7+) : déblocage, coût (10% Complexité), 3 niveaux par ère (×2/×4/×8) ; helpers purs partagés avec le sim
 │   └── inventory.ts      # Sac à dos : déblocage (apparition d'une ressource) + ressources connues groupées par ère
 ├── data/                 # Contenu data-driven (modifiable sans toucher au moteur)
-│   ├── eras/             # Toutes les ères via factory.ts (buildEra) : cosmos (e0-4), life, civilization, space, transcendence ; easing tardif (LATE_FROM, prod ↑ / conso ↓ composées) à partir de l'ère 11 seulement
+│   ├── eras/             # Toutes les ères via factory.ts (buildEra) : cosmos (e1-5), life, civilization, space, transcendence ; easing tardif (LATE_FROM, prod ↑ / conso ↓ composées) à partir de l'ère 12 seulement
 │   ├── crises.ts         # Définitions de crises
 │   ├── metaUpgrades.ts   # Définitions des méta-upgrades
 │   ├── galets.ts         # Définitions des galets de l'infini (collectibles conservés au prestige)

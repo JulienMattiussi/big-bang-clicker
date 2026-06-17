@@ -21,13 +21,13 @@ import type { EraDef, GameDefs } from '@/lib/types'
 const defs: GameDefs = {
   eras: [],
   resources: {
-    quark: { id: 'quark', eraId: 'e0', nameKey: '', tier: 0, isBase: true },
-    proton: { id: 'proton', eraId: 'e0', nameKey: '', tier: 1 },
+    quark: { id: 'quark', eraId: 'e1', nameKey: '', tier: 0, isBase: true },
+    proton: { id: 'proton', eraId: 'e1', nameKey: '', tier: 1 },
   },
   generators: {
     quarkGen: {
       id: 'quarkGen',
-      eraId: 'e0',
+      eraId: 'e1',
       nameKey: '',
       output: 'quark',
       baseRate: 1,
@@ -37,7 +37,7 @@ const defs: GameDefs = {
   converters: {
     fuse: {
       id: 'fuse',
-      eraId: 'e0',
+      eraId: 'e1',
       nameKey: '',
       inputs: [{ resource: 'quark', amount: 3 }],
       outputs: [{ resource: 'proton', amount: 1 }],
@@ -201,18 +201,18 @@ describe('décroissance de Complexité par ère', () => {
   const decayDefs: GameDefs = {
     ...defs,
     eras: [
-      { id: 'e0', unlock: {} } as unknown as EraDef,
-      { id: 'e1', unlock: {} } as unknown as EraDef,
+      { id: 'e1', index: 0, unlock: {} } as unknown as EraDef,
+      { id: 'e2', index: 1, unlock: {} } as unknown as EraDef,
     ],
     resources: {
-      quark: { id: 'quark', eraId: 'e0', nameKey: '', tier: 0, isBase: true },
-      proton: { id: 'proton', eraId: 'e0', nameKey: '', tier: 1 },
-      helium: { id: 'helium', eraId: 'e1', nameKey: '', tier: 1 },
+      quark: { id: 'quark', eraId: 'e1', nameKey: '', tier: 0, isBase: true },
+      proton: { id: 'proton', eraId: 'e1', nameKey: '', tier: 1 },
+      helium: { id: 'helium', eraId: 'e2', nameKey: '', tier: 1 },
     },
     converters: {
       old: {
         id: 'old',
-        eraId: 'e0',
+        eraId: 'e1',
         nameKey: '',
         inputs: [{ resource: 'quark', amount: 1 }],
         outputs: [{ resource: 'proton', amount: 1 }],
@@ -221,7 +221,7 @@ describe('décroissance de Complexité par ère', () => {
       },
       recent: {
         id: 'recent',
-        eraId: 'e1',
+        eraId: 'e2',
         nameKey: '',
         inputs: [{ resource: 'quark', amount: 1 }],
         outputs: [{ resource: 'helium', amount: 1 }],
@@ -232,7 +232,7 @@ describe('décroissance de Complexité par ère', () => {
   }
 
   it('une ère antérieure rapporte 1/50 de la plus récente', () => {
-    const base = { resources: { quark: 100 }, unlockedEras: ['e0', 'e1'] }
+    const base = { resources: { quark: 100 }, unlockedEras: ['e1', 'e2'] }
     const recent = tick(
       stateWith({ ...base, converters: { recent: { level: 1, enabled: true } } }),
       decayDefs,
@@ -279,7 +279,7 @@ describe('calculs consolidés (source unique)', () => {
           loreKey: '',
           color: '',
           motif: '',
-          discoverEraId: 'e0',
+          discoverEraId: 'e1',
           effect: { type: 'complexityMultiplier', maxEraIndex: 0, value: 3 },
         },
       ],
@@ -316,13 +316,13 @@ describe('gel de production et palier pendant une crise', () => {
   const crisisDefs: GameDefs = {
     ...defs,
     eras: [
-      { id: 'e0', unlock: {} } as unknown as EraDef,
-      { id: 'e1', unlock: { complexity: 100 } } as unknown as EraDef,
+      { id: 'e1', unlock: {} } as unknown as EraDef,
+      { id: 'e2', unlock: { complexity: 100 } } as unknown as EraDef,
     ],
     crises: {
       ext: {
         id: 'ext',
-        eraId: 'e0',
+        eraId: 'e1',
         risk: { sourceResource: 'quark', threshold: 10, telegraph: true },
         trigger: 'threshold',
         regression: [{ type: 'resetResource', target: 'proton', value: 0 }],
@@ -357,7 +357,7 @@ describe('gel de production et palier pendant une crise', () => {
   })
 
   it('bloque le franchissement de palier tant qu une crise est déclenchée', () => {
-    const state = stateWith({ unlockedEras: ['e0'], complexity: 150, crises: ready })
+    const state = stateWith({ unlockedEras: ['e1'], complexity: 150, crises: ready })
     expect(canUnlockNextEra(state, crisisDefs)).toBe(false)
     // Résolue, le palier redevient franchissable.
     const cleared = { ...state, crises: { ext: { risk: 100, resolved: true, count: 1 } } }
@@ -371,11 +371,11 @@ describe('gel de production et palier pendant une crise', () => {
 describe('multiplicateurs dérivés (mémoire + crise), rétroactifs', () => {
   const derivedDefs = (reboundValue: number): GameDefs => ({
     ...defs,
-    eras: [{ id: 'e7', clickResource: 'beast', generators: ['beastGen'] } as unknown as EraDef],
+    eras: [{ id: 'e8', clickResource: 'beast', generators: ['beastGen'] } as unknown as EraDef],
     generators: {
       beastGen: {
         id: 'beastGen',
-        eraId: 'e7',
+        eraId: 'e8',
         nameKey: '',
         output: 'beast',
         baseRate: 1,
@@ -385,7 +385,7 @@ describe('multiplicateurs dérivés (mémoire + crise), rétroactifs', () => {
     crises: {
       ext: {
         id: 'ext',
-        eraId: 'e7',
+        eraId: 'e8',
         risk: { threshold: 1, telegraph: false },
         trigger: 'threshold',
         regression: [],
@@ -396,7 +396,7 @@ describe('multiplicateurs dérivés (mémoire + crise), rétroactifs', () => {
   })
 
   it('la mémoire dérive 2^niveau sur la production (rien dans multipliers)', () => {
-    const s = stateWith({ memoryLevels: { e7: 2 } })
+    const s = stateWith({ memoryLevels: { e8: 2 } })
     expect(generatorPerSec(s, derivedDefs(10), 'beastGen', 1)).toBeCloseTo(4) // 2^2
   })
 

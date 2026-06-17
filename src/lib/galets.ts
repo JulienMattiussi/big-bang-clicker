@@ -66,7 +66,7 @@ function galetsAffecting(
   eraId: string,
   type: GaletDef['effect']['type'],
 ): GaletDef[] {
-  const eraIdx = Number(eraId.slice(1)) || 0
+  const eraIdx = defs.eras.find((e) => e.id === eraId)?.index ?? 0
   return defs.galets.filter(
     (g) => state.galets?.[g.id]?.found && g.effect.type === type && eraIdx <= g.effect.maxEraIndex,
   )

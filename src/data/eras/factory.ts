@@ -113,8 +113,7 @@ function cumulativeStep(changePoints: Record<number, number>, eraIdx: number): n
 
 export function buildEra(spec: SimpleEraSpec): EraBundle {
   const { id, base } = spec
-  // Era index (e11 -> 11). Late eras get an easing multiplier; earlier ones get 1.
-  const eraIdx = Number(id.slice(1)) || 0
+  const eraIdx = spec.index
   const prodMult = cumulativeStep(PROD_STEP_FROM, eraIdx)
   const consMult = cumulativeStep(CONS_STEP_FROM, eraIdx)
 

@@ -3,7 +3,7 @@ import { buildEra, type EraBundle } from './factory'
 /** LIFE tier (eras 5 to 10): from prebiotic chemistry to the conquest of land. */
 const bundles: EraBundle[] = [
   buildEra({
-    id: 'e5',
+    id: 'e6',
     index: 5,
     uiTier: 'life',
     icon: 'dna-strand',
@@ -17,7 +17,7 @@ const bundles: EraBundle[] = [
     generatorBase: 50, // cheaper first usine for this era (less grind to start)
   }),
   buildEra({
-    id: 'e6',
+    id: 'e7',
     index: 6,
     uiTier: 'life',
     icon: 'cell',
@@ -30,7 +30,7 @@ const bundles: EraBundle[] = [
     unlockComplexity: 25_000,
   }),
   buildEra({
-    id: 'e7',
+    id: 'e8',
     index: 7,
     uiTier: 'life',
     icon: 'leaf',
@@ -43,7 +43,7 @@ const bundles: EraBundle[] = [
     unlockComplexity: 80_000,
   }),
   buildEra({
-    id: 'e8',
+    id: 'e9',
     index: 8,
     uiTier: 'life',
     // Era icon (complex cell with organelles) kept distinct from its resources (organelle, eukaryote).
@@ -57,7 +57,7 @@ const bundles: EraBundle[] = [
     unlockComplexity: 250_000,
   }),
   buildEra({
-    id: 'e9',
+    id: 'e10',
     index: 9,
     uiTier: 'life',
     icon: 'fish',
@@ -71,7 +71,7 @@ const bundles: EraBundle[] = [
     unlockComplexity: 800_000,
   }),
   buildEra({
-    id: 'e10',
+    id: 'e11',
     index: 10,
     uiTier: 'life',
     icon: 'trees',

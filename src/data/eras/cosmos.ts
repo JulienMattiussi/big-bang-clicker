@@ -10,7 +10,7 @@ const bundles: EraBundle[] = [
   // Big Bang & cooling: cooling the plasma freezes out particles; binding them
   // (confinement) forms the first nucleons.
   buildEra({
-    id: 'e0',
+    id: 'e1',
     index: 0,
     uiTier: 'cosmos',
     icon: 'flame',
@@ -29,7 +29,7 @@ const bundles: EraBundle[] = [
   // Recombination: electrons bind to nucleons (from era 0, which must keep
   // running) to form the first hydrogen atoms. Cross-era chaining.
   buildEra({
-    id: 'e1',
+    id: 'e2',
     index: 1,
     uiTier: 'cosmos',
     icon: 'orbit',
@@ -52,7 +52,7 @@ const bundles: EraBundle[] = [
   // First stars & galaxies: gravity collapses gas clouds; ignition consumes era 1
   // hydrogen to form stars, which assemble into galaxies.
   buildEra({
-    id: 'e2',
+    id: 'e3',
     index: 2,
     uiTier: 'cosmos',
     icon: 'star-cluster',
@@ -83,7 +83,7 @@ const bundles: EraBundle[] = [
   // converters use `res.<element>` keys. Only heavy elements (iron) really pay
   // off in Complexity (high tier); intermediates are low tier on purpose.
   buildEra({
-    id: 'e3',
+    id: 'e4',
     index: 3,
     uiTier: 'cosmos',
     icon: 'hexagon',
@@ -147,7 +147,7 @@ const bundles: EraBundle[] = [
   // Solar system & Earth: gravity accretes dust (enriched with era 3 heavy
   // elements) into planets. A plain single recipe, so the terse form fits.
   buildEra({
-    id: 'e4',
+    id: 'e5',
     index: 4,
     uiTier: 'cosmos',
     icon: 'solar-system',

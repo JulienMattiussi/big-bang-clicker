@@ -33,7 +33,7 @@ Références assumées : **Cell to Singularity** (même thème évolutif),
         seuil atteint ──► nouvelle ère débloquée (nouveau verbe)
                 │
                 ▼
-     ... 19 ères ... ──► ère 19 (e18) : explosion ──► PRESTIGE (New Game+)
+     ... 19 ères ... ──► ère 19 : explosion ──► PRESTIGE (New Game+)
 ```
 
 Chaque ère est une instance du même moteur générique : une ressource locale,
@@ -121,7 +121,7 @@ Complexité **autant que** le stock. La Complexité :
 
 ### 3.3 Monnaie de prestige : les Échos
 
-Au terme de l'ère 19 (`e18`) (la ville-univers explose), le joueur déclenche un
+Au terme de l'ère 19 (la ville-univers explose), le joueur déclenche un
 **nouveau Big Bang**. Tout est remis à zéro (ressources locales, générateurs,
 convertisseurs, ères) SAUF les **Échos**, gagnés en fonction de la Complexité totale
 accumulée durant la partie. Les Échos achètent des **bonus permanents** (méta-
@@ -136,7 +136,7 @@ Formule de prestige (principe, à équilibrer) :
 
 ### 3.4 Mini-jeu de mémoire (puits de Complexité optionnel)
 
-Débloqué à l'**ère 8** (`e7`) (première oxydation), puis disponible dans chaque ère.
+Débloqué à l'**ère 8** (première oxydation), puis disponible dans chaque ère.
 Un jeu de **concentration** (cartes-ressources à apparier) que l'on tente en
 misant **10% de la Complexité** courante. Le réussir **double** (cumulable) la
 production de la **ressource principale de l'ère courante**.
@@ -158,7 +158,7 @@ d'oeil H2G2, voir [NARRATIVE.md](./NARRATIVE.md)) ; le 21 en est la moitié
 ### 3.5 Sac à dos (inventaire global)
 
 Outil de **vue d'ensemble** débloqué en milieu de partie (à l'apparition d'une
-ressource donnée, par défaut les microbes de l'ère 7 (`e6`)), introduit par une modale
+ressource donnée, par défaut les microbes de l'ère 7), introduit par une modale
 d'annonce. Il liste **toutes les ressources connues**, groupées par ère
 (colonnes teintées par palier), avec leur **quantité en temps réel** et un badge
 « ! » si la ressource est en déclin ou figée. Cliquer une ressource **saute à
@@ -175,8 +175,8 @@ Décision clé : **les ères débloquées continuent de tourner en arrière-plan
   [UI-UX.md](./UI-UX.md)).
 - **Chaînage inter-ères** : c'est le mécanisme par défaut, porté par le réseau
   de ressources (section 3.1). La sortie d'une ère est l'entrée d'une autre
-  (ex : les atomes de l'ère 2 (`e1`) alimentent les convertisseurs stellaires de
-  l'ère 3 (`e2`)). Donc une ère ancienne doit continuer de produire pour alimenter les
+  (ex : les atomes de l'ère 2 alimentent les convertisseurs stellaires de
+  l'ère 3). Donc une ère ancienne doit continuer de produire pour alimenter les
   ères récentes ; détail des chaînes dans [PHASES.md](./PHASES.md).
 - L'ère "active" (celle qu'on regarde) reçoit un léger bonus de focus pour
   récompenser l'attention sans pénaliser l'idle.
@@ -239,7 +239,7 @@ débouchent sur un redémarrage **changé et amélioré**. C'est un "mini-presti
 thématique, à l'échelle d'une ère.
 
 **Cohérence thématique** : ces crises sont des **échos réduits de l'explosion
-finale** (ère 19 (`e18`)). Le motif "effondrement puis renaissance augmentée" se répète
+finale** (ère 19). Le motif "effondrement puis renaissance augmentée" se répète
 de façon fractale tout au long du jeu : la complexité progresse par cycles de
 rupture et de rebond, pas en ligne droite. (Le nom de la monnaie de prestige,
 les Échos, prend ici tout son sens.)
@@ -277,30 +277,30 @@ les Échos, prend ici tout son sens.)
 
 ### 6.3 Exemples (détaillés par ère dans [PHASES.md](./PHASES.md))
 
-- **Extinction de masse** (ère 11 (`e10`)) : un clade domine (ex : les dinosaures) puis
+- **Extinction de masse** (ère 11) : un clade domine (ex : les dinosaures) puis
   disparaît dans une extinction ; au rebond, une branche jusque-là mineure
   explose en diversité (ex : les mammifères) et ouvre une voie meilleure.
-- **Esclavage** (ère 13 (`e12`)) : l'esclave est une ressource sur-exploitée ; au-delà
+- **Esclavage** (ère 13) : l'esclave est une ressource sur-exploitée ; au-delà
   d'un seuil, révolte (menée par un certain Starpacus), la société éclate ; les
   ex-esclaves deviennent des citoyens (ressource meilleure), la société repart
   améliorée.
-- **Arme atomique** (ère 15 (`e14`)) : la course à l'armement fait monter le risque ;
+- **Arme atomique** (ère 15) : la course à l'armement fait monter le risque ;
   une bombe éclate, forte régression ; les survivants refondent une société plus
   avancée et résiliente.
-- **Crise écologique** (ère 15 (`e14`)) : l'industrialisation et la sur-exploitation
+- **Crise écologique** (ère 15) : l'industrialisation et la sur-exploitation
   font monter la pollution ; au seuil, effondrement écologique (régression) ;
   une transition durable relance sur des bases plus efficaces et résilientes.
-- **Soulèvement IA** (ère 15 (`e14`)) : une IA toute-puissante (le Matrixator) se
+- **Soulèvement IA** (ère 15) : une IA toute-puissante (le Matrixator) se
   retourne contre ses créateurs ; prise de contrôle des machines (régression) ;
   un alignement avec l'IA relance sur des bases plus puissantes.
-- **Navette spatiale** (ère 16 (`e15`)) : pousser les lancements sans sécurité fait
+- **Navette spatiale** (ère 16) : pousser les lancements sans sécurité fait
   exploser une navette ; le budget est gelé (régression) ; une avancée de
   sécurité relance la conquête sur de meilleures bases.
 
 D'autres crises pourront être ajoutées dans le même esprit (krachs économiques,
 pandémies...), avec parcimonie.
 
-### 6.4 Résolution interactive (implémenté : extinction, ère 11 (`e10`))
+### 6.4 Résolution interactive (implémenté : extinction, ère 11)
 
 Une crise peut se **surmonter par un mini-jeu plein écran** plutôt que par un
 simple bouton. La première crise codée, l'**extinction de masse** :
@@ -330,7 +330,7 @@ simple, puis plus riche). Détail dans [PHASES.md](./PHASES.md).
 > c'est le **moyen manuel d'obtenir une ressource** (bouton "Produire", ou les
 > cases d'un widget comme le tableau périodique). Acheter des niveaux
 > l'**automatise** (elle tourne alors au tick), façon clicker (cliquer puis
-> automatiser). Prototype : le tableau périodique de l'ère 4 (`e3`) (cases cliquables
+> automatiser). Prototype : le tableau périodique de l'ère 4 (cases cliquables
 > qui fusionnent les éléments légers en lourds, dévoilées progressivement ;
 > automatisation achetable dans le panneau des forges).
 
@@ -341,25 +341,25 @@ Vue d'ensemble :
 
 | Ère (`id`) | Thème | Verbe central |
 |----:|-------|---------------|
-| 1 (`e0`) | Big Bang & refroidissement | Refroidir |
-| 2 (`e1`) | Recombinaison (premiers atomes) | Capturer les électrons |
-| 3 (`e2`) | Premières étoiles & galaxies | Effondrer / allumer |
-| 4 (`e3`) | Forges stellaires (éléments lourds) | Forger (Mendeleïev) |
-| 5 (`e4`) | Système solaire & Terre | Accréter / faire entrer en collision |
-| 6 (`e5`) | Terre habitable + briques de la vie | Stabiliser & synthétiser |
-| 7 (`e6`) | Premières vies (procaryotes) | Répliquer / diviser |
-| 8 (`e7`) | Photosynthèse & Grande Oxydation | Oxygéner |
-| 9 (`e8`) | Eucaryotes & endosymbiose | Fusionner / complexifier |
-| 10 (`e9`) | Multicellularité & Cambrien | Assembler des organismes |
-| 11 (`e10`) | Conquête des terres (plantes, animaux) | Faire évoluer / peupler |
-| 12 (`e11`) | Intelligence (préhistoire) | Apprendre / innover |
-| 13 (`e12`) | Sociétés (néolithique, villes) | Organiser / bâtir |
-| 14 (`e13`) | Relations inter-sociétés | Négocier / conquérir |
-| 15 (`e14`) | Technologies | Rechercher / inventer |
-| 16 (`e15`) | Conquête spatiale | Lancer / explorer |
-| 17 (`e16`) | Voyage intergalactique | Coloniser / fédérer / relier les galaxies |
-| 18 (`e17`) | Ville-univers (grande unification) | Unifier / englober |
-| 19 (`e18`) | Explosion (nouveau Big Bang) | Transcender (prestige) |
+| 1 | Big Bang & refroidissement | Refroidir |
+| 2 | Recombinaison (premiers atomes) | Capturer les électrons |
+| 3 | Premières étoiles & galaxies | Effondrer / allumer |
+| 4 | Forges stellaires (éléments lourds) | Forger (Mendeleïev) |
+| 5 | Système solaire & Terre | Accréter / faire entrer en collision |
+| 6 | Terre habitable + briques de la vie | Stabiliser & synthétiser |
+| 7 | Premières vies (procaryotes) | Répliquer / diviser |
+| 8 | Photosynthèse & Grande Oxydation | Oxygéner |
+| 9 | Eucaryotes & endosymbiose | Fusionner / complexifier |
+| 10 | Multicellularité & Cambrien | Assembler des organismes |
+| 11 | Conquête des terres (plantes, animaux) | Faire évoluer / peupler |
+| 12 | Intelligence (préhistoire) | Apprendre / innover |
+| 13 | Sociétés (néolithique, villes) | Organiser / bâtir |
+| 14 | Relations inter-sociétés | Négocier / conquérir |
+| 15 | Technologies | Rechercher / inventer |
+| 16 | Conquête spatiale | Lancer / explorer |
+| 17 | Voyage intergalactique | Coloniser / fédérer / relier les galaxies |
+| 18 | Ville-univers (grande unification) | Unifier / englober |
+| 19 | Explosion (nouveau Big Bang) | Transcender (prestige) |
 
 ## 8. Progression et déblocage
 
@@ -382,13 +382,13 @@ Vue d'ensemble :
 - Certaines ères débloquent des **mécaniques bonus** (mini-systèmes) décrites
   dans [PHASES.md](./PHASES.md), à introduire progressivement pour ne pas
   noyer le joueur.
-- **Easing tardif (à partir de l'ère 12 (`e11`) seulement)** : les seuils croissent en
-  ×3,16/ère, et après l'ère 11 (`e10`) les gros boosts annexes (galets ≤ ère 10 (`e9`), rebond de
-  crise ≤ ère 11 (`e10`)) ne s'appliquent plus. Pour éviter la divergence ("éternité"), le
+- **Easing tardif (à partir de l'ère 12 seulement)** : les seuils croissent en
+  ×3,16/ère, et après l'ère 11 les gros boosts annexes (galets ≤ ère 10, rebond de
+  crise ≤ ère 11) ne s'appliquent plus. Pour éviter la divergence ("éternité"), le
   factory applique aux ères >= `LATE_FROM` une production ↑ et une consommation ↓
-  **composées par ère** (`LATE_PROD`/`LATE_CONSUMPTION`). Les ères 1-11 (`e0`-`e10`) restent
+  **composées par ère** (`LATE_PROD`/`LATE_CONSUMPTION`). Les ères 1-11 restent
   strictement intactes. Calibré via `make sim`.
-- **Accélérateur de skill (constellation Simon, ère 12 (`e11`))** : reproduire une
+- **Accélérateur de skill (constellation Simon, ère 12)** : reproduire une
   séquence de 10 idées **double la Complexité de l'ère** (cumulable, plafonné à
   `MAX_COMPLEXITY_BOOST` clears, soit ×32). Levier actif, réservé aux joueurs qui
   maîtrisent le mini-jeu ; persisté en compteur, multiplicateur dérivé (cf.
@@ -481,7 +481,7 @@ Règles concrètes :
   - une invention technologique absurde ;
   - une invention majeure déclenchée par un évènement ridicule
     (le sérieux du résultat contraste avec la bêtise de la cause).
-- **La grande chute comique est réservée à la fin** (ère 19 (`e18`) : la ville-univers
+- **La grande chute comique est réservée à la fin** (ère 19 : la ville-univers
   explose à cause d'un dirigeant qui a oublié le gaz, voir
   [PHASES.md](./PHASES.md)). Tout l'humour léger en amont prépare ce contraste.
 - **Dosage** : l'humour reste minoritaire ; en cas de doute, pencher vers la

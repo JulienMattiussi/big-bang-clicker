@@ -11,7 +11,7 @@ describe('SaveMenu', () => {
   beforeEach(() => {
     useI18nStore.setState({ locale: 'fr' })
     useGameStore.setState({
-      state: { ...createInitialState(0, 'e0'), resources: { particule: 5 } },
+      state: { ...createInitialState(0, 'e1'), resources: { particule: 5 } },
     })
   })
 
@@ -39,7 +39,7 @@ describe('SaveMenu', () => {
     const out = defs.generators[gen].output
     useGameStore.setState({
       state: {
-        ...createInitialState(0, 'e0'),
+        ...createInitialState(0, 'e1'),
         generators: { [gen]: { level: 5 } },
         resources: { [out]: 100 },
         lastSeen: 1000,

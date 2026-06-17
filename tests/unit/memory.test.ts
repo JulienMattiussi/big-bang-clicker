@@ -11,7 +11,7 @@ import {
 } from '@/lib/memory'
 import { makeState, makeEra, makeDefs } from '../helpers'
 
-const defs = makeDefs({ eras: [makeEra({ id: 'e7', clickResource: 'beast' })] })
+const defs = makeDefs({ eras: [makeEra({ id: 'e8', clickResource: 'beast' })] })
 
 describe('memoryUnlocked', () => {
   it('verrouillé tant que le convertisseur de déblocage n a pas été monté', () => {
@@ -26,16 +26,16 @@ describe('memoryUnlocked', () => {
 
 describe('memoryLevel / memoryEraMaxed', () => {
   it('part au niveau 1 puis suit le nombre de réussites, plafonné au max', () => {
-    expect(memoryLevel(makeState(), 'e7')).toBe(1)
-    expect(memoryLevel(makeState({ memoryLevels: { e7: 1 } }), 'e7')).toBe(2)
-    expect(memoryLevel(makeState({ memoryLevels: { e7: 99 } }), 'e7')).toBe(MEMORY_MAX_LEVEL)
+    expect(memoryLevel(makeState(), 'e8')).toBe(1)
+    expect(memoryLevel(makeState({ memoryLevels: { e8: 1 } }), 'e8')).toBe(2)
+    expect(memoryLevel(makeState({ memoryLevels: { e8: 99 } }), 'e8')).toBe(MEMORY_MAX_LEVEL)
   })
 
   it('maxé une fois MEMORY_MAX_LEVEL réussites atteintes', () => {
-    expect(memoryEraMaxed(makeState({ memoryLevels: { e7: MEMORY_MAX_LEVEL - 1 } }), 'e7')).toBe(
+    expect(memoryEraMaxed(makeState({ memoryLevels: { e8: MEMORY_MAX_LEVEL - 1 } }), 'e8')).toBe(
       false,
     )
-    expect(memoryEraMaxed(makeState({ memoryLevels: { e7: MEMORY_MAX_LEVEL } }), 'e7')).toBe(true)
+    expect(memoryEraMaxed(makeState({ memoryLevels: { e8: MEMORY_MAX_LEVEL } }), 'e8')).toBe(true)
   })
 })
 
@@ -60,17 +60,17 @@ describe('memoryStart', () => {
 
 describe('memoryWin', () => {
   it('incrémente le niveau sans graver de multiplicateur (dérivé par le moteur)', () => {
-    const a = memoryWin(makeState({ currentEraId: 'e7' }), defs)
-    expect(a.memoryLevels.e7).toBe(1)
+    const a = memoryWin(makeState({ currentEraId: 'e8' }), defs)
+    expect(a.memoryLevels.e8).toBe(1)
     expect(a.multipliers.beast ?? 1).toBe(1) // pas gravé
 
     const b = memoryWin(a, defs)
-    expect(b.memoryLevels.e7).toBe(2)
+    expect(b.memoryLevels.e8).toBe(2)
     expect(b.multipliers.beast ?? 1).toBe(1)
   })
 
   it('no-op si l ère est déjà maxée', () => {
-    const maxed = makeState({ currentEraId: 'e7', memoryLevels: { e7: MEMORY_MAX_LEVEL } })
+    const maxed = makeState({ currentEraId: 'e8', memoryLevels: { e8: MEMORY_MAX_LEVEL } })
     expect(memoryWin(maxed, defs)).toBe(maxed)
   })
 })

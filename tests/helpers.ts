@@ -9,7 +9,7 @@ export function makeState(overrides: Partial<GameState> = {}): GameState {
 /** Ère de test minimale (champs non pertinents vides), avec surcharges. */
 export function makeEra(overrides: Partial<EraDef> = {}): EraDef {
   return {
-    id: 'e0',
+    id: 'e1',
     index: 0,
     nameKey: '',
     taglineKey: '',

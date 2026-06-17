@@ -17,11 +17,11 @@ import type { GameDefs, GameState } from '@/lib/types'
 
 const defs: GameDefs = {
   eras: [],
-  resources: { quark: { id: 'quark', eraId: 'e0', nameKey: '', tier: 0, isBase: true } },
+  resources: { quark: { id: 'quark', eraId: 'e1', nameKey: '', tier: 0, isBase: true } },
   generators: {
     quarkGen: {
       id: 'quarkGen',
-      eraId: 'e0',
+      eraId: 'e1',
       nameKey: '',
       output: 'quark',
       baseRate: 1,

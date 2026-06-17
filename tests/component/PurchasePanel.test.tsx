@@ -11,7 +11,7 @@ describe('PurchasePanel', () => {
     useI18nStore.setState({ locale: 'fr' })
     useGameStore.setState({
       state: {
-        ...createInitialState(0, 'e0'),
+        ...createInitialState(0, 'e1'),
         // The converter is revealed once its input (particle) is known.
         discovered: { particle: true },
         generators: { expansion: { level: 1 } },

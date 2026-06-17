@@ -8,7 +8,7 @@ import type { CrisisDef } from '@/lib/types'
 export const crisisDefs: CrisisDef[] = [
   {
     id: 'extinction',
-    eraId: 'e10',
+    eraId: 'e11',
     risk: { sourceResource: 'fauna', threshold: 200_000, floor: 2_000 },
     trigger: 'threshold',
     // The extinction hits flora as hard as fauna; both rebound (the post-crisis
@@ -28,7 +28,7 @@ export const crisisDefs: CrisisDef[] = [
   },
   {
     id: 'revolt',
-    eraId: 'e12',
+    eraId: 'e13',
     risk: {
       sourceResource: 'population',
       threshold: 1_000_000,
@@ -50,7 +50,7 @@ export const crisisDefs: CrisisDef[] = [
   // risk on their own. threshold 1 = ready as soon as triggerCrisis sets the risk.
   {
     id: 'atomic',
-    eraId: 'e14',
+    eraId: 'e15',
     risk: { threshold: 1 },
     trigger: 'player',
     regression: [
@@ -76,7 +76,7 @@ export const crisisDefs: CrisisDef[] = [
   },
   {
     id: 'crash',
-    eraId: 'e14',
+    eraId: 'e15',
     risk: { threshold: 1 },
     trigger: 'player',
     regression: [
@@ -94,7 +94,7 @@ export const crisisDefs: CrisisDef[] = [
   },
   {
     id: 'climate',
-    eraId: 'e14',
+    eraId: 'e15',
     risk: { threshold: 1 },
     trigger: 'player',
     // Same toll as the machine rebellion / nuclear war: a civilisation-wide blow.
@@ -123,7 +123,7 @@ export const crisisDefs: CrisisDef[] = [
   // healthy rebound (the derisory damage is the joke).
   {
     id: 'y2k',
-    eraId: 'e14',
+    eraId: 'e15',
     risk: { threshold: 1 },
     trigger: 'player',
     regression: [{ type: 'grantResource', target: 'technology', value: -1 }],
@@ -135,7 +135,7 @@ export const crisisDefs: CrisisDef[] = [
   },
   {
     id: 'machineRebellion',
-    eraId: 'e14',
+    eraId: 'e15',
     risk: { threshold: 1 },
     trigger: 'player',
     // Same toll as the nuclear war: the machines turning is just as devastating.
@@ -167,7 +167,7 @@ export const crisisDefs: CrisisDef[] = [
   // resources, then a healthy rebound.
   {
     id: 'encounter',
-    eraId: 'e16',
+    eraId: 'e17',
     risk: {
       sourceResource: 'federation',
       threshold: 1,

@@ -63,9 +63,9 @@ Objectif : un moteur qui sait jouer **une** ère, piloté par des données.
 Objectif : **2 ères jouables et reliées**, pour valider le fun et la
 cohabitation avant de produire les 19.
 
-- [x] Ère 1 (`e0`, Refroidir) + Ère 2 (`e1`, Recombinaison) jouables (data-driven).
+- [x] Ère 1 (Refroidir) + Ère 2 (Recombinaison) jouables (data-driven).
 - [x] Passage d'ère + cohabitation (la recombinaison consomme les nucléons de
-      l'ère 1 (`e0`), qui doit continuer de tourner).
+      l'ère 1, qui doit continuer de tourner).
 - [x] Méta-ressource Complexité fonctionnelle.
 - [x] Coquille UI du tier COSMOS (GameShell, panneaux ressources/production,
       clic, onglets d'ères) + thème par palier via data-tier.
@@ -81,7 +81,7 @@ Objectif : ajouter les ères par lots cohérents (par tier UI), en réutilisant
 le moteur. Pour chaque ère : données, contenu narratif, mini-système éventuel,
 traductions FR/EN, tests.
 
-- [x] Tier COSMOS : ères 3 (`e2`, premières étoiles & galaxies), 4 (`e3`, forges
+- [x] Tier COSMOS : ères 3 (premières étoiles & galaxies), 4 (forges
       stellaires), avec chaînage inter-ères (étoiles <- hydrogène, forges <-
       étoiles).
 - [x] Widgets iconiques centraux (scène cliquable) : jauge de refroidissement,
@@ -89,11 +89,11 @@ traductions FR/EN, tests.
 - [x] **Toutes les ères 5 à 19** créées (data-driven via fabrique `buildEra`),
       bilingues FR/EN, avec chaînage inter-ères et déblocage par Complexité.
       Thèmes par tier (cosmos/vivant/civilisation/spatial/transcendance) appliqués.
-- [x] **Prestige** (ère 19 (`e18`), finale "Explosion") : bandeau "Renaissance",
+- [x] **Prestige** (ère 19, finale "Explosion") : bandeau "Renaissance",
       conversion en Échos, reset.
-- [x] **Crises (régressions)** : extinction (e10), révolte de Starpacus
-      (e12), crises de l'ère industrielle dont l'arme atomique (e14), première
-      rencontre (e16) ; bandeau de crise + résolution.
+- [x] **Crises (régressions)** : extinction (e11), révolte de Starpacus
+      (e13), crises de l'ère industrielle dont l'arme atomique (e15), première
+      rencontre (e17) ; bandeau de crise + résolution.
 - [x] Widget générique de repli + widgets dédiés à **chaque** ère (jauge,
       atome de Bohr, pépinière, tableau périodique, accrétion, molécules, Petri,
       balance, endosymbiose, assemblage, arbre, mémoire, cité, carte, inventions,

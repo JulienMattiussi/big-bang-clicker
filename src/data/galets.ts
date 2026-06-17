@@ -15,7 +15,7 @@ export const galetDefs: GaletDef[] = [
     motif: 'atom',
     shape: 0,
     // Found when the Life milestone (era 5) becomes reachable, before crossing it.
-    discoverEraId: 'e5',
+    discoverEraId: 'e6',
     effect: { type: 'generatorMultiplier', maxEraIndex: 4, value: 10 },
   },
   {
@@ -28,7 +28,7 @@ export const galetDefs: GaletDef[] = [
     shape: 1,
     // Found once First life (e6) is reached and the next milestone (e7, 80k)
     // becomes reachable. Boosts secondary factories up to the First-life era.
-    discoverEraId: 'e7',
+    discoverEraId: 'e8',
     effect: { type: 'converterMultiplier', maxEraIndex: 6, value: 5 },
   },
   {
@@ -42,7 +42,7 @@ export const galetDefs: GaletDef[] = [
     // Found by CLICKING it as it rides the Cambrian assembly belt (era 9), not by a
     // milestone. Boosts the Complexity gained from every era up to the Cambrian.
     discovery: 'widget',
-    discoverEraId: 'e9',
+    discoverEraId: 'e10',
     effect: { type: 'complexityMultiplier', maxEraIndex: 9, value: 8 },
   },
   {
@@ -55,7 +55,7 @@ export const galetDefs: GaletDef[] = [
     shape: 0,
     // Earned in the Societies city widget by reaching the super-bonus harmony.
     discovery: 'widget',
-    discoverEraId: 'e12',
+    discoverEraId: 'e13',
     // Halves the input cost of every era's terminal converter up to the Societies.
     effect: { type: 'terminalConsumption', maxEraIndex: 12, value: 0.5 },
   },
@@ -69,7 +69,7 @@ export const galetDefs: GaletDef[] = [
     shape: 1,
     // Found on the FIRST landing in the Space-conquest rocket widget.
     discovery: 'widget',
-    discoverEraId: 'e15',
+    discoverEraId: 'e16',
     // Quadruples every era's WIDGET reward (useEraMechanic), never the factories.
     effect: { type: 'widgetMultiplier', maxEraIndex: 18, value: 4 },
   },
@@ -83,7 +83,7 @@ export const galetDefs: GaletDef[] = [
     shape: 3, // the open-mouthed creature silhouette
     // Granted by overcoming the era-16 encounter crisis (the hooded fighters).
     discovery: 'crisis',
-    discoverEraId: 'e16',
+    discoverEraId: 'e17',
     // Mind control: the memory mini-game costs only 1% (eased with joker cards).
     effect: { type: 'memoryBoost', maxEraIndex: 18, value: 0.01 },
   },

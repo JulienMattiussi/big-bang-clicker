@@ -17,7 +17,7 @@ function galet(id: string, overrides: Partial<GaletDef> = {}): GaletDef {
     loreKey: '',
     color: '',
     motif: '',
-    discoverEraId: 'e1',
+    discoverEraId: 'e2',
     effect: { type: 'generatorMultiplier', maxEraIndex: 4, value: 10 },
     ...overrides,
   }
@@ -25,7 +25,7 @@ function galet(id: string, overrides: Partial<GaletDef> = {}): GaletDef {
 
 const gen: GeneratorDef = {
   id: 'gen1',
-  eraId: 'e2',
+  eraId: 'e3',
   nameKey: '',
   output: 'r',
   baseRate: 1,
@@ -33,7 +33,7 @@ const gen: GeneratorDef = {
 }
 const conv: ConverterDef = {
   id: 'conv1',
-  eraId: 'e2',
+  eraId: 'e3',
   nameKey: '',
   inputs: [],
   outputs: [],
@@ -42,7 +42,7 @@ const conv: ConverterDef = {
 }
 
 const defs = makeDefs({
-  eras: [makeEra({ id: 'e1', unlock: { complexity: 100 } })],
+  eras: [makeEra({ id: 'e2', unlock: { complexity: 100 } }), makeEra({ id: 'e3', index: 2 })],
   generators: { gen1: gen },
   converters: { conv1: conv },
   galets: [
@@ -78,8 +78,8 @@ describe('discoverableGalets', () => {
 
 describe('widgetGaletForEra', () => {
   it('renvoie le galet à découverte widget de l ère, sinon undefined', () => {
-    expect(widgetGaletForEra(defs, 'e1')?.id).toBe('wid')
-    expect(widgetGaletForEra(defs, 'e2')).toBeUndefined()
+    expect(widgetGaletForEra(defs, 'e2')?.id).toBe('wid')
+    expect(widgetGaletForEra(defs, 'e3')).toBeUndefined()
   })
 })
 

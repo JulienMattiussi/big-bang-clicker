@@ -10,8 +10,9 @@ import { sign } from './integrity'
 
 /** v2 introduced the signed save envelope; v3 stopped baking memory/crisis
  *  multipliers into `multipliers` (now derived from levels/counts); v4 merged the
- *  Intergalactic era into the Intergalactic Voyage and shifted later era ids. */
-export const SAVE_VERSION = 5
+ *  Intergalactic era into the Intergalactic Voyage and shifted later era ids; v5
+ *  dropped the dead `upgrades` field; v6 renumbered era ids to 1-based. */
+export const SAVE_VERSION = 6
 const SAVE_KEY = 'big-bang-clicker:save'
 /** Cap on the offline-idle credit (anti clock-cheat). */
 const DEFAULT_OFFLINE_CAP_SECONDS = 60 * 60 * 8
@@ -81,6 +82,25 @@ const migrations: Record<number, Migration> = {
     const next = { ...state, version: 5 } as GameState & { upgrades?: unknown }
     delete next.upgrades
     return next
+  },
+  // v5 -> v6: era ids renumbered 0-based -> 1-based (e0..e18 becomes e1..e19) to
+  // match the in-game "Ère N" display. Shift every persisted era id and the
+  // era-keyed maps.
+  5: (state) => {
+    const shift = (id: string): EraId => `e${(Number(id.slice(1)) || 0) + 1}`
+    const remapKeys = (rec: Record<string, number>): Record<string, number> => {
+      const out: Record<string, number> = {}
+      for (const k in rec) out[shift(k)] = rec[k]!
+      return out
+    }
+    return {
+      ...state,
+      currentEraId: shift(state.currentEraId),
+      unlockedEras: state.unlockedEras.map(shift),
+      memoryLevels: remapKeys(state.memoryLevels),
+      complexityBoosts: remapKeys(state.complexityBoosts),
+      version: 6,
+    }
   },
 }
 

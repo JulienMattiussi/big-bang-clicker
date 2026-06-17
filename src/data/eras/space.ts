@@ -3,7 +3,7 @@ import { buildEra, type EraBundle } from './factory'
 /** SPACE tier (eras 15 to 17): from space conquest to the universe-city. */
 const bundles: EraBundle[] = [
   buildEra({
-    id: 'e15',
+    id: 'e16',
     index: 15,
     uiTier: 'space',
     icon: 'telescope',
@@ -21,7 +21,7 @@ const bundles: EraBundle[] = [
     unlockComplexity: 800_000_000,
   }),
   buildEra({
-    id: 'e16',
+    id: 'e17',
     index: 16,
     uiTier: 'space',
     icon: 'radar',
@@ -37,7 +37,7 @@ const bundles: EraBundle[] = [
     unlockComplexity: 2_000_000_000,
   }),
   buildEra({
-    id: 'e17',
+    id: 'e18',
     index: 17,
     uiTier: 'space',
     // Era icon (grand unification) kept distinct from its resources.

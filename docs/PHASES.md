@@ -18,7 +18,7 @@
 > Statut : structure figée (19 ères) ; chiffres et contenu fin à affiner. La
 > partie biologique/anthropologique reste **à re-sourcer** (voir SCIENCE.md).
 >
-> Numérotation comme en jeu (1-based) : « Ère N » a pour id technique `e(N-1)`.
+> Numérotation comme en jeu (1-based) : « Ère N » a pour id technique `eN`.
 
 ## Légende
 
@@ -36,8 +36,8 @@
 | Tier UI | Ères | Bascule |
 |---|---|---|
 | COSMOS | 1 à 5 | base |
-| VIVANT | 6 à 11 | **transformation majeure** (apparition de la vie, ère 6/7 (`e5`/`e6`)) |
-| CIVILISATION | 12 à 15 | **transformation majeure** (apparition des sociétés, ère 13 (`e12`)) |
+| VIVANT | 6 à 11 | **transformation majeure** (apparition de la vie, ère 6/7) |
+| CIVILISATION | 12 à 15 | **transformation majeure** (apparition des sociétés, ère 13) |
 | SPATIAL | 16 à 18 | marquée |
 | TRANSCENDANCE | 19 | spectaculaire (prestige) |
 
@@ -45,7 +45,7 @@
 
 ## Tier COSMOS
 
-### Ère 1 (`e0`) - Big Bang & refroidissement `vérifié`
+### Ère 1 - Big Bang & refroidissement `vérifié`
 
 - **Accroche** : « Trop chaud pour exister. Laisse l'univers respirer. »
 - **Narratif** : l'univers naît, dense et brûlant. Forces qui se découplent,
@@ -61,14 +61,14 @@
   forces ; convertisseurs de nucléosynthèse primordiale.
 - **Passage** : température assez basse pour la recombinaison (~3000 K).
 
-### Ère 2 (`e1`) - Recombinaison : premiers atomes `vérifié`
+### Ère 2 - Recombinaison : premiers atomes `vérifié`
 
 - **Accroche** : « Les électrons se posent enfin : que la lumière soit. »
 - **Narratif** : électrons et noyaux se lient en atomes neutres. L'univers
   devient transparent : la première lumière (fond diffus cosmologique) s'échappe.
 - **Verbe** : capturer les électrons / assembler les premiers atomes.
 - **Ressources & chaînes** :
-  - Base : Électrons libres, noyaux (de l'ère 1 (`e0`)).
+  - Base : Électrons libres, noyaux (de l'ère 1).
   - `noyau H + électron -> hydrogène neutre`
   - `noyau He + 2 électrons -> hélium neutre`
   - Sous-produit : Photons (CMB) libérés.
@@ -77,16 +77,16 @@
 - **Production** : refroidissement résiduel, capture électronique (auto).
 - **Passage** : gaz neutre H/He formé en quantité -> âges sombres.
 - **Note science** : ce sont les **atomes légers**. Les lourds viendront des
-  étoiles (ère 4 (`e3`)), pas ici.
+  étoiles (ère 4), pas ici.
 
-### Ère 3 (`e2`) - Âges sombres -> premières étoiles & galaxies `vérifié`
+### Ère 3 - Âges sombres -> premières étoiles & galaxies `vérifié`
 
 - **Accroche** : « Dans le noir absolu, allume les premiers soleils. »
 - **Narratif** : dans le noir, la gravité rassemble le gaz vierge. Les
   premières étoiles (Population III) s'allument, les galaxies s'assemblent.
 - **Verbe** : effondrer / allumer.
 - **Ressources & chaînes** :
-  - Base : Gaz (H/He, consommé depuis l'ère 2 (`e1`)), Gravité/Densité.
+  - Base : Gaz (H/He, consommé depuis l'ère 2), Gravité/Densité.
   - `gaz + gravité -> nuage moléculaire -> proto-étoile -> étoile (Pop III)`
   - `étoiles -> amas -> galaxie`
 - **Widget** : **Voie lactée naissante** (champ d'étoiles qu'on allume,
@@ -94,9 +94,9 @@
 - **Production** : effondrement de halos, allumage stellaire, fusion de galaxies.
 - **Passage** : étoiles massives en fin de vie, prêtes à forger et exploser.
 - **Note science** : étoiles, galaxies, réionisation et forge **cohabitent**
-  (chevauchement jusqu'à z~5). L'ère 4 (`e3`) démarre donc en recouvrement.
+  (chevauchement jusqu'à z~5). L'ère 4 démarre donc en recouvrement.
 
-### Ère 4 (`e3`) - Forges stellaires : les éléments lourds `vérifié`
+### Ère 4 - Forges stellaires : les éléments lourds `vérifié`
 
 - **Accroche** : « Rien ne se perd, rien ne se crée, tout se transforme. »
   (Lavoisier, forme popularisée)
@@ -105,7 +105,7 @@
   tableau périodique se remplit.
 - **Verbe** : forger les éléments lourds.
 - **Ressources & chaînes** :
-  - Base : Étoiles (consommées depuis l'ère 3 (`e2`)), Métallicité.
+  - Base : Étoiles (consommées depuis l'ère 3), Métallicité.
   - `He -> C -> O -> ... -> Fe` (fusion stellaire, jusqu'au fer)
   - `supernova` et `fusion d'étoiles à neutrons -> éléments au-delà du fer`
     (r-process : or, uranium...)
@@ -114,7 +114,7 @@
 - **Production** : étoiles massives, supernovae, fusions d'étoiles à neutrons.
 - **Passage** : assez de métaux pour former un disque planétaire rocheux.
 
-### Ère 5 (`e4`) - Système solaire & Terre `vérifié`
+### Ère 5 - Système solaire & Terre `vérifié`
 
 - **Accroche** : « De la poussière d'étoiles, bâtis un monde. »
 - **Narratif** : autour d'une étoile, un disque enrichi en métaux s'agrège :
@@ -122,7 +122,7 @@
   impact géant (Hadéen).
 - **Verbe** : accréter / faire entrer en collision.
 - **Ressources & chaînes** :
-  - Base : Poussière/disque (métaux de l'ère 4 (`e3`)), Gravité.
+  - Base : Poussière/disque (métaux de l'ère 4), Gravité.
   - `poussière -> planétésimaux -> protoplanètes -> planètes`
   - `impact géant -> Lune` ; `différenciation -> noyau / manteau / croûte`
 - **Widget** : **disque d'accrétion / collisions** (combiner des corps pour en
@@ -136,7 +136,7 @@
 
 ## Tier VIVANT - TRANSFORMATION MAJEURE de l'UI (apparition de la vie)
 
-### Ère 6 (`e5`) - Terre habitable + briques de la vie `co-émergence`
+### Ère 6 - Terre habitable + briques de la vie `co-émergence`
 
 - **Accroche** : « De l'eau, de la chaleur, et la chimie s'emballe. »
 - **Narratif** : la planète devient habitable (océans, atmosphère, climat
@@ -157,7 +157,7 @@
 - **Note science** : co-émergence validée (cycle CHONPS dans le même contexte
   géochimique que l'habitabilité). Datations d'abiogenèse débattues.
 
-### Ère 7 (`e6`) - Premières vies (LUCA, procaryotes) `consensus à re-sourcer`
+### Ère 7 - Premières vies (LUCA, procaryotes) `consensus à re-sourcer`
 
 - **Accroche** : « Une cellule se divise. Tout commence vraiment. »
 - **Narratif** : les premières cellules apparaissent et se divisent. La vie est
@@ -170,7 +170,7 @@
 - **Production** : division binaire, métabolisme primitif.
 - **Passage** : apparition de la photosynthèse oxygénique.
 
-### Ère 8 (`e7`) - Photosynthèse & Grande Oxydation `consensus à re-sourcer`
+### Ère 8 - Photosynthèse & Grande Oxydation `consensus à re-sourcer`
 
 - **Accroche** : « Le premier souffle d'oxygène change tout. »
 - **Narratif** : des cyanobactéries captent la lumière et rejettent de
@@ -184,7 +184,7 @@
 - **Production** : cyanobactéries, tapis microbiens.
 - **Passage** : O2 suffisant pour soutenir des cellules complexes.
 
-### Ère 9 (`e8`) - Eucaryotes & endosymbiose `consensus à re-sourcer`
+### Ère 9 - Eucaryotes & endosymbiose `consensus à re-sourcer`
 
 - **Accroche** : « Mieux vaut s'associer que se digérer. »
 - **Narratif** : des cellules en absorbent d'autres sans les digérer :
@@ -197,7 +197,7 @@
 - **Production** : endosymbioses, acquisition d'organites.
 - **Passage** : conditions pour la multicellularité.
 
-### Ère 10 (`e9`) - Multicellularité & explosion cambrienne `consensus à re-sourcer`
+### Ère 10 - Multicellularité & explosion cambrienne `consensus à re-sourcer`
 
 - **Accroche** : « L'union fait le corps : mille formes surgissent. »
 - **Narratif** : les cellules s'associent en tissus, puis en organismes. Au
@@ -212,7 +212,7 @@
 - **Production** : agrégation cellulaire, différenciation des tissus.
 - **Passage** : organismes prêts à coloniser les terres.
 
-### Ère 11 (`e10`) - Conquête des terres : plantes & animaux `consensus à re-sourcer`
+### Ère 11 - Conquête des terres : plantes & animaux `consensus à re-sourcer`
 
 - **Accroche** : « La vie trouve toujours un chemin. » (clin d'oeil Jurassic
   Park, voir [NARRATIVE.md](./NARRATIVE.md))
@@ -238,7 +238,7 @@
 
 ## Tier CIVILISATION - TRANSFORMATION MAJEURE de l'UI (apparition des sociétés)
 
-### Ère 12 (`e11`) - Intelligence (préhistoire) `consensus à re-sourcer`
+### Ère 12 - Intelligence (préhistoire) `consensus à re-sourcer`
 
 - **Accroche** : « Le feu, l'outil, le mot : l'esprit s'éveille. »
 - **Narratif** : des créatures deviennent intelligentes : outils, feu, langage,
@@ -251,7 +251,7 @@
 - **Production** : outils, feu, chasse coordonnée, transmission culturelle.
 - **Passage** : sédentarisation / premières communautés stables.
 
-### Ère 13 (`e12`) - Sociétés (néolithique, villes, écriture) `consensus à re-sourcer`
+### Ère 13 - Sociétés (néolithique, villes, écriture) `consensus à re-sourcer`
 
 - **Accroche** : « De la tribu à la cité : bâtir ensemble. »
 - **Narratif** : agriculture, sédentarisation, villages puis villes,
@@ -273,7 +273,7 @@
   [GAME-DESIGN.md](./GAME-DESIGN.md) section 6.
 - **Passage** : plusieurs sociétés distinctes coexistent.
 
-### Ère 14 (`e13`) - Relations inter-sociétés `consensus à re-sourcer`
+### Ère 14 - Relations inter-sociétés `consensus à re-sourcer`
 
 - **Accroche** : « Commercer, négocier... ou conquérir. »
 - **Narratif** : commerce, diplomatie, guerres, alliances, empires.
@@ -286,7 +286,7 @@
 - **Production** : routes commerciales, ambassades, armées, ports.
 - **Passage** : accélération technologique soutenue.
 
-### Ère 15 (`e14`) - Technologies `consensus à re-sourcer`
+### Ère 15 - Technologies `consensus à re-sourcer`
 
 - **Accroche** : « Inventer plus vite qu'on ne réfléchit. »
 - **Narratif** : révolutions agricole, industrielle, numérique. La tech
@@ -318,7 +318,7 @@
 
 ## Tier SPATIAL
 
-### Ère 16 (`e15`) - Conquête spatiale `vérifié -> spéculatif`
+### Ère 16 - Conquête spatiale `vérifié -> spéculatif`
 
 - **Accroche** : « La Terre est un berceau, pas une demeure. »
 - **Narratif** : fusées, satellites, Lune, Mars, premières colonies hors-sol.
@@ -337,7 +337,7 @@
   [GAME-DESIGN.md](./GAME-DESIGN.md) section 6.
 - **Passage** : présence multiplanétaire stable.
 
-### Ère 17 (`e16`) - Voyage intergalactique `spéculatif`
+### Ère 17 - Voyage intergalactique `spéculatif`
 
 - **Accroche** : « Le grand vide entre les galaxies n'attend que d'être franchi. »
 - **Narratif** : la civilisation se répand de galaxie en galaxie. D'abord sa
@@ -346,24 +346,24 @@
   toujours plus lointains : l'univers devient un quartier.
 - **Verbe** : explorer / fédérer (à l'échelle inter-galactique).
 - **Ressources & chaînes** :
-  - Base : Vaisseaux ; consomme les Colonies (ère 16 (`e15`)).
+  - Base : Vaisseaux ; consomme les Colonies (ère 16).
   - `vaisseaux + colonies -> fédération` (mondes reliés à travers le vide)
 - **Widget** : **carte galactique -> toile cosmique** (systèmes à coloniser,
-  puis filaments reliant les galaxies). Réutilise la Voie lactée de l'ère 3 (`e2`).
+  puis filaments reliant les galaxies). Réutilise la Voie lactée de l'ère 3.
 - **Production** : chantiers spatiaux, flottes générationnelles, fédération.
 - **Passage** : assez de fédérations pour entamer l'unification de l'univers.
 - **Note structure** : cette ère **fusionne** les anciennes « Sociétés
   galactiques » et « Sociétés intergalactiques » en un seul voyage (le découpage
   doublonnait ; le geste et la chaîne de ressources sont identiques).
 
-### Ère 18 (`e17`) - La grande unification (ville-univers) `spéculatif`
+### Ère 18 - La grande unification (ville-univers) `spéculatif`
 
 - **Accroche** : « L'univers entier, réuni en une seule ville. »
 - **Narratif** : toute la matière et l'énergie de l'univers convergent en une
   unique ville-univers (civilisation de Type III+).
 - **Verbe** : unifier / englober.
 - **Ressources & chaînes** :
-  - Base : Districts ; consomme les Fédérations (ère 17 (`e16`)).
+  - Base : Districts ; consomme les Fédérations (ère 17).
   - `districts + fédérations -> ville-univers`
   - jauge de **complétude de l'univers** qui sature.
 - **Widget** : **ville-univers / horloge cosmique** (la complétude se remplit,
@@ -375,7 +375,7 @@
 
 ## Tier TRANSCENDANCE
 
-### Ère 19 (`e18`) - Explosion : nouveau Big Bang `spéculatif`
+### Ère 19 - Explosion : nouveau Big Bang `spéculatif`
 
 - **Accroche** : « Tout finit... et tout recommence, en mieux. »
 - **Narratif** : la ville-univers est saturée de complexité, au bord de
@@ -386,12 +386,12 @@
 - **Ton** : bascule **comique/absurde** assumée pour la toute fin. Les enjeux
   cosmiques sont anéantis par une bêtise domestique : c'est le contraste qui
   fait le sel de la chute. (Formulation exacte du gag **à affiner**.)
-- **Note de design** : l'instabilité (jauge de complétude de l'ère 18 (`e17`)) fournit
+- **Note de design** : l'instabilité (jauge de complétude de l'ère 18) fournit
   la poudre ; l'incident trivial fournit l'étincelle. Possibilité d'un petit
   évènement scripté/illustré au moment du déclenchement.
 - **Verbe** : transcender (déclencher le prestige).
 - **Mécanique** : conversion de la Complexité totale en **Échos** ; reset
-  complet sauf Échos et méta-upgrades ; retour à l'ère 1 (`e0`), plus fort. Voir
+  complet sauf Échos et méta-upgrades ; retour à l'ère 1, plus fort. Voir
   [GAME-DESIGN.md](./GAME-DESIGN.md) section 3.3.
 - **Widget** : **singularité / écran qui se contracte puis explose** (transition
   spectaculaire vers la nouvelle partie).
@@ -414,8 +414,8 @@
   ressources). Voir [UI-UX.md](./UI-UX.md) section 5.
 - **Crises (régressions)** : certaines ères portent une crise (effondrement
   partiel puis rebond amélioré), echo réduit de l'explosion finale. Six sont
-  déjà posées (extinction de masse ère 11 (`e10`), esclavage ère 13 (`e12`), arme atomique +
-  crise écologique + soulèvement IA ère 15 (`e14`), navette ère 16 (`e15`)) ; d'autres pourront
+  déjà posées (extinction de masse ère 11, esclavage ère 13, arme atomique +
+  crise écologique + soulèvement IA ère 15, navette ère 16) ; d'autres pourront
   être ajoutées avec parcimonie. Mécanique décrite dans
   [GAME-DESIGN.md](./GAME-DESIGN.md) section 6.
 - **À re-sourcer** : tout ce qui est marqué `consensus à re-sourcer` (ères 7 à

@@ -123,7 +123,7 @@ function galetMachineMultiplier(
   eraId: EraId,
   type: GaletEffect['type'],
 ): number {
-  const eraIdx = eraIndexFromId(eraId)
+  const eraIdx = eraIndexOf(defs, eraId)
   let m = 1
   for (const galet of defs.galets ?? []) {
     if (galet.effect.type !== type) continue
@@ -345,15 +345,14 @@ export function unlockNextEra(state: GameState, defs: GameDefs): GameState {
 /** Each era older than the latest unlocked one contributes this much LESS Complexity. */
 export const COMPLEXITY_ERA_DECAY = 50
 
-function eraIndexFromId(eraId: string): number {
-  const n = Number(eraId.slice(1))
-  return Number.isFinite(n) ? n : 0
+function eraIndexOf(defs: GameDefs, eraId: string): number {
+  return defs.eras.find((e) => e.id === eraId)?.index ?? 0
 }
 
-function latestUnlockedIndex(state: GameState): number {
+function latestUnlockedIndex(state: GameState, defs: GameDefs): number {
   let max = 0
   for (const id of state.unlockedEras) {
-    const n = eraIndexFromId(id)
+    const n = eraIndexOf(defs, id)
     if (n > max) max = n
   }
   return max
@@ -378,7 +377,7 @@ export function complexityPerUnit(
   const def = defs.resources[resource]
   const tier = def?.tier ?? 0
   const eraId = def?.eraId ?? ''
-  const gap = latestEra - eraIndexFromId(eraId)
+  const gap = latestEra - eraIndexOf(defs, eraId)
   const recency = gap <= 0 ? 1 : 1 / COMPLEXITY_ERA_DECAY ** gap
   const boost = COMPLEXITY_BOOST ** (state.complexityBoosts?.[eraId] ?? 0)
   return tier * recency * galetComplexityMultiplier(state, defs, eraId) * boost
@@ -432,7 +431,7 @@ export function manualConvert(state: GameState, defs: GameDefs, id: ConverterId)
   for (const input of conv.inputs) {
     resources[input.resource] = (resources[input.resource] ?? 0) - input.amount * consume
   }
-  const latestEra = latestUnlockedIndex(state)
+  const latestEra = latestUnlockedIndex(state, defs)
   let gained = 0
   for (const output of conv.outputs) {
     const produced = output.amount * converterOutputMultiplier(state, defs, id, output.resource)
@@ -457,7 +456,7 @@ export function manualProduce(state: GameState, defs: GameDefs, id: ConverterId)
   const conv = defs.converters[id]
   if (!conv) return state
   const resources = { ...state.resources }
-  const latestEra = latestUnlockedIndex(state)
+  const latestEra = latestUnlockedIndex(state, defs)
   let gained = 0
   for (const output of conv.outputs) {
     const produced = output.amount * converterOutputMultiplier(state, defs, id, output.resource)
@@ -484,7 +483,7 @@ export function tick(state: GameState, defs: GameDefs, dt: number): GameState {
 
   const resources = { ...state.resources }
   let gained = 0
-  const latestEra = latestUnlockedIndex(state)
+  const latestEra = latestUnlockedIndex(state, defs)
 
   // Resources frozen by a triggered, unresolved crisis: their production halts
   // until the crisis is overcome, so the player cannot progress around it.

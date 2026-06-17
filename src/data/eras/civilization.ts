@@ -3,7 +3,7 @@ import { buildEra, type EraBundle } from './factory'
 /** CIVILIZATION tier (eras 11 to 14): from intelligence to technology. */
 const bundles: EraBundle[] = [
   buildEra({
-    id: 'e11',
+    id: 'e12',
     index: 11,
     uiTier: 'civilization',
     icon: 'lightbulb',
@@ -16,7 +16,7 @@ const bundles: EraBundle[] = [
     unlockComplexity: 8_000_000,
   }),
   buildEra({
-    id: 'e12',
+    id: 'e13',
     index: 12,
     uiTier: 'civilization',
     icon: 'landmark',
@@ -30,7 +30,7 @@ const bundles: EraBundle[] = [
     unlockComplexity: 25_000_000,
   }),
   buildEra({
-    id: 'e13',
+    id: 'e14',
     index: 13,
     uiTier: 'civilization',
     icon: 'swords',
@@ -44,7 +44,7 @@ const bundles: EraBundle[] = [
     unlockComplexity: 80_000_000,
   }),
   buildEra({
-    id: 'e14',
+    id: 'e15',
     index: 14,
     uiTier: 'civilization',
     widget: 'inventions',
