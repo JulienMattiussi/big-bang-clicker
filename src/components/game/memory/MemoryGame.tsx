@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/Button'
 import { Modal } from '@/components/ui/Modal'
 import { Icon } from '@/components/ui/Icon'
 import { EraIcon } from '@/components/game/EraIcon'
+import { Galet } from '@/components/art/Galet'
 import { EraSymbolCluster } from '@/components/game/memory/Answer42'
 import { CardBack, CardFace } from '@/components/game/memory/MemoryCards'
 import { applyJokers, dealCards, shuffle, JOKER_LABEL, type Card } from '@/components/game/memory/memoryDeck'
@@ -40,6 +41,8 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
   // The level the NEXT attempt plays, and whether this era is fully boosted.
   const upcomingLevel = useGameStore((s) => memoryLevel(s.state, s.state.currentEraId))
   const maxed = useGameStore((s) => memoryEraMaxed(s.state, s.state.currentEraId))
+  // The Force pebble (octarine), when active, drives this game's discount + jokers.
+  const force = useGameStore((s) => memoryGalet(s.state, s.defs))
   const upcomingCfg = MEMORY_LEVELS[upcomingLevel]
 
   const era = defs.eras.find((e) => e.id === currentEraId) ?? defs.eras[0]
@@ -173,6 +176,9 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
               </p>
             ) : null}
           </div>
+          {force ? (
+            <Galet color={force.color} motif={force.motif} shape={force.shape} size={40} />
+          ) : null}
         </div>
         <div className="flex items-center gap-4">
           {phase === 'play' ? (
@@ -334,6 +340,9 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                   <Button onClick={play} disabled={!affordable}>
                     {phase === 'start' ? t('memory.play') : t('memory.replay')}
                   </Button>
+                ) : null}
+                {!maxed && force ? (
+                  <Galet color={force.color} motif={force.motif} shape={force.shape} size={34} />
                 ) : null}
               </div>
               {!maxed && !affordable ? (

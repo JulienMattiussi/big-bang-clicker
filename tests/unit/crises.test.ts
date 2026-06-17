@@ -8,7 +8,6 @@ const defs: GameDefs = {
   resources: {},
   generators: {},
   converters: {},
-  upgrades: {},
   crises: {
     revolte: {
       id: 'revolte',

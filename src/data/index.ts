@@ -67,7 +67,6 @@ export const defs: GameDefs = {
   resources: byId(resources),
   generators: byId(generators),
   converters: byId(converters),
-  upgrades: {},
   crises: byId(crisisDefs),
   metaUpgrades: metaUpgradeDefs,
   galets: galetDefs,

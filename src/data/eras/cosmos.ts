@@ -88,6 +88,7 @@ const bundles: EraBundle[] = [
     uiTier: 'cosmos',
     icon: 'hexagon',
     widget: 'periodic',
+    layout: 'wide',
     base: { id: 'fusion', icon: 'fusion', tier: 4 },
     generatorId: 'pressure',
     generatorRate: 1.1, // +10% productivity across this era's machines
@@ -151,6 +152,7 @@ const bundles: EraBundle[] = [
     uiTier: 'cosmos',
     icon: 'solar-system',
     widget: 'accretion',
+    layout: 'wide',
     base: { id: 'dust', icon: 'dust', tier: 5 },
     combined: { id: 'planet', icon: 'globe', tier: 7 },
     consumes: 'heavyElement',

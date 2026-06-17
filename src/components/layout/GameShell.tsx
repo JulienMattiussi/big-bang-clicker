@@ -6,7 +6,7 @@ import { EraTransition } from '@/components/layout/EraTransition'
 import { InventoryButton } from '@/components/game/inventory/InventoryButton'
 import { EraTabs } from '@/components/game/EraTabs'
 import { ClickArea } from '@/components/game/ClickArea'
-import { isFullWidthWidget } from '@/components/game/widgets/interactive'
+import { isWideLayout, wideRowClass } from '@/components/layout/eraLayout'
 import { ResourcePanel } from '@/components/game/ResourcePanel'
 import { PurchasePanel } from '@/components/game/PurchasePanel'
 import { ComplexityBadge } from '@/components/game/ComplexityBadge'
@@ -14,6 +14,7 @@ import { MemoryFeature } from '@/components/game/memory/MemoryFeature'
 import { NextGoal } from '@/components/game/NextGoal'
 import { MilestoneButton } from '@/components/game/MilestoneButton'
 import { EraIcon } from '@/components/game/EraIcon'
+import { eraTitle } from '@/components/game/eraTitle'
 import { PrestigeBanner } from '@/components/game/PrestigeBanner'
 import { CrisisBanner } from '@/components/game/CrisisBanner'
 import { CrisisGame } from '@/components/game/CrisisGame'
@@ -67,12 +68,13 @@ export function GameShell() {
           then the era title, which lands on the buttons' line (so the buttons
           never push the title down). Right: language and options. */}
       <header className="flex flex-col gap-3">
-        {/* Two-row grid. Row 1 (pebbles / Complexity / milestone gauge / options)
-            always exists thanks to the pills, so row 2 (era title / memory button
-            under Complexity / unlock button under the gauge) stays put: the title
-            shares the buttons' row instead of rising to the pills, and the
-            pebbles keep their reserved slot above the title even when empty. */}
-        <div className="grid grid-cols-[1fr_auto_auto_1fr] items-start gap-x-4 gap-y-1.5">
+        {/* Two-row grid. The centre column holds the Complexity pill (so the pill
+            is centred on the page); the milestone gauge sits at the start of the
+            right column, glued to the pill's right, with options at the far right.
+            This keeps the left column (era title) as wide as possible. Row 1 always
+            exists thanks to the pills, so row 2 (era title / memory button under
+            Complexity / unlock button under the gauge) stays put. */}
+        <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-x-4 gap-y-1.5">
           <div className="col-start-1 row-start-1 flex items-center gap-2">
             <GaletReceptacle />
             <InventoryButton />
@@ -80,22 +82,22 @@ export function GameShell() {
           <div className="col-start-2 row-start-1 flex justify-center">
             <ComplexityBadge />
           </div>
-          <div className="col-start-3 row-start-1 flex justify-center">
+          <div className="col-start-3 row-start-1 flex items-center justify-between gap-3">
             <NextGoal />
-          </div>
-          <div className="col-start-4 row-start-1 flex justify-end gap-3">
-            <LanguageSwitch />
-            <SaveMenu />
+            <div className="flex gap-3">
+              <LanguageSwitch />
+              <SaveMenu />
+            </div>
           </div>
 
           <div className="col-start-1 row-start-2 flex items-start gap-3">
             <EraIcon icon={era.icon} className="mt-1 h-9 w-9 shrink-0" />
             <div>
               <h1 className="text-3xl font-bold tracking-tight">
-                {t(era.nameKey as TranslationKey)}
+                {eraTitle(t('era.word'), era.index, t(era.nameKey as TranslationKey))}
               </h1>
               {/* Reserved height (2 lines): switching language doesn't shift the rest. */}
-              <p className="mt-0.5 min-h-6 max-w-prose leading-snug text-muted italic">
+              <p className="mt-0.5 min-h-6 max-w-prose text-sm leading-snug text-muted italic">
                 {t(era.taglineKey as TranslationKey)}
               </p>
             </div>
@@ -103,8 +105,12 @@ export function GameShell() {
           <div className="col-start-2 row-start-2 flex justify-center">
             <MemoryFeature />
           </div>
-          <div className="col-start-3 row-start-2 flex justify-center">
-            <MilestoneButton />
+          {/* Centred within the gauge's own width (w-48), pinned to the start of
+              the column, so it stays directly under the gauge as before. */}
+          <div className="col-start-3 row-start-2 flex">
+            <div className="flex w-48 justify-center">
+              <MilestoneButton />
+            </div>
           </div>
         </div>
         <EraTabs />
@@ -114,17 +120,13 @@ export function GameShell() {
 
       {/* Sliding transition between eras (direction by tab order). */}
       <EraTransition eraId={era.id} index={era.index} className="flex flex-col gap-4">
-        {isFullWidthWidget(era.widget) ? (
+        {isWideLayout(era.layout) ? (
           <>
             <section className="-mt-2 flex justify-center pb-2">{central}</section>
-            {/* Resources stay narrow next to the wide machines panel. The
-                civilization eras (Societies -> Industry) widen the resource column
-                a bit, where many eras' resources cohabit and it gets cramped. */}
-            <section
-              className={`grid gap-4 ${
-                era.uiTier === 'civilization' ? 'md:grid-cols-[1fr_2fr]' : 'md:grid-cols-[1fr_3fr]'
-              }`}
-            >
+            {/* Resources stay narrow next to the wide machines panel; 'wide-roomy'
+                eras (Societies -> Industry) widen the resource column a bit, where
+                many eras' resources cohabit and it gets cramped. */}
+            <section className={`grid gap-4 ${wideRowClass(era.layout)}`}>
               <ResourcePanel era={era} />
               <PurchasePanel era={era} wide />
             </section>

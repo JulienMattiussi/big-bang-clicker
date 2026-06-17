@@ -69,7 +69,7 @@ export function ResourcePanel({ era }: { era: EraDef }) {
 
   return (
     <Panel title={t(era.stockKey as TranslationKey)}>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-3 py-1">
         {era.resources
           .filter((id) => revealed.has(id))
           .map((id) => {
@@ -82,7 +82,7 @@ export function ResourcePanel({ era }: { era: EraDef }) {
               <li
                 key={id}
                 title={consumers}
-                className="relative flex items-center justify-between gap-3"
+                className="relative flex items-center justify-between gap-3 py-1"
               >
                 <span className="flex min-w-0 items-center gap-2">
                   {/* Notification badge overlapping the icon's corner: red when
@@ -141,7 +141,7 @@ export function ResourcePanel({ era }: { era: EraDef }) {
         {hasHiddenKey ? (
           <li
             title={t('complexity.toDiscover')}
-            className="flex items-center justify-between gap-3 opacity-70"
+            className="flex items-center justify-between gap-3 py-1 opacity-70"
           >
             <span className="flex min-w-0 items-center gap-2">
               <IconBadge icon="circle-dot" symbol="?" kind="resource" />

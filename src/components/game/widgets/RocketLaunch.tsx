@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState, type ReactElement, type ReactNode } from 'react'
+import { type ReactElement, type ReactNode } from 'react'
 import { useEraMechanic } from './useEraMechanic'
 import { WidgetGalet } from './WidgetGalet'
+import { StarField } from './StarField'
 import { Galet } from '@/components/art/Galet'
+import { useSimLoop } from '@/hooks/useSimLoop'
+import { useArrivalReward } from '@/hooks/useArrivalReward'
 import { announceGalet } from '@/hooks/useGalets'
 import { widgetGaletForEra } from '@/lib/galets'
 import { useGameStore } from '@/store/gameStore'
@@ -20,9 +23,9 @@ import {
   step,
   type Phase,
   type Ship,
-  type World,
+  type RocketWorld,
 } from './rocketWorld'
-import type { TranslationKey } from '@/i18n/types'
+import type { Translate, TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
 
 // Precomputed star field (a few faint dots), shared across the space scenes.
@@ -74,23 +77,6 @@ function Rocket({
   )
 }
 
-function StarField(): ReactElement {
-  return (
-    <>
-      {STARS.map(([x, y], i) => (
-        <circle
-          key={i}
-          cx={x}
-          cy={y}
-          r={i % 3 === 0 ? 1.3 : 0.8}
-          fill="var(--color-fg)"
-          opacity="0.4"
-        />
-      ))}
-    </>
-  )
-}
-
 /** Shared scene frame: a portrait SVG with a soft vertical gradient by phase. */
 function Scene({ phase, children }: { phase: Phase; children: ReactNode }): ReactElement {
   return (
@@ -117,7 +103,7 @@ function Outcome({
   t,
 }: {
   ship: Ship
-  t: (k: TranslationKey) => string
+  t: Translate
 }): ReactElement | null {
   if (!ship.result) return null
   const ok = ship.result === 'land'
@@ -143,29 +129,16 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
   const { t } = useTranslation()
   const { verb, gainBase, gainCombinedScaled } = useEraMechanic(era)
 
-  const [world, setWorld] = useState<World>(freshWorld)
+  const [world, setWorld] = useSimLoop(freshWorld, (w) => step(w, STEP_MS / 1000), STEP_MS)
 
   const defs = useGameStore((s) => s.defs)
   const galet = widgetGaletForEra(defs, era.id)
   const galetFound = useGameStore((s) => (galet ? !!s.state.galets[galet.id]?.found : false))
 
-  // The live loop: a pure step every tick (no side effects in the updater).
-  useEffect(() => {
-    const handle = setInterval(() => setWorld((w) => step(w, STEP_MS / 1000)), STEP_MS)
-    return () => clearInterval(handle)
-  }, [])
-
-  // Reward each fresh successful landing (the delta since last seen), and on the
-  // first one reveal the space-time pebble. Store actions belong in an effect.
-  const rewarded = useRef(0)
-  useEffect(() => {
-    const delta = world.landedTotal - rewarded.current
-    if (delta > 0) {
-      rewarded.current = world.landedTotal
-      gainCombinedScaled(delta) // +1 Colony per landing (galet + era factory mults only)
-      if (galet && !galetFound) announceGalet(galet)
-    }
-  }, [world.landedTotal, gainCombinedScaled, galet, galetFound])
+  useArrivalReward(world.landedTotal, (delta) => {
+    gainCombinedScaled(delta)
+    if (galet && !galetFound) announceGalet(galet)
+  })
 
   const [launch, ascent, cruise, landing] = world.slots
 
@@ -179,7 +152,7 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
     setWorld(addThrust)
     gainBase(1)
   }
-  const act = (fn: (w: World) => World) => () => setWorld(fn)
+  const act = (fn: (w: RocketWorld) => RocketWorld) => () => setWorld(fn)
   const fire = () => setWorld((w) => fireStar(w).world)
 
   const colTitle = (p: Phase) => t(`rocket.phase.${p}` as TranslationKey)
@@ -256,7 +229,7 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
         <Column title={colTitle('ascent')}>
           <div className="relative overflow-hidden rounded-md">
             <Scene phase="ascent">
-              <StarField />
+              <StarField stars={STARS} />
               {ascent ? <AscentScene ship={ascent} /> : <Waiting t={t} />}
             </Scene>
             <SteerButton
@@ -286,7 +259,7 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
             className="relative block w-full overflow-hidden rounded-md transition active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-default"
           >
             <Scene phase="cruise">
-              <StarField />
+              <StarField stars={STARS} />
               {cruise ? <CruiseScene ship={cruise} /> : <Waiting t={t} />}
             </Scene>
           </button>
@@ -297,7 +270,7 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
         <Column title={colTitle('landing')}>
           <div className="relative overflow-hidden rounded-md">
             <Scene phase="landing">
-              <StarField />
+              <StarField stars={STARS} />
               <path d="M0 138 Q50 120 100 138 V150 H0 Z" fill="var(--color-fg)" opacity="0.16" />
               {landing ? (
                 <>
@@ -387,7 +360,7 @@ function Column({ title, children }: { title: string; children: ReactNode }): Re
   )
 }
 
-function Waiting({ t }: { t: (k: TranslationKey) => string }): ReactElement {
+function Waiting({ t }: { t: Translate }): ReactElement {
   return (
     <text x="50" y="78" textAnchor="middle" className="fill-muted text-[8px]" opacity="0.6">
       {t('rocket.waiting')}

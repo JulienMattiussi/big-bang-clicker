@@ -112,20 +112,16 @@ const MOTIFS: Record<string, (color: string) => ReactElement> = {
       </g>
     )
   },
-  // A stylised ascending starbird inside an arc - a rebel emblem (original design).
+  // A rebel starbird: a near-circular crest with a flaming central crown and two
+  // raised wings, split from it by a pair of slits (the two reverse-wound loops,
+  // carved out by nonzero fill). Sat on the body, clear of the snout.
   rebel: (color) => (
-    <g
-      transform="translate(18 16)"
-      fill="none"
-      stroke={color}
-      strokeWidth="1.3"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M-10 3 A 11 11 0 0 1 10 3" opacity="0.6" />
-      <path d="M-9 5 C -5 -2 -2 -7 0 -9 C 2 -7 5 -2 9 5" />
-      <path d="M0 -8 V 6" />
-      <circle r="1.3" cy="-9" fill={color} stroke="none" />
+    <g transform="translate(17 15.5) scale(1.13)">
+      <path
+        fill={color}
+        fillRule="nonzero"
+        d="M0,8 C2.6,8 4.4,7 5.8,5.7 C7.1,4.4 7.9,2.6 8,0.3 C8.05,-1.4 7.9,-3 7.4,-4.3 L5.8,-7.6 L4.7,-5.9 L3,-3 L1.9,-7 L0.9,-4.7 L0,-8.7 L-0.9,-4.7 L-1.9,-7 L-3,-3 L-4.7,-5.9 L-5.8,-7.6 L-7.4,-4.3 C-7.9,-3 -8.05,-1.4 -8,0.3 C-7.9,2.6 -7.1,4.4 -5.8,5.7 C-4.4,7 -2.6,8 0,8 Z M4,-5.4 C4.42,-4.95 5.37,-3.33 5.7,-2.2 C6.03,-1.07 6.18,0.3 6,1.4 C5.82,2.5 5.12,3.77 4.6,4.4 C4.08,5.03 3.33,5.5 2.9,5.2 C2.47,4.9 2.1,3.57 2,2.6 C1.9,1.63 2.18,0.4 2.3,-0.6 C2.42,-1.6 2.55,-2.68 2.7,-3.4 C2.85,-4.12 2.98,-4.57 3.2,-4.9 C3.42,-5.23 3.58,-5.85 4,-5.4 Z M-3.2,-4.9 C-2.98,-4.57 -2.85,-4.12 -2.7,-3.4 C-2.55,-2.68 -2.42,-1.6 -2.3,-0.6 C-2.18,0.4 -1.9,1.63 -2,2.6 C-2.1,3.57 -2.47,4.9 -2.9,5.2 C-3.33,5.5 -4.08,5.03 -4.6,4.4 C-5.12,3.77 -5.82,2.5 -6,1.4 C-6.18,0.3 -6.03,-1.07 -5.7,-2.2 C-5.37,-3.33 -4.42,-4.95 -4,-5.4 C-3.58,-5.85 -3.42,-5.23 -3.2,-4.9 Z"
+      />
     </g>
   ),
 }

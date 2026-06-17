@@ -8,10 +8,18 @@ export type ResourceId = string
 export type EraId = string
 export type GeneratorId = string
 export type ConverterId = string
-export type UpgradeId = string
 export type CrisisId = string
 
 export type UiTier = 'cosmos' | 'life' | 'civilization' | 'space' | 'transcendence'
+
+/**
+ * Page disposition chosen per era (see the catalogue in components/layout/eraLayout.ts):
+ * - compact:    widget centred in a 3-column row (resources | widget | machines)
+ * - wide:       widget full-width on top, then resources (1fr) | machines (3fr)
+ * - wide-roomy: like wide, with a roomier resources column (1fr | 2fr)
+ * - wide-split: like wide, but the machines panel splits 2fr:3fr (one wider card)
+ */
+export type EraLayoutName = 'compact' | 'wide' | 'wide-roomy' | 'wide-split'
 
 /** An amount of a resource (recipe input/output, cost...). */
 export interface ResourceAmount {
@@ -76,16 +84,6 @@ export interface Effect {
   /** Destination resource (for transformResource: target -> to). */
   to?: ResourceId
   value?: number
-}
-
-export interface UpgradeDef {
-  id: UpgradeId
-  eraId: EraId
-  nameKey: string
-  descKey: string
-  cost: ResourceAmount[]
-  requires?: UpgradeId[]
-  effects: Effect[]
 }
 
 /** Prestige meta-upgrade: a permanent bonus bought with Echoes. */
@@ -205,11 +203,12 @@ export interface EraDef {
   icon: string
   uiTier: UiTier
   widget: string
+  /** Page/panel disposition (see EraLayoutName). */
+  layout: EraLayoutName
   unlock: { resource?: ResourceId; amount?: number; complexity?: number }
   resources: ResourceId[]
   generators: GeneratorId[]
   converters: ConverterId[]
-  upgrades: UpgradeId[]
   crises: CrisisId[]
 }
 
@@ -219,7 +218,6 @@ export interface GameDefs {
   resources: Record<ResourceId, ResourceDef>
   generators: Record<GeneratorId, GeneratorDef>
   converters: Record<ConverterId, ConverterDef>
-  upgrades: Record<UpgradeId, UpgradeDef>
   crises: Record<CrisisId, CrisisDef>
   metaUpgrades: MetaUpgradeDef[]
   galets: GaletDef[]
@@ -250,7 +248,6 @@ export interface GameState {
   resources: Record<ResourceId, number>
   generators: Record<GeneratorId, GeneratorState>
   converters: Record<ConverterId, ConverterState>
-  upgrades: Record<UpgradeId, boolean>
   crises: Record<CrisisId, CrisisRuntime>
   /** Production multipliers per resource, plus the 'global' and 'meta' keys. */
   multipliers: Record<string, number>

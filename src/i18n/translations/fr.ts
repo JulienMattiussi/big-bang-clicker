@@ -56,6 +56,8 @@ export const fr = {
   'app.unlock': 'Franchir le palier',
   'lang.label': 'Langue',
   'nav.eras': 'Ères',
+  // Singular word used to prefix an era by its number, e.g. "Ère 1 : Big Bang".
+  'era.word': 'Ère',
 
   'ui.buy': 'Améliorer',
   'ui.perSecond': '/s',

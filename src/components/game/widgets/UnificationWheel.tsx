@@ -8,9 +8,14 @@ import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
 
-const SPOKE_IN = 17 // spoke start radius (svg units, around the core)
-const SPOKE_OUT = 33 // spoke end radius
-const ICON_R = 44 // era-icon ring radius (% of the square)
+// Flattened wide ellipse (viewBox 200x100, same 2:1 ratio as the box, so strokes
+// stay uniform). Centre (100,50); radii below are in those viewBox units.
+const CX = 100
+const CY = 50
+const RING_X = 86 // era-icon ring: horizontal radius
+const RING_Y = 40 // era-icon ring: vertical radius
+const SPOKE_IN = 0.4 // spoke start, as a fraction of the ring radius
+const SPOKE_OUT = 0.74 // spoke end, as a fraction of the ring radius
 
 /**
  * Era 17 (The Great Unification): the conclusive system. The era's recipe draws
@@ -41,24 +46,29 @@ export function UnificationWheel({ era }: { era: EraDef }): ReactElement {
   }
 
   return (
-    <div className="mt-4 flex w-full flex-col items-center gap-3">
+    <div className="mt-2 flex w-full flex-col items-center gap-2">
       <span className="inline-flex items-center gap-2 text-base font-semibold text-fg">
         {verb}
         <WidgetGalet />
       </span>
 
-      <div className="relative aspect-square w-full max-w-md">
-        <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden>
+      <div className="relative aspect-9/4 w-full max-w-2xl">
+        <svg
+          viewBox="0 0 200 100"
+          preserveAspectRatio="none"
+          className="absolute inset-0 h-full w-full"
+          aria-hidden
+        >
           {feeders.map((e, i) => {
             const { cos, sin } = at(i)
             const ok = (resources[e.clickResource] ?? 0) > 0
             return (
               <line
                 key={e.id}
-                x1={50 + SPOKE_IN * cos}
-                y1={50 + SPOKE_IN * sin}
-                x2={50 + SPOKE_OUT * cos}
-                y2={50 + SPOKE_OUT * sin}
+                x1={CX + RING_X * SPOKE_IN * cos}
+                y1={CY + RING_Y * SPOKE_IN * sin}
+                x2={CX + RING_X * SPOKE_OUT * cos}
+                y2={CY + RING_Y * SPOKE_OUT * sin}
                 stroke="var(--color-accent)"
                 strokeWidth={ok ? 1.4 : 0.8}
                 strokeLinecap="round"
@@ -66,9 +76,9 @@ export function UnificationWheel({ era }: { era: EraDef }): ReactElement {
               />
             )
           })}
-          {/* universe-city core */}
-          <circle cx="50" cy="50" r="15" fill="var(--color-accent)" opacity="0.12" />
-          <circle cx="50" cy="50" r="10" fill="var(--color-accent)" opacity="0.22" />
+          {/* universe-city core glow (flattened to match the disk) */}
+          <ellipse cx={CX} cy={CY} rx="28" ry="14" fill="var(--color-accent)" opacity="0.12" />
+          <ellipse cx={CX} cy={CY} rx="19" ry="9.5" fill="var(--color-accent)" opacity="0.22" />
         </svg>
 
         {/* The gesture: forge the unification at the core. */}
@@ -76,7 +86,7 @@ export function UnificationWheel({ era }: { era: EraDef }): ReactElement {
           type="button"
           onClick={tap}
           aria-label={verb}
-          className="absolute top-1/2 left-1/2 flex h-[26%] w-[26%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-accent bg-bg/70 text-accent transition select-none hover:bg-bg/90 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="absolute top-1/2 left-1/2 flex aspect-square h-[46%] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border-2 border-accent bg-bg/70 text-accent transition select-none hover:bg-bg/90 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         >
           <Icon name="universe-city" className="h-8 w-8" aria-hidden />
         </button>
@@ -92,7 +102,7 @@ export function UnificationWheel({ era }: { era: EraDef }): ReactElement {
               className={`absolute flex h-7 w-7 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border text-xs transition ${
                 ok ? 'border-accent bg-surface text-accent' : 'border-border bg-bg text-muted opacity-40'
               }`}
-              style={{ left: `${50 + ICON_R * cos}%`, top: `${50 + ICON_R * sin}%` }}
+              style={{ left: `${50 + (RING_X / 2) * cos}%`, top: `${50 + RING_Y * sin}%` }}
               title={def ? t(def.nameKey as TranslationKey) : e.id}
             >
               {def?.symbol ? (

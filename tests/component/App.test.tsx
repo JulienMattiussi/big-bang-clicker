@@ -17,7 +17,8 @@ describe('App', () => {
 
   it("affiche l'ère de départ et son verbe (FR)", () => {
     render(<App />)
-    expect(screen.getByRole('heading', { name: 'Big Bang' })).toBeInTheDocument()
+    // Title is prefixed by the era's 1-based number ("Ère 1 : Big Bang").
+    expect(screen.getByRole('heading', { name: 'Ère 1 : Big Bang' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Refroidir' })).toBeInTheDocument()
   })
 

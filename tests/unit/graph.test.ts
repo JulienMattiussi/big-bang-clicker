@@ -27,7 +27,6 @@ const defs: GameDefs = {
       resources: ['a', 'b', 'c'],
       generators: ['genA'],
       converters: ['makeB', 'makeC'],
-      upgrades: [],
       crises: [],
     },
   ],
@@ -59,7 +58,6 @@ const defs: GameDefs = {
       cost: [],
     },
   },
-  upgrades: {},
   crises: {},
 }
 

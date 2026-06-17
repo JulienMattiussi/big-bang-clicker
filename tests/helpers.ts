@@ -24,7 +24,6 @@ export function makeEra(overrides: Partial<EraDef> = {}): EraDef {
     resources: [],
     generators: [],
     converters: [],
-    upgrades: [],
     crises: [],
     ...overrides,
   }
@@ -37,7 +36,6 @@ export function makeDefs(overrides: Partial<GameDefs> = {}): GameDefs {
     resources: {},
     generators: {},
     converters: {},
-    upgrades: {},
     crises: {},
     metaUpgrades: [],
     galets: [],

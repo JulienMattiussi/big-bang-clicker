@@ -5,14 +5,7 @@ import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
 import { MEMORY_LEVELS, memoryLevel, memoryUnlocked } from '@/lib/memory'
 import { useTranslation } from '@/i18n/useTranslation'
-
-interface Intro {
-  transform: string
-  top: number
-  left: number
-  width: number
-  height: number
-}
+import type { IntroRect } from '@/components/ui/introRect'
 
 /**
  * Entry point of the memory mini-game: a distinct call-to-action button (a card
@@ -37,7 +30,7 @@ export function MemoryFeature() {
   const [open, setOpen] = useState(false)
 
   const btnRef = useRef<HTMLButtonElement>(null)
-  const [intro, setIntro] = useState<Intro | null>(null)
+  const [intro, setIntro] = useState<IntroRect | null>(null)
   const [landed, setLanded] = useState(false)
 
   // On highlight (modal just closed): measure the real button and spawn a giant

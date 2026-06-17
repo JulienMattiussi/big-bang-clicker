@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { EraIcon } from '@/components/game/EraIcon'
+import { eraTitle } from '@/components/game/eraTitle'
 import { AlertBadge } from '@/components/ui/AlertBadge'
 import { useGameStore } from '@/store/gameStore'
 import { decliningResources, stalledResources } from '@/lib/graph'
@@ -101,6 +102,8 @@ export function EraTabs() {
   const renderTab = (era: (typeof visible)[number], showLabel: boolean) => {
     const active = era.id === current
     const name = t(era.nameKey as TranslationKey)
+    // Numbered form ("Ère 1 : Big Bang") for the tooltip and the icon-only a11y name.
+    const numbered = eraTitle(t('era.word'), era.index, name)
     return (
       <button
         key={era.id}
@@ -108,8 +111,8 @@ export function EraTabs() {
         type="button"
         disabled={active}
         aria-current={active ? 'true' : undefined}
-        aria-label={showLabel ? undefined : name}
-        title={showLabel ? undefined : name}
+        aria-label={showLabel ? undefined : numbered}
+        title={numbered}
         onClick={() => setEra(era.id)}
         className={`${TAB_BASE} ${
           active

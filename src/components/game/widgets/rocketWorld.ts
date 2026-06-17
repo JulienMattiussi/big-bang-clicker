@@ -41,7 +41,7 @@ export interface Ship {
   flash: number // seconds left on the outcome flash before removal
 }
 
-export interface World {
+export interface RocketWorld {
   slots: (Ship | null)[] // length 4, indexed by PHASES
   nextId: number
   landedTotal: number // cumulative successful landings (the component rewards the delta)
@@ -107,7 +107,7 @@ function freshLaunch(id: number, color: number): Ship {
   }
 }
 
-export function freshWorld(): World {
+export function freshWorld(): RocketWorld {
   const color = Math.floor(Math.random() * ROCKET_COLORS)
   return {
     slots: [freshLaunch(1, color), null, null, null],
@@ -119,7 +119,7 @@ export function freshWorld(): World {
 
 /** Advances every in-flight ship by dt. `landedTotal` grows by each ship that just
  *  landed safely this step, so the caller can reward the delta. */
-export function step(world: World, dt: number): World {
+export function step(world: RocketWorld, dt: number): RocketWorld {
   // Idle: nothing in flight and the pad rocket has fully slid in but is not yet
   // thrusting - step would only re-clone an unchanged world. Return the SAME
   // reference so setState skips the re-render (the widget steps continuously,
@@ -283,7 +283,7 @@ export function step(world: World, dt: number): World {
 }
 
 /** Click the rocket: add thrust to the launch ship. */
-export function addThrust(world: World): World {
+export function addThrust(world: RocketWorld): RocketWorld {
   const launch = world.slots[0]
   if (!launch || launch.arrive < 100 || launch.thrust >= 100) return world
   const slots = [...world.slots]
@@ -293,7 +293,7 @@ export function addThrust(world: World): World {
 
 /** Tap left/right to right a jolted ascending rocket. The correct side (opposite
  *  the lean) straightens it; the wrong side tips it over. Idle taps do nothing. */
-export function nudge(world: World, dir: number): World {
+export function nudge(world: RocketWorld, dir: number): RocketWorld {
   const ascent = world.slots[1]
   if (!ascent || ascent.result || ascent.corrected >= ascent.needed) return world
   if (ascent.tilt === 0) return world // nothing to correct right now
@@ -317,7 +317,7 @@ export function nudge(world: World, dir: number): World {
 
 /** Fire when a sight is on the star. Two stages: first the horizontal (X) sight,
  *  then the vertical (Y) one; the second catch locks the heading. */
-export function fireStar(world: World): { world: World; hit: boolean } {
+export function fireStar(world: RocketWorld): { world: RocketWorld; hit: boolean } {
   const cruise = world.slots[2]
   if (!cruise || cruise.locked) return { world, hit: false }
   const slots = [...world.slots]
@@ -333,7 +333,7 @@ export function fireStar(world: World): { world: World; hit: boolean } {
 }
 
 /** Tap left/right to steer the landing ship toward the pad. */
-export function steer(world: World, dir: number): World {
+export function steer(world: RocketWorld, dir: number): RocketWorld {
   const land = world.slots[3]
   if (!land || land.result) return world
   const slots = [...world.slots]

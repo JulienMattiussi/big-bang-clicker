@@ -8,6 +8,7 @@ const bundles: EraBundle[] = [
     uiTier: 'space',
     icon: 'telescope',
     widget: 'rocket',
+    layout: 'wide',
     base: { id: 'fuel', icon: 'jerrycan', tier: 16 },
     combined: { id: 'colony', icon: 'rocket', tier: 18 },
     consumes: 'technology',
@@ -25,6 +26,7 @@ const bundles: EraBundle[] = [
     uiTier: 'space',
     icon: 'radar',
     widget: 'massrelay',
+    layout: 'wide',
     base: { id: 'ship', icon: 'ship', tier: 17 },
     combined: { id: 'federation', icon: 'satellite', tier: 19 },
     consumes: 'colony',
@@ -41,6 +43,7 @@ const bundles: EraBundle[] = [
     // Era icon (grand unification) kept distinct from its resources.
     icon: 'unification',
     widget: 'unification',
+    layout: 'wide-split',
     base: { id: 'district', icon: 'district', tier: 19 },
     combined: { id: 'universeCity', icon: 'universe-city', tier: 21 },
     consumes: 'federation',

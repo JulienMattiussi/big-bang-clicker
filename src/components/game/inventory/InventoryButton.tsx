@@ -5,14 +5,7 @@ import { useGameStore } from '@/store/gameStore'
 import { useInventoryStore } from '@/store/inventoryStore'
 import { backpackUnlocked } from '@/lib/inventory'
 import { useTranslation } from '@/i18n/useTranslation'
-
-interface Intro {
-  transform: string
-  top: number
-  left: number
-  width: number
-  height: number
-}
+import type { IntroRect } from '@/components/ui/introRect'
 
 /**
  * Round backpack button (right of the pebble receptacle) opening the global
@@ -29,7 +22,7 @@ export function InventoryButton() {
   const [open, setOpen] = useState(false)
 
   const btnRef = useRef<HTMLButtonElement>(null)
-  const [intro, setIntro] = useState<Intro | null>(null)
+  const [intro, setIntro] = useState<IntroRect | null>(null)
   const [landed, setLanded] = useState(false)
 
   // On highlight (unlock modal just closed): measure the real button and spawn a

@@ -11,7 +11,7 @@ import { sign } from './integrity'
 /** v2 introduced the signed save envelope; v3 stopped baking memory/crisis
  *  multipliers into `multipliers` (now derived from levels/counts); v4 merged the
  *  Intergalactic era into the Intergalactic Voyage and shifted later era ids. */
-export const SAVE_VERSION = 4
+export const SAVE_VERSION = 5
 export const SAVE_KEY = 'big-bang-clicker:save'
 /** Cap on the offline-idle credit (anti clock-cheat). */
 export const DEFAULT_OFFLINE_CAP_SECONDS = 60 * 60 * 8
@@ -28,7 +28,6 @@ export function createInitialState(now: number, firstEraId: EraId = ''): GameSta
     resources: {},
     generators: {},
     converters: {},
-    upgrades: {},
     crises: {},
     multipliers: {},
     complexity: 0,
@@ -75,6 +74,13 @@ const migrations: Record<number, Migration> = {
       currentEraId: remap(state.currentEraId),
       version: 4,
     }
+  },
+  // v4 -> v5: the per-era "upgrades" system (scaffolded since init, never built)
+  // was removed. Drop the dead persisted field so it stops carrying over.
+  4: (state) => {
+    const next = { ...state, version: 5 } as GameState & { upgrades?: unknown }
+    delete next.upgrades
+    return next
   },
 }
 

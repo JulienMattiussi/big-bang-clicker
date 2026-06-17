@@ -21,6 +21,7 @@ const bundles: EraBundle[] = [
     uiTier: 'civilization',
     icon: 'landmark',
     widget: 'city',
+    layout: 'wide-roomy',
     base: { id: 'population', icon: 'users', tier: 13 },
     combined: { id: 'city', icon: 'city', tier: 15 },
     consumes: 'knowledge',
@@ -34,6 +35,7 @@ const bundles: EraBundle[] = [
     uiTier: 'civilization',
     icon: 'swords',
     widget: 'map',
+    layout: 'wide-roomy',
     base: { id: 'trade', icon: 'coins', tier: 14 },
     combined: { id: 'empire', icon: 'crown', tier: 25 },
     consumes: 'city',
@@ -46,6 +48,7 @@ const bundles: EraBundle[] = [
     index: 14,
     uiTier: 'civilization',
     widget: 'inventions',
+    layout: 'wide-roomy',
     // Era icon (industry) kept distinct from its resources (research, technology).
     icon: 'hammer',
     base: { id: 'research', icon: 'flask', tier: 15 },

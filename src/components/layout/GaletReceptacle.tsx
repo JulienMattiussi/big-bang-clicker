@@ -5,14 +5,10 @@ import { useGameStore } from '@/store/gameStore'
 import { useGaletStore } from '@/store/galetStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
+import type { IntroRect } from '@/components/ui/introRect'
 
-interface GaletIntro {
+interface GaletIntro extends IntroRect {
   id: string
-  transform: string
-  top: number
-  left: number
-  width: number
-  height: number
 }
 
 /** Pebble size inside a socket (px); the FLIP clone matches it. */

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useCrisisStore, CRISIS_GOAL } from '@/store/crisisStore'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
-import { GROUND_Y, H, IMPACT_R, STEP_MS, W, freshWorld, step, type World } from './crisisWorld'
+import { GROUND_Y, H, IMPACT_R, STEP_MS, W, freshWorld, step, type CrisisWorld } from './crisisWorld'
 import { CritterGlyph, MeteorGlyph } from '@/components/art/CrisisCreatures'
 
 /**
@@ -22,7 +22,7 @@ export function ExtinctionGame() {
   const resolveCrisis = useGameStore((s) => s.resolveCrisis)
   const enqueueEvent = useGameStore((s) => s.enqueueEvent)
 
-  const [world, setWorld] = useState<World>(freshWorld)
+  const [world, setWorld] = useState<CrisisWorld>(freshWorld)
   const won = useRef(false)
 
   useEffect(() => {

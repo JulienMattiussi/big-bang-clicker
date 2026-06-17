@@ -2,6 +2,7 @@ import type {
   ConverterDef,
   CostCurve,
   EraDef,
+  EraLayoutName,
   GeneratorDef,
   ResourceAmount,
   ResourceDef,
@@ -47,6 +48,8 @@ export interface SimpleEraSpec {
   uiTier: UiTier
   icon: string
   widget?: string
+  /** Page/panel disposition; defaults to 'compact' (see EraLayoutName). */
+  layout?: EraLayoutName
   base: EraResourceSpec
   generatorId: string
   /** Cost of the generator's first level (default 100). */
@@ -190,11 +193,11 @@ export function buildEra(spec: SimpleEraSpec): EraBundle {
     icon: spec.icon,
     uiTier: spec.uiTier,
     widget: spec.widget ?? 'generic',
+    layout: spec.layout ?? 'compact',
     unlock: spec.unlockComplexity != null ? { complexity: spec.unlockComplexity } : {},
     resources: resources.map((r) => r.id),
     generators: [spec.generatorId],
     converters: converters.map((c) => c.id),
-    upgrades: [],
     crises: [],
   }
 

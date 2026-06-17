@@ -43,25 +43,3 @@ export const INTERACTIVE_WIDGETS: Record<string, (props: { era: EraDef }) => Rea
   massrelay: MassRelay,
   unification: UnificationWheel,
 }
-
-/**
- * Interactive widgets that need the full content width (shown above the panels).
- * Compact ones stay centered in the 3-column layout, like the non-interactive
- * eras.
- */
-const FULLWIDTH_WIDGETS = new Set([
-  'periodic',
-  'accretion',
-  'assembly',
-  'tree',
-  'city',
-  'map',
-  'inventions',
-  'rocket',
-  'massrelay',
-  'unification',
-])
-
-export function isFullWidthWidget(widget: string): boolean {
-  return FULLWIDTH_WIDGETS.has(widget)
-}

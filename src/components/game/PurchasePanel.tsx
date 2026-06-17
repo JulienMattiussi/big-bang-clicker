@@ -13,6 +13,7 @@ import {
   nextCost,
 } from '@/lib/engine'
 import { revealedMachines } from '@/lib/reveal'
+import { isSplitMachines } from '@/components/layout/eraLayout'
 import {
   galetsAffectingConverter,
   galetsAffectingGenerator,
@@ -23,10 +24,9 @@ import {
   MachineRow,
   type FlowEntry,
   type GaletBadge,
-  type T,
 } from '@/components/game/MachineRow'
 import { formatNumber } from '@/lib/format'
-import type { TranslationKey } from '@/i18n/types'
+import type { Translate, TranslationKey } from '@/i18n/types'
 import type {
   ConverterDef,
   EraDef,
@@ -36,7 +36,7 @@ import type {
   ResourceId,
 } from '@/lib/types'
 
-function describeCost(cost: Record<ResourceId, number>, defs: GameDefs, t: T): string {
+function describeCost(cost: Record<ResourceId, number>, defs: GameDefs, t: Translate): string {
   return Object.entries(cost)
     .map(
       ([id, amount]) =>
@@ -46,7 +46,7 @@ function describeCost(cost: Record<ResourceId, number>, defs: GameDefs, t: T): s
 }
 
 /** Tooltip for the manual "Produce" button: what one recipe consumes and produces. */
-function describeRecipe(conv: ConverterDef, defs: GameDefs, t: T): string {
+function describeRecipe(conv: ConverterDef, defs: GameDefs, t: Translate): string {
   const side = (list: ResourceAmount[]) =>
     list
       .map(
@@ -75,9 +75,14 @@ export function PurchasePanel({ era, wide = false }: { era: EraDef; wide?: boole
   const revealedCount =
     era.generators.filter((id) => revealed.has(id)).length +
     era.converters.filter((id) => revealed.has(id)).length
+  // 'wide-split' eras give one card extra width (e.g. the Unification's long,
+  // one-input-per-era recipe) so its inputs fit on several columns; its partner
+  // (rendered first, a generator) is squeezed accordingly.
   const wideGrid =
     revealedCount <= 2
-      ? 'grid grid-cols-1 gap-2 sm:grid-cols-2'
+      ? isSplitMachines(era.layout)
+        ? 'grid grid-cols-1 gap-2 sm:grid-cols-[2fr_3fr]'
+        : 'grid grid-cols-1 gap-2 sm:grid-cols-2'
       : 'grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3'
 
   // Era a resource belongs to, only when it differs from the current one

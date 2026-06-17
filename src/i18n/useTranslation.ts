@@ -1,9 +1,9 @@
 import { useI18nStore } from './i18nStore'
 import { translations } from './translations'
-import type { Locale, TranslationKey } from './types'
+import type { Locale, Translate, TranslationKey } from './types'
 
 interface UseTranslation {
-  t: (key: TranslationKey) => string
+  t: Translate
   locale: Locale
   setLocale: (locale: Locale) => void
 }

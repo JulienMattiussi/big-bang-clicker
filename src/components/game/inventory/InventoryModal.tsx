@@ -43,7 +43,7 @@ export function InventoryModal({ onClose }: { onClose: () => void }) {
       onClose={onClose}
       closeOnBackdrop
       labelledBy="inventory-title"
-      className="modal-in h-full max-h-[92vh] w-full max-w-5xl perspective-[2200px]"
+      className="modal-in h-full max-h-[92vh] w-full max-w-6xl perspective-[2200px]"
     >
       <div
         className={`grid h-full transition-transform duration-500 transform-3d ${
@@ -74,7 +74,7 @@ export function InventoryModal({ onClose }: { onClose: () => void }) {
           {/* Masonry: era blocks flow into several columns and stack within each
               to fill the space (a column is NOT one era). */}
           <div className="min-h-0 flex-1 overflow-y-auto p-5 pb-16">
-            <div className="columns-1 gap-3 sm:columns-2 lg:columns-3 xl:columns-4">
+            <div className="columns-1 gap-3 sm:columns-2 lg:columns-3 xl:columns-4 2xl:columns-5">
               {groups.map(({ era, resources }) => (
                 <section
                   key={era.id}

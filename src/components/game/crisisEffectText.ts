@@ -1,8 +1,6 @@
 import { formatNumber } from '@/lib/format'
 import type { Effect, GameDefs, ResourceDef } from '@/lib/types'
-import type { TranslationKey } from '@/i18n/types'
-
-type Translate = (key: TranslationKey) => string
+import type { Translate, TranslationKey } from '@/i18n/types'
 
 /** A crisis effect ready to render as an aligned row: the affected thing's name,
  *  the magnitude (loss/gain), and the resource (for its icon + era icon). */

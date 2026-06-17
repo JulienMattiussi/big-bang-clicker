@@ -38,7 +38,7 @@ const COL_W = (PARL_RIGHT - PARL_LEFT) / SEAT_COLS
 /** Y of each gradin ledge (front row last), for drawing the stone tiers. */
 export const SEAT_TIERS = Array.from({ length: SEAT_ROWS }, (_, r) => SEAT_BOTTOM - r * ROW_H)
 
-export type PersonState = 'angry' | 'walking' | 'seated'
+type PersonState = 'angry' | 'walking' | 'seated'
 export interface Person {
   id: number
   x: number

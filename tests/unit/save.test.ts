@@ -29,7 +29,6 @@ const defs: GameDefs = {
     },
   },
   converters: {},
-  upgrades: {},
   crises: {},
 }
 

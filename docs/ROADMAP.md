@@ -41,7 +41,7 @@ de `./MyRepos`.
 Objectif : un moteur qui sait jouer **une** ère, piloté par des données.
 
 - [x] Types du domaine (`src/lib/types.ts`) : Era, Resource, Generator,
-      Converter, Upgrade, Crisis, GameState.
+      Converter, Crisis, GameState.
 - [x] Moteur de tick (`engine.ts`) : production, conversions bornées,
       coûts géométriques, achats, Complexité.
 - [x] `src/lib/format.ts` (notation abrégée des grands nombres).

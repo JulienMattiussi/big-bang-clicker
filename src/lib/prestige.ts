@@ -37,7 +37,6 @@ export function prestige(state: GameState, now: number): GameState {
     resources: {},
     generators: {},
     converters: {},
-    upgrades: {},
     crises: {},
     multipliers: {},
     complexity: 0,

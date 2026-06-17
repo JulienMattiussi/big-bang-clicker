@@ -57,6 +57,7 @@ export const en: Translations = {
   'app.unlock': 'Reach the milestone',
   'lang.label': 'Language',
   'nav.eras': 'Eras',
+  'era.word': 'Era',
 
   'ui.buy': 'Upgrade',
   'ui.perSecond': '/s',

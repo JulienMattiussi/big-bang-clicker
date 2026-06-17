@@ -20,14 +20,14 @@ export interface Invention {
 }
 
 /** A buzzword restyling applied to the whole list on each loop. */
-export interface Variant {
+interface InventionVariant {
   /** i18n suffix keys live under `invent.variant.<key>.tag` / `.note`. */
   key: string
   /** Fixed palette token for the recoloured glyph (see theme.css). */
   color: string
 }
 
-export const VARIANTS: Variant[] = [
+export const VARIANTS: InventionVariant[] = [
   { key: 'usb', color: 'var(--stone-light)' },
   { key: 'bluetooth', color: 'var(--part-6)' },
   { key: 'laser', color: 'var(--part-1)' },

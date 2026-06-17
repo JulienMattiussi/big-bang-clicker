@@ -35,7 +35,7 @@ interface Flash {
   x: number
   born: number
 }
-export interface World {
+export interface CrisisWorld {
   creatures: Creature[]
   meteors: Meteor[]
   flashes: Flash[]
@@ -47,7 +47,7 @@ export interface World {
 
 const rand = (a: number, b: number) => a + Math.random() * (b - a)
 
-export const freshWorld = (): World => ({
+export const freshWorld = (): CrisisWorld => ({
   creatures: [],
   meteors: [],
   flashes: [],
@@ -58,7 +58,7 @@ export const freshWorld = (): World => ({
 })
 
 /** Advances the world one STEP_MS tick (pure: returns a new world). */
-export function step(prev: World): World {
+export function step(prev: CrisisWorld): CrisisWorld {
   const dt = STEP_MS / 1000
   const time = prev.time + STEP_MS
   let next = prev.next

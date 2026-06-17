@@ -5,9 +5,7 @@ import { Icon } from '@/components/ui/Icon'
 import { EraIcon } from '@/components/game/EraIcon'
 import { Galet } from '@/components/art/Galet'
 import { formatFixed } from '@/lib/format'
-import type { TranslationKey } from '@/i18n/types'
-
-export type T = (key: TranslationKey) => string
+import type { Translate } from '@/i18n/types'
 
 /** A machine flow entry: a resource and its per-second rate now and next level. */
 export interface FlowEntry {
@@ -22,13 +20,24 @@ export interface FlowEntry {
 }
 
 function FlowLine({ label, entries }: { label: string; entries: FlowEntry[] }) {
-  // Stack the resources vertically when there are several (more readable than
-  // a long inline row, e.g. recombination consuming nucleons + electrons).
-  const stacked = entries.length > 1
+  // A few resources stack vertically (more readable than a long inline row, e.g.
+  // recombination consuming nucleons + electrons); long lists (the Unification's
+  // one-per-era recipe) wrap into columns to stay short.
+  const n = entries.length
+  const layout =
+    n <= 1
+      ? 'flex flex-wrap items-center gap-x-2'
+      : n <= 4
+        ? 'flex flex-col gap-0.5'
+        : n <= 8
+          ? 'grid grid-cols-2 gap-x-3 gap-y-0.5'
+          : n <= 12
+            ? 'grid grid-cols-3 gap-x-3 gap-y-0.5'
+            : 'grid grid-cols-4 gap-x-3 gap-y-0.5'
   return (
     <div className="flex items-start gap-2">
       <span className="shrink-0">{label}</span>
-      <div className={stacked ? 'flex flex-col gap-0.5' : 'flex flex-wrap items-center gap-x-2'}>
+      <div className={layout}>
         {entries.map((e, i) => (
           <span
             key={i}
@@ -62,7 +71,7 @@ export function MachineFlows({
   consume,
   produce,
 }: {
-  t: T
+  t: Translate
   consume: FlowEntry[]
   produce: FlowEntry[]
 }) {
@@ -92,7 +101,7 @@ interface RowProps {
   costLabel: string
   affordable: boolean
   onBuy: () => void
-  t: T
+  t: Translate
   flows: ReactNode
   /** Converters only: manual craft (one recipe per click) + automation toggle. */
   onCraft?: () => void

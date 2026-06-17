@@ -45,7 +45,6 @@ const defs: GameDefs = {
       cost: [{ resource: 'quark', base: 50, growth: 1.2 }],
     },
   },
-  upgrades: {},
   crises: {},
 }
 

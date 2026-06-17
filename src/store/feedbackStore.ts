@@ -8,7 +8,7 @@ import { create } from 'zustand'
  */
 export type FloaterTone = 'gain' | 'resource' | 'spend'
 
-export interface Floater {
+interface Floater {
   id: number
   /** Counter the floater is anchored to, e.g. 'complexity' or 'res:star'. */
   target: string
