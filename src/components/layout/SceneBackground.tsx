@@ -70,8 +70,13 @@ export function SceneBackground({ eraIndex }: { eraIndex: number }): ReactElemen
         frozen ? 'scene-paused' : ''
       }`}
     >
-      {/* Keyed so switching era groups fades the new scene in. */}
-      <div key={scene} className="bg-scene absolute inset-0">
+      {/* Keyed so switching era groups fades the new scene in. The city-universe
+          finale is softened (depth of field) so it sits behind the widget. The
+          slight scale-up hides the blur's transparent edge bleed. */}
+      <div
+        key={scene}
+        className={`bg-scene absolute inset-0 ${scene === 'cityUniverse' ? 'scale-105 blur-[3px]' : ''}`}
+      >
         <Scene eraIndex={eraIndex} />
       </div>
     </div>
