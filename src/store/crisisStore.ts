@@ -14,6 +14,7 @@ export const CRISIS_GAMES = new Set([
   'y2k',
   'machineRebellion',
   'encounter',
+  'spice',
 ])
 
 /**

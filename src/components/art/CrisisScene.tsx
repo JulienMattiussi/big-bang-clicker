@@ -74,6 +74,40 @@ export function CrisisScene({
       </svg>
     )
   }
+  if (id === 'spice') {
+    // Salakis (a Dune wink): a mudworm rears over the dunes, spice glinting amber.
+    const SPICE = '#e8a13a'
+    return (
+      <svg viewBox="0 0 240 140" className={className} fill="none" aria-hidden>
+        {STARS.map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r="1" fill="var(--color-fg)" opacity="0.35" />
+        ))}
+        {/* Dunes. */}
+        <path d="M0 122 Q70 104 130 118 T240 116 L240 140 L0 140 Z" fill="var(--color-fg)" fillOpacity="0.16" />
+        <path d="M0 132 Q90 120 160 130 T240 128 L240 140 L0 140 Z" fill="var(--color-fg)" fillOpacity="0.1" />
+        {/* Rearing worm: arched body with a ringed maw. */}
+        <path
+          d="M150 138 C 132 104 176 96 158 60"
+          stroke="var(--color-fg)"
+          strokeOpacity="0.5"
+          strokeWidth="16"
+          strokeLinecap="round"
+          fill="none"
+        />
+        <circle cx="158" cy="56" r="13" fill="var(--color-bg)" stroke="var(--color-fg)" strokeOpacity="0.5" strokeWidth="3" />
+        <circle cx="158" cy="56" r="7" fill="none" stroke="var(--danger)" strokeWidth="2" opacity="0.7" />
+        <circle cx="158" cy="56" r="3" fill="var(--danger)" opacity="0.7" />
+        {/* Spice glints on the sand. */}
+        {[
+          [44, 120],
+          [80, 128],
+          [104, 122],
+        ].map(([x, y]) => (
+          <circle key={x} cx={x} cy={y} r="2.4" fill={SPICE} opacity="0.85" />
+        ))}
+      </svg>
+    )
+  }
   if (id !== 'extinction') {
     return <Icon name="skull" className={`${className} text-red-400`} />
   }

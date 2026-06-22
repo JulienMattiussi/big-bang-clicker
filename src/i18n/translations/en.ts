@@ -168,7 +168,9 @@ export const en: Translations = {
   'massrelay.hint.charge': 'Click to charge the mass-effect relay.',
   'massrelay.hint.fire': 'Catapult a ship when the beam crosses a galaxy.',
   'unification.hint':
-    'Click the core to unify. Each spoke is an era converging: lit while it still feeds the universe-city.',
+    'Channel each lit era into the core: completing the ring triggers unification. Close it before the countdown ends, and in chronological order, to stack both bonuses.',
+  'unification.channel': 'Channel:',
+  'unification.progress': 'Era convergence',
 
   'invent.title': 'Inventions',
   'invent.gauge': 'Next invention',
@@ -370,6 +372,7 @@ export const en: Translations = {
   'crisis.y2k.name': 'Y2K bug',
   'crisis.machineRebellion.name': 'Machine rebellion',
   'crisis.encounter.name': 'Hooded ambush',
+  'crisis.spice.name': 'Spice cartel',
   'crisis.effect.damage': 'Consequence',
   'crisis.effect.boost': 'Rebound',
   'crisis.effect.loss': '-{amount} ({pct}%)',
@@ -387,6 +390,12 @@ export const en: Translations = {
   'revoltGame.aria': 'Public square: free protesters and fill the Parliament.',
   'revoltGame.saved': 'In Parliament',
   'revoltGame.citizen': 'Free this protester',
+  'spiceGame.hint':
+    'Rotate the pipes to link the spice source to the universe-city and restore the conduit.',
+  'spiceGame.aria': 'Pipe grid: rotate each segment to connect the spice source to the universe-city.',
+  'spiceGame.tile': 'Pipe: rotate',
+  'spiceGame.progress': 'Conduit to the city',
+  'spiceGame.stage': '(stage {n}/{total})',
   'crisis.extinction.trigger': 'Mass extinction: the dominant clade collapses.',
   'crisis.extinction.rebound': 'A minor branch thrives: life resumes, more diverse.',
   'crisis.revolt.trigger': "Starpacus's revolt: society shatters.",
@@ -411,6 +420,10 @@ export const en: Translations = {
     'On a far galaxy, hooded figures spring up, brandishing odd torches. Harmless-looking... yet remarkably tough. Survive the onslaught!',
   'crisis.encounter.rebound':
     'The hooded ones are driven off. Acknowledging your strength, one of them bows and offers you a mysterious painted pebble in tribute. The intergalactic road is clear, and your fleet sets off stronger than ever.',
+  'crisis.spice.trigger':
+    'Salakis is the most coveted planet of all: it harbours mysterious mudworms that produce the “Spice”, the most precious resource in the universe. A smugglers’ cartel is diverting the flow that feeds the universe-city. Reroute the spice home before they drain it all!',
+  'crisis.spice.rebound':
+    'The conduit restored, the spice flows back to the city. The cartel packs up: better fed than ever, districts and universe-cities double their output.',
 
   'prestige.title': 'Rebirth',
   'prestige.desc': 'Everything restarts, boosted by Echoes.',

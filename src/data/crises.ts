@@ -187,4 +187,30 @@ export const crisisDefs: CrisisDef[] = [
       reboundKey: 'crisis.encounter.rebound',
     },
   },
+  // Era 18: once the universe-city concentrates enough wealth, a spice cartel
+  // moves in to siphon it (Dune wink). Gated on universeCity so it lands well into
+  // the era, guaranteed. The gate level is provisional, to retune against sim.
+  // Confronted through the bespoke "reroute the spice" game (SpiceGame.tsx).
+  {
+    id: 'spice',
+    eraId: 'e18',
+    risk: {
+      sourceResource: 'universeCity',
+      threshold: 1,
+      gate: { resource: 'universeCity', level: 250_000 },
+    },
+    trigger: 'threshold',
+    regression: [
+      { type: 'resetResource', target: 'district', value: 0.5 },
+      { type: 'resetResource', target: 'universeCity', value: 0.5 },
+    ],
+    rebound: [
+      { type: 'multiplier', target: 'district', value: 2 },
+      { type: 'multiplier', target: 'universeCity', value: 2 },
+    ],
+    textKeys: {
+      triggerKey: 'crisis.spice.trigger',
+      reboundKey: 'crisis.spice.rebound',
+    },
+  },
 ]

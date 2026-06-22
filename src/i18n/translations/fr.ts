@@ -170,7 +170,9 @@ export const fr = {
   'massrelay.hint.charge': 'Clique pour charger le relais à effet de masse.',
   'massrelay.hint.fire': 'Catapulte un vaisseau quand le faisceau croise une galaxie.',
   'unification.hint':
-    'Clique le cœur pour unifier. Chaque rayon est une ère qui converge : allumé tant qu’elle alimente la ville-univers.',
+    'Canalise chaque ère allumée vers le cœur : l’anneau complet déclenche l’unification. Boucle-le avant la fin du compte à rebours, et dans l’ordre chronologique, pour cumuler les bonus.',
+  'unification.channel': 'Canaliser :',
+  'unification.progress': 'Convergence des ères',
 
   'invent.title': 'Inventions',
   'invent.gauge': 'Prochaine invention',
@@ -382,6 +384,7 @@ export const fr = {
   'crisis.y2k.name': "Bug de l'an 2000",
   'crisis.machineRebellion.name': 'Rébellion des machines',
   'crisis.encounter.name': 'Embuscade encapuchonnée',
+  'crisis.spice.name': "Cartel de l'épice",
   'crisis.effect.damage': 'Conséquence',
   'crisis.effect.boost': 'Rebond',
   'crisis.effect.loss': '-{amount} ({pct}%)',
@@ -399,6 +402,13 @@ export const fr = {
   'revoltGame.aria': 'Place publique : affranchis les révoltés et remplis le Parlement.',
   'revoltGame.saved': 'Au Parlement',
   'revoltGame.citizen': 'Affranchir ce révolté',
+  'spiceGame.hint':
+    'Oriente les tuyaux pour relier la source d’épice à la ville-univers et rétablir le conduit.',
+  'spiceGame.aria':
+    'Grille de tuyaux : oriente chaque segment pour relier la source d’épice à la ville-univers.',
+  'spiceGame.tile': 'Tuyau : tourner',
+  'spiceGame.progress': 'Conduit vers la cité',
+  'spiceGame.stage': '(étape {n}/{total})',
   'crisis.extinction.trigger': "Extinction de masse : le clade dominant s'effondre.",
   'crisis.extinction.rebound': 'Une branche mineure prospère : la vie repart, plus diverse.',
   'crisis.revolt.trigger': 'Révolte de Starpacus : la société éclate.',
@@ -423,6 +433,10 @@ export const fr = {
     "Sur une galaxie lointaine, des silhouettes encapuchonnées surgissent, brandissant d'étranges lampes torches. L'air de rien... mais redoutablement coriaces. Survis à l'assaut !",
   'crisis.encounter.rebound':
     "Les encapuchons sont repoussés. Reconnaissant ta force, l'un d'eux s'incline et t'offre en tribut un mystérieux galet peint. La voie intergalactique est libre, et ta flotte repart de plus belle.",
+  'crisis.spice.trigger':
+    'Salakis, planète de toutes les convoitises : elle abrite de mystérieux vers de vase qui produisent l’« Épice », la plus précieuse ressource de l’univers. Un cartel de trafiquants en détourne le flux qui irrigue la ville-univers. Renvoie l’épice vers la cité avant qu’ils ne siphonnent tout !',
+  'crisis.spice.rebound':
+    'Le conduit rétabli, l’épice afflue de nouveau vers la cité. Le cartel plie bagage : mieux irrigués que jamais, districts et villes-univers doublent leur cadence.',
 
   'prestige.title': 'Renaissance',
   'prestige.desc': 'Tout recommence, augmenté par les Échos.',

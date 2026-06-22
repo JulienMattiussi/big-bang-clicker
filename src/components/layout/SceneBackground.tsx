@@ -8,6 +8,10 @@ import { CivilizationScene } from './scenes/CivilizationScene'
 import { CosmosScene } from './scenes/CosmosScene'
 import { SingularityScene } from './scenes/SingularityScene'
 import { usePageHidden } from '@/hooks/usePageHidden'
+import { useIdle } from '@/hooks/useIdle'
+
+/** Freeze the ambient animations after this long without any interaction. */
+const IDLE_FREEZE_MS = 120_000
 
 /**
  * Ambient scene background, rendered behind the whole UI. It changes by ERA GROUP
@@ -53,13 +57,17 @@ const SCENES: Record<Scene, (props: { eraIndex: number }) => ReactElement> = {
 export function SceneBackground({ eraIndex }: { eraIndex: number }): ReactElement {
   const scene = sceneFor(eraIndex)
   const Scene = SCENES[scene]
-  // Freeze the ambient animations while the tab is hidden (nothing to composite).
+  // Freeze the ambient animations when nothing is watching: tab hidden, or the
+  // player idle in the foreground (screen left on overnight) - the continuous
+  // compositing is otherwise the heaviest CPU/raster cost on screen.
   const hidden = usePageHidden()
+  const idle = useIdle(IDLE_FREEZE_MS)
+  const frozen = hidden || idle
   return (
     <div
       aria-hidden
       className={`pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-bg transition-colors duration-700 ${
-        hidden ? 'scene-paused' : ''
+        frozen ? 'scene-paused' : ''
       }`}
     >
       {/* Keyed so switching era groups fades the new scene in. */}
