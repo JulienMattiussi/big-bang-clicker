@@ -12,7 +12,14 @@ export function StarField({
   return (
     <g aria-hidden>
       {stars.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r={i % 3 === 0 ? big : small} fill="var(--color-fg)" opacity="0.4" />
+        <circle
+          key={i}
+          cx={x}
+          cy={y}
+          r={i % 3 === 0 ? big : small}
+          fill="var(--color-fg)"
+          opacity="0.4"
+        />
       ))}
     </g>
   )

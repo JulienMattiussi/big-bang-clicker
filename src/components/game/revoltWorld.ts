@@ -95,11 +95,31 @@ function spawnGroup(time: number, startId: number): { people: Person[]; nextId: 
   const baseY = rand(Y_MIN + 6, Y_MAX - 6)
   const baseX = rand(X_MIN + 24, STREET_MAX - 24)
   for (let i = 0; i < size; i++) {
-    const base = { id: id++, state: 'angry' as const, entered: false, hits: 0, hitCd: 0, blinkUntil: 0, t0: time }
+    const base = {
+      id: id++,
+      state: 'angry' as const,
+      entered: false,
+      hits: 0,
+      hitCd: 0,
+      blinkUntil: 0,
+      t0: time,
+    }
     if (fromTop) {
-      people.push({ ...base, x: baseX + rand(-10, 10), y: Y_MIN - rand(4, 14) - i * 6, vx: rand(-9, 9), vy: rand(18, 30) })
+      people.push({
+        ...base,
+        x: baseX + rand(-10, 10),
+        y: Y_MIN - rand(4, 14) - i * 6,
+        vx: rand(-9, 9),
+        vy: rand(18, 30),
+      })
     } else {
-      people.push({ ...base, x: -rand(4, 14) - i * 6, y: baseY + rand(-6, 6), vx: rand(18, 30), vy: rand(-7, 7) })
+      people.push({
+        ...base,
+        x: -rand(4, 14) - i * 6,
+        y: baseY + rand(-6, 6),
+        vx: rand(18, 30),
+        vy: rand(-7, 7),
+      })
     }
   }
   return { people, nextId: id }

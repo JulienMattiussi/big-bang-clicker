@@ -85,7 +85,8 @@ export function SpiceGame() {
   return (
     <div className="flex w-full flex-col items-center gap-2">
       <span className="text-base font-semibold text-red-400">
-        {t('spiceGame.hint')} {t('spiceGame.stage').replace('{n}', String(stage)).replace('{total}', String(STAGES))}
+        {t('spiceGame.hint')}{' '}
+        {t('spiceGame.stage').replace('{n}', String(stage)).replace('{total}', String(STAGES))}
       </span>
       <svg
         viewBox={`0 0 ${vbW} ${vbH}`}
@@ -97,7 +98,15 @@ export function SpiceGame() {
 
         {/* Spice source (left): worm-spice node feeding the inlet. */}
         <g aria-hidden>
-          <line x1={src.x - CELL / 2} y1={src.y} x2={PAD_X - 8} y2={src.y} stroke={SPICE} strokeWidth="6" strokeLinecap="round" />
+          <line
+            x1={src.x - CELL / 2}
+            y1={src.y}
+            x2={PAD_X - 8}
+            y2={src.y}
+            stroke={SPICE}
+            strokeWidth="6"
+            strokeLinecap="round"
+          />
           <circle cx={PAD_X - 16} cy={src.y} r="8" fill={SPICE} opacity="0.85" />
           <circle cx={PAD_X - 26} cy={src.y - 7} r="3.5" fill={SPICE} opacity="0.6" />
         </g>

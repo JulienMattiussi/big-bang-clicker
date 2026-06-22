@@ -436,7 +436,7 @@ export const fr = {
   'crisis.spice.trigger':
     'Salakis, planète de toutes les convoitises : elle abrite de mystérieux vers de vase qui produisent l’« Épice », la plus précieuse ressource de l’univers. Un cartel de trafiquants en détourne le flux qui irrigue la ville-univers. Renvoie l’épice vers la cité avant qu’ils ne siphonnent tout !',
   'crisis.spice.rebound':
-    'Le conduit rétabli, l’épice afflue de nouveau vers la cité. Le cartel plie bagage : mieux irrigués que jamais, districts et villes-univers doublent leur cadence.',
+    'Le conduit rétabli, l’épice afflue de nouveau vers la cité. Le cartel plie bagage : mieux irrigués que jamais, districts et duchés doublent leur cadence.',
 
   'prestige.title': 'Renaissance',
   'prestige.desc': 'Tout recommence, augmenté par les Échos.',
@@ -509,7 +509,7 @@ export const fr = {
   'res.ship': 'Vaisseaux',
   'res.federation': 'Fédérations',
   'res.district': 'Districts',
-  'res.universeCity': 'Ville-univers',
+  'res.universeCity': 'Duchés',
   'res.tension': 'Tension',
 
   'gen.expansion': "Expansion de l'espace",

@@ -134,7 +134,11 @@ export function InventoryModal({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          <FlipButton icon="arrow-down-right" label={t('guide.flip')} onClick={() => setFlipped(true)} />
+          <FlipButton
+            icon="arrow-down-right"
+            label={t('guide.flip')}
+            onClick={() => setFlipped(true)}
+          />
         </div>
 
         {/* Back: the cover. */}
@@ -145,7 +149,11 @@ export function InventoryModal({ onClose }: { onClose: () => void }) {
           <p className="px-6 text-center text-6xl font-black tracking-tight text-accent sm:text-8xl">
             {t('guide.dontPanic')}
           </p>
-          <FlipButton icon="arrow-down-right" label={t('guide.flip')} onClick={() => setFlipped(false)} />
+          <FlipButton
+            icon="arrow-down-right"
+            label={t('guide.flip')}
+            onClick={() => setFlipped(false)}
+          />
         </div>
       </div>
     </Modal>

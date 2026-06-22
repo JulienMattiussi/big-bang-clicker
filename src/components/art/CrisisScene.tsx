@@ -39,7 +39,11 @@ export function CrisisScene({
         {/* distant galaxy + ground */}
         <ellipse cx="180" cy="34" rx="40" ry="11" fill="var(--color-accent)" opacity="0.12" />
         <ellipse cx="180" cy="34" rx="16" ry="5" fill="var(--color-accent)" opacity="0.18" />
-        <path d="M0 124 Q120 112 240 124 L240 140 L0 140 Z" fill="var(--color-fg)" fillOpacity="0.14" />
+        <path
+          d="M0 124 Q120 112 240 124 L240 140 L0 140 Z"
+          fill="var(--color-fg)"
+          fillOpacity="0.14"
+        />
         {figures.map(({ cx, dir }) => (
           <g key={cx}>
             {/* torch beam (halo + core) */}
@@ -83,8 +87,16 @@ export function CrisisScene({
           <circle key={i} cx={x} cy={y} r="1" fill="var(--color-fg)" opacity="0.35" />
         ))}
         {/* Dunes. */}
-        <path d="M0 122 Q70 104 130 118 T240 116 L240 140 L0 140 Z" fill="var(--color-fg)" fillOpacity="0.16" />
-        <path d="M0 132 Q90 120 160 130 T240 128 L240 140 L0 140 Z" fill="var(--color-fg)" fillOpacity="0.1" />
+        <path
+          d="M0 122 Q70 104 130 118 T240 116 L240 140 L0 140 Z"
+          fill="var(--color-fg)"
+          fillOpacity="0.16"
+        />
+        <path
+          d="M0 132 Q90 120 160 130 T240 128 L240 140 L0 140 Z"
+          fill="var(--color-fg)"
+          fillOpacity="0.1"
+        />
         {/* Rearing worm: arched body with a ringed maw. */}
         <path
           d="M150 138 C 132 104 176 96 158 60"
@@ -94,8 +106,24 @@ export function CrisisScene({
           strokeLinecap="round"
           fill="none"
         />
-        <circle cx="158" cy="56" r="13" fill="var(--color-bg)" stroke="var(--color-fg)" strokeOpacity="0.5" strokeWidth="3" />
-        <circle cx="158" cy="56" r="7" fill="none" stroke="var(--danger)" strokeWidth="2" opacity="0.7" />
+        <circle
+          cx="158"
+          cy="56"
+          r="13"
+          fill="var(--color-bg)"
+          stroke="var(--color-fg)"
+          strokeOpacity="0.5"
+          strokeWidth="3"
+        />
+        <circle
+          cx="158"
+          cy="56"
+          r="7"
+          fill="none"
+          stroke="var(--danger)"
+          strokeWidth="2"
+          opacity="0.7"
+        />
         <circle cx="158" cy="56" r="3" fill="var(--danger)" opacity="0.7" />
         {/* Spice glints on the sand. */}
         {[

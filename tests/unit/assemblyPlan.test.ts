@@ -17,7 +17,7 @@ describe('parts catalogue', () => {
 })
 
 describe('partsOf / planFor', () => {
-  it('donne les pièces d\'un organisme connu, vide sinon', () => {
+  it("donne les pièces d'un organisme connu, vide sinon", () => {
     expect(partsOf('trilobite')).toEqual(['segment', 'eye', 'leg'])
     expect(partsOf('inconnu')).toEqual([])
   })

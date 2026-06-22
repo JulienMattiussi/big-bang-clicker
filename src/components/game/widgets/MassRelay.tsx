@@ -137,23 +137,51 @@ export function MassRelay({ era }: { era: EraDef }): ReactElement {
 
             {ship ? (
               <>
-                <line x1={CX} y1={CY} x2={g.x} y2={g.y} stroke="var(--color-accent)" strokeWidth="2.4" opacity="0.7" />
+                <line
+                  x1={CX}
+                  y1={CY}
+                  x2={g.x}
+                  y2={g.y}
+                  stroke="var(--color-accent)"
+                  strokeWidth="2.4"
+                  opacity="0.7"
+                />
                 <circle cx={ship.x} cy={ship.y} r="2.2" fill="var(--color-fg)" />
               </>
             ) : null}
 
             {/* relay arms */}
-            <g fill="none" stroke="var(--color-fg)" strokeWidth="3" strokeLinecap="round" opacity="0.55">
+            <g
+              fill="none"
+              stroke="var(--color-fg)"
+              strokeWidth="3"
+              strokeLinecap="round"
+              opacity="0.55"
+            >
               <path d="M34 20 Q16 50 34 80" />
               <path d="M66 20 Q84 50 66 80" />
             </g>
             {/* gyroscopic ring, spinning once charged */}
             <g transform={`rotate(${world.spin} ${CX} ${CY})`} opacity={0.3 + 0.5 * lit}>
-              <ellipse cx={CX} cy={CY} rx="13" ry="5" fill="none" stroke="var(--color-accent)" strokeWidth="1.4" />
+              <ellipse
+                cx={CX}
+                cy={CY}
+                rx="13"
+                ry="5"
+                fill="none"
+                stroke="var(--color-accent)"
+                strokeWidth="1.4"
+              />
             </g>
             {/* core, brightening with charge */}
             <circle cx={CX} cy={CY} r="16" fill="var(--color-accent)" opacity={0.12 + 0.25 * lit} />
-            <circle cx={CX} cy={CY} r={6 + 3 * lit} fill="var(--color-accent)" opacity={0.4 + 0.6 * lit} />
+            <circle
+              cx={CX}
+              cy={CY}
+              r={6 + 3 * lit}
+              fill="var(--color-accent)"
+              opacity={0.4 + 0.6 * lit}
+            />
 
             {world.result === 'miss' ? (
               <circle

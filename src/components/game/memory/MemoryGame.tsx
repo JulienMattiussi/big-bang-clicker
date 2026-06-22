@@ -6,7 +6,13 @@ import { EraIcon } from '@/components/game/EraIcon'
 import { Galet } from '@/components/art/Galet'
 import { EraSymbolCluster } from '@/components/game/memory/Answer42'
 import { CardBack, CardFace } from '@/components/game/memory/MemoryCards'
-import { applyJokers, dealCards, shuffle, JOKER_LABEL, type Card } from '@/components/game/memory/memoryDeck'
+import {
+  applyJokers,
+  dealCards,
+  shuffle,
+  JOKER_LABEL,
+  type Card,
+} from '@/components/game/memory/memoryDeck'
 import { memoryGalet } from '@/lib/galets'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
@@ -275,6 +281,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                 <>
                   <p className="text-lg font-bold text-accent">{t('memory.maxed.title')}</p>
                   <p className="text-muted">{t('memory.maxed.body')}</p>
+                  <Icon name="trophy" className="mx-auto mt-2 h-16 w-16 text-octarine" aria-hidden />
                 </>
               ) : (
                 <p className="text-muted">

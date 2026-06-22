@@ -69,7 +69,7 @@ describe('fireStar (phase croisière)', () => {
     expect(y.world.slots[2]?.locked).toBe(true)
   })
 
-  it('rate quand la mire est loin de l\'étoile', () => {
+  it("rate quand la mire est loin de l'étoile", () => {
     const w = freshWorld()
     w.slots[2] = { ...baseShip(), reticle: 0, star: 80 }
     expect(fireStar(w).hit).toBe(false)

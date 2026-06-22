@@ -9,10 +9,24 @@ function JokerGlyph({ kind }: { kind: 'sith' | 'jedi' }) {
   const color = kind === 'sith' ? 'var(--color-octarine)' : 'var(--color-secondary)'
   return (
     <svg viewBox="0 0 24 24" className="h-9 w-9" aria-hidden>
-      <line x1="12" y1="3" x2="12" y2="15" stroke={color} strokeWidth="5" strokeLinecap="round" opacity="0.25" />
+      <line
+        x1="12"
+        y1="3"
+        x2="12"
+        y2="15"
+        stroke={color}
+        strokeWidth="5"
+        strokeLinecap="round"
+        opacity="0.25"
+      />
       <line x1="12" y1="3" x2="12" y2="15" stroke={color} strokeWidth="2.2" strokeLinecap="round" />
       {kind === 'sith' ? (
-        <path d="M8.5 14.6 L10 15.3 M15.5 14.6 L14 15.3" stroke={color} strokeWidth="1.8" strokeLinecap="round" />
+        <path
+          d="M8.5 14.6 L10 15.3 M15.5 14.6 L14 15.3"
+          stroke={color}
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        />
       ) : null}
       <rect x="10.7" y="15" width="2.6" height="6" rx="1" fill={color} />
     </svg>

@@ -2,7 +2,16 @@ import { useEffect, useRef, useState } from 'react'
 import { useCrisisStore, CRISIS_GOAL } from '@/store/crisisStore'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
-import { GROUND_Y, H, IMPACT_R, STEP_MS, W, freshWorld, step, type CrisisWorld } from './crisisWorld'
+import {
+  GROUND_Y,
+  H,
+  IMPACT_R,
+  STEP_MS,
+  W,
+  freshWorld,
+  step,
+  type CrisisWorld,
+} from './crisisWorld'
 import { CritterGlyph, MeteorGlyph } from '@/components/art/CrisisCreatures'
 
 /**

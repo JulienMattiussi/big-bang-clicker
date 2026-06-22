@@ -392,7 +392,8 @@ export const en: Translations = {
   'revoltGame.citizen': 'Free this protester',
   'spiceGame.hint':
     'Rotate the pipes to link the spice source to the universe-city and restore the conduit.',
-  'spiceGame.aria': 'Pipe grid: rotate each segment to connect the spice source to the universe-city.',
+  'spiceGame.aria':
+    'Pipe grid: rotate each segment to connect the spice source to the universe-city.',
   'spiceGame.tile': 'Pipe: rotate',
   'spiceGame.progress': 'Conduit to the city',
   'spiceGame.stage': '(stage {n}/{total})',
@@ -423,7 +424,7 @@ export const en: Translations = {
   'crisis.spice.trigger':
     'Salakis is the most coveted planet of all: it harbours mysterious mudworms that produce the “Spice”, the most precious resource in the universe. A smugglers’ cartel is diverting the flow that feeds the universe-city. Reroute the spice home before they drain it all!',
   'crisis.spice.rebound':
-    'The conduit restored, the spice flows back to the city. The cartel packs up: better fed than ever, districts and universe-cities double their output.',
+    'The conduit restored, the spice flows back to the city. The cartel packs up: better fed than ever, districts and duchies double their output.',
 
   'prestige.title': 'Rebirth',
   'prestige.desc': 'Everything restarts, boosted by Echoes.',
@@ -496,7 +497,7 @@ export const en: Translations = {
   'res.ship': 'Ships',
   'res.federation': 'Federations',
   'res.district': 'Districts',
-  'res.universeCity': 'Universe-city',
+  'res.universeCity': 'Duchies',
   'res.tension': 'Tension',
 
   'gen.expansion': 'Expansion of space',

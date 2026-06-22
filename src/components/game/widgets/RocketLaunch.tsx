@@ -98,13 +98,7 @@ function Scene({ phase, children }: { phase: Phase; children: ReactNode }): Reac
 }
 
 /** Outcome flash over a finished landing/ascent ship. */
-function Outcome({
-  ship,
-  t,
-}: {
-  ship: Ship
-  t: Translate
-}): ReactElement | null {
+function Outcome({ ship, t }: { ship: Ship; t: Translate }): ReactElement | null {
   if (!ship.result) return null
   const ok = ship.result === 'land'
   return (

@@ -31,7 +31,7 @@ describe('addCharge', () => {
 })
 
 describe('fire', () => {
-  it('ne fait rien si le noyau n\'est pas plein', () => {
+  it("ne fait rien si le noyau n'est pas plein", () => {
     const w = { ...freshRelay(), charge: 50 }
     expect(fire(w)).toBe(w)
   })

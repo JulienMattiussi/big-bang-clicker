@@ -37,7 +37,7 @@ export function freshRelay(): RelayWorld {
 
 /** Smallest angular gap (degrees) between two headings. */
 export function angularGap(a: number, b: number): number {
-  const d = Math.abs(((((a - b) % 360) + 360) % 360))
+  const d = Math.abs((((a - b) % 360) + 360) % 360)
   return d > 180 ? 360 - d : d
 }
 

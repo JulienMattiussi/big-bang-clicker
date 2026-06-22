@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { Answer42 } from '@/components/game/memory/Answer42'
 import { MemoryGame } from '@/components/game/memory/MemoryGame'
+import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
-import { MEMORY_LEVELS, memoryLevel, memoryUnlocked } from '@/lib/memory'
+import { MEMORY_LEVELS, memoryEraMaxed, memoryLevel, memoryUnlocked } from '@/lib/memory'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { IntroRect } from '@/components/ui/introRect'
 
@@ -25,6 +26,7 @@ export function MemoryFeature() {
   // The next attempt's level shapes the emblem: deck size (21/42) and set size.
   const cfg = useGameStore((s) => MEMORY_LEVELS[memoryLevel(s.state, s.state.currentEraId)]!)
   const digits: [string, string] = cfg.cards === 21 ? ['2', '1'] : ['4', '2']
+  const maxed = useGameStore((s) => memoryEraMaxed(s.state, s.state.currentEraId))
   const highlight = useMemoryStore((s) => s.highlight)
   const clearHighlight = useMemoryStore((s) => s.clearHighlight)
   const [open, setOpen] = useState(false)
@@ -72,7 +74,9 @@ export function MemoryFeature() {
 
   if (!unlocked) return null
 
-  const face = (
+  const face = maxed ? (
+    <Icon name="trophy" className="h-6 w-6 shrink-0 text-bg" aria-hidden />
+  ) : (
     <Answer42 eraIcon={eraIcon} digits={digits} count={cfg.group} className="h-7 shrink-0" />
   )
 

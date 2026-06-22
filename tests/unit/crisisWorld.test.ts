@@ -17,7 +17,7 @@ describe('freshWorld', () => {
 })
 
 describe('step', () => {
-  it('avance le temps d\'un tick et renvoie un nouvel état', () => {
+  it("avance le temps d'un tick et renvoie un nouvel état", () => {
     const w = freshWorld()
     const after = step(w)
     expect(after).not.toBe(w)
@@ -26,9 +26,7 @@ describe('step', () => {
 
   it('un météore qui touche le sol foudroie la créature dessous et laisse un flash', () => {
     const world: CrisisWorld = {
-      creatures: [
-        { id: 1, x: 50, vx: 0, kind: 'rat', state: 'run', t0: 0 },
-      ],
+      creatures: [{ id: 1, x: 50, vx: 0, kind: 'rat', state: 'run', t0: 0 }],
       // Juste au-dessus du sol : un tick l\'amène à l\'impact, à la même abscisse.
       meteors: [{ id: 2, x: 50, y: GROUND_Y - 1, vy: 200 }],
       flashes: [],
