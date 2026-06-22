@@ -213,4 +213,20 @@ export const crisisDefs: CrisisDef[] = [
       reboundKey: 'crisis.spice.rebound',
     },
   },
+  // Era 19 finale: the forgotten gas. A 'player' trigger so it never arms on its
+  // own (a ready crisis would block reaching e19); useEndgame arms it on entering
+  // the era. Unwinnable and effect-free - GasLeakGame just runs the 15 s countdown,
+  // then this resolves so the contraction widget can take over.
+  {
+    id: 'gasLeak',
+    eraId: 'e19',
+    risk: { threshold: 1 },
+    trigger: 'player',
+    regression: [],
+    rebound: [],
+    textKeys: {
+      triggerKey: 'crisis.gasLeak.trigger',
+      reboundKey: 'crisis.gasLeak.rebound',
+    },
+  },
 ]

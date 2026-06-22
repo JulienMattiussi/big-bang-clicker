@@ -16,6 +16,7 @@ import { InventionsWidget } from './InventionsWidget'
 import { RocketLaunch } from './RocketLaunch'
 import { MassRelay } from './MassRelay'
 import { UnificationWheel } from './UnificationWheel'
+import { SingularityWidget } from './SingularityWidget'
 import type { EraDef } from '@/lib/types'
 
 /**
@@ -42,4 +43,5 @@ export const INTERACTIVE_WIDGETS: Record<string, (props: { era: EraDef }) => Rea
   rocket: RocketLaunch,
   massrelay: MassRelay,
   unification: UnificationWheel,
+  singularity: SingularityWidget,
 }

@@ -6,6 +6,7 @@
 export const fr = {
   'app.complexity': 'Complexité',
   'app.nextGoal': 'Prochain palier',
+  'app.collapse': 'Effondrement',
   'complexity.source': 'Produit de la Complexité',
   'complexity.reduced': 'réduite, ère antérieure',
   'complexity.toDiscover': 'Quelque chose à découvrir ici fera progresser la Complexité',
@@ -320,6 +321,7 @@ export const fr = {
   'memory.goal.triplets': 'à retrouver trois par trois (triplets)',
   'memory.half':
     "Tu n'as pour l'instant accès qu'à la moitié de la mémoire de l'univers. Prouve ta valeur avant d'atteindre 42.",
+  'memory.eraLevel': 'Mémoire niveau {n}',
   'memory.maxed.title': "Mémoire de l'ère complète",
   'memory.maxed.body':
     "Tu as gravé toute la mémoire de cette ère : sa production est déjà ×8. Il n'y a plus rien à doubler ici.",
@@ -409,6 +411,18 @@ export const fr = {
   'spiceGame.tile': 'Tuyau : tourner',
   'spiceGame.progress': 'Conduit vers la cité',
   'spiceGame.stage': '(étape {n}/{total})',
+  'gasLeak.hint': 'Le gaz a été oublié ! Éteins les fuites avant la catastrophe...',
+  'gasLeak.aria': 'Fuites de gaz : clique pour les éteindre avant la fin du compte à rebours.',
+  'gasLeak.leak': 'Éteindre la fuite',
+  'singularity.hint': 'Clique pour contracter l’univers, jusqu’à le réduire en un point unique.',
+  'endgame.chain.title': 'Réaction en chaîne',
+  'endgame.chain.body':
+    'Trop tard. La première flamme en allume une autre, qui en allume mille. La cité-univers, si parfaitement reliée, devient le chemin idéal de l’embrasement : tout se propage, tout cède. Sous son propre poids, l’univers s’effondre et se contracte vers un point unique.',
+  'endgame.title': 'Nouveau Big Bang',
+  'endgame.body':
+    'Tout se rassemble en un point, puis explose : un univers neuf renaît, augmenté par les Échos accumulés.',
+  'endgame.echoes': 'Échos gagnés',
+  'endgame.button': 'Renaître',
   'crisis.extinction.trigger': "Extinction de masse : le clade dominant s'effondre.",
   'crisis.extinction.rebound': 'Une branche mineure prospère : la vie repart, plus diverse.',
   'crisis.revolt.trigger': 'Révolte de Starpacus : la société éclate.',
@@ -437,6 +451,9 @@ export const fr = {
     'Salakis, planète de toutes les convoitises : elle abrite de mystérieux vers de vase qui produisent l’« Épice », la plus précieuse ressource de l’univers. Un cartel de trafiquants en détourne le flux qui irrigue la ville-univers. Renvoie l’épice vers la cité avant qu’ils ne siphonnent tout !',
   'crisis.spice.rebound':
     'Le conduit rétabli, l’épice afflue de nouveau vers la cité. Le cartel plie bagage : mieux irrigués que jamais, districts et duchés doublent leur cadence.',
+  'crisis.gasLeak.trigger':
+    'Un dirigeant de district achève tranquillement son petit-déjeuner... et oublie d’éteindre le gaz.\nUne alarme retentit. Puis une autre. Car ce mince filet réveille un problème structurel caché, laissé là par un ingénieur négligeant : une fuite en amorce une autre, qui en amorce dix.\nLa réaction en chaîne s’emballe et menace désormais toute la cité-univers. Risque majeur. Étouffe les fuites avant qu’elles ne se propagent !',
+  'crisis.gasLeak.rebound': 'L’univers renaît.',
 
   'prestige.title': 'Renaissance',
   'prestige.desc': 'Tout recommence, augmenté par les Échos.',
@@ -641,11 +658,11 @@ export const fr = {
   'era.e18.stock': 'Univers',
   'era.e18.machines': 'Districts',
   'era.e18.verb': 'Unifier',
-  'era.e19.name': 'Explosion',
+  'era.e19.name': 'Mort et naissance',
   'era.e19.tagline': 'Tout finit... et tout recommence, en mieux.',
   'era.e19.stock': 'Instabilité',
   'era.e19.machines': 'Singularité',
-  'era.e19.verb': 'Tendre vers la rupture',
+  'era.e19.verb': 'Contracter',
 
   // Textes de transition (modale d'évènement) affichés en entrant dans l'ère.
   'era.e2.transition':
@@ -683,5 +700,5 @@ export const fr = {
   'era.e18.transition':
     "Tout converge : l'univers entier se rassemble en une seule ville-univers à son apogée. C'est alors qu'un savant fou, Harry Sheldon, prétend avoir inventé une science prédictive infaillible. Son verdict : l'univers s'éteindra très bientôt, à cause d'une obscure histoire de plaque de cuisson. Personne ne le prend au sérieux.",
   'era.e19.transition':
-    "Quelque part, un dirigeant de quartier galactique a oublié d'éteindre le gaz après son petit-déjeuner. L'univers entier s'embrase. Tout est à refaire... en mieux.",
+    "L'univers entier a convergé en une unique cité-univers, parfaitement orchestrée : chaque district, chaque flux d'énergie, chaque pensée s'y accordent en une symphonie d'une perfection absolue. Rien ne manque, rien ne dépasse. L'apogée de tout ce qui fut.",
 } as const

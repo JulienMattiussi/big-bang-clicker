@@ -100,6 +100,15 @@ export interface RunResult {
   reachedFinal: boolean
   /** True if the run hit a wall (stuck, could not progress) before the end. */
   stuck: boolean
+  /** Prestige mode: on first reaching the final era, prestige once then replay a
+   *  full second run with the Echo/meta bonuses (to compare run 1 vs run 2). */
+  prestige: boolean
+  /** Echoes gained by the single prestige (0 for a normal run): the "prestige level". */
+  echoes: number
+  /** Game-seconds to first reach the final era (run 1), or null if never. */
+  cycle1S: number | null
+  /** Game-seconds of the post-prestige second run (prestige mode only), or null. */
+  cycle2S: number | null
   milestones: MilestoneStat[]
   series: SeriesPoint[]
 }

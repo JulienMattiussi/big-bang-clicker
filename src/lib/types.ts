@@ -19,7 +19,7 @@ export type UiTier = 'cosmos' | 'life' | 'civilization' | 'space' | 'transcenden
  * - wide-roomy: like wide, with a roomier resources column (1fr | 2fr)
  * - wide-split: like wide, but the machines panel splits 2fr:3fr (one wider card)
  */
-export type EraLayoutName = 'compact' | 'wide' | 'wide-roomy' | 'wide-split'
+export type EraLayoutName = 'compact' | 'wide' | 'wide-roomy' | 'wide-split' | 'solo'
 
 /** An amount of a resource (recipe input/output, cost...). */
 export interface ResourceAmount {

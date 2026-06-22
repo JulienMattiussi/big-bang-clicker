@@ -9,6 +9,8 @@ export interface LineSeries {
   key: string
   color: string
   dashed?: boolean
+  /** Explicit stroke-dasharray (overrides `dashed`), e.g. for a prestige run. */
+  dash?: string
   /** 0-1; older snapshots are drawn fainter so overlaid runs stay legible. */
   opacity?: number
   points: LinePoint[]
@@ -125,7 +127,7 @@ export function LineChart({
             stroke={s.color}
             strokeOpacity={s.opacity ?? 1}
             strokeWidth="1.8"
-            strokeDasharray={s.dashed ? '5 4' : undefined}
+            strokeDasharray={s.dash ?? (s.dashed ? '5 4' : undefined)}
             strokeLinejoin="round"
             points={s.points.map((p) => `${px(p.x)},${py(p.y)}`).join(' ')}
           />

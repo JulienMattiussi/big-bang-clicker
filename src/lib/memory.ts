@@ -53,7 +53,7 @@ export function memoryUnlocked(state: GameState): boolean {
 }
 
 /** How many times this era's resource has already been boosted (0..MAX). */
-function memoryCompletions(state: GameState, eraId: string): number {
+export function memoryCompletions(state: GameState, eraId: string): number {
   return state.memoryLevels?.[eraId] ?? 0
 }
 

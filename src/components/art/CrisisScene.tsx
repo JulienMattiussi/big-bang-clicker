@@ -136,6 +136,43 @@ export function CrisisScene({
       </svg>
     )
   }
+  if (id === 'gasLeak') {
+    // The forgotten gas: a cooktop with one burner left ablaze, the left knob on.
+    const FLAME = '#f59e0b'
+    const FLAME_CORE = '#fde68a'
+    return (
+      <svg viewBox="0 0 240 140" className={className} fill="none" aria-hidden>
+        {/* Stove body + cooktop surface. */}
+        <rect x="80" y="56" width="80" height="72" rx="6" fill="var(--color-fg)" fillOpacity="0.16" stroke="var(--color-fg)" strokeOpacity="0.4" strokeWidth="1.5" />
+        <rect x="74" y="48" width="92" height="10" rx="3" fill="var(--color-fg)" fillOpacity="0.28" />
+        <ellipse cx="102" cy="53" rx="10" ry="3" fill="none" stroke="var(--color-fg)" strokeOpacity="0.5" strokeWidth="1.4" />
+        <ellipse cx="138" cy="53" rx="10" ry="3" fill="none" stroke="var(--color-fg)" strokeOpacity="0.5" strokeWidth="1.4" />
+        {/* Control knobs: the leftmost is turned on (tick toward the flame). */}
+        {[98, 120, 142].map((cx, i) => (
+          <g key={cx}>
+            <circle cx={cx} cy="66" r="3.4" fill="var(--color-bg)" stroke="var(--color-fg)" strokeOpacity="0.5" strokeWidth="1.2" />
+            <line
+              x1={cx}
+              y1="66"
+              x2={i === 0 ? cx - 2.4 : cx}
+              y2={i === 0 ? 64 : 63}
+              stroke={i === 0 ? FLAME : 'var(--color-fg)'}
+              strokeOpacity={i === 0 ? 0.9 : 0.5}
+              strokeWidth="1.4"
+              strokeLinecap="round"
+            />
+          </g>
+        ))}
+        {/* Oven door + handle. */}
+        <rect x="88" y="76" width="64" height="46" rx="4" fill="none" stroke="var(--color-fg)" strokeOpacity="0.35" strokeWidth="1.2" />
+        <line x1="98" y1="82" x2="142" y2="82" stroke="var(--color-fg)" strokeOpacity="0.4" strokeWidth="2.4" strokeLinecap="round" />
+        {/* Flame on the left burner. */}
+        <ellipse cx="102" cy="42" rx="12" ry="9" fill={FLAME} opacity="0.18" />
+        <path d="M102 24 C 110 34 109 44 102 49 C 95 44 94 34 102 24 Z" fill={FLAME} />
+        <path d="M102 33 C 106 38 106 45 102 47 C 98 45 98 38 102 33 Z" fill={FLAME_CORE} />
+      </svg>
+    )
+  }
   if (id !== 'extinction') {
     return <Icon name="skull" className={`${className} text-red-400`} />
   }

@@ -57,7 +57,9 @@ export function EventHero({
         {flanker}
       </span>
       <div
-        className={`relative my-1 flex items-center justify-center ${wide ? 'h-32 w-full [--color-accent:#ef4444]' : 'h-28 w-28'}`}
+        className={`relative my-1 flex items-center justify-center ${
+          wide ? 'h-32 w-full' : 'h-28 w-28'
+        } ${wide && tone === 'danger' ? '[--color-accent:#ef4444]' : ''}`}
       >
         <div
           aria-hidden
@@ -72,7 +74,10 @@ export function EventHero({
       <h2 id="event-title" className="text-2xl font-bold">
         {title}
       </h2>
-      <p className="leading-relaxed text-muted">{body}</p>
+      {/* A body may carry "\n" breaks to read as separate paragraphs. */}
+      <div className="flex flex-col gap-2 leading-relaxed text-muted">
+        {body.split('\n').map((para, i) => (para.trim() ? <p key={i}>{para}</p> : null))}
+      </div>
     </div>
   )
 }

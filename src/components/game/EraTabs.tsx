@@ -2,8 +2,10 @@ import { useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { EraIcon } from '@/components/game/EraIcon'
 import { eraTitle } from '@/components/game/eraTitle'
 import { AlertBadge } from '@/components/ui/AlertBadge'
+import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
 import { decliningResources, stalledResources } from '@/lib/graph'
+import { MEMORY_MAX_LEVEL, memoryCompletions } from '@/lib/memory'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 
@@ -104,6 +106,9 @@ export function EraTabs() {
     const name = t(era.nameKey as TranslationKey)
     // Numbered form ("Ère 1 : Big Bang") for the tooltip and the icon-only a11y name.
     const numbered = eraTitle(t('era.word'), era.index, name)
+    const done = memoryCompletions(state, era.id)
+    const tip =
+      done > 0 ? `${numbered} (${t('memory.eraLevel').replace('{n}', String(done))})` : numbered
     return (
       <button
         key={era.id}
@@ -111,8 +116,8 @@ export function EraTabs() {
         type="button"
         disabled={active}
         aria-current={active ? 'true' : undefined}
-        aria-label={showLabel ? undefined : numbered}
-        title={numbered}
+        aria-label={showLabel ? undefined : tip}
+        title={tip}
         onClick={() => setEra(era.id)}
         className={`${TAB_BASE} ${
           active
@@ -122,7 +127,20 @@ export function EraTabs() {
       >
         {/* 24px glyph but -m-0.5 keeps its layout footprint at 20px, so the icon
             looks bigger while the tab size stays put (it overflows into padding). */}
-        <EraIcon icon={era.icon} className="-m-0.5 h-6 w-6 shrink-0" />
+        <span className="relative -m-0.5 inline-flex shrink-0">
+          <EraIcon icon={era.icon} className="h-6 w-6" />
+          {done > 0 ? (
+            <span className="absolute -right-1 -bottom-1 inline-flex h-3.5 w-3.5 items-center justify-center rounded-full bg-bg text-octarine">
+              {done >= MEMORY_MAX_LEVEL ? (
+                <Icon name="trophy" className="h-2.5 w-2.5" aria-hidden />
+              ) : (
+                <span className="text-[9px] leading-none font-bold" aria-hidden>
+                  {done}
+                </span>
+              )}
+            </span>
+          ) : null}
+        </span>
         {/* Label always present (animated collapse/expand); the gap to the icon
             is its own margin so it disappears cleanly when collapsed. */}
         <span

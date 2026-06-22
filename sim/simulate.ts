@@ -17,6 +17,7 @@ import {
   unlockNextEra,
 } from '@/lib/engine'
 import { readyCrises, resolveCrisis, updateRisk } from '@/lib/crises'
+import { prestige as runPrestige } from '@/lib/prestige'
 import { memoryUnlocked, memoryLevel, memoryEraMaxed, memoryStart, memoryWin } from '@/lib/memory'
 import { revealedMachines, revealedResources } from '@/lib/reveal'
 import { decliningResources, netFlows } from '@/lib/graph'
@@ -258,6 +259,7 @@ export function simulate(
   profile: ProfileConfig,
   policy: UnlockPolicy,
   meta: { runId: string; runLabel: string; gitCommit: string; defsHash: string; generatedAt: string },
+  prestige = false,
 ): RunResult {
   let state = applyMeta(createInitialState(0, defs.eras[0]?.id), defs)
 
@@ -293,6 +295,12 @@ export function simulate(
   let cityThriving = 0
   let nextCityThriveT = CITY_THRIVE_INTERVAL_S
   let nextCrisisT = CRISIS_TRIGGER_INTERVAL_S
+  // Prestige mode: time of first reaching the final era, whether the single
+  // prestige has fired, the Echoes it granted, and the second run's duration.
+  let firstFinalT: number | null = null
+  let prestiged = false
+  let echoes = 0
+  let cycle2S: number | null = null
 
   for (let iter = 0; iter < MAX_ITERS; iter++) {
     state = tick(state, defs, DT)
@@ -491,11 +499,15 @@ export function simulate(
         measureCompleteness(state, currentEra).fullyActivated ||
         stepsSinceProgress >= READY_STALL_S
       if (ready) {
-        milestones[currentEra.index].completeness = measureCompleteness(state, currentEra)
+        // Record once (a prestige run replays eras; keep run-1's milestone data).
+        if (milestones[currentEra.index].completeness === null)
+          milestones[currentEra.index].completeness = measureCompleteness(state, currentEra)
         state = unlockNextEra(state, defs)
         const m = milestones[next.index]
-        m.unlockedAtS = t
-        m.grindS = m.reachableAtS === null ? 0 : t - m.reachableAtS
+        if (m.unlockedAtS === null) {
+          m.unlockedAtS = t
+          m.grindS = m.reachableAtS === null ? 0 : t - m.reachableAtS
+        }
         stepsSinceProgress = 0
         wasStarved = false
       }
@@ -507,7 +519,40 @@ export function simulate(
     }
 
     const latestIdx = currentEra.index
-    if (latestIdx >= defs.eras.length - 1) break // reached the final era
+    if (latestIdx >= defs.eras.length - 1) {
+      if (firstFinalT === null) firstFinalT = t
+      if (!prestige) break // normal run: done at the final era
+      if (!prestiged) {
+        // One prestige (Echoes + reset to era 1 + meta), then replay a second run
+        // with the bonuses, mirroring gameStore.prestige.
+        prestiged = true
+        state = runPrestige(state, t)
+        state = applyMeta(
+          {
+            ...state,
+            currentEraId: defs.eras[0]?.id ?? '',
+            unlockedEras: defs.eras[0] ? [defs.eras[0].id] : [],
+          },
+          defs,
+        )
+        echoes = state.echoes
+        // Fresh trackers for the second run (cooldowns relative to now).
+        stepsSinceProgress = 0
+        wasStarved = false
+        lastComplexity = 0
+        clickCarry = 0
+        completeCarry = 0
+        cityThriving = 0
+        nextMemoryT = t
+        nextSimonT = t + SIMON_INTERVAL_S
+        nextCityThriveT = t + CITY_THRIVE_INTERVAL_S
+        nextCrisisT = t + CRISIS_TRIGGER_INTERVAL_S
+        for (const k in memoryTries) delete memoryTries[k]
+      } else {
+        cycle2S = t - firstFinalT // the post-prestige second run's duration
+        break
+      }
+    }
     if (stepsSinceProgress >= GLOBAL_STALL_S && !canUnlock) {
       stuck = true
       break
@@ -522,7 +567,7 @@ export function simulate(
   series.push({ t, complexity: state.complexity, eraIndex: finalEra.index })
 
   return {
-    label: `${profile.id} / ${policy}`,
+    label: `${profile.id} / ${policy}${prestige ? ' / prestige' : ''}`,
     profileId: profile.id,
     profileLabel: profile.label,
     unlockPolicy: policy,
@@ -534,8 +579,12 @@ export function simulate(
     generatedAt: meta.generatedAt,
     totalTimeS: t,
     finalEraIndex: finalEra.index,
-    reachedFinal: finalEra.index >= defs.eras.length - 1,
+    reachedFinal: firstFinalT !== null,
     stuck,
+    prestige,
+    echoes,
+    cycle1S: firstFinalT,
+    cycle2S,
     milestones,
     series,
   }

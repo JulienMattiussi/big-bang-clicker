@@ -6,7 +6,7 @@ import { SeaScene } from './scenes/SeaScene'
 import { LandScene } from './scenes/LandScene'
 import { CivilizationScene } from './scenes/CivilizationScene'
 import { CosmosScene } from './scenes/CosmosScene'
-import { SingularityScene } from './scenes/SingularityScene'
+import { CityUniverseScene } from './scenes/CityUniverseScene'
 import { usePageHidden } from '@/hooks/usePageHidden'
 import { useIdle } from '@/hooks/useIdle'
 
@@ -30,7 +30,7 @@ type Scene =
   | 'land'
   | 'civilization'
   | 'cosmos'
-  | 'singularity'
+  | 'cityUniverse'
 
 function sceneFor(index: number): Scene {
   if (index <= 1) return 'plasma' // e0-e1: formless luminous gas
@@ -40,7 +40,7 @@ function sceneFor(index: number): Scene {
   if (index === 10) return 'land' // e10: conquest of land (terrestrial)
   if (index <= 14) return 'civilization' // e11-e14: minds, cities, nations, tech (neuron field)
   if (index <= 17) return 'cosmos' // e15-e17: space, galaxies, universe-city
-  return 'singularity' // e18: collapse / rebirth
+  return 'cityUniverse' // e19: the universe gathered into one vast city
 }
 
 const SCENES: Record<Scene, (props: { eraIndex: number }) => ReactElement> = {
@@ -51,7 +51,7 @@ const SCENES: Record<Scene, (props: { eraIndex: number }) => ReactElement> = {
   land: LandScene,
   civilization: CivilizationScene,
   cosmos: CosmosScene,
-  singularity: SingularityScene,
+  cityUniverse: CityUniverseScene,
 }
 
 export function SceneBackground({ eraIndex }: { eraIndex: number }): ReactElement {

@@ -6,9 +6,14 @@ import type { EraLayoutName } from '@/lib/types'
  * layout rules live in one place instead of scattered heuristics.
  */
 
+/** Solo layout shows ONLY the widget (no resources/machines panels). */
+export function isSoloLayout(layout: EraLayoutName): boolean {
+  return layout === 'solo'
+}
+
 /** Wide layouts show the widget full-width on top, then a resources|machines row. */
 export function isWideLayout(layout: EraLayoutName): boolean {
-  return layout !== 'compact'
+  return layout !== 'compact' && layout !== 'solo'
 }
 
 /** Grid class for the resources|machines row of a wide layout. */

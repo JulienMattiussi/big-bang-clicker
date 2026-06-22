@@ -1,9 +1,11 @@
 import { useEffect } from 'react'
 import { GameShell } from '@/components/layout/GameShell'
 import { EventModal } from '@/components/game/EventModal'
+import { EndGameModal } from '@/components/game/EndGameModal'
 import { useTick } from '@/hooks/useTick'
 import { useEvents } from '@/hooks/useEvents'
 import { useGalets } from '@/hooks/useGalets'
+import { useEndgame } from '@/hooks/useEndgame'
 import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 
@@ -11,6 +13,7 @@ function App() {
   useTick()
   useEvents()
   useGalets()
+  useEndgame()
   const { locale } = useTranslation()
   const tampered = useGameStore((s) => s.tampered)
   const clearTampered = useGameStore((s) => s.clearTampered)
@@ -37,6 +40,7 @@ function App() {
     <>
       <GameShell />
       <EventModal />
+      <EndGameModal />
     </>
   )
 }

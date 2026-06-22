@@ -35,10 +35,21 @@ const PROFILE_COLOR: Record<string, string> = {
   active: 'var(--color-accent)',
   optimal: 'var(--color-octarine)',
 }
-const runKey = (r: RunResult) => `${r.profileId}__${r.unlockPolicy}`
+const runKey = (r: RunResult) => `${r.profileId}__${r.unlockPolicy}__${r.prestige ? 'p' : 'n'}`
 const uid = (r: RunResult) => `${r.runId}__${runKey(r)}`
 const colorFor = (r: RunResult) => PROFILE_COLOR[r.profileId] ?? 'var(--color-fg)'
-const isDashed = (r: RunResult) => r.unlockPolicy === 'ready'
+// Line/swatch styling encodes policy (solid=asap, dashed=ready) and mode
+// (prestige runs get a finer dash / dotted swatch) on top of colour=profile.
+const dashFor = (r: RunResult): string | undefined =>
+  r.prestige
+    ? r.unlockPolicy === 'ready'
+      ? '6 4 1 4'
+      : '1 5'
+    : r.unlockPolicy === 'ready'
+      ? '5 4'
+      : undefined
+const borderStyleFor = (r: RunResult): 'solid' | 'dashed' | 'dotted' =>
+  r.prestige ? 'dotted' : r.unlockPolicy === 'ready' ? 'dashed' : 'solid'
 
 function fmtDuration(s: number | null): string {
   if (s === null) return '-'
@@ -96,7 +107,7 @@ export function SimViewer() {
   const timeSeries: LineSeries[] = runs.map((r) => ({
     key: uid(r),
     color: colorFor(r),
-    dashed: isDashed(r),
+    dash: dashFor(r),
     opacity: snapOpacity(r.runId),
     points: r.milestones
       .filter((m) => m.unlockedAtS !== null)
@@ -105,7 +116,7 @@ export function SimViewer() {
   const complexitySeries: LineSeries[] = runs.map((r) => ({
     key: uid(r),
     color: colorFor(r),
-    dashed: isDashed(r),
+    dash: dashFor(r),
     opacity: snapOpacity(r.runId),
     points: r.series.map((p) => ({ x: Math.max(p.t, 1), y: Math.max(p.complexity, 1) })),
   }))
@@ -167,15 +178,17 @@ export function SimViewer() {
                 <span
                   aria-hidden
                   className="inline-block h-0 w-6 border-t-2"
-                  style={{ borderColor: colorFor(r), borderStyle: isDashed(r) ? 'dashed' : 'solid' }}
+                  style={{ borderColor: colorFor(r), borderStyle: borderStyleFor(r) }}
                 />
                 {r.profileLabel}
+                {r.prestige ? <span className="text-octarine">· prestige</span> : null}
               </label>
             ))}
           </div>
         ))}
         <span className="mt-1 text-xs text-muted">
-          (couleur = profil · plein = ASAP · pointillé = prêt · opacité = ancienneté du snapshot)
+          (couleur = profil · plein = ASAP · tirets = prêt · pointillé/fin = prestige · opacité =
+          ancienneté du snapshot)
         </span>
       </section>
 
@@ -227,7 +240,9 @@ export function SimViewer() {
               <th className="py-2 pr-4">Run</th>
               <th className="px-2">Snapshot</th>
               <th className="px-2">Ère atteinte</th>
-              <th className="px-2">Temps total</th>
+              <th className="px-2">Run 1</th>
+              <th className="px-2">Run 2 (prestige)</th>
+              <th className="px-2">Échos</th>
               <th className="px-2">Paliers franchis</th>
               <th className="px-2">Tout activé avant le suivant</th>
               <th className="px-2">Retours arrière</th>
@@ -252,18 +267,25 @@ export function SimViewer() {
                       className="mr-2 inline-block h-0 w-5 border-t-2 align-middle"
                       style={{
                         borderColor: colorFor(r),
-                        borderStyle: isDashed(r) ? 'dashed' : 'solid',
+                        borderStyle: borderStyleFor(r),
                         opacity: snapOpacity(r.runId),
                       }}
                     />
                     {r.profileLabel} <span className="text-muted">· {r.unlockPolicy}</span>
+                    {r.prestige ? <span className="text-octarine"> · prestige</span> : null}
                   </td>
                   <td className="px-2 text-xs text-muted">{r.runLabel}</td>
                   <td className="px-2">
                     {r.milestones[r.finalEraIndex]?.eraName} (e{r.finalEraIndex})
                     {r.stuck ? <span className="ml-1 text-accent">mur</span> : null}
                   </td>
-                  <td className="px-2 tabular-nums">{fmtDuration(r.totalTimeS)}</td>
+                  <td className="px-2 tabular-nums">{fmtDuration(r.cycle1S ?? null)}</td>
+                  <td className="px-2 tabular-nums">
+                    {r.prestige ? fmtDuration(r.cycle2S ?? null) : '-'}
+                  </td>
+                  <td className="px-2 tabular-nums text-octarine">
+                    {r.prestige ? `+${r.echoes ?? 0}` : '-'}
+                  </td>
                   <td className="px-2 tabular-nums">{reached}</td>
                   <td className="px-2 tabular-nums">
                     {full}/{left.length}
@@ -288,7 +310,8 @@ export function SimViewer() {
           >
             {ALL_RUNS.map((r) => (
               <option key={uid(r)} value={uid(r)}>
-                {r.profileLabel} · {r.unlockPolicy} · {r.runLabel}
+                {r.profileLabel} · {r.unlockPolicy}
+                {r.prestige ? ' · prestige' : ''} · {r.runLabel}
               </option>
             ))}
           </select>

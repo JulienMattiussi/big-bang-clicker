@@ -1,9 +1,9 @@
 import type { EraDef, GeneratorDef, ResourceDef } from '@/lib/types'
 
 /**
- * TRANSCENDENCE tier (era 18) - Explosion. Final era: accumulate tension until
- * you can transcend (prestige / new Big Bang). No converter; the prestige action
- * happens via PrestigeBanner.
+ * TRANSCENDENCE tier (era 18) - Explosion. Final era: the forgotten-gas crisis
+ * (GasLeakGame) then the singularity widget (contract to a point) drive the New
+ * Big Bang. No converter; the prestige reset is triggered from EndGameModal.
  */
 
 export const era18Resources: ResourceDef[] = [
@@ -32,8 +32,8 @@ export const era18: EraDef = {
   clickResource: 'tension',
   icon: 'burst',
   uiTier: 'transcendence',
-  widget: 'cooling',
-  layout: 'compact',
+  widget: 'singularity',
+  layout: 'solo',
   unlock: { complexity: 18_000_000_000 },
   resources: ['tension'],
   generators: ['instability'],

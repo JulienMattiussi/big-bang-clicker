@@ -37,18 +37,24 @@ test('run balance simulations', () => {
   const dir = `sim/results/${runId}`
   mkdirSync(dir, { recursive: true })
 
-  const total = PROFILES.length * UNLOCK_POLICIES.length
+  // Each profile x policy is run twice: a normal run, and a prestige run (one
+  // prestige then a second run with the bonuses), so the viewer can compare them.
+  const MODES = [false, true] as const
+  const total = PROFILES.length * UNLOCK_POLICIES.length * MODES.length
   let n = 0
   for (const profile of PROFILES) {
     for (const policy of UNLOCK_POLICIES) {
-      const result = simulate(profile, policy, meta)
-      writeFileSync(`${dir}/${profile.id}__${policy}.json`, JSON.stringify(result))
-      n++
-      const reached = result.milestones[result.finalEraIndex]
-      const days = (result.totalTimeS / 86400).toFixed(1)
-      console.log(
-        `[${n}/${total}] ${result.label}: reached ${reached?.eraName ?? '?'} (e${result.finalEraIndex}) in ${days}d${result.stuck ? ' [stuck]' : ''}`,
-      )
+      for (const prestige of MODES) {
+        const result = simulate(profile, policy, meta, prestige)
+        const mode = prestige ? 'prestige' : 'normal'
+        writeFileSync(`${dir}/${profile.id}__${policy}__${mode}.json`, JSON.stringify(result))
+        n++
+        const reached = result.milestones[result.finalEraIndex]
+        const days = (result.totalTimeS / 86400).toFixed(1)
+        console.log(
+          `[${n}/${total}] ${result.label}: reached ${reached?.eraName ?? '?'} (e${result.finalEraIndex}) in ${days}d${result.stuck ? ' [stuck]' : ''}${prestige ? ` [+${result.echoes} echoes]` : ''}`,
+        )
+      }
     }
   }
 

@@ -6,7 +6,7 @@ import { EraTransition } from '@/components/layout/EraTransition'
 import { InventoryButton } from '@/components/game/inventory/InventoryButton'
 import { EraTabs } from '@/components/game/EraTabs'
 import { ClickArea } from '@/components/game/ClickArea'
-import { isWideLayout, wideRowClass } from '@/components/layout/eraLayout'
+import { isSoloLayout, isWideLayout, wideRowClass } from '@/components/layout/eraLayout'
 import { ResourcePanel } from '@/components/game/ResourcePanel'
 import { PurchasePanel } from '@/components/game/PurchasePanel'
 import { ComplexityBadge } from '@/components/game/ComplexityBadge'
@@ -15,7 +15,6 @@ import { NextGoal } from '@/components/game/NextGoal'
 import { MilestoneButton } from '@/components/game/MilestoneButton'
 import { EraIcon } from '@/components/game/EraIcon'
 import { eraTitle } from '@/components/game/eraTitle'
-import { PrestigeBanner } from '@/components/game/PrestigeBanner'
 import { CrisisBanner } from '@/components/game/CrisisBanner'
 import { CrisisGame } from '@/components/game/CrisisGame'
 import { useGameStore } from '@/store/gameStore'
@@ -116,11 +115,11 @@ export function GameShell() {
         <EraTabs />
       </header>
 
-      <PrestigeBanner />
-
       {/* Sliding transition between eras (direction by tab order). */}
       <EraTransition eraId={era.id} index={era.index} className="flex flex-col gap-4">
-        {isWideLayout(era.layout) ? (
+        {isSoloLayout(era.layout) ? (
+          <section className="flex justify-center pt-2">{central}</section>
+        ) : isWideLayout(era.layout) ? (
           <>
             <section className="-mt-2 flex justify-center pb-2">{central}</section>
             {/* Resources stay narrow next to the wide machines panel; 'wide-roomy'

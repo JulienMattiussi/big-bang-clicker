@@ -15,6 +15,7 @@ export const CRISIS_GAMES = new Set([
   'machineRebellion',
   'encounter',
   'spice',
+  'gasLeak',
 ])
 
 /**

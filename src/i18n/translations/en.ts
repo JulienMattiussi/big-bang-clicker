@@ -8,6 +8,7 @@ import type { Translations } from '../types'
 export const en: Translations = {
   'app.complexity': 'Complexity',
   'app.nextGoal': 'Next milestone',
+  'app.collapse': 'Collapse',
   'complexity.source': 'Produces Complexity',
   'complexity.reduced': 'reduced, older era',
   'complexity.toDiscover': 'Something to discover here will grow Complexity',
@@ -308,6 +309,7 @@ export const en: Translations = {
   'memory.goal.triplets': 'matched in triplets (three of a kind)',
   'memory.half':
     'For now you only have access to half the memory of the universe. Prove your worth before you reach 42.',
+  'memory.eraLevel': 'Memory level {n}',
   'memory.maxed.title': "This era's memory is complete",
   'memory.maxed.body':
     "You have engraved this era's entire memory: its production is already x8. There is nothing left to double here.",
@@ -397,6 +399,18 @@ export const en: Translations = {
   'spiceGame.tile': 'Pipe: rotate',
   'spiceGame.progress': 'Conduit to the city',
   'spiceGame.stage': '(stage {n}/{total})',
+  'gasLeak.hint': 'The gas was left on! Snuff out the leaks before disaster...',
+  'gasLeak.aria': 'Gas leaks: click to snuff them out before the countdown ends.',
+  'gasLeak.leak': 'Snuff out the leak',
+  'singularity.hint': 'Click to contract the universe, down to a single point.',
+  'endgame.chain.title': 'Chain reaction',
+  'endgame.chain.body':
+    'Too late. The first flame lights another, which lights a thousand. The universe-city, so perfectly interconnected, becomes the ideal path for the blaze: everything spreads, everything gives way. Under its own weight, the universe collapses, contracting toward a single point.',
+  'endgame.title': 'New Big Bang',
+  'endgame.body':
+    'Everything gathers into a point, then erupts: a fresh universe is reborn, boosted by the Echoes you gathered.',
+  'endgame.echoes': 'Echoes earned',
+  'endgame.button': 'Be reborn',
   'crisis.extinction.trigger': 'Mass extinction: the dominant clade collapses.',
   'crisis.extinction.rebound': 'A minor branch thrives: life resumes, more diverse.',
   'crisis.revolt.trigger': "Starpacus's revolt: society shatters.",
@@ -425,6 +439,9 @@ export const en: Translations = {
     'Salakis is the most coveted planet of all: it harbours mysterious mudworms that produce the “Spice”, the most precious resource in the universe. A smugglers’ cartel is diverting the flow that feeds the universe-city. Reroute the spice home before they drain it all!',
   'crisis.spice.rebound':
     'The conduit restored, the spice flows back to the city. The cartel packs up: better fed than ever, districts and duchies double their output.',
+  'crisis.gasLeak.trigger':
+    'A district leader quietly finishes breakfast... and forgets to turn off the gas.\nAn alarm sounds. Then another. For that thin trickle wakes a hidden structural flaw, left behind by a negligent engineer: one leak triggers another, which triggers ten.\nThe chain reaction runs wild and now threatens the whole universe-city. Major risk. Snuff out the leaks before they spread!',
+  'crisis.gasLeak.rebound': 'The universe is reborn.',
 
   'prestige.title': 'Rebirth',
   'prestige.desc': 'Everything restarts, boosted by Echoes.',
@@ -629,11 +646,11 @@ export const en: Translations = {
   'era.e18.stock': 'Universe',
   'era.e18.machines': 'Districts',
   'era.e18.verb': 'Unify',
-  'era.e19.name': 'Explosion',
+  'era.e19.name': 'Death and birth',
   'era.e19.tagline': 'Everything ends... and begins again, better.',
   'era.e19.stock': 'Instability',
   'era.e19.machines': 'Singularity',
-  'era.e19.verb': 'Push to the brink',
+  'era.e19.verb': 'Collapse',
 
   // Transition texts (event modal) shown when entering the era.
   'era.e2.transition':
@@ -671,5 +688,5 @@ export const en: Translations = {
   'era.e18.transition':
     'Everything converges: the entire universe gathers into a single universe-city at its peak. That is when a mad scientist, Harry Sheldon, claims to have invented an infallible predictive science. His verdict: the universe will end very soon, over some obscure business about a kitchen stove. Nobody takes him seriously.',
   'era.e19.transition':
-    'Somewhere, a galactic-district leader forgot to turn off the gas after breakfast. The whole universe goes up in flames. Time to start over... better.',
+    'The entire universe has converged into a single universe-city, perfectly orchestrated: every district, every flow of energy, every thought in flawless accord, a symphony of absolute perfection. Nothing missing, nothing astray. The apex of all that ever was.',
 }

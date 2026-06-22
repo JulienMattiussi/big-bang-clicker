@@ -5,6 +5,8 @@ import { Icon } from '@/components/ui/Icon'
 import { EraIcon } from '@/components/game/EraIcon'
 import { EventHero, type HeroTone } from '@/components/game/EventHero'
 import { CrisisScene } from '@/components/art/CrisisScene'
+import { UniverseCityScene } from '@/components/art/UniverseCityScene'
+import { ChainReactionScene } from '@/components/art/ChainReactionScene'
 import { Galet } from '@/components/art/Galet'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
@@ -51,6 +53,7 @@ export function EventModal() {
   // A crisis with a survival mini-game: closing the modal drops into the widget.
   const crisisGame = crisisId !== null && CRISIS_GAMES.has(crisisId)
   const isCrisisWon = event.id.startsWith('crisis-won:')
+  const isChain = event.id === 'endgame:chain'
 
   // Explicit, data-driven effect lines: the regression on the trigger modal, the
   // rebound on the "overcome" modal (derived from the crisis data).
@@ -82,11 +85,20 @@ export function EventModal() {
   // fallback). tone drives the eyebrow/glow; glyph is the central illustration.
   let hero: { tone: HeroTone; eyebrow: string; glyph: ReactNode; wide?: boolean } | null = null
   if (era) {
-    hero = {
-      tone: 'accent',
-      eyebrow: t('era.unlocked.eyebrow'),
-      glyph: <EraIcon icon={era.icon} className="relative h-20 w-20" />,
-    }
+    // The final era opens on a grand universe-city illustration, not its tab icon.
+    hero =
+      era.id === 'e19'
+        ? {
+            tone: 'accent',
+            eyebrow: t('era.unlocked.eyebrow'),
+            wide: true,
+            glyph: <UniverseCityScene className="relative h-32 w-auto" />,
+          }
+        : {
+            tone: 'accent',
+            eyebrow: t('era.unlocked.eyebrow'),
+            glyph: <EraIcon icon={era.icon} className="relative h-20 w-20" />,
+          }
   } else if (isMemory) {
     hero = {
       tone: 'octarine',
@@ -104,6 +116,13 @@ export function EventModal() {
       tone: 'accent',
       eyebrow: t('crisis.overcome.eyebrow'),
       glyph: <Icon name="sunrise" className="relative h-16 w-16 text-accent" />,
+    }
+  } else if (isChain) {
+    hero = {
+      tone: 'danger',
+      eyebrow: t('app.collapse'),
+      wide: true,
+      glyph: <ChainReactionScene className="relative h-32 w-auto" />,
     }
   } else if (crisisId) {
     hero = {
@@ -125,13 +144,13 @@ export function EventModal() {
       labelledBy="event-title"
       tier={era?.uiTier}
       className={`w-full max-w-md rounded-lg border bg-surface p-6 text-fg shadow-xl ${
-        crisisId ? 'crisis-modal' : 'modal-in'
+        crisisId || isChain ? 'crisis-modal' : 'modal-in'
       } ${
         octarine
           ? 'complexity-glow border-octarine/50'
           : accentBorder
             ? 'border-accent/50 shadow-[0_0_45px_-10px_var(--color-accent)]'
-            : crisisId
+            : crisisId || isChain
               ? 'border-red-500/50'
               : 'border-border'
       }`}
