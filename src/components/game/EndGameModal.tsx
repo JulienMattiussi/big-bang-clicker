@@ -76,6 +76,18 @@ export function EndGameModal() {
         </p>
       </div>
 
+      {/* Spells out the irreversible reset so the player knows what is lost vs kept. */}
+      <div className="mt-4 w-full rounded-md border border-border bg-bg/40 p-3 text-left text-sm">
+        <p className="flex gap-2">
+          <span className="shrink-0 font-semibold text-fg">{t('endgame.resets.label')}</span>
+          <span className="text-muted">{t('endgame.resets.list')}</span>
+        </p>
+        <p className="mt-1.5 flex gap-2">
+          <span className="shrink-0 font-semibold text-octarine">{t('endgame.keeps.label')}</span>
+          <span className="text-muted">{t('endgame.keeps.list')}</span>
+        </p>
+      </div>
+
       <div className="mt-4 flex flex-col gap-2">
         <div className="text-xs font-semibold tracking-wide text-muted uppercase">
           {t('meta.title')}

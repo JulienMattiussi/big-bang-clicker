@@ -57,7 +57,7 @@ fond de scène par palier, modales d'évènements). Arborescence :
 src/
 ├── lib/                  # Logique pure, zéro React (entièrement testée)
 │   ├── types.ts          # Types du domaine (Era + layout, Resource, Generator, Converter, Crisis, MetaUpgrade, GameState...)
-│   ├── engine.ts         # Tick, coûts (arrondis), achats, conversion manuelle, multiplicateurs de galets, clickYield, palier ; gèle la production des ressources touchées par une crise active et bloque le palier tant qu'elle n'est pas résolue
+│   ├── engine/           # Moteur découpé par préoccupation (barrel index.ts, API stable `@/lib/engine`) : cost, eras (palier/déblocage), multipliers (galets/mémoire/rebonds dérivés), rates (débits single-source), complexity, actions (achats/clic/conversion), tick ; gèle la production des ressources touchées par une crise active et bloque le palier tant qu'elle n'est pas résolue
 │   ├── graph.ts          # Flux nets réels + alertes (ressources en déclin / production à zéro), dépendances, tri
 │   ├── reveal.ts         # Dévoilement progressif (machines / ressources)
 │   ├── events.ts         # Évènements narratifs déclenchés (transitions, crises, tuto)

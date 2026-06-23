@@ -410,6 +410,10 @@ export const en: Translations = {
   'endgame.body':
     'Everything gathers into a point, then erupts: a fresh universe is reborn, boosted by the Echoes you gathered.',
   'endgame.echoes': 'Echoes earned',
+  'endgame.resets.label': 'Reset',
+  'endgame.resets.list': 'Resources, machines, unlocked eras and Complexity',
+  'endgame.keeps.label': 'Kept',
+  'endgame.keeps.list': 'Echoes, meta-upgrades and infinity pebbles',
   'endgame.button': 'Be reborn',
   'rebirth.button': 'Rebirths',
   'rebirth.title': 'Rebirths',

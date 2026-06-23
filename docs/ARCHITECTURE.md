@@ -33,7 +33,7 @@ Voir aussi [AGENTS.md](../AGENTS.md). Détail data-driven :
 src/
 ├── lib/                  # logique pure (zéro React, testée)
 │   ├── types.ts          # types du domaine (Def + State)
-│   ├── engine.ts         # tick, coûts (arrondis), achats, conversion manuelle, débits single-source (generatorPerSec/converterOutputPerSec, réutilisés par l'UI), Complexité = production réelle (complexityPerUnit), palier (gelé en crise)
+│   ├── engine/           # moteur découpé par préoccupation (barrel index.ts ; API stable `@/lib/engine`) : cost, eras (palier), multipliers (galets/mémoire/rebonds dérivés), rates (débits single-source generatorPerSec/converterOutputPerSec réutilisés par l'UI), complexity (= production réelle, complexityPerUnit), actions (achats/clic/conversion), tick (gelé en crise)
 │   ├── graph.ts          # flux nets réels + alertes (déclin / production à zéro), dépendances, tri
 │   ├── reveal.ts         # dévoilement progressif (machines / ressources)
 │   ├── events.ts         # évènements narratifs déclenchés (transitions, crises, tuto)
@@ -57,10 +57,13 @@ src/
 │   ├── feedbackStore.ts  # nombres flottants transitoires (+X / -X)
 │   ├── clickPulse.ts     # signal générique "verbe activé" (widgets passifs, ex. jauge)
 │   ├── eventStore.ts     # file des modales d'évènements (transitions, crises, import de save...)
-│   ├── memoryStore.ts    # signal transitoire du mini-jeu de mémoire (flash du bouton)
-│   ├── inventoryStore.ts # signal transitoire du sac à dos (flash/atterrissage du bouton)
+│   ├── highlightStore.ts # factory de store « flash de bouton » (signal transitoire réutilisable)
+│   ├── memoryStore.ts    # signal d'atterrissage du bouton mémoire (dérivé de highlightStore)
+│   ├── inventoryStore.ts # signal d'atterrissage du bouton sac à dos (dérivé de highlightStore)
+│   ├── rebirthStore.ts   # signal d'atterrissage du bouton de journal des renaissances (dérivé)
 │   ├── galetStore.ts     # signal transitoire : galet découvert qui se pose sur son socle (FLIP)
-│   └── crisisStore.ts    # mini-jeu de crise en cours (id + créatures sauvées ; transitoire)
+│   ├── crisisStore.ts    # mini-jeu de crise en cours (id + créatures sauvées ; transitoire)
+│   └── endgameStore.ts   # signal de fin (ère 19) : contraction de la singularité + modale de renaissance
 ├── i18n/                 # i18n custom (voir section 10) ; locale persistée en localStorage
 ├── hooks/
 │   ├── useTick.ts        # boucle de jeu + autosauvegarde (+ sauvegarde à la fermeture)
@@ -70,14 +73,17 @@ src/
 │   ├── useMilestone.ts   # données du palier suivant (jauge NextGoal + bouton MilestoneButton)
 │   ├── useArrivalReward.ts # crédite un gain à chaque nouvel élément arrivé (delta d'un total cumulé)
 │   ├── useSimLoop.ts     # mini-boucle générique (setInterval) pilotant un « monde » de widget/mini-jeu
+│   ├── useCrisisWin.ts   # séquence de victoire partagée des mini-jeux de crise (résout + rebond + stop)
+│   ├── useFlipIntro.ts   # atterrissage FLIP partagé des boutons (mémoire / sac / renaissances)
+│   ├── useEndgame.ts     # arme la crise de fin (gaz) à l'entrée de l'ère 19
 │   └── usePageHidden.ts  # signal de page masquée / en arrière-plan (pagehide / visibilitychange)
 ├── components/
-│   ├── ui/               # primitives (Button, Panel, Modal (scrim/dialog/Escape partagés), Icon, IconBadge, AlertBadge, FloaterLayer...) ; introRect.ts (rect/transform partagé des animations d'arrivée : inventaire, mémoire, galet)
-│   ├── art/              # graphisme exclusivement : glyphs/ (icônes custom du registre Icon) + illustrations (Galet, Sauropod, OrganismGlyph, PartGlyph, CrisisCreatures, CrisisScene)
-│   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, galets ; modales (EventModal + EventHero, layout « hero » partagé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge) ; eraTitle.ts (titre « Ère N : Nom »)
+│   ├── ui/               # primitives (Button, Panel, Modal (scrim/dialog/Escape partagés), Icon, IconBadge, AlertBadge, FloaterLayer...) ; introRect.ts + FlipIntroClone (clone animé partagé, cf. useFlipIntro)
+│   ├── art/              # graphisme exclusivement : glyphs/ (icônes custom du registre Icon) + illustrations (Galet, Sauropod, OrganismGlyph, PartGlyph, CrisisCreatures, CrisisScene, ChainReactionScene, UniverseCityScene)
+│   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, galets ; modales (EventModal + EventHero, layout « hero » partagé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge, mini-jeux ExtinctionGame/RevoltGame/SpiceGame/SurviveGame/GasLeakGame via useCrisisWin) ; fin de jeu (EndGameModal, RebirthButton/RebirthModal) ; eraTitle.ts (titre « Ère N : Nom »)
 │   │   ├── memory/       # mini-jeu de mémoire : MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42 (+EraSymbolCluster), police Neogen
 │   │   ├── inventory/    # sac à dos : InventoryButton/InventoryModal
-│   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish...) routés par interactive.ts ; helpers svgCoords.ts, StarField.tsx (champ d'étoiles SVG partagé)
+│   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish, SingularityWidget de fin...) routés par interactive.ts ; helpers svgCoords.ts, StarField.tsx (champ d'étoiles SVG partagé)
 │   └── layout/           # coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier), GaletReceptacle ; eraLayout.ts (disposition de page par ère, voir EraLayoutName)
 └── App.tsx               # navigation par état (pas de router)
 ```
@@ -338,7 +344,7 @@ graver le multiplicateur le figerait pour toujours dans la save.
 Sources de multiplicateur, toutes dérivées :
 - **Méta-upgrades** : booléens `metaUpgrades[id]` -> `applyMeta` recalcule
   `multipliers.meta` au chargement (`meta.ts`).
-- **Galets** : `{ found, active }` -> `galet*Multiplier` lus en direct (`engine.ts`).
+- **Galets** : `{ found, active }` -> `galet*Multiplier` lus en direct (`engine/multipliers.ts`).
 - **Mémoire** : niveau `memoryLevels[era]` -> le moteur applique `MEMORY_BOOST^niveau`
   (`memoryResourceMultiplier`). `memoryWin` n'incrémente **que** le niveau.
 - **Rebonds de crise** : compteur `crises[id].count` -> le moteur applique

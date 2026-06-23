@@ -94,7 +94,7 @@ export function GasLeakGame() {
                 }
               }}
               className="cursor-pointer outline-none transition hover:stroke-accent focus-visible:stroke-accent"
-              strokeWidth="1.5"
+              strokeWidth="2"
             />
           </g>
         ))}
