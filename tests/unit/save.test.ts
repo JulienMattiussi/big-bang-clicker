@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { afterEach, beforeEach, describe, it, expect } from 'vitest'
 import {
   SAVE_VERSION,
   TAMPER_ERROR,
@@ -7,8 +7,10 @@ import {
   deserialize,
   exportSave,
   importSave,
+  loadFromStorage,
   migrate,
   parseSaved,
+  saveToStorage,
   serialize,
   serializeSigned,
 } from '@/lib/save'
@@ -65,6 +67,62 @@ describe('migrations', () => {
     const migrated = migrate(v2)
     expect(migrated.version).toBe(SAVE_VERSION)
     expect(migrated.multipliers).toEqual({})
+  })
+
+  it('v1 -> ... : traverse toute la chaîne de migrations sans casser', () => {
+    const v1 = { ...createInitialState(0), version: 1 }
+    const migrated = migrate(v1)
+    expect(migrated.version).toBe(SAVE_VERSION)
+    expect(migrated.rebirths).toBe(0) // ajouté par la migration v6 -> v7
+  })
+
+  it('v5 -> v6 : renumérote les ids d ère (0-based -> 1-based)', () => {
+    const v5 = {
+      ...createInitialState(0),
+      version: 5,
+      currentEraId: 'e0',
+      unlockedEras: ['e0', 'e1'],
+      memoryLevels: { e0: 2 },
+      complexityBoosts: { e1: 1 },
+    }
+    const migrated = migrate(v5)
+    expect(migrated.currentEraId).toBe('e1')
+    expect(migrated.unlockedEras).toEqual(['e1', 'e2'])
+    expect(migrated.memoryLevels).toEqual({ e1: 2 })
+    expect(migrated.complexityBoosts).toEqual({ e2: 1 })
+  })
+})
+
+describe('loadFromStorage', () => {
+  beforeEach(() => localStorage.clear())
+  afterEach(() => localStorage.clear())
+
+  it('renvoie null sans sauvegarde stockée', () => {
+    expect(loadFromStorage()).toEqual({ state: null, tampered: false })
+  })
+
+  it('relit une sauvegarde valide écrite par le jeu', () => {
+    const state = { ...createInitialState(7), complexity: 321 }
+    saveToStorage(state)
+    const loaded = loadFromStorage()
+    expect(loaded.tampered).toBe(false)
+    expect(loaded.state?.complexity).toBe(321)
+  })
+
+  it('signale une sauvegarde altérée (tampered) sans la charger', () => {
+    saveToStorage(createInitialState(0))
+    const key = localStorage.key(0)!
+    const env = JSON.parse(localStorage.getItem(key)!)
+    const hacked = { ...JSON.parse(env.d), complexity: 999_999 }
+    localStorage.setItem(key, JSON.stringify({ d: JSON.stringify(hacked), s: env.s }))
+    expect(loadFromStorage()).toEqual({ state: null, tampered: true })
+  })
+
+  it('renvoie un état nul (non altéré) sur un JSON illisible', () => {
+    saveToStorage(createInitialState(0))
+    const key = localStorage.key(0)!
+    localStorage.setItem(key, 'not json{')
+    expect(loadFromStorage()).toEqual({ state: null, tampered: false })
   })
 })
 

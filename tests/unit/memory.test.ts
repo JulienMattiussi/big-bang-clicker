@@ -4,14 +4,35 @@ import {
   MEMORY_UNLOCK_CONVERTER,
   memoryCost,
   memoryEraMaxed,
+  memoryJokerSets,
   memoryLevel,
   memoryStart,
   memoryUnlocked,
   memoryWin,
 } from '@/lib/memory'
 import { makeState, makeEra, makeDefs } from '../helpers'
+import type { GaletDef } from '@/lib/types'
 
 const defs = makeDefs({ eras: [makeEra({ id: 'e8', clickResource: 'beast' })] })
+
+// A Force pebble (mind control): its `value` is the cheaper cost fraction (1%).
+const forceGalet: GaletDef = {
+  id: 'force',
+  nameKey: '',
+  descKey: '',
+  loreKey: '',
+  color: '',
+  motif: '',
+  discoverEraId: 'e16',
+  discovery: 'crisis',
+  effect: { type: 'memoryBoost', maxEraIndex: 99, value: 0.01 },
+}
+const forceDefs = makeDefs({
+  eras: [makeEra({ id: 'e8', clickResource: 'beast' })],
+  galets: [forceGalet],
+})
+const withForce = (overrides = {}) =>
+  makeState({ galets: { force: { found: true, active: true } }, ...overrides })
 
 describe('memoryUnlocked', () => {
   it('verrouillé tant que le convertisseur de déblocage n a pas été monté', () => {
@@ -43,6 +64,28 @@ describe('memoryCost', () => {
   it('coûte 10% de la Complexité, au minimum 1', () => {
     expect(memoryCost(makeState({ complexity: 1000 }), defs)).toBe(100)
     expect(memoryCost(makeState({ complexity: 0 }), defs)).toBe(1)
+  })
+
+  it('chute à la fraction du galet Force (1%), au minimum 1', () => {
+    expect(memoryCost(withForce({ complexity: 1000 }), forceDefs)).toBe(10)
+    expect(memoryCost(withForce({ complexity: 0 }), forceDefs)).toBe(1)
+  })
+
+  it('devient gratuit quand le méta puissance des galets amplifie le galet Force', () => {
+    const amplified = withForce({ complexity: 1000, multipliers: { metaGalet: 2 } })
+    expect(memoryCost(amplified, forceDefs)).toBe(0)
+  })
+})
+
+describe('memoryJokerSets', () => {
+  it('aucun joker sans galet Force', () => {
+    expect(memoryJokerSets(makeState(), defs, 2)).toBe(0)
+  })
+
+  it('2 jokers avec le galet, +1 par niveau une fois amplifié', () => {
+    expect(memoryJokerSets(withForce(), forceDefs, 3)).toBe(2)
+    const amplified = withForce({ multipliers: { metaGalet: 2 } })
+    expect(memoryJokerSets(amplified, forceDefs, 3)).toBe(5) // 2 + niveau 3
   })
 })
 

@@ -27,4 +27,18 @@ describe('prestige', () => {
     expect(next.metaUpgrades).toEqual({ boost: true })
     expect(next.lastSeen).toBe(9999)
   })
+
+  it('incrémente le compteur de renaissances et conserve les galets', () => {
+    const state = stateWith({ rebirths: 2, galets: { matter: { found: true, active: true } } })
+    const next = prestige(state, 1)
+    expect(next.rebirths).toBe(3)
+    expect(next.galets).toEqual({ matter: { found: true, active: true } })
+  })
+
+  it('tolère des champs rebirths/galets absents (sauvegarde ancienne)', () => {
+    const partial = { ...stateWith({}), rebirths: undefined, galets: undefined }
+    const next = prestige(partial as Parameters<typeof prestige>[0], 1)
+    expect(next.rebirths).toBe(1)
+    expect(next.galets).toEqual({})
+  })
 })

@@ -1,10 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import {
   applyClick,
+  buyConverter,
   buyGenerator,
   canAfford,
   canManualConvert,
   canUnlockNextEra,
+  nextLockedEra,
   complexityPerUnit,
   converterOutputPerSec,
   costAtLevel,
@@ -81,6 +83,23 @@ describe('achats', () => {
 
   it('refuse un achat non abordable', () => {
     expect(buyGenerator(stateWith({ resources: { quark: 5 } }), defs, 'quarkGen')).toBeNull()
+  })
+
+  it('achète un convertisseur (débite, monte le niveau, activé par défaut)', () => {
+    const next = buyConverter(stateWith({ resources: { quark: 50 } }), defs, 'fuse')
+    expect(next).not.toBeNull()
+    expect(next!.resources.quark).toBe(0)
+    expect(next!.converters.fuse).toEqual({ level: 1, enabled: true })
+  })
+
+  it('buyConverter : null si inconnu ou non abordable', () => {
+    expect(buyConverter(stateWith({ resources: { quark: 999 } }), defs, 'unknown')).toBeNull()
+    expect(buyConverter(stateWith({ resources: { quark: 5 } }), defs, 'fuse')).toBeNull()
+  })
+
+  it('buyConverter conserve l état activé/désactivé existant', () => {
+    const off = stateWith({ resources: { quark: 999 }, converters: { fuse: { level: 1, enabled: false } } })
+    expect(buyConverter(off, defs, 'fuse')!.converters.fuse.enabled).toBe(false)
   })
 })
 
@@ -194,6 +213,30 @@ describe('franchissement de palier', () => {
     })
     const next = tick(state, eraDefs, 1)
     expect(next.complexity).toBe(100)
+  })
+
+  it('franchit aussi sur un seuil de ressource (pas seulement la Complexité)', () => {
+    const resourceDefs: GameDefs = {
+      ...defs,
+      eras: [
+        { id: 'a', unlock: {} } as unknown as EraDef,
+        { id: 'b', unlock: { resource: 'quark', amount: 100 } } as unknown as EraDef,
+      ],
+    }
+    const below = stateWith({ unlockedEras: ['a'], resources: { quark: 50 } })
+    const enough = stateWith({ unlockedEras: ['a'], resources: { quark: 100 } })
+    expect(canUnlockNextEra(below, resourceDefs)).toBe(false)
+    expect(canUnlockNextEra(enough, resourceDefs)).toBe(true)
+  })
+
+  it('nextLockedEra : prochaine ère verrouillée avec condition, sinon undefined', () => {
+    const state = stateWith({ unlockedEras: ['a'] })
+    expect(nextLockedEra(state, eraDefs)?.id).toBe('b')
+    expect(nextLockedEra(stateWith({ unlockedEras: ['a', 'b'] }), eraDefs)).toBeUndefined()
+  })
+
+  it('canUnlockNextEra : faux quand aucune ère verrouillée ne reste', () => {
+    expect(canUnlockNextEra(stateWith({ unlockedEras: ['a', 'b'] }), eraDefs)).toBe(false)
   })
 })
 

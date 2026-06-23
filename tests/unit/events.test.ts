@@ -3,7 +3,7 @@ import { useGameStore } from '@/store/gameStore'
 import { triggeredEvents } from '@/lib/events'
 import type { GameEvent } from '@/lib/events'
 import { defs } from '@/data'
-import { makeState } from '../helpers'
+import { makeState, makeDefs } from '../helpers'
 
 const ev = (id: string, galetId?: string): GameEvent => ({
   id,
@@ -59,5 +59,39 @@ describe('triggeredEvents', () => {
       generators: { [era0.generators[0]]: { level: 1 } },
     })
     expect(triggeredEvents(state, defs).map((e) => e.id)).toContain('tuto:firstMachine')
+  })
+
+  it('annonce le mini-jeu de mémoire une fois l oxydation montée', () => {
+    const state = makeState({ converters: { oxidation: { level: 1, enabled: true } } })
+    expect(triggeredEvents(state, defs).map((e) => e.id)).toContain('feature:memory')
+  })
+
+  it('annonce le sac à dos à l apparition de sa ressource', () => {
+    const state = makeState({ resources: { microbe: 1 } })
+    expect(triggeredEvents(state, defs).map((e) => e.id)).toContain('feature:backpack')
+  })
+
+  it('annonce une crise prête ou déjà survenue, jamais une crise inconnue de l état', () => {
+    const crisisDefs = makeDefs({
+      crises: {
+        c: {
+          id: 'c',
+          eraId: 'e1',
+          risk: { threshold: 10 },
+          trigger: 'threshold',
+          regression: [],
+          rebound: [],
+          textKeys: { warnKey: '', triggerKey: 'crisis.c.trigger', reboundKey: '' },
+        },
+      },
+    })
+    // Aucune entrée runtime : pas d'annonce.
+    expect(triggeredEvents(makeState({}), crisisDefs).map((e) => e.id)).not.toContain('crisis:c')
+    // Prête (risque au seuil).
+    const ready = makeState({ crises: { c: { risk: 10, resolved: false, count: 0 } } })
+    expect(triggeredEvents(ready, crisisDefs).map((e) => e.id)).toContain('crisis:c')
+    // Déjà survenue (count > 0) même résolue.
+    const past = makeState({ crises: { c: { risk: 0, resolved: true, count: 1 } } })
+    expect(triggeredEvents(past, crisisDefs).map((e) => e.id)).toContain('crisis:c')
   })
 })
