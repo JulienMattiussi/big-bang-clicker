@@ -30,7 +30,7 @@ const FLASH_MS = 600
 const FEEDBACK_MS = 700
 
 /**
- * Era 11 (Intelligence): a constellation of ideas (a Simon-style memory game).
+ * Era e12 (Intelligence): a constellation of ideas (a Simon-style memory game).
  * Watch the sequence light up, then reproduce it by clicking the ideas in order.
  * EVERY click yields the base resource (the RIGHT one doubles it); reproducing the
  * whole sequence yields the secondary resource and the pattern grows by one. A

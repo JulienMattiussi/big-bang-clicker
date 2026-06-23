@@ -297,20 +297,30 @@ les Échos, prend ici tout son sens.)
 - **Crise écologique** (ère 15) : l'industrialisation et la sur-exploitation
   font monter la pollution ; au seuil, effondrement écologique (régression) ;
   une transition durable relance sur des bases plus efficaces et résilientes.
-- **Soulèvement IA** (ère 15) : une IA toute-puissante (le Matrixator) se
-  retourne contre ses créateurs ; prise de contrôle des machines (régression) ;
-  un alignement avec l'IA relance sur des bases plus puissantes.
-- **Navette spatiale** (ère 16) : pousser les lancements sans sécurité fait
-  exploser une navette ; le budget est gelé (régression) ; une avancée de
-  sécurité relance la conquête sur de meilleures bases.
+- **Soulèvement IA** (ère 15) : une IA toute-puissante se retourne contre ses
+  créateurs (crise `machineRebellion`) ; un alignement relance sur de meilleures
+  bases.
+- **Krach économique** (ère 15) et **bug de l'an 2000** (ère 15) : deux crises
+  industrielles supplémentaires, même schéma régression -> rebond.
+- **Première rencontre** (ère 17) : des créatures hostiles (`encounter`) ; la
+  vaincre octroie le **galet de la Force**.
+- **Cartel de l'épice** (ère 18) : planète Salakis, vers de vase (`spice`) ;
+  mini-jeu de réorientation de conduits.
+- **Fuite de gaz** (ère 19, finale) : crise **ingagnable** (`gasLeak`) qui
+  déclenche la réaction en chaîne menant au nouveau Big Bang (voir 3.3).
 
-D'autres crises pourront être ajoutées dans le même esprit (krachs économiques,
-pandémies...), avec parcimonie.
+> Aucune crise n'est rattachée à l'ère 16 dans la version finale (l'idée d'une
+> « navette qui explose » n'a pas été retenue). Toutes les crises ci-dessus sont
+> implémentées (`src/data/crises.ts`).
 
-### 6.4 Résolution interactive (implémenté : extinction, ère 11)
+### 6.4 Résolution interactive (mini-jeux plein écran)
 
-Une crise peut se **surmonter par un mini-jeu plein écran** plutôt que par un
-simple bouton. La première crise codée, l'**extinction de masse** :
+Une crise se **surmonte par un mini-jeu plein écran** plutôt que par un simple
+bouton. Plusieurs sont implémentés et partagent la même séquence de victoire
+(hook `useCrisisWin`) : **extinction** (`ExtinctionGame`), **révolte**
+(`RevoltGame`), **survie** générique des crises industrielles (`SurviveGame`),
+**épice** (`SpiceGame`), et la **fuite de gaz** finale ingagnable (`GasLeakGame`).
+Exemple de référence, l'**extinction de masse** :
 
 - **Déclenchement** : risque ∝ excès de **faune** au-dessus d'un plancher.
 - **Annonce** : modale dramatique (illustration d'impact) dont le bouton

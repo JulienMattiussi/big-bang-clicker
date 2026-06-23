@@ -56,7 +56,12 @@ Objectifs :
   ce qui matérialise les transformations d'UI par paliers.
 - **Mémorabilité** : chaque ère a une identité visuelle forte.
 
-### 1.1 Catalogue de widgets (proposition, mapping provisoire)
+### 1.1 Catalogue de widgets (brainstorm d'origine)
+
+> **Note (jeu terminé)** : ce tableau est le **brainstorm initial**. Les 19
+> widgets réellement livrés (parfois différents de ces propositions : p. ex.
+> « arbre technologique » -> frise d'inventions, « carte galactique » -> relais à
+> effet de masse) sont décrits dans [WIDGETS.md](./WIDGETS.md), qui fait foi.
 
 | Widget iconique | Idée d'interaction | Ère(s) candidate(s) |
 |---|---|---|
@@ -79,9 +84,8 @@ Objectifs :
 | **Ville-univers / horloge cosmique** | unifier, jauge de complétude qui sature | Ville-univers |
 | **Singularité / écran qui explose** | déclencher le prestige (transition spectaculaire) | Explosion |
 
-Le mapping définitif sera arrêté après le redécoupage des ères. Un widget peut
-réapparaître à une autre échelle (la Voie lactée à l'ère des astres puis à
-l'ère spatiale).
+Un widget peut réapparaître à une autre échelle (la Voie lactée à l'ère des
+astres puis à l'ère spatiale).
 
 ### 1.2 Règles d'intégration des widgets
 
@@ -144,13 +148,13 @@ ressources | machines s'affiche en dessous (la colonne ressources s'élargit en
 Décision validée : coquille stable **avec transformations profondes par
 paliers**, plus marquées aux ères critiques.
 
-| Palier (tier) | Ères (provisoire) | Identité visuelle | Transformation |
+| Palier (tier) | Ères | Identité visuelle | Transformation |
 |---|---|---|---|
-| COSMOS | Big Bang -> planète | noir spatial, particules, lueurs froides | base |
-| VIVANT | apparition de la vie -> intelligence | matières organiques, palette chaude, arbre du vivant | **majeure** (1er grand basculement) |
-| CIVILISATION | sociétés -> technologies | cartes, bâtiments, interface "humaine" | **majeure** (2e grand basculement) |
-| SPATIAL | conquête -> ville-univers | cartes stellaires, panneaux de flotte | marquée |
-| TRANSCENDANCE | explosion | contraction puis explosion -> prestige | spectaculaire |
+| COSMOS | e1-e5 (Big Bang -> planète) | noir spatial, particules, lueurs froides | base |
+| VIVANT | e6-e11 (apparition de la vie -> intelligence) | matières organiques, palette chaude, arbre du vivant | **majeure** (1er grand basculement) |
+| CIVILISATION | e12-e15 (sociétés -> technologies) | cartes, bâtiments, interface "humaine" | **majeure** (2e grand basculement) |
+| SPATIAL | e16-e18 (conquête -> ville-univers) | cartes stellaires, panneaux de flotte | marquée |
+| TRANSCENDANCE | e19 (explosion) | contraction puis explosion -> prestige | spectaculaire |
 
 Les deux transformations majeures (apparition de la vie ; apparition des
 sociétés) modifient la mise en page, la palette et l'iconographie, pas

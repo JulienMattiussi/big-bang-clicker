@@ -28,13 +28,13 @@ Objectif : un dossier de doc complet et validé avant d'écrire le moteur.
 Objectif : un projet qui démarre, lint, teste et build, conforme au standard
 de `./MyRepos`.
 
-- [ ] Scaffold Vite + React 19 + TypeScript strict.
-- [ ] Tailwind v4 (`@tailwindcss/vite`), alias `@/`.
-- [ ] ESLint (typescript-eslint) + Prettier (config maison).
-- [ ] Vitest + Testing Library ; Playwright pour l'e2e.
-- [ ] `Makefile` (install/start/build/lint/format/typecheck/test/fix/check).
-- [ ] `AGENTS.md` + `CLAUDE.md` + `README.md`.
-- [ ] CI minimale (à aligner sur tes autres repos si tu en as une).
+- [x] Scaffold Vite + React 19 + TypeScript strict.
+- [x] Tailwind v4 (`@tailwindcss/vite`), alias `@/`.
+- [x] ESLint (typescript-eslint) + Prettier (config maison).
+- [x] Vitest + Testing Library ; Playwright pour l'e2e.
+- [x] `Makefile` (install/start/build/lint/format/typecheck/test/fix/check + knip + sim).
+- [x] `AGENTS.md` + `CLAUDE.md` + `README.md`.
+- [ ] CI minimale (à aligner sur tes autres repos) - **non mise en place**.
 
 ## Phase C - Moteur de jeu générique
 
@@ -55,8 +55,10 @@ Objectif : un moteur qui sait jouer **une** ère, piloté par des données.
       inventaire, méta, mémoire) : on teste la mécanique, pas les nombres.
 - [x] i18n bilingue (FR par défaut, EN proposé) : clés typées, store, hook,
       sélecteur de langue dans l'UI, persistance localStorage.
-- [ ] Reste à venir : `settingsStore` (dark mode, plafond idle), et le
-      remplissage des traductions au fil du contenu.
+- [x] Remplissage complet des traductions FR/EN (typage garantissant la parité).
+- [ ] `settingsStore` (dark mode, plafond idle réglable) - **non implémenté**
+      (le jeu est sombre par défaut ; le plafond idle est une constante). Reporté,
+      cf. « Reste optionnel » en bas.
 
 ## Phase D - Tranche verticale (vertical slice)
 
@@ -108,12 +110,31 @@ traductions FR/EN, tests.
       franchissable ; reste à affiner finement en playtest.
 - [x] **Méta-upgrades** (dépense des Échos) : multiplicateurs de production
       globaux permanents, persistants à travers les renaissances.
-- [ ] Onboarding / tutoriel léger.
+- [~] Onboarding : **tutoriel de la première machine** en place (modale
+      `tuto.firstMachine` via le système d'évènements) ; pas d'onboarding plus
+      large au-delà.
 - [x] Accessibilité (passe faite : focus, aria, contrastes, lang, progressbar).
 - [ ] Responsive mobile à peaufiner ; dark mode (déjà sombre par défaut) options.
 - [x] Traduction EN complète (typage garantit la complétude des clés).
 - [ ] (Optionnel) PWA, son, succès.
 - [ ] Déploiement (statique).
+
+## Reste optionnel (jeu jouable de bout en bout)
+
+Le jeu est **fonctionnellement terminé** : 19 ères, prestige + 4 méta-upgrades,
+crises et mini-jeux, séquence de fin, save/import signée, FR/EN, `make check`
+vert. Ce qui reste relève du **confort ou de l'optionnel**, par ordre indicatif :
+
+- **Responsive mobile** : à peaufiner (mise en page pensée desktop d'abord).
+- **`settingsStore`** : aucun réglage joueur (pas de plafond idle réglable ni de
+  bascule de thème). À ajouter seulement si un besoin apparaît.
+- **CI** : aucun workflow ; `make check` est lancé manuellement.
+- **Déploiement statique** : non configuré (build Vite prêt à héberger).
+- **Onboarding élargi** : au-delà du tuto première machine.
+- **Extras optionnels** : PWA, sons, succès.
+- **Idées narratives non retenues** (mémoire de conception, cf.
+  [NARRATIVE.md](./NARRATIVE.md)) : religions/athéisme, Cultivateurs comme
+  crise, Terre super-ordinateur, drive à improbabilité, couteau à huître laser.
 
 ## Principes de travail
 

@@ -13,7 +13,7 @@ import type { EraDef } from '@/lib/types'
 const clicksFor = (variant: number) => 10 + variant * 2
 
 /**
- * Era 14 (Industrial Revolution): tap on the left to charge the invention gauge;
+ * Era e15 (Industrial Revolution): tap on the left to charge the invention gauge;
  * each full gauge produces a free batch of Technology and reveals the next real
  * invention on the right, in historical order. Discoveries are persisted across
  * reloads. Full-width.

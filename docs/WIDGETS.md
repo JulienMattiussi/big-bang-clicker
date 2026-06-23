@@ -1,16 +1,15 @@
 # Big Bang Clicker - Catalogue de conception des widgets-mécaniques
 
-> **Statut : implémentés.** Les widgets des ères 5 à 14 décrits ici sont codés et
-> branchés (`src/components/game/widgets/`, registre `interactive.ts`), plus un
-> widget de **crise** plein écran (survie à l'extinction, ère 11). Depuis, les
-> ères 15 à 18 ont aussi reçu leur widget interactif (arbre des inventions,
-> lancement de fusée, relais à effet de masse, roue de l'unification), si bien
-> que **chaque ère** dispose désormais de son geste propre. Ce document reste la
-> référence de conception des widgets des ères 5 à 14 ci-dessous.
+> **Statut : implémentés (jeu terminé).** **Chaque** ère (1 à 19) dispose de son
+> widget interactif, codé et branché (`src/components/game/widgets/`, registre
+> `interactive.ts`), plus les **mini-jeux de crise** plein écran (extinction,
+> révolte, survie, épice, fuite de gaz). Ce document décrit la conception des
+> widgets des ères 5 à 19 (les ères 1-4 étaient déjà implémentées avant ce
+> dossier).
 >
 > Numérotation comme en jeu (1-based) : « Ère N » a pour id technique `eN`.
 >
-> Conception des widgets des **ères 5 à 14** (les ères 1-4 étaient déjà
+> Conception des widgets des **ères 5 à 19** (les ères 1-4 étaient déjà
 > implémentées). Respecte le
 > [playbook widgets](./UI-UX.md) et les règles d'[AGENTS](../AGENTS.md) :
 > mécanique concrète, jolie + réactive, anti-frustration (jamais d'échec sec),
@@ -42,6 +41,11 @@ tenir, structures vivantes qu'on peut perdre, bonus d'adjacence, territoires).
 | **12** | Intelligence | constellation d'idées | **mémoire / séquence** (Simon) |
 | **13** | Sociétés | plan de la cité | **placement sur grille** (adjacences) |
 | **14** | Nations | carte du monde | **contrôle de territoire** (diplomatie vs guerre) |
+| **15** | Technologies | frise des inventions | **charger une jauge** qui révèle les inventions dans l'ordre historique |
+| **16** | Conquête spatiale | lancement de fusée | **empiler des étages** + séquence de lancement |
+| **17** | Voyage intergalactique | relais à effet de masse | **charger puis catapulter** un vaisseau |
+| **18** | Grande unification | roue de l'unification | **converger** (aligner/relier vers un centre) |
+| **19** | Explosion | singularité | **contracter** jusqu'à un point unique -> renaissance |
 
 ---
 
@@ -313,6 +317,62 @@ section 6.4 (`CrisisGame`, `CrisisBanner`, `CrisisScene`, `crisisStore`).
       \\    |       |         C neutre : [Negocier] (sur) ou [Conquerir] (risque)
    ( D )--( E )==( F )
 ```
+
+---
+
+## Ère 15 - Technologies : frise des inventions
+
+- **Mécanique - charger une jauge de découverte.** Cliquer à gauche **remplit
+  une jauge** ; à chaque jauge pleine, un **lot gratuit de Technologie** est
+  produit et la **prochaine invention réelle** se révèle à droite, **dans
+  l'ordre historique** (avec des variantes parodiques renommées). Découvertes
+  persistées entre les renaissances.
+- **Progression / nouveauté** : un widget **timeline** (révélation séquentielle)
+  plutôt qu'un arbre technologique interactif (idée initiale d'UI-UX non
+  retenue). Anti-frustration : la jauge ne fait qu'avancer.
+- **Crises associées** : c'est l'ère la plus dense en crises (krach de 1929,
+  bug de l'an 2000, arme atomique, rébellion des machines, crise climatique),
+  toutes résolues par le mini-jeu partagé `SurviveGame` (marteler pour remplir
+  la barre de survie). a11y : boutons étiquetés, `progressbar`.
+
+## Ère 16 - Conquête spatiale : lancement de fusée
+
+- **Mécanique - empiler et lancer.** On **améliore/empile des étages** de fusée
+  puis on déclenche une **séquence de lancement** (flamme animée). Le geste manuel
+  alimente la production ; l'automatisation prend le relais.
+- **Progression / nouveauté** : retour à un geste d'**artisanat/timing** après
+  les systèmes stratégiques, cohérent avec le redémarrage « ère de l'ingénierie ».
+- **Récurrence** : la fusée se complexifie (étages, livrées) au fil des
+  lancements.
+
+## Ère 17 - Voyage intergalactique : relais à effet de masse
+
+- **Mécanique - charger puis catapulter.** On **charge un relais à effet de
+  masse** (clin d'oeil Mass Effect) puis on **catapulte un vaisseau** de galaxie
+  en galaxie. Introduit par la modale du **capitaine Shepherd**.
+- **Crise associée** : **première rencontre** (`encounter`, créatures
+  encapuchonnées) ; la vaincre octroie le **galet de la Force**.
+
+## Ère 18 - Grande unification : roue de l'unification
+
+- **Mécanique - faire converger.** Une **roue de convergence** que l'on aligne /
+  relie vers un centre pour **unifier** la ville-univers ; jauge de complétude qui
+  sature (alimente l'instabilité de la fin).
+- **Crise associée** : **cartel de l'épice** (`spice`, planète Salakis,
+  vers de vase) - mini-jeu plein écran de **réorientation de conduits** en
+  3 étapes (`SpiceGame`).
+
+## Ère 19 - Explosion : singularité (séquence de fin)
+
+- **Mécanique - contracter jusqu'au point.** Une **vaste ellipse** (l'univers
+  entier) que chaque clic **contracte d'un cran** jusqu'à un **point unique** ;
+  au dernier clic, l'univers s'effondre, **1 Écho est crédité** et la **modale de
+  renaissance** (`EndGameModal`) s'ouvre. Dégradé radial jaune (clair au centre),
+  point central blanc.
+- **Crise de fin** : à l'entrée de l'ère, la **fuite de gaz** plein écran
+  (`GasLeakGame`) se déclenche - **ingagnable par construction** (chrono 15 s),
+  elle mène toujours à la modale « réaction en chaîne », puis au widget de
+  contraction. Voir [PHASES.md](./PHASES.md) (ère 19).
 
 ---
 

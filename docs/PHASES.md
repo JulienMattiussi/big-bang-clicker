@@ -15,8 +15,10 @@
 > Interface : coquille stable + widgets iconiques + paliers de transformation
 > (voir [UI-UX.md](./UI-UX.md)).
 >
-> Statut : structure figée (19 ères) ; chiffres et contenu fin à affiner. La
-> partie biologique/anthropologique reste **à re-sourcer** (voir SCIENCE.md).
+> Statut : **les 19 ères sont implémentées et jouables de bout en bout**
+> (data-driven, FR/EN, widgets, crises, prestige). Les annotations « spéculatif »
+> qui subsistent ci-dessous qualifient l'**état des connaissances scientifiques**
+> (ères futures), pas l'avancement du développement (voir SCIENCE.md).
 >
 > Numérotation comme en jeu (1-based) : « Ère N » a pour id technique `eN`.
 
@@ -142,15 +144,15 @@
 - **Narratif** : la planète devient habitable (océans, atmosphère, climat
   stable) **en même temps** que sa chimie se complexifie vers le vivant. Les
   deux processus s'entremêlent.
-- **Verbe** : stabiliser **et** synthétiser (double mécanique parallèle).
+- **Verbe** : synthétiser (chimie prébiotique).
 - **Ressources & chaînes** :
-  - Jauges d'habitabilité : Atmosphère, Eau/Océans, Température, Champ
-    magnétique (à équilibrer).
   - Chimie : `CHONPS + énergie (foudre/hydrothermal) -> acides aminés,
     nucléotides, lipides`
   - `nucléotides -> ARN` (monde à ARN) ; `lipides -> membranes -> protocellule`
-- **Widget** : scène double : **coupe de planète/volcan** (habitabilité,
-  dégazage, océans) + **molécules en boules et bâtons** (chimie prébiotique).
+- **Widget** : **molécules en boules et bâtons** (`MoleculeBuilder`, chimie
+  prébiotique). *Réalisation* : l'équilibrage d'habitabilité (atmosphère, etc.)
+  initialement imaginé ici a finalement été livré en **ère 8** sous la forme du
+  widget `AtmosphereBalance` (Grande Oxydation), plus pertinent à ce moment.
 - **Production** : dégazage volcanique, apport d'eau (comètes), sources
   hydrothermales, auto-catalyse, réplication de l'ARN.
 - **Passage** : réplicateur encapsulé stable -> première cellule.
@@ -327,14 +329,13 @@
 - **Ressources & chaînes** :
   - `carburant + étages -> fusée -> lancement -> orbite`
   - `orbite -> Lune / Mars -> colonies orbitales`
-- **Widget** : **étages de propulsion d'une fusée** (empiler/améliorer,
-  séquence de lancement) + **carte du système solaire** à débloquer.
+- **Widget** : **étages de propulsion d'une fusée** (`RocketLaunch` :
+  empiler/améliorer, séquence de lancement).
 - **Production** : fusées, stations, sondes, colonies.
-- **Crise (régression)** : **navette qui explose**. Pousser les lancements sans
-  investir dans la sécurité fait monter le risque ; au seuil, une navette
-  explose, le **budget spatial est gelé** (régression). Une avancée de sécurité
-  relance ensuite la conquête sur de **meilleures bases**. Voir
-  [GAME-DESIGN.md](./GAME-DESIGN.md) section 6.
+- **Crise (régression)** : *aucune en ère 16* dans la version finale. La crise
+  « navette qui explose » imaginée ici n'a pas été retenue ; les crises spatiales
+  livrées sont la **première rencontre** (e17, `encounter`) et le **cartel de
+  l'épice** (e18, `spice`).
 - **Passage** : présence multiplanétaire stable.
 
 ### Ère 17 - Voyage intergalactique `spéculatif`
@@ -380,12 +381,13 @@
 - **Accroche** : « Tout finit... et tout recommence, en mieux. »
 - **Narratif** : la ville-univers est saturée de complexité, au bord de
   l'instabilité. Et puis tout bascule pour une raison dérisoire : un dirigeant
-  de galaxie a oublié d'éteindre le gaz (et un patin) après son petit-déjeuner,
-  déclenchant une réaction en chaîne. Tout explose : un nouveau Big Bang. La
-  renaissance est augmentée par les Échos.
+  de district achève son petit-déjeuner et **oublie d'éteindre le gaz** ; ce
+  mince filet réveille un défaut structurel caché et une fuite en amorce dix.
+  La réaction en chaîne emballe tout : un nouveau Big Bang. La renaissance est
+  augmentée par les Échos.
 - **Ton** : bascule **comique/absurde** assumée pour la toute fin. Les enjeux
   cosmiques sont anéantis par une bêtise domestique : c'est le contraste qui
-  fait le sel de la chute. (Formulation exacte du gag **à affiner**.)
+  fait le sel de la chute.
 - **Note de design** : l'instabilité (jauge de complétude de l'ère 18) fournit
   la poudre ; l'incident trivial fournit l'étincelle. Possibilité d'un petit
   évènement scripté/illustré au moment du déclenchement.

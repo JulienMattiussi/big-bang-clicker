@@ -30,7 +30,7 @@
 | (Histoire des religions) | **Naissance et disparition de religions** au fil de la société ; la société la plus évoluée devient **athée** | 13 (Sociétés) | Arc narratif / évènements |
 | Mass Effect | Le **Commandant Shepard** meurt en luttant contre une civilisation hostile, les **Cultivateurs** | 17 (galactique) / 18 (intergalactique) | Évènement narratif / clin d'oeil |
 | Mass Effect | **Intégré (e17)** : le **capitaine Shepherd** découvre de gigantesques **relais à effet de masse** pour voyager de galaxie en galaxie (modale de transition + widget de l'ère : charger le relais, catapulter un vaisseau) | 17 (Voyage intergalactique) | Techno + widget / clin d'oeil |
-| Dune | **À venir (e18)** : une **crise des trafiquants d'épice** (l'épice convoitée, les vers de vase, la planète **Salakis**) | 18 (La grande unification) | Crise / clin d'oeil |
+| Dune | **Intégré (e18)** : une **crise des trafiquants d'épice** (l'épice convoitée, les vers de vase, la planète **Salakis**), mini-jeu plein écran de réorientation de conduits (`SpiceGame`) | 18 (La grande unification) | Crise / clin d'oeil |
 | H2G2 | **"Pas de panique"** affiché au déclenchement d'une crise (régression) : un clin d'oeil qui **rassure** le joueur au pire moment | Transverse (crises, section 6) | **Humour utile (UX)** |
 | H2G2 | Le nombre **42** comme "réponse" cachée : jalon/easter egg secret (ex : à 42 d'une ressource ou de Complexité, un message énigmatique) | Transverse | Easter egg / nombre culte |
 | H2G2 | La Terre est en réalité un **super-ordinateur** construit pour calculer la Grande Question (et un dirigeant l'éteindra, cf. ère 19) | 5-6 (Terre) | Clin d'oeil narratif |
@@ -39,17 +39,23 @@
 | Pierres de l'infini (Marvel) | Six **galets peints de l'infini** (Espace, Temps, Réalité, Pouvoir, Esprit, Âme), rares, à collectionner à travers les ères et les prestiges ; les réunir tous débloque un effet majeur. Nom volontairement mondain (de simples galets peints qui gouvernent l'univers) | Transverse (méta-progression) | Collection rare / clin d'oeil |
 | Jurassic Park | « **La vie trouve toujours un chemin** » comme accroche / titre de l'ère de l'évolution | 11 (Évolution) | Phrase d'interface / clin d'oeil |
 | Spartacus | La révolte des esclaves est menée par un certain **Starpacus** | 13 (Sociétés) | Évènement nommé / clin d'oeil |
-| The Matrix | Une IA toute-puissante, le **Matrixator**, se soulève : crise (régression) | 15 (Technologies) | Crise nommée / clin d'oeil |
+| The Matrix | **Intégré (e15)** : une IA toute-puissante se soulève (crise `machineRebellion`) ; le nom « Matrixator » n'a finalement pas été retenu | 15 (Technologies) | Crise / clin d'oeil |
 | Lavoisier | « Rien ne se perd, rien ne se crée, tout se transforme » en accroche de l'ère des forges stellaires (forme popularisée) | 4 (Forges) | Citation / accroche |
 
-> **Statut :** les lignes marquées « Intégré » sont en jeu. **Dune** (crise des
-> trafiquants d'épice, ère 18) est la prochaine retenue. Les autres entrées non
-> marquées (couteau à huître laser, religions/athéisme, mort de Shepherd face aux
-> Cultivateurs, Terre super-ordinateur, drive à improbabilité, renommage en
-> « Matrixator ») ne sont **pas retenues** : l'univers du jeu est jugé déjà
-> suffisamment garni en clins d'oeil.
+> **Statut (jeu terminé) :** toutes les lignes marquées « Intégré » sont en jeu
+> (Asimov/Sheldon, Mass Effect/Shepherd + relais, Dune/épice, « Pas de panique »,
+> 42, octarine, galets de l'infini, Jurassic Park, Starpacus, Rébellion des
+> machines, Lavoisier). Les idées **non retenues** (couteau à huître laser,
+> religions/athéisme, mort de Shepherd face aux Cultivateurs, Terre
+> super-ordinateur, drive à improbabilité, nom « Matrixator ») restent listées
+> ici comme mémoire de conception : l'univers est jugé déjà assez garni.
 
 ## Idées de mise en scène
+
+> Section de **mémoire de conception** (jeu terminé) : un brainstorm dont seule
+> une partie a été retenue. Ce qui a été livré figure dans le tableau ci-dessus
+> (entrées « Intégré ») et dans [WIDGETS.md](./WIDGETS.md) ; le reste est
+> conservé ici à titre d'historique.
 
 - **Inventions abandonnées** (couteau à huître laser, psychohistoire) : peuvent
   apparaitre
@@ -67,10 +73,9 @@
   comme un super-calculateur cherchant la Grande Question, et le nombre **42**
   semé en easter egg. Belle résonance avec la fin (ère 19) : tout l'univers
   comme un calcul, interrompu par une bêtise domestique.
-- **Épice / Salakis** (ère 17) : au-delà du clin d'oeil, l'épice peut être une
-  **ressource du réseau** (rare, produite par une chaîne dédiée via les vers de
-  vase) requise pour débloquer ou accélérer l'expansion galactique. Voir le
-  modèle de ressources dans [GAME-DESIGN.md](./GAME-DESIGN.md) section 3.1.
+- **Épice / Salakis** (ère 18) : finalement livrée comme une **crise** (mini-jeu
+  `SpiceGame` de réorientation de conduits) plutôt que comme une ressource du
+  réseau ; l'idée initiale d'en faire une ressource rare n'a pas été retenue.
 - **Galets peints de l'infini** : chacun peut correspondre à un domaine
   fondamental du jeu, ancré dans une ère :
   - Espace -> conquête spatiale / intergalactique (ères 16-18)

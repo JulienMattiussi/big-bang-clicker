@@ -1,7 +1,7 @@
 import type { EraDef, GeneratorDef, ResourceDef } from '@/lib/types'
 
 /**
- * TRANSCENDENCE tier (era 18) - Explosion. Final era: the forgotten-gas crisis
+ * TRANSCENDENCE tier (era e19) - Explosion. Final era: the forgotten-gas crisis
  * (GasLeakGame) then the singularity widget (contract to a point) drive the New
  * Big Bang. No converter; the prestige reset is triggered from EndGameModal.
  */

@@ -1,6 +1,6 @@
 import { buildEra, type EraBundle } from './factory'
 
-/** SPACE tier (eras 15 to 17): from space conquest to the universe-city. */
+/** SPACE tier (eras e16 to e18): from space conquest to the universe-city. */
 const bundles: EraBundle[] = [
   buildEra({
     id: 'e16',
