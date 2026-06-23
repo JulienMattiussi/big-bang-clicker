@@ -1,19 +1,20 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Answer42 } from '@/components/game/memory/Answer42'
 import { MemoryGame } from '@/components/game/memory/MemoryGame'
 import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
 import { MEMORY_LEVELS, memoryEraMaxed, memoryLevel, memoryUnlocked } from '@/lib/memory'
+import { FlipIntroClone } from '@/components/ui/FlipIntroClone'
+import { useFlipIntro } from '@/hooks/useFlipIntro'
 import { useTranslation } from '@/i18n/useTranslation'
-import type { IntroRect } from '@/components/ui/introRect'
 
 /**
  * Entry point of the memory mini-game: a distinct call-to-action button (a card
  * on each side of "4 [era symbol] 2"), shown once the mechanic is unlocked
- * (era 7, oxidation leveled). When the unlock modal closes, a giant copy of the
- * button appears at screen centre and shrinks into its real spot (FLIP) so the
- * player sees exactly where the new power lives. Opens the game modal.
+ * (era 7, oxidation leveled). When the unlock modal closes, the shared FLIP intro
+ * lands a giant copy into its real spot so the player sees exactly where the new
+ * power lives. Opens the game modal.
  */
 export function MemoryFeature() {
   const { t } = useTranslation()
@@ -30,47 +31,10 @@ export function MemoryFeature() {
   const highlight = useMemoryStore((s) => s.highlight)
   const clearHighlight = useMemoryStore((s) => s.clearHighlight)
   const [open, setOpen] = useState(false)
-
-  const btnRef = useRef<HTMLButtonElement>(null)
-  const [intro, setIntro] = useState<IntroRect | null>(null)
-  const [landed, setLanded] = useState(false)
-
-  // On highlight (modal just closed): measure the real button and spawn a giant
-  // clone transformed to screen centre; the next effect lets it shrink home.
-  useEffect(() => {
-    if (!highlight) return
-    const el = btnRef.current
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-    const r = el?.getBoundingClientRect()
-    if (!r || r.width === 0 || reduce) {
-      clearHighlight()
-      return
-    }
-    const big = Math.min(window.innerWidth * 0.8, 680)
-    const scale = big / r.width
-    const tx = window.innerWidth / 2 - (r.left + r.width / 2)
-    const ty = window.innerHeight / 2 - (r.top + r.height / 2)
-    setLanded(false)
-    setIntro({
-      transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
-      top: r.top,
-      left: r.left,
-      width: r.width,
-      height: r.height,
-    })
-    const done = window.setTimeout(() => {
-      setIntro(null)
-      clearHighlight()
-    }, 1050)
-    return () => window.clearTimeout(done)
-  }, [highlight, clearHighlight])
-
-  // Once the giant clone is on screen, flip it to its natural place (animated).
-  useEffect(() => {
-    if (!intro) return
-    const raf = requestAnimationFrame(() => setLanded(true))
-    return () => cancelAnimationFrame(raf)
-  }, [intro])
+  const { btnRef, intro, landed } = useFlipIntro(highlight, clearHighlight, {
+    maxSize: 680,
+    vwFactor: 0.8,
+  })
 
   if (!unlocked) return null
 
@@ -86,7 +50,6 @@ export function MemoryFeature() {
         ref={btnRef}
         type="button"
         onClick={() => {
-          setIntro(null)
           clearHighlight()
           setOpen(true)
         }}
@@ -97,25 +60,12 @@ export function MemoryFeature() {
         {face}
       </button>
 
-      {/* Giant clone shrinking from screen centre into the button's place. */}
       {intro ? (
-        <div
-          aria-hidden
-          className="pointer-events-none fixed z-50"
-          style={{
-            top: intro.top,
-            left: intro.left,
-            width: intro.width,
-            height: intro.height,
-            transformOrigin: 'center center',
-            transform: landed ? 'none' : intro.transform,
-            transition: 'transform 0.95s cubic-bezier(0.16, 1, 0.3, 1)',
-          }}
-        >
+        <FlipIntroClone intro={intro} landed={landed}>
           <span className="flex h-full w-full items-center justify-center gap-1 overflow-hidden rounded-md bg-octarine shadow-2xl">
             {face}
           </span>
-        </div>
+        </FlipIntroClone>
       ) : null}
 
       {open ? <MemoryGame onClose={() => setOpen(false)} /> : null}

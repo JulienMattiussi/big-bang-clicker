@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { useCrisisStore, CRISIS_GOAL } from '@/store/crisisStore'
-import { useGameStore } from '@/store/gameStore'
+import { CRISIS_GOAL } from '@/store/crisisStore'
+import { useCrisisWin } from '@/hooks/useCrisisWin'
 import { useTranslation } from '@/i18n/useTranslation'
 import {
   H,
@@ -30,10 +30,7 @@ const RED = 'var(--danger)'
  */
 export function RevoltGame() {
   const { t } = useTranslation()
-  const fighting = useCrisisStore((s) => s.fighting)
-  const stop = useCrisisStore((s) => s.stop)
-  const resolveCrisis = useGameStore((s) => s.resolveCrisis)
-  const enqueueEvent = useGameStore((s) => s.enqueueEvent)
+  const win = useCrisisWin()
 
   const [world, setWorld] = useState<CrowdWorld>(freshCrowd)
   const won = useRef(false)
@@ -49,19 +46,8 @@ export function RevoltGame() {
   useEffect(() => {
     if (won.current || seated < CRISIS_GOAL) return
     won.current = true
-    const { defs } = useGameStore.getState()
-    const def = fighting ? defs.crises[fighting] : undefined
-    resolveCrisis(fighting as string)
-    if (def) {
-      enqueueEvent({
-        id: `crisis-won:${fighting}`,
-        tone: 'transition',
-        titleKey: 'crisis.overcome.title',
-        bodyKey: def.textKeys.reboundKey,
-      })
-    }
-    stop()
-  }, [seated, fighting, resolveCrisis, enqueueEvent, stop])
+    win()
+  }, [seated, win])
 
   const free = (id: number) => setWorld((prev) => enfranchise(prev, id))
 

@@ -389,14 +389,21 @@
 - **Note de design** : l'instabilité (jauge de complétude de l'ère 18) fournit
   la poudre ; l'incident trivial fournit l'étincelle. Possibilité d'un petit
   évènement scripté/illustré au moment du déclenchement.
-- **Verbe** : transcender (déclencher le prestige).
-- **Mécanique** : conversion de la Complexité totale en **Échos** ; reset
-  complet sauf Échos et méta-upgrades ; retour à l'ère 1, plus fort. Voir
-  [GAME-DESIGN.md](./GAME-DESIGN.md) section 3.3.
-- **Widget** : **singularité / écran qui se contracte puis explose** (transition
-  spectaculaire vers la nouvelle partie).
-- **Rejouabilité** : chaque cycle débloque de nouveaux méta-upgrades et
-  potentiellement des variantes narratives.
+- **Verbe** : contracter (resserrer la singularité jusqu'au point unique).
+- **Séquence de fin** (implémentée) :
+  1. **Crise du gaz** plein écran, armée dès l'entrée dans l'ère 19 : des fuites
+     surgissent de plus en plus vite, le joueur les éteint au clic mais c'est
+     **ingagnable par construction**. Un chrono de 15 s mène toujours à la
+     réaction en chaîne (modale obligatoire « réaction en chaîne »).
+  2. **Widget de contraction** (`singularity`) : une singularité pleine largeur
+     que le joueur resserre clic après clic jusqu'à un point unique ; au terme,
+     l'univers s'effondre et **1 Écho est crédité**.
+  3. **Modale de fin** « Nouveau Big Bang » : le joueur affecte son Écho à l'un
+     des quatre méta-upgrades (voir [GAME-DESIGN.md](./GAME-DESIGN.md) section
+     3.3) puis **renaît** (reset complet sauf Échos, méta-upgrades et galets ;
+     retour à l'ère 1, plus fort).
+- **Rejouabilité** : chaque renaissance accumule Échos et méta-upgrades ; un
+  bouton de journal des renaissances apparaît après la première.
 
 ---
 

@@ -54,7 +54,7 @@ export function RebirthModal({ onClose }: { onClose: () => void }) {
                 <span className="text-xs text-muted">{t(m.descKey as TranslationKey)}</span>
               </span>
               <span className={`shrink-0 text-xs ${has ? 'text-octarine' : 'text-muted'}`}>
-                {has ? t('meta.owned') : '—'}
+                {has ? t('meta.owned') : '-'}
               </span>
             </li>
           )

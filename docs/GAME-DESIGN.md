@@ -121,18 +121,25 @@ Complexité **autant que** le stock. La Complexité :
 
 ### 3.3 Monnaie de prestige : les Échos
 
-Au terme de l'ère 19 (la ville-univers explose), le joueur déclenche un
-**nouveau Big Bang**. Tout est remis à zéro (ressources locales, générateurs,
-convertisseurs, ères) SAUF les **Échos**, gagnés en fonction de la Complexité totale
-accumulée durant la partie. Les Échos achètent des **bonus permanents** (méta-
-upgrades) qui rendent chaque renaissance plus rapide et plus puissante : c'est
-le New Game+ augmenté.
+Au terme de l'ère 19 (la ville-univers se contracte puis explose), le joueur
+déclenche un **nouveau Big Bang**. Tout est remis à zéro (ressources locales,
+générateurs, convertisseurs, ères) SAUF les **Échos**. La séquence de fin est
+détaillée en [PHASES.md](./PHASES.md) (ère 19).
 
-Formule de prestige (principe, à équilibrer) :
+Le joueur gagne **1 Écho par renaissance** (gain forfaitaire, crédité au moment
+de l'effondrement pour être dépensable aussitôt). Chaque Écho achète **un** bonus
+permanent (méta-upgrade) ; la modale de fin présente quatre choix mutuellement
+finançables au fil des renaissances :
 
-```
-échos_gagnés = floor( k * sqrt(complexité_totale / seuil_base) )
-```
+| Choix | Effet |
+|---|---|
+| Production globale | ×2 sur toute la production |
+| Mémoire cosmique | ×1,5 sur la Complexité |
+| Puissance des clics | ×2 sur le rendement du widget cliqué |
+| Puissance des galets | ×2 sur l'effet de chaque galet (amplifie aussi les galets réducteurs) |
+
+Les Échos et les méta-upgrades sont **conservés** d'une renaissance à l'autre :
+c'est le New Game+ augmenté.
 
 ### 3.4 Mini-jeu de mémoire (puits de Complexité optionnel)
 
@@ -359,7 +366,7 @@ Vue d'ensemble :
 | 16 | Conquête spatiale | Lancer / explorer |
 | 17 | Voyage intergalactique | Coloniser / fédérer / relier les galaxies |
 | 18 | Ville-univers (grande unification) | Unifier / englober |
-| 19 | Explosion (nouveau Big Bang) | Transcender (prestige) |
+| 19 | Explosion (nouveau Big Bang) | Contracter (effondrement -> prestige) |
 
 ## 8. Progression et déblocage
 

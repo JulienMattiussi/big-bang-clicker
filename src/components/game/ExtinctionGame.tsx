@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useCrisisStore, CRISIS_GOAL } from '@/store/crisisStore'
-import { useGameStore } from '@/store/gameStore'
+import { useCrisisWin } from '@/hooks/useCrisisWin'
 import { useTranslation } from '@/i18n/useTranslation'
 import {
   GROUND_Y,
@@ -24,12 +24,9 @@ import { CritterGlyph, MeteorGlyph } from '@/components/art/CrisisCreatures'
  */
 export function ExtinctionGame() {
   const { t } = useTranslation()
-  const fighting = useCrisisStore((s) => s.fighting)
   const saved = useCrisisStore((s) => s.saved)
   const rescue = useCrisisStore((s) => s.rescue)
-  const stop = useCrisisStore((s) => s.stop)
-  const resolveCrisis = useGameStore((s) => s.resolveCrisis)
-  const enqueueEvent = useGameStore((s) => s.enqueueEvent)
+  const win = useCrisisWin()
 
   const [world, setWorld] = useState<CrisisWorld>(freshWorld)
   const won = useRef(false)
@@ -53,18 +50,7 @@ export function ExtinctionGame() {
     if (won.current) return
     if (useCrisisStore.getState().saved >= CRISIS_GOAL) {
       won.current = true
-      const { defs } = useGameStore.getState()
-      const def = fighting ? defs.crises[fighting] : undefined
-      resolveCrisis(fighting as string)
-      if (def) {
-        enqueueEvent({
-          id: `crisis-won:${fighting}`,
-          tone: 'transition',
-          titleKey: 'crisis.overcome.title',
-          bodyKey: def.textKeys.reboundKey,
-        })
-      }
-      stop()
+      win()
     }
   }
 

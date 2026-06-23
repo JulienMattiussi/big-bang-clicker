@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useCrisisStore } from '@/store/crisisStore'
-import { useGameStore } from '@/store/gameStore'
+import { useCrisisWin } from '@/hooks/useCrisisWin'
 import { useTranslation } from '@/i18n/useTranslation'
 import {
   DIR_VEC,
@@ -36,10 +35,7 @@ const cellCenter = (r: number, c: number) => ({
  */
 export function SpiceGame() {
   const { t } = useTranslation()
-  const fighting = useCrisisStore((s) => s.fighting)
-  const stop = useCrisisStore((s) => s.stop)
-  const resolveCrisis = useGameStore((s) => s.resolveCrisis)
-  const enqueueEvent = useGameStore((s) => s.enqueueEvent)
+  const win = useCrisisWin()
 
   const [stage, setStage] = useState(1)
   const [world, setWorld] = useState<SpiceWorld>(() => freshSpice(1))
@@ -58,21 +54,10 @@ export function SpiceGame() {
         busy.current = false
         return
       }
-      const { defs } = useGameStore.getState()
-      const def = fighting ? defs.crises[fighting] : undefined
-      resolveCrisis(fighting as string)
-      if (def) {
-        enqueueEvent({
-          id: `crisis-won:${fighting}`,
-          tone: 'transition',
-          titleKey: 'crisis.overcome.title',
-          bodyKey: def.textKeys.reboundKey,
-        })
-      }
-      stop()
+      win()
     }, WIN_DELAY_MS)
     return () => clearTimeout(handle)
-  }, [solved, stage, fighting, resolveCrisis, enqueueEvent, stop])
+  }, [solved, stage, win])
 
   const turn = (i: number) => setWorld((prev) => rotate(prev, i))
 

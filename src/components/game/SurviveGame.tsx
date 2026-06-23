@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useCrisisStore } from '@/store/crisisStore'
 import { useGameStore } from '@/store/gameStore'
+import { useCrisisWin } from '@/hooks/useCrisisWin'
 import { useTranslation } from '@/i18n/useTranslation'
 import { CrisisScene } from '@/components/art/CrisisScene'
 import { crisisGaletForEra } from '@/lib/galets'
@@ -22,11 +23,9 @@ const CLICK_GAIN = 0.045
 export function SurviveGame() {
   const { t } = useTranslation()
   const fighting = useCrisisStore((s) => s.fighting)
-  const stop = useCrisisStore((s) => s.stop)
-  const resolveCrisis = useGameStore((s) => s.resolveCrisis)
   const resetInventions = useGameStore((s) => s.resetInventions)
-  const enqueueEvent = useGameStore((s) => s.enqueueEvent)
   const defs = useGameStore((s) => s.defs)
+  const win = useCrisisWin()
   // Fresh per fight: the game unmounts when a crisis resolves (the banner takes
   // over), so a new crisis remounts it with a clean bar.
   const [progress, setProgress] = useState(0)
@@ -48,21 +47,14 @@ export function SurviveGame() {
     setProgress(next)
     if (next < 1) return
     won.current = true
-    resolveCrisis(fighting as string)
+    win()
     resetInventions() // the invention discovery restarts from the first one
     if (def) {
-      enqueueEvent({
-        id: `crisis-won:${fighting}`,
-        tone: 'transition',
-        titleKey: 'crisis.overcome.title',
-        bodyKey: def.textKeys.reboundKey,
-      })
       // Some crises hand out a pebble for overcoming them (e.g. the Force pebble
       // from the era-16 encounter); its discovery popup follows the rebound one.
       const galet = crisisGaletForEra(defs, def.eraId)
       if (galet && !useGameStore.getState().state.galets[galet.id]?.found) announceGalet(galet)
     }
-    stop()
   }
 
   return (

@@ -64,7 +64,7 @@ src/
 │   ├── crises.ts         # Crises : risque, déclenchement, régression/rebond
 │   ├── prestige.ts       # Échos + reset New Game+
 │   ├── meta.ts           # Méta-upgrades de prestige
-│   ├── save.ts           # État initial, sérialisation versionnée (SAVE_VERSION = 5) + migrations, idle, export/import ; enveloppe SIGNÉE (intégrité) : rejet de toute save non signée ou modifiée
+│   ├── save.ts           # État initial, sérialisation versionnée (SAVE_VERSION = 7) + migrations, idle, export/import ; enveloppe SIGNÉE (intégrité) : rejet de toute save non signée ou modifiée
 │   ├── integrity.ts      # Empreinte légère (cyrb53 + sel) anti-triche de save : ralentisseur, pas inviolable (jeu front-end open source)
 │   ├── format.ts         # Notation abrégée des grands nombres
 │   ├── galets.ts         # Galets de l'infini : découverte (palier OU widget), galets affectant générateur/convertisseur/Complexité
@@ -76,14 +76,14 @@ src/
 │   ├── metaUpgrades.ts   # Définitions des méta-upgrades
 │   ├── galets.ts         # Définitions des galets de l'infini (collectibles conservés au prestige)
 │   └── index.ts          # defs : GameDefs (agrégation typée)
-├── store/                # Stores Zustand : gameStore (persisté ; sauve aussitôt les actions de progression discrètes) ; feedbackStore, clickPulse, eventStore, memoryStore, inventoryStore, galetStore, crisisStore (transitoires)
+├── store/                # Stores Zustand : gameStore (persisté ; sauve aussitôt les actions de progression discrètes) ; feedbackStore, clickPulse, eventStore, galetStore, crisisStore, endgameStore (modale de fin) ; highlightStore (factory) + memoryStore/inventoryStore/rebirthStore (signaux d'atterrissage de bouton dérivés de la factory) ; tous transitoires sauf gameStore
 ├── i18n/                 # i18n custom (FR source de vérité, EN typé complet) ; locale persistée en localStorage
-├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales), useGalets (découverte), useMilestone (jauge/bouton de palier), useArrivalReward (récompense d'arrivée d'ère), useSimLoop (boucle d'animation locale d'un widget), usePageHidden (pause hors onglet)
+├── hooks/                # useTick (boucle + autosauvegarde), useEvents (modales), useGalets (découverte), useMilestone (jauge/bouton de palier), useArrivalReward (récompense d'arrivée d'ère), useSimLoop (boucle d'animation locale d'un widget), usePageHidden (pause hors onglet), useEndgame (arme la crise de fin en ère 19), useCrisisWin (séquence de victoire partagée des mini-jeux de crise), useFlipIntro (atterrissage FLIP partagé des boutons mémoire/sac/renaissances)
 ├── components/           # Par domaine ; un composant par fichier
-│   ├── ui/               # Primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...) ; helper introRect.ts (animation de vol vers un emplacement)
-│   ├── art/              # GRAPHISME exclusivement : glyphs/ (icônes custom du registre Icon), illustrations (Galet, Sauropod, OrganismGlyph, PartGlyph, CrisisCreatures, CrisisScene)
-│   ├── game/             # Ressources, machines, paliers, badges, galets ; modales d'évènements (EventModal + EventHero, layout « hero » partagé typé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge) ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal) ; helper eraTitle.ts (titre « Ère N : ... »)
-│   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish...) routés par interactive.ts ; clic d'ère via useEraMechanic ; helpers svgCoords.ts, StarField.tsx
+│   ├── ui/               # Primitives (Button, Panel, Icon, IconBadge, AlertBadge, FloaterLayer...) ; helper introRect.ts + FlipIntroClone (clone animé partagé, cf. useFlipIntro)
+│   ├── art/              # GRAPHISME exclusivement : glyphs/ (icônes custom du registre Icon), illustrations (Galet, Sauropod, OrganismGlyph, PartGlyph, CrisisCreatures, CrisisScene, ChainReactionScene, UniverseCityScene)
+│   ├── game/             # Ressources, machines, paliers, badges, galets ; modales d'évènements (EventModal + EventHero, layout « hero » partagé typé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge, mini-jeux ExtinctionGame/RevoltGame/SpiceGame/SurviveGame/GasLeakGame via useCrisisWin) ; fin de jeu (EndGameModal, RebirthButton/RebirthModal) ; jeu de mémoire (MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42+EraSymbolCluster, police Neogen) ; inventaire (InventoryButton/InventoryModal) ; helper eraTitle.ts (titre « Ère N : ... »)
+│   │   └── widgets/      # Widgets d'ère : passifs + 10+ interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, MoleculeBuilder, PetriDish, SingularityWidget de fin...) routés par interactive.ts ; clic d'ère via useEraMechanic ; helpers svgCoords.ts, StarField.tsx
 │   └── layout/           # Coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier + shared.ts/Defs.tsx), GaletReceptacle ; eraLayout.ts (disposition de page par ère, EraLayoutName) ; LanguageSwitch, SaveMenu
 └── App.tsx               # Navigation par état (pas de router)
 tests/
@@ -214,10 +214,12 @@ pas seulement à constater.
    `CrisisScene`, `#ef4444`), scrim de modale (`bg-black/60`), dégradé de
    température de `CoolingWidget`, **vert de la zone cible d'`AtmosphereBalance`**
    (`#22c55e`), **verts du feuillage du décor terrestre**
-   (`scenes/LandScene` ère 10), **couleurs d'illustration du mini-jeu de crise**
-   (`CrisisGame` ciel rouge sombre + `art/CrisisCreatures` météore/flammes), et `theme.css` /
-   `index.css` (CSS brut autorisé). Tout nouveau hex hors de ces cas est à
-   remplacer par un jeton.
+   (`scenes/LandScene` ère 10), **couleurs d'illustration des mini-jeux de crise**
+   (fonds rouge sombre `#1a0d12`/`#140a0e`, flammes `#f59e0b`/`#fde68a`, ver
+   d'épice `#e8a13a`, rouge danger `#ef4444` : `ExtinctionGame`, `RevoltGame`,
+   `SpiceGame`, `GasLeakGame`, `art/CrisisCreatures`, `art/CrisisScene`,
+   `art/ChainReactionScene`), et `theme.css` / `index.css` (CSS brut autorisé).
+   Tout nouveau hex hors de ces cas est à remplacer par un jeton.
 4. **i18n** : parité stricte FR/EN (même nombre de clés), tout texte via `t()`,
    aucune chaîne affichée en dur.
 5. **Accessibilité** (voir la checklist « Principes produit » ci-dessus) :
