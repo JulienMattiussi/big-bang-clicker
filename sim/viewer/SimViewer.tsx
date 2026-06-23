@@ -205,7 +205,7 @@ export function SimViewer() {
             xLog={false}
             yLog
             xTickValues={eraTicks}
-            fmtX={(v) => `e${Math.round(v)}`}
+            fmtX={(v) => `e${Math.round(v) + 1}`}
             fmtY={(v) => fmtDuration(v)}
             renderXTick={(v) => {
               const icon = ERA_ICON[Math.round(v)]
@@ -276,7 +276,7 @@ export function SimViewer() {
                   </td>
                   <td className="px-2 text-xs text-muted">{r.runLabel}</td>
                   <td className="px-2">
-                    {r.milestones[r.finalEraIndex]?.eraName} (e{r.finalEraIndex})
+                    {r.milestones[r.finalEraIndex]?.eraName} (e{r.finalEraIndex + 1})
                     {r.stuck ? <span className="ml-1 text-accent">mur</span> : null}
                   </td>
                   <td className="px-2 tabular-nums">{fmtDuration(r.cycle1S ?? null)}</td>
@@ -338,7 +338,7 @@ export function SimViewer() {
                   return (
                     <tr key={m.eraId} className="border-b border-border/50">
                       <td className="py-2 pr-4">
-                        {m.eraName} <span className="text-muted">e{m.eraIndex}</span>
+                        {m.eraName} <span className="text-muted">e{m.eraIndex + 1}</span>
                       </td>
                       <td className="px-2 tabular-nums">{fmtDuration(m.unlockedAtS)}</td>
                       <td className="px-2 tabular-nums">{fmtDuration(m.grindS)}</td>
