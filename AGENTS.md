@@ -92,9 +92,9 @@ tests/
 ├── component/            # Vitest + Testing Library
 └── e2e/                  # Playwright (smoke)
 sim/                      # Harnais de simulation d'équilibrage (exclu de make check)
-├── profiles.ts           # Profils de joueur (minimal, idle, casual, active, optimal)
-├── simulate.ts           # Boucle de simulation headless (temps/palier, retours arrière, activation)
-├── run.sim.ts            # Écrit un snapshot daté par `make sim` (sim/results/<runId>/), élague les vieux
+├── profiles.ts           # Profils de joueur (minimal, casual, active, optimal)
+├── simulate.ts           # Boucle headless d'UN run : démarre directement au niveau de renaissance demandé (bonus pré-appliqués, pas de multi-tour) et va jusqu'à la destruction de l'ère 19 (crise du gaz + contraction) ; mesure son temps mural
+├── run.sim.ts            # Écrit un snapshot daté par `make sim` ; paramétrable par variables d'env : SIM_PROFILE, SIM_POLICY (asap/ready), SIM_REBIRTHS (niveau de renaissance), SIM_META (ids de méta-upgrades affectés, séparés par des virgules : spark/memory/echo/rebirth). Sans SIM_PROFILE : matrice profils × politiques au niveau 0
 └── viewer/               # Visualisation comparée ; superpose plusieurs snapshots successifs (make sim-view)
 ```
 

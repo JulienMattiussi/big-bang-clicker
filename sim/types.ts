@@ -7,6 +7,16 @@
 export type UnlockPolicy = 'asap' | 'ready'
 type BuyStrategy = 'cheapest' | 'tierFirst'
 
+/** Renaissance setup a run STARTS from: the bonuses are pre-applied (no multi-tour
+ *  loop), so the simulation directly plays one pass at the chosen rebirth level
+ *  with the chosen Echo allocation. */
+export interface RebirthConfig {
+  /** Renaissance level: number of rebirths already done (each grants 1 Echo). */
+  rebirths: number
+  /** Meta-upgrade ids bought with those Echoes (the Echo allocation), pre-applied. */
+  metaUpgrades: string[]
+}
+
 /** A simulated player archetype. */
 export interface ProfileConfig {
   id: string
@@ -98,16 +108,26 @@ export interface RunResult {
   /** Highest era index reached. */
   finalEraIndex: number
   reachedFinal: boolean
+  /** True once the era-19 destruction finale played out (gas crisis -> singularity
+   *  contraction -> collapse): the universe was actually destroyed, not just entered. */
+  reachedDestruction: boolean
+  /** Game-seconds at the universe's collapse (end of the destruction finale), or null. */
+  destroyedAtS: number | null
   /** True if the run hit a wall (stuck, could not progress) before the end. */
   stuck: boolean
-  /** Prestige mode: on first reaching the final era, prestige once then replay a
-   *  full second run with the Echo/meta bonuses (to compare run 1 vs run 2). */
+  /** True when the run started with renaissance bonuses (rebirths > 0). */
   prestige: boolean
-  /** Echoes gained by the single prestige (0 for a normal run): the "prestige level". */
+  /** Renaissance level the run started at (each rebirth = 1 Echo). */
+  rebirths: number
+  /** Echo allocation pre-applied for this run (owned meta-upgrade ids). */
+  metaUpgrades: string[]
+  /** Echoes available at the chosen renaissance level (= rebirths). */
   echoes: number
-  /** Game-seconds to first reach the final era (run 1), or null if never. */
+  /** Wall-clock time this run took to compute, in milliseconds. */
+  wallMs: number
+  /** Game-seconds to reach the final era, or null if never. */
   cycle1S: number | null
-  /** Game-seconds of the post-prestige second run (prestige mode only), or null. */
+  /** Unused since the multi-tour was dropped; kept null for viewer compatibility. */
   cycle2S: number | null
   milestones: MilestoneStat[]
   series: SeriesPoint[]

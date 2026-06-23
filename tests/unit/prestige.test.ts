@@ -35,6 +35,13 @@ describe('prestige', () => {
     expect(next.galets).toEqual({ matter: { found: true, active: true } })
   })
 
+  it('conserve le flag « vu » du tuto première machine, mais pas les évènements narratifs', () => {
+    const state = stateWith({ seenEvents: { 'tuto:firstMachine': true, 'era:e5': true } })
+    const next = prestige(state, 1)
+    expect(next.seenEvents['tuto:firstMachine']).toBe(true) // onboarding : jamais rejoué
+    expect(next.seenEvents['era:e5']).toBeUndefined() // récit : peut rejouer
+  })
+
   it('tolère des champs rebirths/galets absents (sauvegarde ancienne)', () => {
     const partial = { ...stateWith({}), rebirths: undefined, galets: undefined }
     const next = prestige(partial as Parameters<typeof prestige>[0], 1)

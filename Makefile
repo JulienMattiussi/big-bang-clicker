@@ -49,7 +49,7 @@ test-e2e-ui: ## Run e2e tests with Playwright UI
 	npm run test:e2e:ui
 
 .PHONY: sim sim-view
-sim: ## Run balance simulations (writes sim/results/*.json); play the game meanwhile
+sim: ## Run balance sims -> sim/results/. Target one run with env vars: SIM_PROFILE, SIM_POLICY, SIM_REBIRTHS, SIM_META
 	npx vitest run --config sim/vitest.sim.config.ts
 
 sim-view: ## Show the simulation viewer URL (needs `make start` running)

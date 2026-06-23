@@ -273,7 +273,7 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
         ))}
       </svg>
       <span className="text-base font-semibold text-fg">{verb}</span>
-      <span className="flex flex-col items-center gap-1.5 text-xs text-muted">
+      <span className="flex flex-col items-center gap-1.5 whitespace-pre-line text-center text-xs text-muted">
         {t('molecule.hint')}
         <WidgetGalet />
       </span>

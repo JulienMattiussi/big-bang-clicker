@@ -9,6 +9,11 @@ import type { GameState } from './types'
  *  here): the reset only carries the already-earned Echoes over. */
 const ECHO_PER_REBIRTH = 1
 
+/** Onboarding events that fire once per PLAYER, not once per run: their "seen"
+ *  flag survives the reset so they never replay after a rebirth (the first-machine
+ *  tutorial would otherwise reappear when era 1 is played again). */
+const PERSISTENT_EVENTS = ['tuto:firstMachine'] as const
+
 /** Echoes gained by transcending: a flat one per rebirth. */
 export function echoesGain(): number {
   return ECHO_PER_REBIRTH
@@ -37,7 +42,9 @@ export function prestige(state: GameState, now: number): GameState {
     totalComplexityEver: state.totalComplexityEver,
     rebirths: (state.rebirths ?? 0) + 1,
     discovered: {},
-    seenEvents: {},
+    seenEvents: Object.fromEntries(
+      PERSISTENT_EVENTS.filter((id) => state.seenEvents?.[id]).map((id) => [id, true]),
+    ),
     galets: state.galets ?? {},
     memoryLevels: {},
     complexityBoosts: {},

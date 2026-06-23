@@ -17,13 +17,19 @@ import {
   unlockNextEra,
 } from '@/lib/engine'
 import { readyCrises, resolveCrisis, updateRisk } from '@/lib/crises'
-import { prestige as runPrestige } from '@/lib/prestige'
 import { memoryUnlocked, memoryLevel, memoryEraMaxed, memoryStart, memoryWin } from '@/lib/memory'
 import { revealedMachines, revealedResources } from '@/lib/reveal'
 import { decliningResources, netFlows } from '@/lib/graph'
 import { discoverableGalets, widgetGaletForEra, widgetGaletMultiplier } from '@/lib/galets'
 import type { EraDef, GameState } from '@/lib/types'
-import type { Completeness, MilestoneStat, ProfileConfig, RunResult, UnlockPolicy } from './types'
+import type {
+  Completeness,
+  MilestoneStat,
+  ProfileConfig,
+  RebirthConfig,
+  RunResult,
+  UnlockPolicy,
+} from './types'
 
 const DT = 1
 const MAX_ITERS = 1_000_000 // ~11.5 game-days: hard cap so a run always terminates
@@ -53,6 +59,13 @@ const CITY_THRIVE_MAX = 9
 /** Player-triggered crises (Industry, e14): spacing between forced triggers, so an
  *  active player reaches and overcomes them one after another across the era. */
 const CRISIS_TRIGGER_INTERVAL_S = 150
+/** Era-19 destruction finale, mirroring the UI sequence (useEndgame ->
+ *  GasLeakGame -> SingularityWidget): the unwinnable gas-leak countdown
+ *  (GasLeakGame LIMIT_MS = 15 s) then the singularity contraction
+ *  (SingularityWidget CONTRACT_CLICKS taps, played at the profile's click rate). */
+const GAS_CRISIS_S = 15
+const SINGULARITY_CLICKS = 20
+const MIN_CONTRACT_RATE = 0.5 // clicks/s floor so the contraction always terminates
 
 /** Deterministic PRNG (mulberry32) seeded per run, so memory outcomes are
  *  reproducible (the sim never reads true randomness). */
@@ -259,9 +272,22 @@ export function simulate(
   profile: ProfileConfig,
   policy: UnlockPolicy,
   meta: { runId: string; runLabel: string; gitCommit: string; defsHash: string; generatedAt: string },
-  prestige = false,
+  rebirth: RebirthConfig = { rebirths: 0, metaUpgrades: [] },
 ): RunResult {
-  let state = applyMeta(createInitialState(0, defs.eras[0]?.id), defs)
+  const wallStart = Date.now()
+  // Start directly at the requested renaissance level with its Echo allocation
+  // pre-applied (no multi-tour): the meta-upgrades are owned and their multipliers
+  // baked in by applyMeta, and the unspent Echoes are credited.
+  const ownedMeta = Object.fromEntries(rebirth.metaUpgrades.map((id) => [id, true]))
+  let state = applyMeta(
+    {
+      ...createInitialState(0, defs.eras[0]?.id),
+      rebirths: rebirth.rebirths,
+      echoes: Math.max(0, rebirth.rebirths - rebirth.metaUpgrades.length),
+      metaUpgrades: ownedMeta,
+    },
+    defs,
+  )
 
   const milestones: MilestoneStat[] = defs.eras.map((e) => ({
     eraId: e.id,
@@ -295,12 +321,9 @@ export function simulate(
   let cityThriving = 0
   let nextCityThriveT = CITY_THRIVE_INTERVAL_S
   let nextCrisisT = CRISIS_TRIGGER_INTERVAL_S
-  // Prestige mode: time of first reaching the final era, whether the single
-  // prestige has fired, the Echoes it granted, and the second run's duration.
+  // Single pass: time of first reaching the final era, and the collapse time.
   let firstFinalT: number | null = null
-  let prestiged = false
-  let echoes = 0
-  let cycle2S: number | null = null
+  let destroyedAtS: number | null = null
 
   for (let iter = 0; iter < MAX_ITERS; iter++) {
     state = tick(state, defs, DT)
@@ -499,7 +522,6 @@ export function simulate(
         measureCompleteness(state, currentEra).fullyActivated ||
         stepsSinceProgress >= READY_STALL_S
       if (ready) {
-        // Record once (a prestige run replays eras; keep run-1's milestone data).
         if (milestones[currentEra.index].completeness === null)
           milestones[currentEra.index].completeness = measureCompleteness(state, currentEra)
         state = unlockNextEra(state, defs)
@@ -520,38 +542,25 @@ export function simulate(
 
     const latestIdx = currentEra.index
     if (latestIdx >= defs.eras.length - 1) {
-      if (firstFinalT === null) firstFinalT = t
-      if (!prestige) break // normal run: done at the final era
-      if (!prestiged) {
-        // One prestige, then replay a second run with the bonuses. The collapse
-        // credits the Echo (mirroring gameStore), the reset only carries it over.
-        prestiged = true
-        state = runPrestige({ ...state, echoes: state.echoes + 1 }, t)
-        state = applyMeta(
-          {
-            ...state,
-            currentEraId: defs.eras[0]?.id ?? '',
-            unlockedEras: defs.eras[0] ? [defs.eras[0].id] : [],
-          },
-          defs,
-        )
-        echoes = state.echoes
-        // Fresh trackers for the second run (cooldowns relative to now).
-        stepsSinceProgress = 0
-        wasStarved = false
-        lastComplexity = 0
-        clickCarry = 0
-        completeCarry = 0
-        cityThriving = 0
-        nextMemoryT = t
-        nextSimonT = t + SIMON_INTERVAL_S
-        nextCityThriveT = t + CITY_THRIVE_INTERVAL_S
-        nextCrisisT = t + CRISIS_TRIGGER_INTERVAL_S
-        for (const k in memoryTries) delete memoryTries[k]
-      } else {
-        cycle2S = t - firstFinalT // the post-prestige second run's duration
-        break
+      // Reached the final era: play the destruction finale once, then stop (single
+      // pass, no replay). Mirrors useEndgame -> GasLeakGame -> SingularityWidget:
+      // arm + resolve the unwinnable gas crisis, then contract the singularity
+      // (SINGULARITY_CLICKS taps at the player's click rate); the collapse ends it.
+      firstFinalT = t
+      const gasThreshold = defs.crises.gasLeak?.risk.threshold ?? 1
+      state = {
+        ...state,
+        crises: {
+          ...state.crises,
+          gasLeak: { risk: gasThreshold, resolved: false, count: state.crises.gasLeak?.count ?? 0 },
+        },
       }
+      state = resolveCrisis(state, defs, 'gasLeak')
+      if (milestones[latestIdx]) milestones[latestIdx].crisesResolved++
+      const contractRate = Math.max(MIN_CONTRACT_RATE, profile.clicksPerSecond)
+      t += GAS_CRISIS_S + SINGULARITY_CLICKS / contractRate
+      destroyedAtS = t
+      break
     }
     if (stepsSinceProgress >= GLOBAL_STALL_S && !canUnlock) {
       stuck = true
@@ -566,8 +575,12 @@ export function simulate(
   }
   series.push({ t, complexity: state.complexity, eraIndex: finalEra.index })
 
+  const rebirthLabel =
+    rebirth.rebirths > 0
+      ? ` / r${rebirth.rebirths}${rebirth.metaUpgrades.length ? `(${rebirth.metaUpgrades.join('+')})` : ''}`
+      : ''
   return {
-    label: `${profile.id} / ${policy}${prestige ? ' / prestige' : ''}`,
+    label: `${profile.id} / ${policy}${rebirthLabel}`,
     profileId: profile.id,
     profileLabel: profile.label,
     unlockPolicy: policy,
@@ -580,11 +593,16 @@ export function simulate(
     totalTimeS: t,
     finalEraIndex: finalEra.index,
     reachedFinal: firstFinalT !== null,
+    reachedDestruction: destroyedAtS !== null,
+    destroyedAtS,
     stuck,
-    prestige,
-    echoes,
+    prestige: rebirth.rebirths > 0,
+    rebirths: rebirth.rebirths,
+    metaUpgrades: rebirth.metaUpgrades,
+    echoes: rebirth.rebirths,
+    wallMs: Date.now() - wallStart,
     cycle1S: firstFinalT,
-    cycle2S,
+    cycle2S: null,
     milestones,
     series,
   }

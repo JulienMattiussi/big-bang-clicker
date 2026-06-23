@@ -77,7 +77,7 @@ export const fr = {
   // Widgets interactifs (ères 4-13) : indications et libellés accessibles.
   'accretion.hint':
     'Clique dans les amas mobiles (en suivant le clic) pour forger des planètes ; ailleurs, tu récoltes de la poussière',
-  'molecule.hint': 'Relie deux atomes pour tracer une liaison ; complète la molécule',
+  'molecule.hint': 'Relie deux atomes pour tracer une liaison\ncomplète la molécule',
   'molecule.atom': 'Atome',
   'petri.hint':
     "Tranche les cellules qui nagent pour les diviser\n3 d'un seul geste = un microbe en plus",

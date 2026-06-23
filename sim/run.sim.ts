@@ -5,6 +5,7 @@ import { createHash } from 'node:crypto'
 import { defs } from '@/data'
 import { PROFILES, UNLOCK_POLICIES } from './profiles'
 import { simulate } from './simulate'
+import type { ProfileConfig, RebirthConfig, UnlockPolicy } from './types'
 
 /** How many past snapshots to keep (older ones are pruned). */
 const KEEP_SNAPSHOTS = 8
@@ -25,6 +26,55 @@ function defsHash(): string {
   return createHash('sha1').update(JSON.stringify(defs)).digest('hex').slice(0, 12)
 }
 
+/**
+ * Selects which run(s) to play from environment variables, so a single run can be
+ * targeted from the CLI:
+ *   SIM_PROFILE=active SIM_POLICY=ready SIM_REBIRTHS=2 SIM_META=spark,echo make sim
+ * - SIM_PROFILE : one profile id (omit to run every profile).
+ * - SIM_POLICY  : 'asap' | 'ready' (omit to run both).
+ * - SIM_REBIRTHS: renaissance level started from (each = 1 Echo); default 0.
+ * - SIM_META    : comma-separated meta-upgrade ids owned (the Echo allocation).
+ * The renaissance bonuses are pre-applied and ONE pass is simulated (no multi-tour).
+ */
+function planRuns(): { profile: ProfileConfig; policy: UnlockPolicy; rebirth: RebirthConfig }[] {
+  const env = process.env
+  const rebirths = Math.max(0, Number(env.SIM_REBIRTHS ?? 0) || 0)
+  const metaUpgrades = (env.SIM_META ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean)
+
+  const known = new Set(defs.metaUpgrades.map((m) => m.id))
+  const unknownMeta = metaUpgrades.filter((id) => !known.has(id))
+  if (unknownMeta.length) {
+    throw new Error(
+      `SIM_META: unknown meta-upgrade(s) ${unknownMeta.join(', ')}. Known: ${[...known].join(', ')}`,
+    )
+  }
+  if (metaUpgrades.length > rebirths) {
+    throw new Error(
+      `SIM_META allocates ${metaUpgrades.length} Echoes but SIM_REBIRTHS is ${rebirths} (1 Echo per rebirth).`,
+    )
+  }
+
+  const profiles = env.SIM_PROFILE
+    ? [
+        PROFILES.find((p) => p.id === env.SIM_PROFILE) ??
+          (() => {
+            throw new Error(
+              `SIM_PROFILE: unknown profile ${env.SIM_PROFILE}. Known: ${PROFILES.map((p) => p.id).join(', ')}`,
+            )
+          })(),
+      ]
+    : PROFILES
+  const policies = env.SIM_POLICY ? [env.SIM_POLICY as UnlockPolicy] : UNLOCK_POLICIES
+
+  const rebirth: RebirthConfig = { rebirths, metaUpgrades }
+  const runs = []
+  for (const profile of profiles) for (const policy of policies) runs.push({ profile, policy, rebirth })
+  return runs
+}
+
 test('run balance simulations', () => {
   const generatedAt = new Date().toISOString()
   const commit = gitCommit()
@@ -37,25 +87,19 @@ test('run balance simulations', () => {
   const dir = `sim/results/${runId}`
   mkdirSync(dir, { recursive: true })
 
-  // Each profile x policy is run twice: a normal run, and a prestige run (one
-  // prestige then a second run with the bonuses), so the viewer can compare them.
-  const MODES = [false, true] as const
-  const total = PROFILES.length * UNLOCK_POLICIES.length * MODES.length
+  const runs = planRuns()
   let n = 0
-  for (const profile of PROFILES) {
-    for (const policy of UNLOCK_POLICIES) {
-      for (const prestige of MODES) {
-        const result = simulate(profile, policy, meta, prestige)
-        const mode = prestige ? 'prestige' : 'normal'
-        writeFileSync(`${dir}/${profile.id}__${policy}__${mode}.json`, JSON.stringify(result))
-        n++
-        const reached = result.milestones[result.finalEraIndex]
-        const days = (result.totalTimeS / 86400).toFixed(1)
-        console.log(
-          `[${n}/${total}] ${result.label}: reached ${reached?.eraName ?? '?'} (e${result.finalEraIndex}) in ${days}d${result.stuck ? ' [stuck]' : ''}${prestige ? ` [+${result.echoes} echoes]` : ''}`,
-        )
-      }
-    }
+  for (const { profile, policy, rebirth } of runs) {
+    const result = simulate(profile, policy, meta, rebirth)
+    const tag = rebirth.rebirths > 0 ? `__r${rebirth.rebirths}` : ''
+    const metaTag = rebirth.metaUpgrades.length ? `_${rebirth.metaUpgrades.join('-')}` : ''
+    writeFileSync(`${dir}/${profile.id}__${policy}${tag}${metaTag}.json`, JSON.stringify(result))
+    n++
+    const reached = result.milestones[result.finalEraIndex]
+    const end = result.reachedDestruction
+      ? `destroyed the universe in ${(result.destroyedAtS! / 86400).toFixed(1)}d`
+      : `reached ${reached?.eraName ?? '?'} (e${result.finalEraIndex}) in ${(result.totalTimeS / 86400).toFixed(1)}d${result.stuck ? ' [stuck]' : ''}`
+    console.log(`[${n}/${runs.length}] ${result.label}: ${end} | ${(result.wallMs / 1000).toFixed(1)}s wall`)
   }
 
   // Prune old snapshots (keep the most recent KEEP_SNAPSHOTS). Snapshot dirs are
@@ -68,5 +112,5 @@ test('run balance simulations', () => {
     rmSync(`sim/results/${old}`, { recursive: true })
   }
 
-  console.log(`\nWrote ${total} runs to ${dir}. Open the viewer: /sim/viewer/`)
+  console.log(`\nWrote ${runs.length} run(s) to ${dir}. Open the viewer: /sim/viewer/`)
 })

@@ -77,7 +77,7 @@ export const en: Translations = {
   // Interactive widgets (eras 4-13): hints and accessible labels.
   'accretion.hint':
     'Click inside the drifting clumps (follow them) to forge planets; elsewhere you gather dust',
-  'molecule.hint': 'Link two atoms to draw a bond; complete the molecule',
+  'molecule.hint': 'Link two atoms to draw a bond\ncomplete the molecule',
   'molecule.atom': 'Atom',
   'petri.hint': 'Slash the swimming cells to split them\n3 in one stroke = a bonus microbe',
   'petri.divide': 'Split a cell',
