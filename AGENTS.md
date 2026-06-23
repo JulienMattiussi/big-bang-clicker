@@ -218,7 +218,9 @@ pas seulement à constater.
    (fonds rouge sombre `#1a0d12`/`#140a0e`, flammes `#f59e0b`/`#fde68a`, ver
    d'épice `#e8a13a`, rouge danger `#ef4444` : `ExtinctionGame`, `RevoltGame`,
    `SpiceGame`, `GasLeakGame`, `art/CrisisCreatures`, `art/CrisisScene`,
-   `art/ChainReactionScene`), et `theme.css` / `index.css` (CSS brut autorisé).
+   `art/ChainReactionScene`), **orange d'avertissement de la légende de
+   renaissance** (`text-orange-400`, libellé « Réinitialisé » d'`EndGameModal`),
+   et `theme.css` / `index.css` (CSS brut autorisé).
    Tout nouveau hex hors de ces cas est à remplacer par un jeton.
 4. **i18n** : parité stricte FR/EN (même nombre de clés), tout texte via `t()`,
    aucune chaîne affichée en dur.

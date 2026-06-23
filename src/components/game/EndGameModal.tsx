@@ -57,7 +57,7 @@ export function EndGameModal() {
     <Modal
       labelledBy="endgame-title"
       onClose={rebirth}
-      className="complexity-glow modal-in w-full max-w-md rounded-lg border border-octarine/50 bg-surface p-6 text-fg shadow-xl"
+      className="complexity-glow modal-in w-full max-w-2xl rounded-xl border border-octarine/50 bg-surface p-7 text-fg shadow-xl"
     >
       <div className="flex flex-col items-center gap-2 text-center">
         <span className="flex items-center gap-2 text-xs font-semibold tracking-[0.25em] text-octarine uppercase">
@@ -65,7 +65,7 @@ export function EndGameModal() {
           {t('prestige.title')}
           <span aria-hidden>✦</span>
         </span>
-        <h2 id="endgame-title" className="text-2xl font-bold">
+        <h2 id="endgame-title" className="text-3xl font-bold">
           {t('endgame.title')}
         </h2>
         <p className="max-w-prose leading-relaxed text-muted">{t('endgame.body')}</p>
@@ -76,75 +76,80 @@ export function EndGameModal() {
         </p>
       </div>
 
-      {/* Spells out the irreversible reset so the player knows what is lost vs kept. */}
-      <div className="mt-4 w-full rounded-md border border-border bg-bg/40 p-3 text-left text-sm">
-        <p className="flex gap-2">
-          <span className="shrink-0 font-semibold text-fg">{t('endgame.resets.label')}</span>
-          <span className="text-muted">{t('endgame.resets.list')}</span>
-        </p>
-        <p className="mt-1.5 flex gap-2">
-          <span className="shrink-0 font-semibold text-octarine">{t('endgame.keeps.label')}</span>
-          <span className="text-muted">{t('endgame.keeps.list')}</span>
-        </p>
+      {/* Read-only legend: deliberately borderless/flat so it never reads as a
+          clickable tile (the meta cards below carry the border + hover affordance). */}
+      <div className="mt-5 grid gap-x-6 gap-y-3 rounded-lg bg-bg/30 px-4 py-3 text-left text-sm sm:grid-cols-2">
+        <div>
+          <span className="text-xs font-semibold tracking-wide text-orange-400 uppercase">
+            {t('endgame.resets.label')}
+          </span>
+          <p className="mt-0.5 leading-snug text-muted">{t('endgame.resets.list')}</p>
+        </div>
+        <div className="sm:border-l sm:border-border/60 sm:pl-6">
+          <span className="text-xs font-semibold tracking-wide text-octarine uppercase">
+            {t('endgame.keeps.label')}
+          </span>
+          <p className="mt-0.5 leading-snug text-fg/80">{t('endgame.keeps.list')}</p>
+        </div>
       </div>
 
-      <div className="mt-4 flex flex-col gap-2">
-        <div className="text-xs font-semibold tracking-wide text-muted uppercase">
+      <div className="mt-5 flex flex-col gap-2">
+        <div id="endgame-meta-title" className="text-xs font-semibold tracking-wide text-muted uppercase">
           {t('meta.title')}
         </div>
-        <ul className="flex flex-col gap-2">
+        <div role="radiogroup" aria-labelledby="endgame-meta-title" className="grid gap-3 sm:grid-cols-2">
           {defs.metaUpgrades.map((meta) => {
             const ownedBefore = !!baseMeta[meta.id] // locked in from past rebirths
             const picked = !!state.metaUpgrades[meta.id] && !ownedBefore // chosen this run
             // Pickable if affordable outright, or by swapping off the current pick.
             const selectable = state.echoes >= meta.echoCost || pickedThisRun
             return (
-              <li
+              <button
                 key={meta.id}
-                className={`flex items-center justify-between gap-3 rounded-md border bg-bg/40 p-2 ${
-                  picked ? 'border-octarine/60' : 'border-border'
+                type="button"
+                role="radio"
+                aria-checked={picked}
+                aria-label={t(meta.nameKey as TranslationKey)}
+                disabled={ownedBefore || (!selectable && !picked)}
+                onClick={() => pick(meta.id)}
+                className={`flex flex-col gap-1.5 rounded-lg border p-3 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                  ownedBefore
+                    ? 'cursor-default border-border bg-bg/30 opacity-60'
+                    : picked
+                      ? 'border-octarine bg-octarine/10 ring-1 ring-octarine/40'
+                      : 'border-border bg-bg/40 hover:border-octarine/50 disabled:cursor-not-allowed disabled:opacity-50'
                 }`}
               >
-                <span className="min-w-0 text-left">
-                  <span className="block leading-tight">{t(meta.nameKey as TranslationKey)}</span>
-                  <span className="text-xs text-muted">{t(meta.descKey as TranslationKey)}</span>
-                </span>
-                <span className="flex shrink-0 flex-col items-end gap-1">
-                  {/* Fixed-height cost line, always reserved so every tile matches. */}
-                  <span className="flex h-4 items-center gap-1 text-xs tabular-nums text-octarine">
-                    {ownedBefore || picked ? null : (
-                      <>
+                <div className="flex items-start justify-between gap-2">
+                  <span className="leading-tight font-semibold">
+                    {t(meta.nameKey as TranslationKey)}
+                  </span>
+                  <span className="flex h-5 shrink-0 items-center gap-1 text-xs font-semibold tracking-wide tabular-nums">
+                    {ownedBefore ? (
+                      <span className="text-muted uppercase">{t('meta.owned')}</span>
+                    ) : picked ? (
+                      <span className="flex items-center gap-1 text-octarine uppercase">
+                        <span aria-hidden>✓</span>
+                        {t('meta.chosen')}
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-octarine">
                         {meta.echoCost}
                         <Icon name="echo" className="h-3 w-3" aria-hidden />
-                      </>
+                      </span>
                     )}
                   </span>
-                  {ownedBefore ? (
-                    <Button variant="ghost" className="whitespace-nowrap" disabled>
-                      {t('meta.owned')}
-                    </Button>
-                  ) : picked ? (
-                    <Button variant="ghost" className="whitespace-nowrap text-octarine" disabled>
-                      {t('meta.chosen')}
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="ghost"
-                      className="whitespace-nowrap"
-                      disabled={!selectable}
-                      onClick={() => pick(meta.id)}
-                    >
-                      {t('meta.choose')}
-                    </Button>
-                  )}
+                </div>
+                <span className="text-xs leading-snug text-muted">
+                  {t(meta.descKey as TranslationKey)}
                 </span>
-              </li>
+              </button>
             )
           })}
-        </ul>
+        </div>
       </div>
 
-      <div className="mt-5 flex justify-center">
+      <div className="mt-6 flex justify-center">
         <Button autoFocus onClick={rebirth} disabled={mustSpend}>
           {t('endgame.button')}
         </Button>

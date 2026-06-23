@@ -54,20 +54,27 @@ export function SingularityWidget({ era }: { era: EraDef }): ReactElement {
           className="absolute inset-0 h-full w-full overflow-visible"
           aria-hidden
         >
+          <defs>
+            {/* Radial fill over the whole disc, brightest at the core and fading out. */}
+            <radialGradient id="singularity-core" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.9" />
+              <stop offset="50%" stopColor="var(--color-accent)" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0.08" />
+            </radialGradient>
+          </defs>
           <g
             style={{ transition: 'transform 0.45s cubic-bezier(0.5, 0, 0.75, 0)' }}
             transform={`translate(150 50) scale(${scale})`}
           >
-            <ellipse cx="0" cy="0" rx="146" ry="46" fill="var(--color-accent)" opacity="0.12" />
-            <ellipse cx="0" cy="0" rx="146" ry="46" fill="none" stroke="var(--color-accent)" strokeWidth="2" opacity="0.7" />
+            <ellipse cx="0" cy="0" rx="146" ry="46" fill="url(#singularity-core)" />
           </g>
           {/* The lone central point: faint at first, ablaze once everything has converged. */}
           <circle
             cx="150"
             cy="50"
             r={reached ? 5 : 2.5}
-            fill="var(--color-octarine)"
-            opacity={0.4 + progress * 0.6}
+            fill="var(--color-fg)"
+            opacity={0.5 + progress * 0.5}
             style={{ transition: 'r 0.4s ease, opacity 0.4s ease' }}
           />
         </svg>
