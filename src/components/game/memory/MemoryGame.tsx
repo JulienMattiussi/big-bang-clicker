@@ -22,6 +22,7 @@ import {
   MEMORY_MAX_LEVEL,
   memoryCost,
   memoryEraMaxed,
+  memoryJokerSets,
   memoryLevel,
   type MemoryLevelConfig,
 } from '@/lib/memory'
@@ -58,7 +59,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
 
   // Deck for a given level config: discovered resources first, then top up with
   // others (unknown next-era resources allowed) to reach the symbol count.
-  const makeDeck = (cfg: MemoryLevelConfig) => {
+  const makeDeck = (cfg: MemoryLevelConfig, level: number) => {
     const discovered = useGameStore.getState().state.discovered
     const pool = Object.keys(discovered)
       .filter((id) => discovered[id])
@@ -71,16 +72,16 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
       pool.push(...extra)
     }
     const deck = dealCards(pool, cfg.symbols, cfg.group)
-    // The Force pebble pre-solves two sets as sith/jedi jokers.
-    const forceActive = !!memoryGalet(useGameStore.getState().state, defs)
-    return forceActive ? applyJokers(deck) : deck
+    // The Force pebble pre-solves joker sets (more per level once amplified).
+    const jokers = memoryJokerSets(useGameStore.getState().state, defs, level)
+    return jokers > 0 ? applyJokers(deck, jokers) : deck
   }
 
   const [phase, setPhase] = useState<Phase>('start')
   // Config of the attempt currently being played (captured when dealt).
   const [cfg, setCfg] = useState<MemoryLevelConfig>(upcomingCfg)
   // Deal a board immediately so it shows (face-down) behind the start text.
-  const [cards, setCards] = useState<Card[]>(() => makeDeck(upcomingCfg))
+  const [cards, setCards] = useState<Card[]>(() => makeDeck(upcomingCfg, upcomingLevel))
   const [mistakes, setMistakes] = useState(0)
   const [busy, setBusy] = useState(false)
   const [confirmQuit, setConfirmQuit] = useState(false)
@@ -97,7 +98,7 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
     const lvl = memoryLevel(useGameStore.getState().state, era?.id ?? '')
     const config = MEMORY_LEVELS[lvl]!
     setCfg(config)
-    setCards(makeDeck(config))
+    setCards(makeDeck(config, lvl))
     setMistakes(0)
     setBusy(false)
     setPhase('play')

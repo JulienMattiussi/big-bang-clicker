@@ -4,8 +4,8 @@ import { makeState, makeDefs } from '../helpers'
 import type { MetaUpgradeDef } from '@/lib/types'
 
 const META: MetaUpgradeDef[] = [
-  { id: 'm1', nameKey: '', descKey: '', echoCost: 10, multiplier: 2 },
-  { id: 'm2', nameKey: '', descKey: '', echoCost: 20, multiplier: 3 },
+  { id: 'm1', nameKey: '', descKey: '', echoCost: 10, target: 'production', multiplier: 2 },
+  { id: 'm2', nameKey: '', descKey: '', echoCost: 20, target: 'production', multiplier: 3 },
 ]
 const defs = makeDefs({ metaUpgrades: META })
 

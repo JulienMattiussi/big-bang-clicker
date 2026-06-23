@@ -47,18 +47,19 @@ export function dealCards(pool: ResourceDef[], symbols: number, group: number): 
   return shuffle(cards)
 }
 
-/** With the Force pebble active: turn two symbol groups into pre-solved joker sets
- *  (one sith, one jedi), revealed and matched from the deal, so the player has two
- *  fewer sets to memorise. Keeps at least one real set to play. */
-export function applyJokers(cards: Card[]): Card[] {
+/** With the Force pebble active: turn `count` symbol groups into pre-solved joker
+ *  sets (alternating sith/jedi), revealed and matched from the deal, so the player
+ *  has that many fewer sets to memorise. The amplified pebble can reveal the whole
+ *  board (count >= the number of sets), which simply clears it outright. */
+export function applyJokers(cards: Card[], count = 2): Card[] {
   const ids = [...new Set(cards.map((c) => c.res.id))]
-  if (ids.length < 3) return cards
-  const [sith, jedi] = ids
+  const reveal = Math.min(Math.max(0, count), ids.length)
+  if (reveal === 0) return cards
+  const jokerOf = new Map<string, 'sith' | 'jedi'>()
+  ids.slice(0, reveal).forEach((id, i) => jokerOf.set(id, i % 2 === 0 ? 'sith' : 'jedi'))
   return cards.map((c) =>
-    c.res.id === sith
-      ? { ...c, joker: 'sith' as const, flipped: true, matched: true }
-      : c.res.id === jedi
-        ? { ...c, joker: 'jedi' as const, flipped: true, matched: true }
-        : c,
+    jokerOf.has(c.res.id)
+      ? { ...c, joker: jokerOf.get(c.res.id)!, flipped: true, matched: true }
+      : c,
   )
 }

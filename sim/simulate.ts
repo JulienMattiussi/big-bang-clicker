@@ -523,10 +523,10 @@ export function simulate(
       if (firstFinalT === null) firstFinalT = t
       if (!prestige) break // normal run: done at the final era
       if (!prestiged) {
-        // One prestige (Echoes + reset to era 1 + meta), then replay a second run
-        // with the bonuses, mirroring gameStore.prestige.
+        // One prestige, then replay a second run with the bonuses. The collapse
+        // credits the Echo (mirroring gameStore), the reset only carries it over.
         prestiged = true
-        state = runPrestige(state, t)
+        state = runPrestige({ ...state, echoes: state.echoes + 1 }, t)
         state = applyMeta(
           {
             ...state,

@@ -67,12 +67,27 @@ export function memoryEraMaxed(state: GameState, eraId: string): boolean {
   return memoryCompletions(state, eraId) >= MEMORY_MAX_LEVEL
 }
 
+const MEMORY_BASE_FRACTION = 0.1
+
+/** True when the Force pebble is amplified by the "pebble power" meta-upgrade. */
+function forcePebbleAmplified(state: GameState, defs: GameDefs): boolean {
+  return !!memoryGalet(state, defs) && (state.multipliers.metaGalet ?? 1) > 1
+}
+
+/** Joker sets the Force pebble pre-solves: 2 with the plain pebble, plus one more
+ *  per level once the pebble-power meta amplifies it (capped to the board by the deck). */
+export function memoryJokerSets(state: GameState, defs: GameDefs, level: number): number {
+  if (!memoryGalet(state, defs)) return 0
+  return 2 + (forcePebbleAmplified(state, defs) ? level : 0)
+}
+
 /** Complexity cost of one attempt: 10% of the current Complexity, dropped to the
- *  Force pebble's fraction (1%) while that mind-control pebble is active. */
+ *  Force pebble's fraction (1%); amplified by the pebble-power meta it becomes free. */
 export function memoryCost(state: GameState, defs: GameDefs): number {
   const galet = memoryGalet(state, defs)
-  const fraction = galet ? galet.effect.value : 0.1
-  return Math.max(1, Math.round(state.complexity * fraction))
+  if (!galet) return Math.max(1, Math.round(state.complexity * MEMORY_BASE_FRACTION))
+  if (forcePebbleAmplified(state, defs)) return 0
+  return Math.max(1, Math.round(state.complexity * galet.effect.value))
 }
 
 /** Pays the attempt's stake. Returns the new state, or `null` if the player can't

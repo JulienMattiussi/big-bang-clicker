@@ -1,6 +1,7 @@
 import { useRef, useState, type ReactElement } from 'react'
 import { useClickPulse } from '@/store/clickPulse'
 import { useEndgameStore } from '@/store/endgameStore'
+import { useGameStore } from '@/store/gameStore'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
@@ -34,7 +35,13 @@ export function SingularityWidget({ era }: { era: EraDef }): ReactElement {
     setProgress(next / CONTRACT_CLICKS) // drains the era-19 complexity gauge
     if (next >= CONTRACT_CLICKS) {
       sealed.current = true
-      window.setTimeout(() => collapse(), COLLAPSE_MS)
+      // The collapse is the renaissance: credit its Echo now, then open the modal
+      // with the meta-upgrades owned so far (so this run's picks stay refundable).
+      window.setTimeout(() => {
+        const baseMeta = { ...useGameStore.getState().state.metaUpgrades }
+        useGameStore.getState().gainEcho()
+        collapse(baseMeta)
+      }, COLLAPSE_MS)
     }
   }
 
@@ -69,7 +76,7 @@ export function SingularityWidget({ era }: { era: EraDef }): ReactElement {
           type="button"
           onClick={contract}
           aria-label={verb}
-          className="absolute inset-0 h-full w-full rounded-xl transition select-none hover:bg-accent/5 active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          className="absolute inset-0 h-full w-full rounded-xl transition select-none active:scale-[0.99] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         />
       </div>
 

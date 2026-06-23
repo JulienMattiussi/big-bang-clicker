@@ -49,7 +49,8 @@ export function widgetGaletMultiplier(state: GameState, defs: GameDefs, eraIdx: 
     const owned = state.galets?.[g.id]
     if (owned?.found && owned.active && eraIdx <= g.effect.maxEraIndex) m *= g.effect.value
   }
-  return m
+  // The "pebble power" meta-upgrade amplifies the pebble's bonus above 1.
+  return 1 + (m - 1) * (state.multipliers.metaGalet ?? 1)
 }
 
 /** Found pebbles that boost the Complexity gain (for the effect badge on the meter). */

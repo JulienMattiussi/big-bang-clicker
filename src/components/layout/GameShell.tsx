@@ -10,6 +10,7 @@ import { isSoloLayout, isWideLayout, wideRowClass } from '@/components/layout/er
 import { ResourcePanel } from '@/components/game/ResourcePanel'
 import { PurchasePanel } from '@/components/game/PurchasePanel'
 import { ComplexityBadge } from '@/components/game/ComplexityBadge'
+import { RebirthButton } from '@/components/game/RebirthButton'
 import { MemoryFeature } from '@/components/game/memory/MemoryFeature'
 import { NextGoal } from '@/components/game/NextGoal'
 import { MilestoneButton } from '@/components/game/MilestoneButton'
@@ -74,9 +75,12 @@ export function GameShell() {
             exists thanks to the pills, so row 2 (era title / memory button under
             Complexity / unlock button under the gauge) stays put. */}
         <div className="grid grid-cols-[1fr_auto_1fr] items-start gap-x-4 gap-y-1.5">
-          <div className="col-start-1 row-start-1 flex items-center gap-2">
-            <GaletReceptacle />
-            <InventoryButton />
+          <div className="col-start-1 row-start-1 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <GaletReceptacle />
+              <InventoryButton />
+            </div>
+            <RebirthButton />
           </div>
           <div className="col-start-2 row-start-1 flex justify-center">
             <ComplexityBadge />

@@ -130,7 +130,8 @@ function galetMachineMultiplier(
     const owned = state.galets?.[galet.id]
     if (owned?.found && owned.active && eraIdx <= galet.effect.maxEraIndex) m *= galet.effect.value
   }
-  return m
+  // The "pebble power" meta-upgrade amplifies the pebbles' bonus above 1.
+  return 1 + (m - 1) * (state.multipliers.metaGalet ?? 1)
 }
 
 /** Multiplier from active pebbles on a generator's (primary factory) output. */
@@ -248,7 +249,8 @@ export function clickYield(state: GameState, defs: GameDefs, era: EraDef): numbe
   return (
     (level + 1) *
     galetGeneratorMultiplier(state, defs, genId) *
-    resourceMultiplier(state, defs, era.clickResource)
+    resourceMultiplier(state, defs, era.clickResource) *
+    (state.multipliers.metaClick ?? 1)
   )
 }
 
@@ -380,7 +382,13 @@ export function complexityPerUnit(
   const gap = latestEra - eraIndexOf(defs, eraId)
   const recency = gap <= 0 ? 1 : 1 / COMPLEXITY_ERA_DECAY ** gap
   const boost = COMPLEXITY_BOOST ** (state.complexityBoosts?.[eraId] ?? 0)
-  return tier * recency * galetComplexityMultiplier(state, defs, eraId) * boost
+  return (
+    tier *
+    recency *
+    galetComplexityMultiplier(state, defs, eraId) *
+    boost *
+    (state.multipliers.metaComplexity ?? 1)
+  )
 }
 
 /** Raw Complexity from producing `amount` of a resource (amount x per-unit). */
@@ -401,8 +409,13 @@ function creditedComplexity(
   rawGain: number,
 ): { complexity: number; totalComplexityEver: number } {
   const next = nextLockedEra(state, defs)
-  const cap =
-    next && next.unlock.complexity !== undefined ? next.unlock.complexity : Number.POSITIVE_INFINITY
+  // Collapse era (freezeComplexity): Complexity is frozen, it can only fall.
+  const frozen = defs.eras.find((e) => e.id === state.currentEraId)?.freezeComplexity
+  const cap = frozen
+    ? state.complexity
+    : next && next.unlock.complexity !== undefined
+      ? next.unlock.complexity
+      : Number.POSITIVE_INFINITY
   const credited = Math.min(rawGain, Math.max(0, cap - state.complexity))
   return {
     complexity: state.complexity + credited,

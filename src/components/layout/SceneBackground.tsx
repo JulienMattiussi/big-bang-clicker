@@ -9,6 +9,7 @@ import { CosmosScene } from './scenes/CosmosScene'
 import { CityUniverseScene } from './scenes/CityUniverseScene'
 import { usePageHidden } from '@/hooks/usePageHidden'
 import { useIdle } from '@/hooks/useIdle'
+import { useEndgameStore } from '@/store/endgameStore'
 
 /** Freeze the ambient animations after this long without any interaction. */
 const IDLE_FREEZE_MS = 120_000
@@ -63,6 +64,8 @@ export function SceneBackground({ eraIndex }: { eraIndex: number }): ReactElemen
   const hidden = usePageHidden()
   const idle = useIdle(IDLE_FREEZE_MS)
   const frozen = hidden || idle
+  // The collapsing singularity bleaches the sky to white as it contracts.
+  const collapse = useEndgameStore((s) => s.progress)
   return (
     <div
       aria-hidden
@@ -79,6 +82,13 @@ export function SceneBackground({ eraIndex }: { eraIndex: number }): ReactElemen
       >
         <Scene eraIndex={eraIndex} />
       </div>
+      {/* Collapse bleach: a white veil fading in with the contraction (e19 only). */}
+      {scene === 'cityUniverse' && collapse > 0 ? (
+        <div
+          className="absolute inset-0 bg-white transition-opacity duration-300"
+          style={{ opacity: collapse }}
+        />
+      ) : null}
     </div>
   )
 }

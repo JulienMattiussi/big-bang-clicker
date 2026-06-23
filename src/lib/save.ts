@@ -11,8 +11,9 @@ import { sign } from './integrity'
 /** v2 introduced the signed save envelope; v3 stopped baking memory/crisis
  *  multipliers into `multipliers` (now derived from levels/counts); v4 merged the
  *  Intergalactic era into the Intergalactic Voyage and shifted later era ids; v5
- *  dropped the dead `upgrades` field; v6 renumbered era ids to 1-based. */
-export const SAVE_VERSION = 6
+ *  dropped the dead `upgrades` field; v6 renumbered era ids to 1-based; v7 added
+ *  the `rebirths` counter. */
+export const SAVE_VERSION = 7
 const SAVE_KEY = 'big-bang-clicker:save'
 /** Cap on the offline-idle credit (anti clock-cheat). */
 const DEFAULT_OFFLINE_CAP_SECONDS = 60 * 60 * 8
@@ -35,6 +36,7 @@ export function createInitialState(now: number, firstEraId: EraId = ''): GameSta
     echoes: 0,
     metaUpgrades: {},
     totalComplexityEver: 0,
+    rebirths: 0,
     discovered: {},
     seenEvents: {},
     galets: {},
@@ -102,6 +104,8 @@ const migrations: Record<number, Migration> = {
       version: 6,
     }
   },
+  // v6 -> v7: the rebirths counter (Big Bangs done) is new; default it to 0.
+  6: (state) => ({ ...state, rebirths: state.rebirths ?? 0, version: 7 }),
 }
 
 export function migrate(state: GameState): GameState {

@@ -87,12 +87,17 @@ export interface Effect {
 }
 
 /** Prestige meta-upgrade: a permanent bonus bought with Echoes. */
+/** What a meta-upgrade's multiplier boosts. */
+export type MetaTarget = 'production' | 'complexity' | 'click' | 'galet'
+
 export interface MetaUpgradeDef {
   id: string
   nameKey: string
   descKey: string
   echoCost: number
-  /** Global production multiplier granted (multiplied across owned meta-upgrades). */
+  /** Which effect the multiplier applies to. */
+  target: MetaTarget
+  /** Multiplier granted (multiplied across owned upgrades of the SAME target). */
   multiplier: number
 }
 
@@ -210,6 +215,8 @@ export interface EraDef {
   generators: GeneratorId[]
   converters: ConverterId[]
   crises: CrisisId[]
+  /** Final/collapse era: Complexity stops rising while here (it can only fall). */
+  freezeComplexity?: boolean
 }
 
 /** All static game definitions. */
@@ -255,6 +262,8 @@ export interface GameState {
   echoes: number
   metaUpgrades: Record<string, boolean>
   totalComplexityEver: number
+  /** Number of rebirths (Big Bangs) completed, kept across renaissances. */
+  rebirths: number
   /** Resources ever produced (>0). Sticky: drives lasting discovery (e.g. periodic table cells). */
   discovered: Record<ResourceId, boolean>
   /** Event-modal ids already shown (so each narrative event fires once). */

@@ -19,8 +19,8 @@ import {
   unlockNextEra as runUnlockNextEra,
 } from '@/lib/engine'
 import { resolveCrisis as runResolveCrisis, updateRisk } from '@/lib/crises'
-import { prestige as runPrestige } from '@/lib/prestige'
-import { applyMeta, buyMeta } from '@/lib/meta'
+import { echoesGain, prestige as runPrestige } from '@/lib/prestige'
+import { applyMeta, buyMeta, refundMeta } from '@/lib/meta'
 import { triggeredEvents } from '@/lib/events'
 import { memoryStart, memoryWin } from '@/lib/memory'
 import {
@@ -71,10 +71,14 @@ interface GameStore {
   importSave: (encoded: string) => 'ok' | 'invalid' | 'tampered'
   /** Fully resets the game (clears the save). */
   reset: () => void
+  /** Credits the renaissance's Echo (when the universe collapses, before rebirth). */
+  gainEcho: () => void
   /** Triggers prestige (new Big Bang): reset except Echoes/meta-upgrades. */
   prestige: () => void
   /** Buys a prestige meta-upgrade with Echoes. */
   buyMetaUpgrade: (id: string) => void
+  /** Refunds a meta-upgrade (Echo back), to undo a choice before rebirth. */
+  refundMetaUpgrade: (id: string) => void
   /** Adds narrative popups to the persisted pending queue in one update (deduped;
    *  skipped if already pending or dismissed). The popups survive a reload. */
   enqueueEvents: (events: GameEvent[]) => void
@@ -199,6 +203,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     saveToStorage(fresh)
     set((s) => ({ state: fresh, epoch: s.epoch + 1 }))
   },
+  gainEcho: () => set((s) => commit({ ...s.state, echoes: s.state.echoes + echoesGain() })),
   prestige: () => {
     const next = runPrestige(get().state, Date.now())
     // The starting era stays unlocked after rebirth.
@@ -214,6 +219,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set((s) => ({ state: reborn, epoch: s.epoch + 1 }))
   },
   buyMetaUpgrade: (id) => set((s) => commit(buyMeta(s.state, s.defs, id))),
+  refundMetaUpgrade: (id) => set((s) => commit(refundMeta(s.state, s.defs, id))),
   // Adds every not-seen, not-already-pending event in ONE set. We compute the
   // fresh list via get() and call set only when there is something new: a no-op
   // set would still notify subscribers, and useEvents enqueues from inside a

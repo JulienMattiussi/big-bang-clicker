@@ -5,27 +5,19 @@
 
 import type { GameState } from './types'
 
-const ECHO_K = 1
-const ECHO_BASE = 1000
+/** Each rebirth grants exactly one Echo (credited when the universe collapses, not
+ *  here): the reset only carries the already-earned Echoes over. */
+const ECHO_PER_REBIRTH = 1
 
-/** "Earned" Echoes over the whole run (monotonic with total Complexity). */
-export function lifetimeEchoes(state: GameState): number {
-  if (state.totalComplexityEver <= 0) return 0
-  return Math.floor(ECHO_K * Math.sqrt(state.totalComplexityEver / ECHO_BASE))
-}
-
-/** Echoes gainable by prestiging now (beyond those already held). */
-export function echoesGain(state: GameState): number {
-  return Math.max(0, lifetimeEchoes(state) - state.echoes)
-}
-
-export function canPrestige(state: GameState): boolean {
-  return echoesGain(state) >= 1
+/** Echoes gained by transcending: a flat one per rebirth. */
+export function echoesGain(): number {
+  return ECHO_PER_REBIRTH
 }
 
 /**
- * Triggers prestige: full run reset. Keeps Echoes (plus the gain), meta-upgrades,
- * the cumulative total Complexity, and the infinity pebbles (kept across rebirths).
+ * Triggers prestige: full run reset. Keeps Echoes (already credited at the
+ * collapse), meta-upgrades, the cumulative total Complexity, and the infinity
+ * pebbles (kept across rebirths).
  */
 export function prestige(state: GameState, now: number): GameState {
   return {
@@ -40,9 +32,10 @@ export function prestige(state: GameState, now: number): GameState {
     crises: {},
     multipliers: {},
     complexity: 0,
-    echoes: state.echoes + echoesGain(state),
+    echoes: state.echoes,
     metaUpgrades: state.metaUpgrades,
     totalComplexityEver: state.totalComplexityEver,
+    rebirths: (state.rebirths ?? 0) + 1,
     discovered: {},
     seenEvents: {},
     galets: state.galets ?? {},

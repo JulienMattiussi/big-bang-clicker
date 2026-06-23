@@ -39,4 +39,5 @@ export const era18: EraDef = {
   generators: ['instability'],
   converters: [],
   crises: [],
+  freezeComplexity: true,
 }
