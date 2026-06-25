@@ -187,6 +187,10 @@ export interface CrisisDef {
   trigger: 'threshold' | 'player' | 'probabilistic'
   regression: Effect[]
   rebound: Effect[]
+  /** Industrial era: most crises make humanity replay its inventions (the survival
+   *  mini-game resets the inventions widget). Set false to overcome the crisis WITHOUT
+   *  that regression (e.g. the Y2K bug: feared catastrophe, nothing actually broke). */
+  regressesInventions?: boolean
   textKeys: { triggerKey: string; reboundKey: string }
 }
 
@@ -277,8 +281,11 @@ export interface GameState {
   complexityBoosts: Record<EraId, number>
   /** City widget (era 12): neighbour pairings the player has discovered. */
   cityPairs: string[]
-  /** Inventions widget (era 14): how many inventions have been revealed (in order). */
+  /** Inventions widget (era 15): how many inventions have been revealed (in order). */
   inventions: number
+  /** Highest `inventions` ever reached this run (kept when a crisis resets `inventions`).
+   *  Re-discovering an invention below this peak is faster (it costs fewer clicks). */
+  inventionsPeak: number
   /** Narrative popups shown but not yet dismissed. Persisted so a popup the
    *  player never closed reappears on reload (and its effect stays deferred). */
   pendingEvents: GameEvent[]

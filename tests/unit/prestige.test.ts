@@ -35,6 +35,12 @@ describe('prestige', () => {
     expect(next.galets).toEqual({ matter: { found: true, active: true } })
   })
 
+  it('réinitialise les inventions et leur pic (nouvel univers, on réinvente de zéro)', () => {
+    const next = prestige(stateWith({ inventions: 5, inventionsPeak: 7 }), 1)
+    expect(next.inventions).toBe(0)
+    expect(next.inventionsPeak).toBe(0)
+  })
+
   it('conserve le flag « vu » du tuto première machine, mais pas les évènements narratifs', () => {
     const state = stateWith({ seenEvents: { 'tuto:firstMachine': true, 'era:e5': true } })
     const next = prestige(state, 1)

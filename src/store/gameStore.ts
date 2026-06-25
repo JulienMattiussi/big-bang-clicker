@@ -282,9 +282,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return commit({ ...s.state, cityPairs: [...s.state.cityPairs, ...fresh] })
     }),
   discoverInvention: () =>
-    set((s) =>
-      commit({ ...s.state, inventions: Math.min(s.state.inventions + 1, INVENTIONS.length) }),
-    ),
+    set((s) => {
+      const inventions = Math.min(s.state.inventions + 1, INVENTIONS.length)
+      return commit({
+        ...s.state,
+        inventions,
+        inventionsPeak: Math.max(s.state.inventionsPeak, inventions),
+      })
+    }),
   resetInventions: () => set((s) => commit({ ...s.state, inventions: 0 })),
   triggerCrisis: (id) =>
     set((s) => {

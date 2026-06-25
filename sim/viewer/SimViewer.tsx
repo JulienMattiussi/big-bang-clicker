@@ -22,13 +22,11 @@ const ALL_RUNS: RunResult[] = Object.values(modules)
   .sort((a, b) => b.runId.localeCompare(a.runId) || a.label.localeCompare(b.label))
 
 /** Snapshots (one per `make sim`), newest first. */
-const SNAPSHOTS = [...new Map(ALL_RUNS.map((r) => [r.runId, r.runLabel])).entries()]
+const SNAPSHOTS = [...new Map(ALL_RUNS.map((r) => [r.runId, r])).entries()]
   .sort((a, b) => b[0].localeCompare(a[0]))
-  .map(([id, label]) => ({ id, label }))
+  .map(([id, r]) => ({ id, label: r.runLabel, commit: r.gitCommit, defsHash: r.defsHash }))
 
 /** Distinct profile x policy combos (shared across snapshots). */
-const RUN_KINDS = [...new Map(ALL_RUNS.map((r) => [`${r.profileId}__${r.unlockPolicy}`, r])).values()]
-
 const PROFILE_COLOR: Record<string, string> = {
   minimal: 'var(--color-era-2)',
   casual: 'var(--color-secondary)',
@@ -39,9 +37,13 @@ const PROFILE_COLOR: Record<string, string> = {
  *  the prestige boolean). */
 const rebirthsOf = (r: RunResult) => r.rebirths ?? (r.prestige ? 1 : 0)
 const metaOf = (r: RunResult) => r.metaUpgrades ?? []
-const runKey = (r: RunResult) =>
-  `${r.profileId}__${r.unlockPolicy}__r${rebirthsOf(r)}_${metaOf(r).join('-')}`
+// One toggle per profile × policy; the renaissance dimension is told apart by
+// SNAPSHOT (each targeted run is its own snapshot), not by a separate toggle.
+const runKey = (r: RunResult) => `${r.profileId}__${r.unlockPolicy}`
 const uid = (r: RunResult) => `${r.runId}__${runKey(r)}`
+// One toggle per distinct run kind (profile × policy × renaissance + Echo allocation),
+// so rebirth variants of the same profile/policy stay separate instead of collapsing.
+const RUN_KINDS = [...new Map(ALL_RUNS.map((r) => [runKey(r), r])).values()]
 const colorFor = (r: RunResult) => PROFILE_COLOR[r.profileId] ?? 'var(--color-fg)'
 // Line/swatch styling encodes policy (solid=asap, dashed=ready) and mode
 // (prestige runs get a finer dash / dotted swatch) on top of colour=profile.
@@ -188,7 +190,11 @@ export function SimViewer() {
                 checked={snapsOn.has(s.id)}
                 onChange={() => setSnapsOn((prev) => toggleSet(prev, s.id))}
               />
-              <span style={{ opacity: snapsOn.has(s.id) ? snapOpacity(s.id) : 0.4 }}>
+              <span
+                className="cursor-help"
+                style={{ opacity: snapsOn.has(s.id) ? snapOpacity(s.id) : 0.4 }}
+                title={`commit ${s.commit} · données ${s.defsHash}`}
+              >
                 {s.label}
                 {i === 0 ? <span className="ml-1 text-xs text-muted">(dernier)</span> : null}
               </span>
@@ -242,9 +248,6 @@ export function SimViewer() {
                     className="inline-block h-0 w-6 shrink-0 border-t-2"
                     style={{ borderColor: colorFor(r), borderStyle: borderStyleFor(r) }}
                   />
-                  {rebirthsOf(r) > 0 ? (
-                    <span className="text-xs text-octarine">r{rebirthsOf(r)}</span>
-                  ) : null}
                 </label>
               )
             }),

@@ -126,6 +126,9 @@ export const crisisDefs: CrisisDef[] = [
     eraId: 'e15',
     risk: { threshold: 1 },
     trigger: 'player',
+    // The millennium bug: dreaded worldwide, but nothing actually broke - so it is
+    // overcome WITHOUT making humanity replay its inventions (unlike the other crises).
+    regressesInventions: false,
     regression: [{ type: 'grantResource', target: 'technology', value: -1 }],
     rebound: [{ type: 'multiplier', target: 'technology', value: 2 }],
     textKeys: {

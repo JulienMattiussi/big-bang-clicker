@@ -13,7 +13,7 @@ import { sign } from './integrity'
  *  Intergalactic era into the Intergalactic Voyage and shifted later era ids; v5
  *  dropped the dead `upgrades` field; v6 renumbered era ids to 1-based; v7 added
  *  the `rebirths` counter. */
-export const SAVE_VERSION = 7
+export const SAVE_VERSION = 9
 const SAVE_KEY = 'big-bang-clicker:save'
 /** Cap on the offline-idle credit (anti clock-cheat). */
 const DEFAULT_OFFLINE_CAP_SECONDS = 60 * 60 * 8
@@ -44,6 +44,7 @@ export function createInitialState(now: number, firstEraId: EraId = ''): GameSta
     complexityBoosts: {},
     cityPairs: [],
     inventions: 0,
+    inventionsPeak: 0,
     pendingEvents: [],
     eventsInitialized: false,
   }
@@ -106,6 +107,22 @@ const migrations: Record<number, Migration> = {
   },
   // v6 -> v7: the rebirths counter (Big Bangs done) is new; default it to 0.
   6: (state) => ({ ...state, rebirths: state.rebirths ?? 0, version: 7 }),
+  // v7 -> v8: the inventions high-water mark is new; seed it from the current count
+  // (re-discovering below it is cheaper). Older saves lose no progress.
+  7: (state) => ({ ...state, inventionsPeak: state.inventionsPeak ?? state.inventions ?? 0, version: 8 }),
+  // v8 -> v9: meta-upgrade ids renamed to describe their effect (spark -> production
+  // boost, etc.); remap owned upgrades so bought ones aren't silently lost.
+  8: (state) => {
+    const rename: Record<string, string> = {
+      spark: 'boostProduction',
+      memory: 'boostComplexity',
+      echo: 'boostClick',
+      rebirth: 'boostGalet',
+    }
+    const metaUpgrades: Record<string, boolean> = {}
+    for (const id in state.metaUpgrades) metaUpgrades[rename[id] ?? id] = state.metaUpgrades[id]!
+    return { ...state, metaUpgrades, version: 9 }
+  },
 }
 
 export function migrate(state: GameState): GameState {

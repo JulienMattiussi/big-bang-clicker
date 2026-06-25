@@ -48,7 +48,9 @@ export function SurviveGame() {
     if (next < 1) return
     won.current = true
     win()
-    resetInventions() // the invention discovery restarts from the first one
+    // Most industrial crises make humanity replay its inventions; a crisis flagged
+    // regressesInventions:false (the Y2K bug) is overcome without that setback.
+    if (def?.regressesInventions !== false) resetInventions()
     if (def) {
       // Some crises hand out a pebble for overcoming them (e.g. the Force pebble
       // from the era-16 encounter); its discovery popup follows the rebound one.

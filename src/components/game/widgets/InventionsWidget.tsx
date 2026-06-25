@@ -11,6 +11,8 @@ import type { EraDef } from '@/lib/types'
 
 /** Clicks per invention: 10 on the base loop, +2 per variant loop (12, 14, ...). */
 const clicksFor = (variant: number) => 10 + variant * 2
+/** Re-inventing something already discovered this run costs this many fewer clicks. */
+const REPLAY_DISCOUNT = 3
 
 /**
  * Era e15 (Industrial Revolution): tap on the left to charge the invention gauge;
@@ -23,6 +25,7 @@ export function InventionsWidget({ era }: { era: EraDef }): ReactElement {
   const { verb, gainBase, gainCombinedScaled } = useEraMechanic(era)
 
   const discovered = useGameStore((s) => s.state.inventions)
+  const peak = useGameStore((s) => s.state.inventionsPeak)
   const crises = useGameStore((s) => s.state.crises)
   const discoverInvention = useGameStore((s) => s.discoverInvention)
   const triggerCrisis = useGameStore((s) => s.triggerCrisis)
@@ -42,7 +45,10 @@ export function InventionsWidget({ era }: { era: EraDef }): ReactElement {
 
   // The gauge charges the NEXT entry to reveal; its loop sets the click cost.
   const charging = timeline[Math.min(discovered, timeline.length - 1)]
-  const need = clicksFor(charging?.variant ?? 0)
+  // Re-inventing something already discovered this run (below the peak, after a
+  // crisis reset) is faster: 3 fewer clicks. New ground costs the full price.
+  const replay = discovered < peak
+  const need = Math.max(1, clicksFor(charging?.variant ?? 0) - (replay ? REPLAY_DISCOUNT : 0))
   const shownIndex = discovered > 0 ? Math.min(viewIndex, discovered - 1) : -1
   const shown = shownIndex >= 0 ? (timeline[shownIndex] ?? null) : null
   const isLatest = shownIndex === discovered - 1

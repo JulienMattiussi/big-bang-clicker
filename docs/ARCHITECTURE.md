@@ -33,7 +33,7 @@ Voir aussi [AGENTS.md](../AGENTS.md). Détail data-driven :
 src/
 ├── lib/                  # logique pure (zéro React, testée)
 │   ├── types.ts          # types du domaine (Def + State)
-│   ├── engine/           # moteur découpé par préoccupation (barrel index.ts ; API stable `@/lib/engine`) : cost, eras (palier), multipliers (galets/mémoire/rebonds dérivés), rates (débits single-source generatorPerSec/converterOutputPerSec réutilisés par l'UI), complexity (= production réelle, complexityPerUnit), actions (achats/clic/conversion), tick (gelé en crise)
+│   ├── engine/           # moteur découpé par préoccupation (barrel index.ts ; API stable `@/lib/engine`) : cost, eras (palier), multipliers (galets/mémoire/rebonds dérivés), rates (débits single-source generatorPerSec/converterOutputPerSec réutilisés par l'UI), complexity (= production réelle, complexityPerUnit), actions (achats/clic/conversion), gestures (gestes de widget purs : gainBase/complete/gainCombinedScaled, source unique partagée par useEraMechanic et le sim), tick (gelé en crise)
 │   ├── graph.ts          # flux nets réels + alertes (déclin / production à zéro), dépendances, tri
 │   ├── reveal.ts         # dévoilement progressif (machines / ressources)
 │   ├── events.ts         # évènements narratifs déclenchés (transitions, crises, tuto)

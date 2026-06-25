@@ -181,11 +181,14 @@ describe('découvertes de widget', () => {
     expect(cur().cityPairs).toEqual(['a', 'b', 'c'])
   })
 
-  it('discoverInvention avance, resetInventions remet à zéro', () => {
+  it('discoverInvention avance et monte le pic ; resetInventions remet à zéro mais garde le pic', () => {
     useGameStore.getState().discoverInvention()
-    expect(cur().inventions).toBe(1)
+    useGameStore.getState().discoverInvention()
+    expect(cur().inventions).toBe(2)
+    expect(cur().inventionsPeak).toBe(2)
     useGameStore.getState().resetInventions()
     expect(cur().inventions).toBe(0)
+    expect(cur().inventionsPeak).toBe(2) // le pic survit au reset (rejeu moins cher)
   })
 })
 

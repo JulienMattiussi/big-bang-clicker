@@ -57,7 +57,7 @@ fond de scène par palier, modales d'évènements). Arborescence :
 src/
 ├── lib/                  # Logique pure, zéro React (entièrement testée)
 │   ├── types.ts          # Types du domaine (Era + layout, Resource, Generator, Converter, Crisis, MetaUpgrade, GameState...)
-│   ├── engine/           # Moteur découpé par préoccupation (barrel index.ts, API stable `@/lib/engine`) : cost, eras (palier/déblocage), multipliers (galets/mémoire/rebonds dérivés), rates (débits single-source), complexity, actions (achats/clic/conversion), tick ; gèle la production des ressources touchées par une crise active et bloque le palier tant qu'elle n'est pas résolue
+│   ├── engine/           # Moteur découpé par préoccupation (barrel index.ts, API stable `@/lib/engine`) : cost, eras (palier/déblocage), multipliers (galets/mémoire/rebonds dérivés), rates (débits single-source), complexity, actions (achats/clic/conversion), gestures (gestes de widget purs gainBase/complete/gainCombinedScaled, partagés par useEraMechanic ET le sim), tick ; gèle la production des ressources touchées par une crise active et bloque le palier tant qu'elle n'est pas résolue
 │   ├── graph.ts          # Flux nets réels + alertes (ressources en déclin / production à zéro), dépendances, tri
 │   ├── reveal.ts         # Dévoilement progressif (machines / ressources)
 │   ├── events.ts         # Évènements narratifs déclenchés (transitions, crises, tuto)
@@ -94,7 +94,7 @@ tests/
 sim/                      # Harnais de simulation d'équilibrage (exclu de make check)
 ├── profiles.ts           # Profils de joueur (minimal, casual, active, optimal)
 ├── simulate.ts           # Boucle headless d'UN run : démarre directement au niveau de renaissance demandé (bonus pré-appliqués, pas de multi-tour) et va jusqu'à la destruction de l'ère 19 (crise du gaz + contraction) ; mesure son temps mural
-├── run.sim.ts            # Écrit un snapshot daté par `make sim` ; paramétrable par variables d'env : SIM_PROFILE, SIM_POLICY (asap/ready), SIM_REBIRTHS (niveau de renaissance), SIM_META (ids de méta-upgrades affectés, séparés par des virgules : spark/memory/echo/rebirth). Sans SIM_PROFILE : matrice profils × politiques au niveau 0
+├── run.sim.ts            # Écrit un snapshot daté par `make sim` ; paramétrable par variables d'env : SIM_PROFILE, SIM_POLICY (asap/ready), SIM_REBIRTHS (niveau de renaissance), SIM_META (ids de méta-upgrades affectés, séparés par des virgules : boostProduction/boostComplexity/boostClick/boostGalet). Sans SIM_PROFILE : matrice profils × politiques au niveau 0
 └── viewer/               # Visualisation comparée ; superpose plusieurs snapshots successifs (make sim-view)
 ```
 

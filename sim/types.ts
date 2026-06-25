@@ -50,6 +50,15 @@ export interface ProfileConfig {
    * doubles the era's main-resource multiplier (so it also speeds Complexity).
    */
   memoryWinRate?: number[]
+  /**
+   * Engaged players (active/optimal) don't only build the latest era: they spend
+   * the resources accumulated in EVERY era to raise that era's factory (generator/
+   * converter) levels - via PURCHASES, never by replaying old widgets. Adds a
+   * cheapest-first purchase pass that uses each era's idle surplus, so older
+   * factories keep climbing (notably under the 'tierFirst' strategy, which would
+   * otherwise pour everything into the latest high-tier factory).
+   */
+  levelsEarlierFactories?: boolean
 }
 
 /** Per-era completeness at the moment the player leaves that era. */

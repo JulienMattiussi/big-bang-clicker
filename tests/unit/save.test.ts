@@ -76,6 +76,25 @@ describe('migrations', () => {
     expect(migrated.rebirths).toBe(0) // ajouté par la migration v6 -> v7
   })
 
+  it('v7 -> v8 : amorce inventionsPeak depuis le compte courant', () => {
+    const v7: GameState = { ...createInitialState(0), version: 7, inventions: 4 }
+    delete (v7 as Partial<GameState>).inventionsPeak
+    const migrated = migrate(v7)
+    expect(migrated.version).toBe(SAVE_VERSION)
+    expect(migrated.inventionsPeak).toBe(4)
+  })
+
+  it('v8 -> v9 : renomme les ids de méta-upgrades possédés sans les perdre', () => {
+    const v8: GameState = {
+      ...createInitialState(0),
+      version: 8,
+      metaUpgrades: { spark: true, rebirth: true },
+    }
+    const migrated = migrate(v8)
+    expect(migrated.version).toBe(SAVE_VERSION)
+    expect(migrated.metaUpgrades).toEqual({ boostProduction: true, boostGalet: true })
+  })
+
   it('v5 -> v6 : renumérote les ids d ère (0-based -> 1-based)', () => {
     const v5 = {
       ...createInitialState(0),

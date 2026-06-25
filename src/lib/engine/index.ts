@@ -25,4 +25,6 @@ export {
   manualConvert,
   manualProduce,
 } from './actions'
+export { applyGainBase, applyComplete, applyGainCombinedScaled } from './gestures'
+export type { GestureResult } from './gestures'
 export { tick } from './tick'

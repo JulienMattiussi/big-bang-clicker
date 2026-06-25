@@ -37,6 +37,7 @@ export const PROFILES: ProfileConfig[] = [
     decisionIntervalS: 2,
     strategy: 'cheapest',
     memoryWinRate: [0.95, 0.78, 0.5],
+    levelsEarlierFactories: true,
   },
   {
     id: 'optimal',
@@ -46,6 +47,7 @@ export const PROFILES: ProfileConfig[] = [
     decisionIntervalS: 1,
     strategy: 'tierFirst',
     memoryWinRate: [1, 0.9, 0.75],
+    levelsEarlierFactories: true,
   },
 ]
 

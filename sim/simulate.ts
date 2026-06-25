@@ -3,13 +3,13 @@ import { fr } from '@/i18n/translations/fr'
 import { createInitialState } from '@/lib/save'
 import { applyMeta } from '@/lib/meta'
 import {
-  applyClick,
+  applyComplete,
+  applyGainBase,
+  applyGainCombinedScaled,
   buyConverter,
   buyGenerator,
   canAfford,
   canUnlockNextEra,
-  converterOutputMultiplier,
-  manualProduce,
   MAX_COMPLEXITY_BOOST,
   nextCost,
   nextLockedEra,
@@ -20,12 +20,7 @@ import { readyCrises, resolveCrisis, updateRisk } from '@/lib/crises'
 import { memoryUnlocked, memoryLevel, memoryEraMaxed, memoryStart, memoryWin } from '@/lib/memory'
 import { revealedMachines, revealedResources } from '@/lib/reveal'
 import { decliningResources, netFlows } from '@/lib/graph'
-import {
-  crisisGaletForEra,
-  discoverableGalets,
-  widgetGaletForEra,
-  widgetGaletMultiplier,
-} from '@/lib/galets'
+import { crisisGaletForEra, discoverableGalets, widgetGaletForEra } from '@/lib/galets'
 import type { EraDef, GameState } from '@/lib/types'
 import type {
   Completeness,
@@ -97,29 +92,24 @@ function nameOf(era: EraDef): string {
   return (fr as Record<string, string>)[era.nameKey] ?? era.id
 }
 
-/** Mirrors the widgets' gainCombinedScaled: a fixed base `n` of the era's combined
- *  resource, scaled by the converter LEVEL, its output multipliers (memory/crisis/
- *  global/meta + converter galets) and the widget pebble - dropping the recipe's
- *  flat late-game easing. This is the manual reward the e14/e15/e16/e17 widgets now
- *  grant (a small batch that grows with the factory), not the free full recipe. */
-function combinedGain(state: GameState, era: EraDef, n: number): GameState {
-  const cid = era.converters[0]
-  if (!cid || n <= 0) return state
-  const combined = defs.converters[cid]?.outputs[0]?.resource
-  if (!combined) return state
-  const level = state.converters[cid]?.level ?? 0
-  const mult =
-    (level + 1) *
-    converterOutputMultiplier(state, defs, cid, combined) *
-    widgetGaletMultiplier(state, defs, era.index)
-  return applyClick(state, combined, n * mult)
-}
-
 /** Eras whose widget reward is a factory-scaled +1 of the combined resource
  *  (Industry inventions + every space era) instead of the free full recipe. */
 function usesScaledCombined(era: EraDef): boolean {
   return era.widget === 'inventions' || era.uiTier === 'space'
 }
+
+/** Applies `n` widget completions to `era`, via the SAME pure gestures the UI uses
+ *  (so the sim can't drift from the real game): scaled eras grant a factory-scaled
+ *  +combined, the others the free full recipe (the map widget doubles it via its
+ *  bloc bonus). Generic space eras carry their combined on clicks, not completions. */
+function applyCompletes(state: GameState, era: EraDef, n: number): GameState {
+  if (n <= 0 || !era.converters[0]) return state
+  if (usesScaledCombined(era)) {
+    return era.widget === 'generic' ? state : applyGainCombinedScaled(state, defs, era, n).state
+  }
+  return applyComplete(state, defs, era, n * (era.widget === 'map' ? 2 : 1)).state
+}
+
 
 function measureCompleteness(state: GameState, era: EraDef): Completeness {
   const gActive = era.generators.filter((id) => (state.generators[id]?.level ?? 0) >= 1)
@@ -410,33 +400,26 @@ export function simulate(
       clicks = Math.floor(clickCarry)
       clickCarry -= clicks
     }
-    // The widget pebble (when found) doubles every manual reward (clicks + combined).
-    const widgetMult = widgetGaletMultiplier(state, defs, currentEra.index)
     const scaled = usesScaledCombined(currentEra)
     // Generic space eras (e16/e17): no bespoke widget, so the combined resource
     // rides on each CLICK (gainBase + gainCombinedScaled), as in ClickArea.
     const spaceGeneric = scaled && currentEra.widget === 'generic'
     if (clicks > 0) {
-      state = applyClick(state, currentEra.clickResource, clicks * cityMult * mapMult * widgetMult)
-      if (spaceGeneric) state = combinedGain(state, currentEra, clicks)
+      // Same gainBase the UI uses: the click yields clickYield (scales with the
+      // generator level + multipliers), not a flat +1. The city/map widgets pass a
+      // bigger `n`, modelled here as the cityMult/mapMult factor on the click count.
+      state = applyGainBase(state, defs, currentEra, clicks * cityMult * mapMult).state
+      if (spaceGeneric) state = applyGainCombinedScaled(state, defs, currentEra, clicks).state
     }
 
     if (profile.clickMode !== 'bootstrap') {
       completeCarry += profile.completesPerSecond * DT
       const completes = Math.floor(completeCarry)
       completeCarry -= completes
-      if (completes > 0 && currentEra.converters.length > 0) {
-        const cid = currentEra.converters[0]
-        if (scaled && !spaceGeneric) {
-          // Industry inventions / rocket landings: each skilled gesture grants a
-          // factory-scaled +1 of the combined resource (no free full recipe).
-          state = combinedGain(state, currentEra, completes)
-        } else if (!spaceGeneric) {
-          // Other widgets: the gesture produces the full recipe for free.
-          let n = completes * mapMult
-          while (n-- > 0) state = manualProduce(state, defs, cid)
-        }
-      }
+      // Widgets only ever produce RESOURCES for the era being played (the latest):
+      // they never touch factory levels. Earlier factories are grown by PURCHASES
+      // (below), not by replaying old widgets.
+      if (completes > 0) state = applyCompletes(state, currentEra, completes)
     }
 
     // Crises an engaged player reaches and overcomes in the current era: the
@@ -501,6 +484,16 @@ export function simulate(
       const res = doPurchases(state, profile.strategy, profile.seedMachines)
       state = res.state
       bought = res.count
+      // Engaged players (active/optimal) don't let earlier eras' resources sit idle:
+      // a second, cheapest-first pass spends each era's accumulated surplus on its
+      // own factory upgrades, so OLDER factories keep climbing - not only the latest.
+      // (A no-op for 'cheapest' profiles, whose first pass already did this; it's the
+      // 'tierFirst' optimal player, biased to the latest high tier, that it corrects.)
+      if (profile.levelsEarlierFactories) {
+        const mop = doPurchases(state, 'cheapest', false)
+        state = mop.state
+        bought += mop.count
+      }
       const starved = feederDeficit(state, currentEra)
       if (starved && !wasStarved) milestones[currentEra.index].backTrips++
       wasStarved = starved
