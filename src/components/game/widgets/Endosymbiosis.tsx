@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
-import { WidgetGalet } from './WidgetGalet'
+import { WidgetHint } from './WidgetHint'
 import { useTranslation } from '@/i18n/useTranslation'
 import { viewBoxPoint } from './svgCoords'
 import type { EraDef } from '@/lib/types'
@@ -282,10 +282,7 @@ export function Endosymbiosis({ era }: { era: EraDef }) {
         </g>
       </svg>
       <span className="text-base font-semibold text-fg">{verb}</span>
-      <span className="flex flex-col items-center gap-1.5 text-xs text-muted">
-        {t('endosymbiosis.hint')}
-        <WidgetGalet />
-      </span>
+      <WidgetHint>{t('endosymbiosis.hint')}</WidgetHint>
     </div>
   )
 }

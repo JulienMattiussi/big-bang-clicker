@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactElement } from 'react'
 import { useEraMechanic } from './useEraMechanic'
-import { WidgetGalet } from './WidgetGalet'
+import { WidgetHint } from './WidgetHint'
 import { useGameStore } from '@/store/gameStore'
 import { announceGalet } from '@/hooks/useGalets'
 import { widgetGaletForEra } from '@/lib/galets'
@@ -451,10 +451,7 @@ export function CityGrid({ era }: { era: EraDef }) {
           })}
         </div>
 
-        <span className="flex items-center justify-center gap-1.5 whitespace-pre-line text-center text-xs text-muted md:col-start-2 md:row-start-1">
-          {t('city.hint')}
-          <WidgetGalet />
-        </span>
+        <WidgetHint className="md:col-start-2 md:row-start-1">{t('city.hint')}</WidgetHint>
 
         <aside
           aria-label={t('city.sidebar')}

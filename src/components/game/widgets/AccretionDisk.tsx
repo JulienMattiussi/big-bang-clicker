@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type MouseEvent } from 'react'
 import { viewBoxPoint } from './svgCoords'
 import { useEraMechanic } from './useEraMechanic'
-import { WidgetGalet } from './WidgetGalet'
+import { WidgetHint } from './WidgetHint'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
 
@@ -359,10 +359,7 @@ export function AccretionDisk({ era }: { era: EraDef }) {
           ) : null}
         </svg>
       </button>
-      <span className="inline-flex items-center justify-center gap-1.5 text-xs text-muted">
-        {t('accretion.hint')}
-        <WidgetGalet />
-      </span>
+      <WidgetHint>{t('accretion.hint')}</WidgetHint>
     </div>
   )
 }

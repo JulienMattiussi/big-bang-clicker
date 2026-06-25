@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from '@/store/gameStore'
 import { useFeedbackStore } from '@/store/feedbackStore'
-import { WidgetGalet } from './WidgetGalet'
+import { WidgetHint } from './WidgetHint'
 import { useTranslation } from '@/i18n/useTranslation'
 import { clickYield } from '@/lib/engine'
 import { formatNumber } from '@/lib/format'
@@ -189,10 +189,7 @@ export function BohrAtom({ era }: { era: EraDef }) {
         </svg>
       </button>
       <span className="text-base font-semibold text-fg">{t(era.verbKey as TranslationKey)}</span>
-      <span className="flex flex-col items-center gap-1.5 text-xs text-muted">
-        {t('bohr.hint')}
-        <WidgetGalet />
-      </span>
+      <WidgetHint>{t('bohr.hint')}</WidgetHint>
     </div>
   )
 }

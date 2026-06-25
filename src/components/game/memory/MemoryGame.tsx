@@ -346,7 +346,11 @@ export function MemoryGame({ onClose }: { onClose: () => void }) {
                 </Button>
                 {!maxed ? (
                   <Button onClick={play} disabled={!affordable}>
-                    {phase === 'start' ? t('memory.play') : t('memory.replay')}
+                    {phase === 'start'
+                      ? t('memory.play')
+                      : phase === 'won'
+                        ? t('memory.nextLevel')
+                        : t('memory.replay')}
                   </Button>
                 ) : null}
                 {!maxed && force ? (

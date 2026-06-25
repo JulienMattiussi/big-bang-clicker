@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
 import { Icon } from '@/components/ui/Icon'
 import { defs } from '@/data'
-import { WidgetGalet } from './WidgetGalet'
+import { WidgetHint } from './WidgetHint'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { EraDef } from '@/lib/types'
 
@@ -300,10 +300,7 @@ export function WorldMap({ era }: { era: EraDef }) {
           ) : null,
         )}
       </svg>
-      <span className="inline-flex items-center justify-center gap-1.5 text-xs text-muted">
-        {t('map.hint')}
-        <WidgetGalet />
-      </span>
+      <WidgetHint>{t('map.hint')}</WidgetHint>
     </div>
   )
 }

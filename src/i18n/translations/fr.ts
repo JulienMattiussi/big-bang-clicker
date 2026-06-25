@@ -82,11 +82,11 @@ export const fr = {
   'petri.hint':
     "Tranche les cellules qui nagent pour les diviser\n3 d'un seul geste = un microbe en plus",
   'petri.divide': 'Diviser une cellule',
-  'balance.hint': "Garde l'aiguille dans la zone verte ; trouve l'équilibre dans la force",
+  'balance.hint': "Garde l'aiguille dans la zone verte\ntrouve l'équilibre dans la force",
   'balance.gauge': 'Balance atmosphérique',
   'balance.co2': 'CO₂',
   'balance.o2': 'O₂',
-  'endosymbiosis.hint': "Clique sur un organite pour l'engloutir ; fais mûrir la cellule",
+  'endosymbiosis.hint': "Clique sur un organite pour l'engloutir\nfais mûrir la cellule",
   'endosymbiosis.organelle': 'Organite',
   'assembly.hint':
     'Assemble l’organisme avant qu’il ne meure : attrape les bonnes pièces sur le tapis',
@@ -339,6 +339,7 @@ export const fr = {
   'memory.forEra': 'Ère',
   'memory.play': 'Tenter',
   'memory.replay': 'Retenter',
+  'memory.nextLevel': 'Niveau suivant',
   'memory.close': 'Fermer',
   'memory.tooPoor': 'Pas assez de Complexité',
   'memory.cardBack': 'Symbole caché',

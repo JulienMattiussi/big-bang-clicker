@@ -1,6 +1,6 @@
 import { type ReactElement, type ReactNode } from 'react'
 import { useEraMechanic } from './useEraMechanic'
-import { WidgetGalet } from './WidgetGalet'
+import { WidgetHint } from './WidgetHint'
 import { StarField } from './StarField'
 import { Galet } from '@/components/art/Galet'
 import { useSimLoop } from '@/hooks/useSimLoop'
@@ -306,10 +306,7 @@ export function RocketLaunch({ era }: { era: EraDef }): ReactElement {
         </Column>
       </div>
 
-      <span className="flex items-center justify-center gap-2 text-center text-sm text-muted">
-        {t('rocket.hint')}
-        <WidgetGalet />
-      </span>
+      <WidgetHint>{t('rocket.hint')}</WidgetHint>
     </div>
   )
 }

@@ -4,7 +4,7 @@ import { fr } from '@/i18n/translations/fr'
 import { formatNumber } from '@/lib/format'
 import { Icon } from '@/components/ui/Icon'
 import { LineChart, type LineSeries } from './charts'
-import type { RunResult } from '../types'
+import type { ProfileConfig, RunResult } from '../types'
 
 /** Era icon by index, for labelling the x axis of the milestone chart. */
 const ERA_ICON: Record<number, string> = Object.fromEntries(
@@ -35,7 +35,12 @@ const PROFILE_COLOR: Record<string, string> = {
   active: 'var(--color-accent)',
   optimal: 'var(--color-octarine)',
 }
-const runKey = (r: RunResult) => `${r.profileId}__${r.unlockPolicy}__${r.prestige ? 'p' : 'n'}`
+/** Renaissance level of a run, tolerant of pre-rebirth snapshots (which only had
+ *  the prestige boolean). */
+const rebirthsOf = (r: RunResult) => r.rebirths ?? (r.prestige ? 1 : 0)
+const metaOf = (r: RunResult) => r.metaUpgrades ?? []
+const runKey = (r: RunResult) =>
+  `${r.profileId}__${r.unlockPolicy}__r${rebirthsOf(r)}_${metaOf(r).join('-')}`
 const uid = (r: RunResult) => `${r.runId}__${runKey(r)}`
 const colorFor = (r: RunResult) => PROFILE_COLOR[r.profileId] ?? 'var(--color-fg)'
 // Line/swatch styling encodes policy (solid=asap, dashed=ready) and mode
@@ -50,6 +55,35 @@ const dashFor = (r: RunResult): string | undefined =>
       : undefined
 const borderStyleFor = (r: RunResult): 'solid' | 'dashed' | 'dotted' =>
   r.prestige ? 'dotted' : r.unlockPolicy === 'ready' ? 'dashed' : 'solid'
+
+// Fixed profile order for the legend grid (so columns line up across policy rows,
+// instead of following the data load order). Only profiles actually present show.
+const PROFILE_ORDER = ['minimal', 'casual', 'active', 'optimal']
+const LEGEND_PROFILES = PROFILE_ORDER.filter((p) => RUN_KINDS.some((r) => r.profileId === p))
+const profileLabelOf = (p: string) => RUN_KINDS.find((r) => r.profileId === p)?.profileLabel ?? p
+const profileConfigOf = (p: string) => RUN_KINDS.find((r) => r.profileId === p)?.config
+
+/** Human description of a profile's simulated behaviour, from its real config. */
+const profileTip = (c: ProfileConfig): string =>
+  [
+    c.clickMode === 'bootstrap'
+      ? `clique juste assez pour lancer l'automatisation (max ${c.clicksPerSecond}/s) puis laisse produire`
+      : `${c.clicksPerSecond} clic/s`,
+    `${c.completesPerSecond} complétion de widget/s`,
+    `réévalue les achats toutes les ${c.decisionIntervalS}s`,
+    `achats : priorité ${c.strategy === 'tierFirst' ? 'au tier le plus haut' : 'au moins cher'}`,
+    c.seedMachines ? `amorce d'abord chaque machine de la chaîne` : null,
+    c.memoryWinRate
+      ? `joue la mémoire (réussite ${c.memoryWinRate.map((x) => `${Math.round(x * 100)}%`).join(' / ')})`
+      : `ne joue pas la mémoire`,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+
+const POLICY_TIP: Record<string, string> = {
+  asap: `ASAP : franchit chaque palier dès qu'il est abordable (joueur pressé), sans finir d'activer l'ère`,
+  ready: `READY : n'avance qu'une fois l'ère pleinement activée (toutes ses machines), ou après un long blocage`,
+}
 
 function fmtDuration(s: number | null): string {
   if (s === null) return '-'
@@ -163,31 +197,61 @@ export function SimViewer() {
         </div>
       </section>
 
-      {/* Profile x policy toggles (apply to every selected snapshot). */}
-      <section className="mb-6 flex flex-col gap-1.5">
-        {(['asap', 'ready'] as const).map((policy) => (
-          <div key={policy} className="flex flex-wrap items-center gap-x-4 gap-y-1">
-            <span className="w-12 shrink-0 text-xs font-semibold text-muted uppercase">{policy}</span>
-            {RUN_KINDS.filter((r) => r.unlockPolicy === policy).map((r) => (
-              <label key={runKey(r)} className="flex cursor-pointer items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={kindsOn.has(runKey(r))}
-                  onChange={() => setKindsOn((prev) => toggleSet(prev, runKey(r)))}
-                />
-                <span
-                  aria-hidden
-                  className="inline-block h-0 w-6 border-t-2"
-                  style={{ borderColor: colorFor(r), borderStyle: borderStyleFor(r) }}
-                />
-                {r.profileLabel}
-                {r.prestige ? <span className="text-octarine">· prestige</span> : null}
-              </label>
-            ))}
-          </div>
-        ))}
+      {/* Profile x policy toggles, as an aligned grid: profiles head the columns
+          (fixed order), policies the rows; a missing run still reserves its cell so
+          nothing shifts. */}
+      <section className="mb-6 flex flex-col gap-2">
+        <div
+          className="grid items-center gap-x-5 gap-y-1.5 self-start text-sm"
+          style={{ gridTemplateColumns: `2.5rem repeat(${LEGEND_PROFILES.length}, auto)` }}
+        >
+          <span aria-hidden />
+          {LEGEND_PROFILES.map((p) => {
+            const c = profileConfigOf(p)
+            return (
+              <span
+                key={p}
+                className="cursor-help text-xs font-semibold whitespace-nowrap"
+                style={{ color: PROFILE_COLOR[p] ?? 'var(--color-fg)' }}
+                title={c ? profileTip(c) : undefined}
+              >
+                {profileLabelOf(p)}
+              </span>
+            )
+          })}
+          {(['asap', 'ready'] as const).map((policy) => [
+            <span
+              key={policy}
+              className="cursor-help text-xs font-semibold text-muted uppercase"
+              title={POLICY_TIP[policy]}
+            >
+              {policy}
+            </span>,
+            ...LEGEND_PROFILES.map((p) => {
+              const r = RUN_KINDS.find((rr) => rr.profileId === p && rr.unlockPolicy === policy)
+              if (!r) return <span key={`${policy}-${p}`} aria-hidden />
+              return (
+                <label key={`${policy}-${p}`} className="flex cursor-pointer items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={kindsOn.has(runKey(r))}
+                    onChange={() => setKindsOn((prev) => toggleSet(prev, runKey(r)))}
+                  />
+                  <span
+                    aria-hidden
+                    className="inline-block h-0 w-6 shrink-0 border-t-2"
+                    style={{ borderColor: colorFor(r), borderStyle: borderStyleFor(r) }}
+                  />
+                  {rebirthsOf(r) > 0 ? (
+                    <span className="text-xs text-octarine">r{rebirthsOf(r)}</span>
+                  ) : null}
+                </label>
+              )
+            }),
+          ])}
+        </div>
         <span className="mt-1 text-xs text-muted">
-          (couleur = profil · plein = ASAP · tirets = prêt · pointillé/fin = prestige · opacité =
+          (couleur = profil · plein = ASAP · tirets = prêt · pointillé/fin = renaissance · opacité =
           ancienneté du snapshot)
         </span>
       </section>
@@ -236,16 +300,34 @@ export function SimViewer() {
         <h2 className="mb-2 text-sm font-semibold tracking-wide text-muted uppercase">Synthèse</h2>
         <table className="w-full text-left text-sm">
           <thead className="text-xs text-muted">
-            <tr className="border-b border-border">
-              <th className="py-2 pr-4">Run</th>
-              <th className="px-2">Snapshot</th>
-              <th className="px-2">Ère atteinte</th>
-              <th className="px-2">Run 1</th>
-              <th className="px-2">Run 2 (prestige)</th>
-              <th className="px-2">Échos</th>
-              <th className="px-2">Paliers franchis</th>
-              <th className="px-2">Tout activé avant le suivant</th>
-              <th className="px-2">Retours arrière</th>
+            <tr className="border-b border-border [&>th]:cursor-help">
+              <th className="py-2 pr-4" title="Profil de joueur · politique de franchissement (ASAP = dès que possible, READY = ère pleinement activée d'abord) · niveau de renaissance et échos affectés">
+                Run
+              </th>
+              <th className="px-2" title="Horodatage du snapshot (une exécution de `make sim`) auquel appartient ce run">
+                Snapshot
+              </th>
+              <th className="px-2" title="Ère la plus avancée atteinte par le run (« mur » = bloqué avant la fin)">
+                Ère atteinte
+              </th>
+              <th className="px-2" title="Temps de jeu simulé pour atteindre la dernière ère (e19), ou « - » si jamais atteinte">
+                → ère finale
+              </th>
+              <th className="px-2" title="Temps de jeu simulé au moment de l'effondrement final (crise du gaz + contraction), ou « - » si l'univers n'a pas été détruit">
+                Destruction
+              </th>
+              <th className="px-2" title="Niveau de renaissance d'où démarre le run (rN = N renaissances, soit N échos pré-affectés), ou « - » sans renaissance">
+                Renaissance
+              </th>
+              <th className="px-2" title="Nombre de paliers d'ère franchis pendant le run">
+                Paliers franchis
+              </th>
+              <th className="px-2" title="Pour combien d'ères quittées toutes les machines (générateurs + convertisseurs) étaient actives avant de passer à la suivante ; ⚠ = ères quittées incomplètes">
+                Tout activé avant le suivant
+              </th>
+              <th className="px-2" title="Épisodes de pénurie : un feeder d'une ère antérieure passe en déclin pendant le run (retour en arrière pour le réalimenter)">
+                Retours arrière
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -272,7 +354,12 @@ export function SimViewer() {
                       }}
                     />
                     {r.profileLabel} <span className="text-muted">· {r.unlockPolicy}</span>
-                    {r.prestige ? <span className="text-octarine"> · prestige</span> : null}
+                    {rebirthsOf(r) > 0 ? (
+                      <span className="text-octarine">
+                        {' '}· renaissance {rebirthsOf(r)}
+                        {metaOf(r).length ? ` (${metaOf(r).join('+')})` : ''}
+                      </span>
+                    ) : null}
                   </td>
                   <td className="px-2 text-xs text-muted">{r.runLabel}</td>
                   <td className="px-2">
@@ -281,10 +368,10 @@ export function SimViewer() {
                   </td>
                   <td className="px-2 tabular-nums">{fmtDuration(r.cycle1S ?? null)}</td>
                   <td className="px-2 tabular-nums">
-                    {r.prestige ? fmtDuration(r.cycle2S ?? null) : '-'}
+                    {r.reachedDestruction ? fmtDuration(r.destroyedAtS ?? null) : '-'}
                   </td>
                   <td className="px-2 tabular-nums text-octarine">
-                    {r.prestige ? `+${r.echoes ?? 0}` : '-'}
+                    {rebirthsOf(r) > 0 ? `r${rebirthsOf(r)}` : '-'}
                   </td>
                   <td className="px-2 tabular-nums">{reached}</td>
                   <td className="px-2 tabular-nums">
@@ -311,7 +398,7 @@ export function SimViewer() {
             {ALL_RUNS.map((r) => (
               <option key={uid(r)} value={uid(r)}>
                 {r.profileLabel} · {r.unlockPolicy}
-                {r.prestige ? ' · prestige' : ''} · {r.runLabel}
+                {rebirthsOf(r) > 0 ? ` · renaissance ${rebirthsOf(r)}` : ''} · {r.runLabel}
               </option>
             ))}
           </select>

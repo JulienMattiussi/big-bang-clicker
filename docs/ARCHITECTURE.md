@@ -83,7 +83,7 @@ src/
 │   ├── game/             # ressources, machines (PurchasePanel + MachineRow), paliers, badges, galets ; modales (EventModal + EventHero, layout « hero » partagé) ; crise (CrisisBanner, CrisisGame plein écran + crisisWorld.ts, ResourceCrisisBadge, mini-jeux ExtinctionGame/RevoltGame/SpiceGame/SurviveGame/GasLeakGame via useCrisisWin) ; fin de jeu (EndGameModal, RebirthButton/RebirthModal) ; eraTitle.ts (titre « Ère N : Nom »)
 │   │   ├── memory/       # mini-jeu de mémoire : MemoryFeature/MemoryGame/MemoryCards/memoryDeck/Answer42 (+EraSymbolCluster), police Neogen
 │   │   ├── inventory/    # sac à dos : InventoryButton/InventoryModal
-│   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish, SingularityWidget de fin...) routés par interactive.ts ; helpers svgCoords.ts, StarField.tsx (champ d'étoiles SVG partagé)
+│   │   └── widgets/      # widgets d'ère : passifs (CoolingWidget...) + interactifs (BohrAtom, StarNursery, PeriodicTable, AccretionDisk, PetriDish, SingularityWidget de fin...) routés par interactive.ts ; descriptif partagé via WidgetHint (texte centré + WidgetGalet) ; helpers svgCoords.ts, StarField.tsx (champ d'étoiles SVG partagé)
 │   └── layout/           # coquille, navigation d'ères, EraTransition (glissement), SceneBackground (dispatcher) + scenes/ (un fichier de fond par palier), GaletReceptacle ; eraLayout.ts (disposition de page par ère, voir EraLayoutName)
 └── App.tsx               # navigation par état (pas de router)
 ```

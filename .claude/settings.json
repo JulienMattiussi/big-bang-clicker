@@ -9,7 +9,8 @@
       "Bash(grep -nE \"^#{1,3} \" docs/ARCHITECTURE.md)",
       "Bash(make -C /home/julien/Documents/MyRepos/big-bang-clicker check)",
       "Bash(make sim *)",
-      "Bash(echo \"make exit=$?\")"
+      "Bash(echo \"make exit=$?\")",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")"
     ]
   }
 }

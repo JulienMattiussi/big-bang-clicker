@@ -23,7 +23,7 @@ import { Galet } from '@/components/art/Galet'
 import { announceGalet } from '@/hooks/useGalets'
 import { widgetGaletForEra } from '@/lib/galets'
 import { useGameStore } from '@/store/gameStore'
-import { WidgetGalet } from './WidgetGalet'
+import { WidgetHint } from './WidgetHint'
 import { useTranslation } from '@/i18n/useTranslation'
 import type { TranslationKey } from '@/i18n/types'
 import type { EraDef } from '@/lib/types'
@@ -301,10 +301,7 @@ export function BodyAssembly({ era }: { era: EraDef }) {
     <div className="flex w-full flex-col items-center gap-3">
       <div className="flex flex-col items-center gap-0.5">
         <span className="text-base font-semibold text-fg">{verb}</span>
-        <span className="inline-flex items-center justify-center gap-1.5 text-xs text-muted">
-          {t('assembly.hint')}
-          <WidgetGalet />
-        </span>
+        <WidgetHint>{t('assembly.hint')}</WidgetHint>
       </div>
 
       <div className="flex items-center gap-4">

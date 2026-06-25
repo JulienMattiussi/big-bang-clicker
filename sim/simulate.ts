@@ -20,7 +20,12 @@ import { readyCrises, resolveCrisis, updateRisk } from '@/lib/crises'
 import { memoryUnlocked, memoryLevel, memoryEraMaxed, memoryStart, memoryWin } from '@/lib/memory'
 import { revealedMachines, revealedResources } from '@/lib/reveal'
 import { decliningResources, netFlows } from '@/lib/graph'
-import { discoverableGalets, widgetGaletForEra, widgetGaletMultiplier } from '@/lib/galets'
+import {
+  crisisGaletForEra,
+  discoverableGalets,
+  widgetGaletForEra,
+  widgetGaletMultiplier,
+} from '@/lib/galets'
 import type { EraDef, GameState } from '@/lib/types'
 import type {
   Completeness,
@@ -82,9 +87,10 @@ function makeRng(seedStr: string): () => number {
 
 const ERA_BY_ID: Record<string, EraDef> = Object.fromEntries(defs.eras.map((e) => [e.id, e]))
 
+/** 0-based era index (matches EraDef.index and the milestones array). NOT the
+ *  1-based era number: `e15` -> 14, not 15. */
 function eraIndexOf(eraId: string): number {
-  const n = Number(eraId.slice(1))
-  return Number.isFinite(n) ? n : 0
+  return ERA_BY_ID[eraId]?.index ?? 0
 }
 
 function nameOf(era: EraDef): string {
@@ -433,47 +439,60 @@ export function simulate(
       }
     }
 
-    // Player-triggered crises (Industry, e14): an active player reaches them via the
-    // inventions widget and overcomes them. Force the era's unresolved ones one at a
-    // time (waiting for each to resolve) so their post-crisis rebound multipliers
-    // shape the late economy, instead of never firing in a headless run.
+    // Crises an engaged player reaches and overcomes in the current era: the
+    // player-triggered ones (Industry inventions) AND the GATED threshold crises
+    // (e.g. the e17 encounter, gated by federation >= 500k) that a complexity-
+    // rushing run would otherwise skip. Force them one at a time (waiting for each
+    // to resolve), meeting any gate so the crisis can ready - modelling the player
+    // having built up to it. Their rebound multipliers AND their reward pebble
+    // (granted on resolution below) then shape the late economy.
     if (profile.completesPerSecond > 0 && t >= nextCrisisT) {
-      const eraPlayerCrises = Object.keys(defs.crises).filter(
-        (id) => defs.crises[id].eraId === currentEra.id && defs.crises[id].trigger === 'player',
-      )
-      const anyPending = eraPlayerCrises.some(
+      const eraCrises = Object.keys(defs.crises).filter((id) => {
+        const d = defs.crises[id]
+        return (
+          d.eraId === currentEra.id &&
+          (d.trigger === 'player' || (d.trigger === 'threshold' && !!d.risk.gate))
+        )
+      })
+      const anyPending = eraCrises.some(
         (id) =>
           !state.crises[id]?.resolved &&
           (state.crises[id]?.risk ?? 0) >= defs.crises[id].risk.threshold,
       )
-      const nextC = anyPending
-        ? undefined
-        : eraPlayerCrises.find(
-            (id) =>
-              !state.crises[id]?.resolved &&
-              (state.crises[id]?.risk ?? 0) < defs.crises[id].risk.threshold,
-          )
+      const nextC = anyPending ? undefined : eraCrises.find((id) => !state.crises[id]?.resolved)
       if (nextC) {
+        const def = defs.crises[nextC]
+        const resources = { ...state.resources }
+        if (def.risk.gate) {
+          resources[def.risk.gate.resource] = Math.max(
+            resources[def.risk.gate.resource] ?? 0,
+            def.risk.gate.level,
+          )
+        }
         state = {
           ...state,
+          resources,
           crises: {
             ...state.crises,
-            [nextC]: {
-              risk: defs.crises[nextC].risk.threshold,
-              resolved: false,
-              count: state.crises[nextC]?.count ?? 0,
-            },
+            [nextC]: { risk: def.risk.threshold, resolved: false, count: state.crises[nextC]?.count ?? 0 },
           },
         }
         nextCrisisT = t + CRISIS_TRIGGER_INTERVAL_S
       }
     }
 
-    // Crises resolved as soon as ready.
+    // Crises resolved as soon as ready. Overcoming one grants its reward pebble
+    // (mirrors useCrisisWin/announceGalet): notably the e17 encounter yields the
+    // Force pebble, which cuts the memory game's cost from 10% to 1% of Complexity.
     for (const cid of readyCrises(state, defs)) {
-      const eIdx = eraIndexOf(defs.crises[cid].eraId)
+      const def = defs.crises[cid]
       state = resolveCrisis(state, defs, cid)
+      const eIdx = eraIndexOf(def.eraId)
       if (milestones[eIdx]) milestones[eIdx].crisesResolved++
+      const galet = crisisGaletForEra(defs, def.eraId)
+      if (galet && !state.galets[galet.id]?.found) {
+        state = { ...state, galets: { ...state.galets, [galet.id]: { found: true, active: true } } }
+      }
     }
 
     // Purchases + back-trip detection on the decision cadence.
