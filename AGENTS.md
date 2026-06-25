@@ -91,10 +91,12 @@ tests/
 ├── unit/                 # Vitest - logique pure
 ├── component/            # Vitest + Testing Library
 └── e2e/                  # Playwright (smoke)
-sim/                      # Harnais de simulation d'équilibrage (exclu de make check)
-├── profiles.ts           # Profils de joueur (minimal, casual, active, optimal)
-├── simulate.ts           # Boucle headless d'UN run : démarre directement au niveau de renaissance demandé (bonus pré-appliqués, pas de multi-tour) et va jusqu'à la destruction de l'ère 19 (crise du gaz + contraction) ; mesure son temps mural
-├── run.sim.ts            # Écrit un snapshot daté par `make sim` ; paramétrable par variables d'env : SIM_PROFILE, SIM_POLICY (asap/ready), SIM_REBIRTHS (niveau de renaissance), SIM_META (ids de méta-upgrades affectés, séparés par des virgules : boostProduction/boostComplexity/boostClick/boostGalet). Sans SIM_PROFILE : matrice profils × politiques au niveau 0
+sim/                      # Harnais de simulation d'équilibrage (exclu de make check). Voir sim/README.md pour le mode d'emploi complet
+├── profiles.ts           # Profils de joueur (minimal, casual, active, optimal) ; clics/completes par seconde + flags (seedMachines, memoryWinRate, levelsEarlierFactories)
+├── simulate.ts           # Boucle headless d'UN run : démarre directement au niveau de renaissance demandé (bonus pré-appliqués, pas de multi-tour) et va jusqu'à la destruction de l'ère 19 (crise du gaz + contraction) ; mesure son temps mural. Plafond MAX_ITERS ~ 11,5 jours-jeu (un run finit là s'il n'a pas atteint DESTRUCTION/STUCK avant) ; constantes en tête
+├── run.sim.ts            # Écrit un snapshot daté par `make sim`. Sans variable : matrice complète 4 profils × 2 politiques au niveau 0. Cibler un run via env : SIM_PROFILE, SIM_POLICY (asap/ready), SIM_REBIRTHS (niveau de renaissance), SIM_META (ids de méta-upgrades possédés, séparés par des virgules : boostProduction/boostComplexity/boostClick/boostGalet). Snapshot = dossier `sim/results/<horodatage>__<commit>[__<cible>]/` (préfixe triable : « dernier » = nom le plus grand, pas le mtime)
+├── types.ts              # RunResult (schéma d'un résultat : finalEraIndex 0-based, reachedDestruction, stuck, series, milestones...) + ProfileConfig/RebirthConfig
+├── summary.mjs           # Résumeur CLI (`make sim-summary` [DIR=...]) : tableau lisible d'un snapshot, pour analyser un run sans relire le JSON
 └── viewer/               # Visualisation comparée ; superpose plusieurs snapshots successifs (make sim-view)
 ```
 
@@ -261,7 +263,8 @@ pas seulement à constater.
 | `make test` | Tests unitaires (e2e : `make test-e2e`) |
 | `make fix` | Format + lint |
 | `make check` | build + lint + typecheck + knip + tests unitaires |
-| `make sim` | Lance les simulations d'équilibrage (génère `sim/results/*.json`) |
+| `make sim` | Lance les simulations d'équilibrage (génère un snapshot dans `sim/results/`). Par défaut la matrice complète 4×2 (~15-20 min) ; cibler un run via SIM_PROFILE/SIM_POLICY/SIM_REBIRTHS/SIM_META (voir `sim/README.md`) |
+| `make sim-summary` | Tableau lisible du dernier snapshot (ou `make sim-summary DIR=sim/results/<id>`) |
 | `make sim-view` | Affiche l'URL du visualiseur graphique (nécessite `make start`) |
 
 ---

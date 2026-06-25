@@ -78,23 +78,28 @@ function planRuns(): { profile: ProfileConfig; policy: UnlockPolicy; rebirth: Re
 test('run balance simulations', () => {
   const generatedAt = new Date().toISOString()
   const commit = gitCommit()
-  // A targeted run (SIM_PROFILE set) tags its snapshot with the profile/policy/
-  // renaissance, so r0 and r1 land as DISTINCT, self-describing entries in the
-  // viewer's snapshot list instead of two look-alike timestamps.
   const env = process.env
   const rb = Math.max(0, Number(env.SIM_REBIRTHS ?? 0) || 0)
   const metaIds = (env.SIM_META ?? '')
     .split(',')
     .map((s) => s.trim())
     .filter(Boolean)
-  const tag = env.SIM_PROFILE
-    ? `${env.SIM_PROFILE} ${env.SIM_POLICY ?? 'asap+ready'} r${rb}${metaIds.length ? `(${metaIds.join('+')})` : ''}`
-    : ''
-  const slug = tag.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '')
+  // A whole `make sim` runs at one renaissance level, so the rebirth tag describes
+  // the SNAPSHOT (it goes in the dir slug even for a full matrix). A targeted run
+  // (SIM_PROFILE) also names its profile/policy. The runLabel stays free of the
+  // rebirth tag: the viewer derives renaissance from each run's data (rebirths +
+  // metaUpgrades), so it shows everywhere without being baked into the string.
+  const targetTag = env.SIM_PROFILE ? `${env.SIM_PROFILE} ${env.SIM_POLICY ?? 'asap+ready'}` : ''
+  const rebirthTag = rb > 0 ? `r${rb}${metaIds.length ? `(${metaIds.join('+')})` : ''}` : ''
+  const slug = [targetTag, rebirthTag]
+    .filter(Boolean)
+    .join(' ')
+    .replace(/[^a-z0-9]+/gi, '-')
+    .replace(/^-|-$/g, '')
   // A snapshot per `make sim`: sortable id (timestamp) + readable label, so the
   // viewer can overlay successive runs and tell them apart.
   const runId = `${generatedAt.slice(0, 16).replace(/[:T]/g, '-')}__${commit}${slug ? `__${slug}` : ''}`
-  const runLabel = `${generatedAt.slice(5, 16).replace('T', ' ')}${tag ? ` · ${tag}` : ''}`
+  const runLabel = `${generatedAt.slice(5, 16).replace('T', ' ')}${targetTag ? ` · ${targetTag}` : ''}`
   const meta = { runId, runLabel, gitCommit: commit, defsHash: defsHash(), generatedAt }
 
   const dir = `sim/results/${runId}`

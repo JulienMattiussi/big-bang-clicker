@@ -89,8 +89,10 @@ src/
 ```
 
 Hors `src/`, le dossier `sim/` héberge un harnais de simulation d'équilibrage
-(profils de joueur, boucle headless, visualiseur), exclu de `make check` et
-lancé via `make sim` / `make sim-view`.
+(profils de joueur, boucle headless réutilisant le vrai moteur, résumeur CLI et
+visualiseur), exclu de `make check` et lancé via `make sim` (matrice complète par
+défaut, ou un run ciblé par variables d'env), `make sim-summary` (tableau du
+dernier snapshot) et `make sim-view`. Mode d'emploi complet : `sim/README.md`.
 
 ## 3. Modèle de données (définitions statiques)
 

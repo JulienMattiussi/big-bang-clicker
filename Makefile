@@ -48,9 +48,12 @@ test-e2e: ## Run e2e tests with Playwright (installs Chromium on first run)
 test-e2e-ui: ## Run e2e tests with Playwright UI
 	npm run test:e2e:ui
 
-.PHONY: sim sim-view
-sim: ## Run balance sims -> sim/results/. Target one run with env vars: SIM_PROFILE, SIM_POLICY, SIM_REBIRTHS, SIM_META
+.PHONY: sim sim-summary sim-view
+sim: ## Run balance sims -> sim/results/. Default: full 4x2 matrix (~15-20 min). Target one run with env vars: SIM_PROFILE, SIM_POLICY, SIM_REBIRTHS, SIM_META
 	npx vitest run --config sim/vitest.sim.config.ts
+
+sim-summary: ## Print a table for the latest snapshot (or: make sim-summary DIR=sim/results/<id>)
+	@node sim/summary.mjs $(DIR)
 
 sim-view: ## Show the simulation viewer URL (needs `make start` running)
 	@echo "Viewer : http://localhost:1138/sim/viewer/  (lance 'make start' si besoin)"

@@ -21,10 +21,25 @@ const ALL_RUNS: RunResult[] = Object.values(modules)
   .map((m) => m.default)
   .sort((a, b) => b.runId.localeCompare(a.runId) || a.label.localeCompare(b.label))
 
-/** Snapshots (one per `make sim`), newest first. */
+/** Renaissance level of a run, tolerant of pre-rebirth snapshots (which only had
+ *  the prestige boolean). */
+const rebirthsOf = (r: RunResult) => r.rebirths ?? (r.prestige ? 1 : 0)
+const metaOf = (r: RunResult) => r.metaUpgrades ?? []
+/** Renaissance suffix derived from the run DATA (rebirths + Echo allocation), so
+ *  it shows even on a full-matrix snapshot whose label string never carried it. */
+const rebirthSuffix = (r: RunResult) =>
+  rebirthsOf(r) > 0 ? ` · r${rebirthsOf(r)}${metaOf(r).length ? `(${metaOf(r).join('+')})` : ''}` : ''
+
+/** Snapshots (one per `make sim`), newest first. A `make sim` runs at a single
+ *  renaissance level, so the rebirth dimension is a property of the snapshot. */
 const SNAPSHOTS = [...new Map(ALL_RUNS.map((r) => [r.runId, r])).entries()]
   .sort((a, b) => b[0].localeCompare(a[0]))
-  .map(([id, r]) => ({ id, label: r.runLabel, commit: r.gitCommit, defsHash: r.defsHash }))
+  .map(([id, r]) => ({
+    id,
+    label: r.runLabel + rebirthSuffix(r),
+    commit: r.gitCommit,
+    defsHash: r.defsHash,
+  }))
 
 /** Distinct profile x policy combos (shared across snapshots). */
 const PROFILE_COLOR: Record<string, string> = {
@@ -33,30 +48,18 @@ const PROFILE_COLOR: Record<string, string> = {
   active: 'var(--color-accent)',
   optimal: 'var(--color-octarine)',
 }
-/** Renaissance level of a run, tolerant of pre-rebirth snapshots (which only had
- *  the prestige boolean). */
-const rebirthsOf = (r: RunResult) => r.rebirths ?? (r.prestige ? 1 : 0)
-const metaOf = (r: RunResult) => r.metaUpgrades ?? []
-// One toggle per profile × policy; the renaissance dimension is told apart by
-// SNAPSHOT (each targeted run is its own snapshot), not by a separate toggle.
+// One toggle per profile × policy. The renaissance dimension is NOT encoded in the
+// line style (it would clash with the policy encoding and the per-profile legend
+// swatch): it is told apart by SNAPSHOT (its checkbox, label and opacity).
 const runKey = (r: RunResult) => `${r.profileId}__${r.unlockPolicy}`
 const uid = (r: RunResult) => `${r.runId}__${runKey(r)}`
-// One toggle per distinct run kind (profile × policy × renaissance + Echo allocation),
-// so rebirth variants of the same profile/policy stay separate instead of collapsing.
 const RUN_KINDS = [...new Map(ALL_RUNS.map((r) => [runKey(r), r])).values()]
 const colorFor = (r: RunResult) => PROFILE_COLOR[r.profileId] ?? 'var(--color-fg)'
-// Line/swatch styling encodes policy (solid=asap, dashed=ready) and mode
-// (prestige runs get a finer dash / dotted swatch) on top of colour=profile.
-const dashFor = (r: RunResult): string | undefined =>
-  r.prestige
-    ? r.unlockPolicy === 'ready'
-      ? '6 4 1 4'
-      : '1 5'
-    : r.unlockPolicy === 'ready'
-      ? '5 4'
-      : undefined
-const borderStyleFor = (r: RunResult): 'solid' | 'dashed' | 'dotted' =>
-  r.prestige ? 'dotted' : r.unlockPolicy === 'ready' ? 'dashed' : 'solid'
+// Line/swatch style encodes ONLY policy (solid=asap, dashed=ready) on top of
+// colour=profile, so the legend swatch always matches the drawn curve.
+const dashFor = (r: RunResult): string | undefined => (r.unlockPolicy === 'ready' ? '5 4' : undefined)
+const borderStyleFor = (r: RunResult): 'solid' | 'dashed' =>
+  r.unlockPolicy === 'ready' ? 'dashed' : 'solid'
 
 // Fixed profile order for the legend grid (so columns line up across policy rows,
 // instead of following the data load order). Only profiles actually present show.
@@ -254,8 +257,8 @@ export function SimViewer() {
           ])}
         </div>
         <span className="mt-1 text-xs text-muted">
-          (couleur = profil · plein = ASAP · tirets = prêt · pointillé/fin = renaissance · opacité =
-          ancienneté du snapshot)
+          (couleur = profil · plein = ASAP · tirets = prêt · opacité = ancienneté du snapshot ·
+          renaissance = indiquée sur le snapshot)
         </span>
       </section>
 
