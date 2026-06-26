@@ -111,18 +111,6 @@ le servir depuis un sous-chemin (GitHub Pages, etc.), sans configuration.
 | [docs/ROADMAP.md](./docs/ROADMAP.md) | Plan de conception et de développement |
 | [AGENTS.md](./AGENTS.md) | Conventions techniques du projet |
 
-## Contribuer
-
-Les contributions sont les bienvenues ! Quelques repères :
-
-- `make check` doit passer avant toute proposition (build + lint + typecheck +
-  knip + tests).
-- Le code (commentaires, identifiants) est en **anglais** ; seules les valeurs
-  de traduction (`src/i18n/translations/`) sont localisées.
-- Le français est la **langue source** de l'i18n ; l'anglais doit fournir
-  toutes les clés.
-- Conventions détaillées dans [AGENTS.md](./AGENTS.md).
-
 ## Licence
 
 [MIT](./LICENSE) © YavaDeus
