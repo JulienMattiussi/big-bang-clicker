@@ -10,6 +10,7 @@ import { ChainReactionScene } from '@/components/art/ChainReactionScene'
 import { Galet } from '@/components/art/Galet'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
+import { useMemoryGameStore } from '@/store/memoryGameStore'
 import { useInventoryStore } from '@/store/inventoryStore'
 import { useGaletStore } from '@/store/galetStore'
 import { useCrisisStore, CRISIS_GAMES } from '@/store/crisisStore'
@@ -41,8 +42,12 @@ export function EventModal() {
   const galet = useGameStore((s) =>
     event?.galetId ? s.defs.galets.find((g) => g.id === event.galetId) : undefined,
   )
+  // Hold any event back while the memory game is open: a crisis (or other event)
+  // readied meanwhile waits in the queue and surfaces when the window closes,
+  // instead of interrupting the player mid-game.
+  const memoryOpen = useMemoryGameStore((s) => s.open)
 
-  if (!event) return null
+  if (!event || memoryOpen) return null
 
   // Era unlock: id is `era:<id>`; the era tints the modal in its tier.
   const eraId = event.id.startsWith('era:') ? event.id.slice(4) : null

@@ -1,9 +1,9 @@
-import { useState } from 'react'
 import { Answer42 } from '@/components/game/memory/Answer42'
 import { MemoryGame } from '@/components/game/memory/MemoryGame'
 import { Icon } from '@/components/ui/Icon'
 import { useGameStore } from '@/store/gameStore'
 import { useMemoryStore } from '@/store/memoryStore'
+import { useMemoryGameStore } from '@/store/memoryGameStore'
 import { MEMORY_LEVELS, memoryEraMaxed, memoryLevel, memoryUnlocked } from '@/lib/memory'
 import { FlipIntroClone } from '@/components/ui/FlipIntroClone'
 import { useFlipIntro } from '@/hooks/useFlipIntro'
@@ -30,7 +30,8 @@ export function MemoryFeature() {
   const maxed = useGameStore((s) => memoryEraMaxed(s.state, s.state.currentEraId))
   const highlight = useMemoryStore((s) => s.highlight)
   const clearHighlight = useMemoryStore((s) => s.clearHighlight)
-  const [open, setOpen] = useState(false)
+  const open = useMemoryGameStore((s) => s.open)
+  const setOpen = useMemoryGameStore((s) => s.setOpen)
   const { btnRef, intro, landed } = useFlipIntro(highlight, clearHighlight, {
     maxSize: 680,
     vwFactor: 0.8,
