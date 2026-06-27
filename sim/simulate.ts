@@ -103,11 +103,18 @@ function usesScaledCombined(era: EraDef): boolean {
  *  +combined, the others the free full recipe (the map widget doubles it via its
  *  bloc bonus). Generic space eras carry their combined on clicks, not completions. */
 function applyCompletes(state: GameState, era: EraDef, n: number): GameState {
-  if (n <= 0 || !era.converters[0]) return state
+  const convId = era.converters[0]
+  if (n <= 0 || !convId) return state
   if (usesScaledCombined(era)) {
     return era.widget === 'generic' ? state : applyGainCombinedScaled(state, defs, era, n).state
   }
-  return applyComplete(state, defs, era, n * (era.widget === 'map' ? 2 : 1)).state
+  // Map widget: each conquer runs the recipe (convLevel + 1) times, scaled by the
+  // factory level like WorldMap.claim, on top of the ×2 bloc doubling.
+  if (era.widget === 'map') {
+    const convLevel = state.converters[convId]?.level ?? 0
+    return applyComplete(state, defs, era, n * 2 * (convLevel + 1)).state
+  }
+  return applyComplete(state, defs, era, n).state
 }
 
 

@@ -72,21 +72,21 @@ export const fr = {
   'machine.produce': 'Produire',
   'widget.temperature': 'Température',
   'bohr.hint': "Capture l'électron quand il s'approche du noyau",
-  'nursery.hint': 'Chaque clic effondre du gaz\nmartèle un point pour allumer une étoile',
+  'nursery.hint': 'Chaque clic effondre du gaz\nMartèle un point pour allumer une étoile',
 
   // Widgets interactifs (ères 4-13) : indications et libellés accessibles.
   'accretion.hint':
-    'Clique dans les amas mobiles (en suivant le clic) pour forger des planètes ; ailleurs, tu récoltes de la poussière',
-  'molecule.hint': 'Relie deux atomes pour tracer une liaison\ncomplète la molécule',
+    'Clique dans les amas mobiles pour forger des planètes ; ailleurs, tu récoltes de la poussière',
+  'molecule.hint': 'Relie deux atomes pour tracer une liaison\nComplète la molécule',
   'molecule.atom': 'Atome',
   'petri.hint':
     "Tranche les cellules qui nagent pour les diviser\n3 d'un seul geste = un microbe en plus",
   'petri.divide': 'Diviser une cellule',
-  'balance.hint': "Garde l'aiguille dans la zone verte\ntrouve l'équilibre dans la force",
+  'balance.hint': "Garde l'aiguille dans la zone verte\nTrouve l'équilibre dans la force",
   'balance.gauge': 'Balance atmosphérique',
   'balance.co2': 'CO₂',
   'balance.o2': 'O₂',
-  'endosymbiosis.hint': "Clique sur un organite pour l'engloutir\nfais mûrir la cellule",
+  'endosymbiosis.hint': "Clique sur un organite pour l'engloutir\nFais mûrir la cellule",
   'endosymbiosis.organelle': 'Organite',
   'assembly.hint':
     'Assemble l’organisme avant qu’il ne meure : attrape les bonnes pièces sur le tapis',
@@ -126,7 +126,7 @@ export const fr = {
   'idea.bonus.title': 'Esprit en éveil',
   'idea.bonus.body':
     'Dix idées reproduites sans faute : une révélation. La Complexité de cette ère est désormais DOUBLÉE (effet permanent, cumulable).',
-  'city.hint': 'Remplis la grille de bons voisinages\nassez harmonieuse, la cité prospère',
+  'city.hint': 'Remplis la grille de bons voisinages\nAssez harmonieuse, la cité prospère',
   'city.empty': 'Parcelle vide',
   'city.house': 'Habitation',
   'city.farm': 'Ferme',

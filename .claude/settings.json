@@ -10,7 +10,10 @@
       "Bash(make -C /home/julien/Documents/MyRepos/big-bang-clicker check)",
       "Bash(make sim *)",
       "Bash(echo \"make exit=$?\")",
-      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")"
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "Bash(npx tsx *)",
+      "Bash(timeout 60 env SIM_PROFILE=active SIM_POLICY=ready npx tsx sim/run.sim.ts)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }

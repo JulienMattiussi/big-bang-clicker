@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useEraMechanic } from './useEraMechanic'
+import { useGameStore } from '@/store/gameStore'
 import { Icon } from '@/components/ui/Icon'
 import { defs } from '@/data'
 import { WidgetHint } from './WidgetHint'
@@ -152,6 +153,9 @@ export function WorldMap({ era }: { era: EraDef }) {
   const converterId = era.converters[0]
   const empireRes = converterId ? defs.converters[converterId]?.outputs[0]?.resource : undefined
   const empireIcon = empireRes ? defs.resources[empireRes]?.icon : undefined
+  const convLevel = useGameStore((s) =>
+    converterId ? (s.state.converters[converterId]?.level ?? 0) : 0,
+  )
 
   const claim = (i: number) => {
     if (!revealed.has(i) || status[i] !== 'neutral') return
@@ -162,8 +166,9 @@ export function WorldMap({ era }: { era: EraDef }) {
       gainBase(bloc ? 2 : 1) // bloc bonus for adjacent holdings
     } else {
       next[i] = 'war'
-      complete()
-      if (bloc) complete()
+      const runs = convLevel + 1
+      complete(runs)
+      if (bloc) complete(runs)
     }
     // Claiming a region reveals its neighbours (they become reachable).
     setRevealed((prev) => {

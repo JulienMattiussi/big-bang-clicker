@@ -166,11 +166,14 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
   const [index, setIndex] = useState(0)
   const [drawn, setDrawn] = useState<Set<string>>(new Set())
   const [selected, setSelected] = useState<number | null>(null)
+  const [hovered, setHovered] = useState<number | null>(null)
   const [done, setDone] = useState(0)
 
   const mol = MOLECULES[index]!
   const isBond = (a: number, b: number) =>
     mol.bonds.some(([i, j]) => bondKey(i, j) === bondKey(a, b))
+  const awaitsBond = (i: number) =>
+    mol.bonds.some(([a, b]) => (a === i || b === i) && !drawn.has(bondKey(a, b)))
 
   const clickAtom = (i: number) => {
     if (selected === null) {
@@ -229,15 +232,19 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
           )
         })}
 
-        {mol.atoms.map((atom, i) => (
+        {mol.atoms.map((atom, i) => {
+          const isSelected = selected === i
+          const isHovered = hovered === i && !isSelected && awaitsBond(i)
+          return (
           <g key={i}>
             <circle
               cx={atom.x}
               cy={atom.y}
-              r="6.5"
-              fill={selected === i ? 'var(--color-accent)' : 'var(--color-surface)'}
-              stroke={TINT[atom.sym] ?? 'var(--color-border)'}
-              strokeWidth="1.8"
+              r={isSelected || isHovered ? 7.5 : 6.5}
+              fill={isSelected ? 'var(--color-accent)' : 'var(--color-surface)'}
+              stroke={isSelected || isHovered ? 'var(--color-accent)' : (TINT[atom.sym] ?? 'var(--color-border)')}
+              strokeWidth={isHovered ? 2.6 : 1.8}
+              className="transition-all duration-150"
             />
             <text
               x={atom.x}
@@ -260,6 +267,8 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
               aria-pressed={selected === i}
               aria-label={`${t('molecule.atom')} ${atom.sym}`}
               onClick={() => clickAtom(i)}
+              onMouseEnter={() => setHovered(i)}
+              onMouseLeave={() => setHovered((h) => (h === i ? null : h))}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault()
@@ -270,7 +279,8 @@ export function MoleculeBuilder({ era }: { era: EraDef }) {
               strokeWidth="2"
             />
           </g>
-        ))}
+          )
+        })}
       </svg>
       <span className="text-base font-semibold text-fg">{verb}</span>
       <WidgetHint>{t('molecule.hint')}</WidgetHint>
