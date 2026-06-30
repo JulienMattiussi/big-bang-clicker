@@ -168,7 +168,10 @@ export function GaletReceptacle() {
           role="tooltip"
           className="shadow-float modal-in absolute top-full left-0 z-30 mt-2 w-80 rounded-lg border border-octarine/40 bg-surface p-3 text-left"
         >
-          <div className="relative flex h-28 items-center justify-center">
+          <p className="text-center text-xs font-semibold tracking-wide text-octarine uppercase">
+            {t('galet.kind')}
+          </p>
+          <div className="relative mt-2 flex h-28 items-center justify-center">
             <div
               aria-hidden
               className="absolute inset-0 rounded-lg blur-xl"

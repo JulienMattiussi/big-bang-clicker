@@ -316,28 +316,38 @@ export function BodyAssembly({ era }: { era: EraDef }) {
         <div className="flex flex-col gap-1">
           <span className="text-sm font-semibold text-accent">{orgName}</span>
           <ul className="flex items-center gap-2" aria-label={`${t('assembly.plan')} : ${orgName}`}>
-            {plan.slots.map((slot, i) => (
-              <li key={i}>
-                <button
-                  type="button"
-                  onClick={() => clickSlot(i)}
-                  disabled={slot.filled}
-                  aria-label={
-                    slot.filled
-                      ? `${partName(slot.id)} (${t('assembly.fitted')})`
-                      : `${t('assembly.wanted')} : ${partName(slot.id)}`
-                  }
-                  style={{ color: colorOf(slot.id) }}
-                  className={`flex h-16 w-16 items-center justify-center rounded-lg border-2 bg-surface transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
-                    slot.filled
-                      ? 'border-current'
-                      : 'cursor-pointer border-dashed border-border opacity-70 hover:opacity-100'
-                  }`}
-                >
-                  <PartGlyph id={slot.id} filled={slot.filled} />
-                </button>
-              </li>
-            ))}
+            {plan.slots.map((slot, i) => {
+              const slotLabel = slot.filled
+                ? `${partName(slot.id)} (${t('assembly.fitted')})`
+                : `${t('assembly.wanted')} : ${partName(slot.id)}`
+              const slotBox = `flex h-16 w-16 items-center justify-center rounded-lg border-2 bg-surface transition ${
+                slot.filled ? 'border-current' : 'border-dashed border-border opacity-70'
+              }`
+              // Slots are interactive only under reduced motion (static tray, no
+              // timing): in normal play they would let the player skip the belt.
+              return (
+                <li key={i}>
+                  {reduced ? (
+                    <button
+                      type="button"
+                      onClick={() => clickSlot(i)}
+                      disabled={slot.filled}
+                      aria-label={slotLabel}
+                      style={{ color: colorOf(slot.id) }}
+                      className={`${slotBox} focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                        slot.filled ? '' : 'cursor-pointer hover:opacity-100'
+                      }`}
+                    >
+                      <PartGlyph id={slot.id} filled={slot.filled} />
+                    </button>
+                  ) : (
+                    <span aria-label={slotLabel} style={{ color: colorOf(slot.id) }} className={slotBox}>
+                      <PartGlyph id={slot.id} filled={slot.filled} />
+                    </span>
+                  )}
+                </li>
+              )
+            })}
           </ul>
         </div>
 

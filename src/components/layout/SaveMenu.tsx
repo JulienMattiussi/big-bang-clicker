@@ -10,9 +10,28 @@ type Status = 'idle' | 'error' | 'tampered'
 export function SaveMenu() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
+  const rootRef = useRef<HTMLDivElement>(null)
+
+  // Close the panel on an outside click (the toggle button lives inside the
+  // root, so it keeps working) or on Escape.
+  useEffect(() => {
+    if (!open) return
+    const onPointer = (e: PointerEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointer)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onPointer)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
 
   return (
-    <div className="relative">
+    <div ref={rootRef} className="relative">
       <Button
         variant="ghost"
         aria-expanded={open}
@@ -136,6 +155,18 @@ function SavePanel({ onDone }: { onDone: () => void }) {
           <Icon name="rotate-ccw" className="mr-1 inline h-4 w-4 align-text-bottom" />
           {confirmReset ? t('save.resetConfirm') : t('save.reset')}
         </Button>
+
+        <p className="border-t border-border pt-3 text-center text-xs text-muted">
+          {t('save.signature')}{' '}
+          <a
+            href="https://yavadeus.vercel.app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-accent transition hover:text-octarine focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            YavaDeus
+          </a>
+        </p>
       </div>
     </div>
   )

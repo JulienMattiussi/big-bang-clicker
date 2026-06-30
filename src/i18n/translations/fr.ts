@@ -21,6 +21,7 @@ export const fr = {
   'galet.found.power': 'Pouvoir',
   'galet.found.cta': "M'en emparer",
   'galet.receptacle': "Galets peints de l'infini",
+  'galet.kind': "Galet peint de l'infini",
   'galet.inactive': 'inactif',
   'galet.active': 'actif',
   'galet.toggle': 'Clic : activer / désactiver',
@@ -497,6 +498,7 @@ export const fr = {
   'save.imported.body': 'Ta progression a été restaurée à partir de la sauvegarde.',
   'save.reset': 'Réinitialiser',
   'save.resetConfirm': 'Confirmer la réinitialisation ?',
+  'save.signature': 'avec ❤️ par',
 
   'res.particle': 'Particules',
   'res.nucleon': 'Nucléons',

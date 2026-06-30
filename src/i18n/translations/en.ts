@@ -23,6 +23,7 @@ export const en: Translations = {
   'galet.found.power': 'Power',
   'galet.found.cta': 'Claim it',
   'galet.receptacle': 'Painted pebbles of infinity',
+  'galet.kind': 'Painted pebble of infinity',
   'galet.inactive': 'inactive',
   'galet.active': 'active',
   'galet.toggle': 'Click to toggle on / off',
@@ -485,6 +486,7 @@ export const en: Translations = {
   'save.imported.body': 'Your progress has been restored from the save.',
   'save.reset': 'Reset',
   'save.resetConfirm': 'Confirm reset?',
+  'save.signature': 'with ❤️ by',
 
   'res.particle': 'Particles',
   'res.nucleon': 'Nucleons',
